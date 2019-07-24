@@ -21,7 +21,7 @@
 
             <com.borjabravo.readmoretextview.ReadMoreTextView
 
-                android:id="@+id/tvPostContent"
+                android:id="@+id/tvPostContentImage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="#333"
@@ -36,7 +36,7 @@
 
             <com.vanniktech.emoji.EmojiTextView
 
-                android:id="@+id/tvPostEmojiContent"
+                android:id="@+id/tvPostEmojiContentImage"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/_5sdp"

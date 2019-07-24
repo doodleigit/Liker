@@ -3,42 +3,40 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="@dimen/_350sdp"
     android:id="@+id/onlyMim"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/_250sdp"
     android:orientation="vertical"
-    android:visibility="visible"
-    >
+    android:visibility="gone">
 
 
-        <com.borjabravo.readmoretextview.ReadMoreTextView
+    <com.borjabravo.readmoretextview.ReadMoreTextView
 
-            android:id="@+id/tvPostContent"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="@dimen/_5sdp"
-            android:textColor="#333"
-            android:gravity="center"
-            android:textSize="24sp"
-            app:colorClickableText="@android:color/holo_blue_light"
-            app:trimCollapsedText="Show less"
-            app:trimExpandedText="Show more"
-            app:trimLength="200"
-            app:trimMode="trimModeLength"
-            tools:text="Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.vHere is my first post.Here is my first post.Here is my first post. " />
+        android:id="@+id/tvPostContentMim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/_5sdp"
+        android:gravity="center"
+        android:textColor="#333"
+        android:textSize="24sp"
+        app:colorClickableText="@android:color/holo_blue_light"
+        app:trimCollapsedText="Show less"
+        app:trimExpandedText="Show more"
+        app:trimLength="200"
+        app:trimMode="trimModeLength"
+        tools:text="Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.vHere is my first post.Here is my first post.Here is my first post. " />
 
-        <com.vanniktech.emoji.EmojiTextView
+    <com.vanniktech.emoji.EmojiTextView
 
-            android:id="@+id/tvPostEmojiContent"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_margin="@dimen/_5sdp"
-            android:gravity="center"
-            android:background="@null"
-            android:imeOptions="actionSend"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:inputType="textCapSentences|textMultiLine" />
-
+        android:id="@+id/tvPostEmojiContentMim"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/_5sdp"
+        android:background="@null"
+        android:gravity="center"
+        android:imeOptions="actionSend"
+        android:inputType="textCapSentences|textMultiLine"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
 
 </LinearLayout>

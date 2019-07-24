@@ -51,4 +51,37 @@ public interface HomeService {
             @Field("post_id") String postId
     );
 
+//https://www.stg.liker.com/addSharedpost
+    @POST(AppConstants.ADD_SHARED_POST)
+    @FormUrlEncoded
+    Call<String> addSharedPost(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("user_id") String userIds,
+            @Field("post_id") String postId,
+            @Field("post_content") String postContent,
+            @Field("post_permission") int postPermission,
+            @Field("category_id") String categoryId,
+            @Field("sub_category_id") String subCategoryId,
+            @Field("post_type") String postType,
+            @Field("user_name") String userName,
+            @Field("friends") String friends
+    );
+
+
+    //https://www.stg.liker.com/send_browser_notification
+    @POST(AppConstants.SEND_BROWSER_NOTIFICATION)
+    @FormUrlEncoded
+    Call<String> sendBrowserNotification(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("to_user_id") String toUserId,//anotherId
+            @Field("from_user_id") String fromUserId,// myId
+            @Field("content_id") String contentId,
+            @Field("type") String type
+    );
+
+
 }

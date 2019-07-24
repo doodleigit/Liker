@@ -1,19 +1,26 @@
 package com.doodle.Home.service;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.os.Build;
+import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.style.UnderlineSpan;
 import android.text.util.Linkify;
+import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.MediaController;
+import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.borjabravo.readmoretextview.ReadMoreTextView;
@@ -23,15 +30,22 @@ import com.danikula.videocache.HttpProxyCacheServer;
 import com.doodle.App;
 import com.doodle.Home.model.PostFooter;
 import com.doodle.Home.model.PostItem;
+import com.doodle.Home.model.postshare.PostShareItem;
+import com.doodle.Home.view.activity.PostShare;
 import com.doodle.R;
 import com.doodle.utils.AppConstants;
 import com.doodle.utils.Operation;
+import com.doodle.utils.PrefManager;
 import com.doodle.utils.Utils;
 import com.vanniktech.emoji.EmojiTextView;
 
 import java.util.HashMap;
 import cn.jzvd.JZVideoPlayerStandard;
 import de.hdodenhof.circleimageview.CircleImageView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 import static com.doodle.App.getProxy;
 import static com.doodle.utils.Utils.containsIllegalCharacters;
 import static com.doodle.utils.Utils.getSpannableStringBuilder;
@@ -55,9 +69,27 @@ public class VideoHolder extends RecyclerView.ViewHolder  {
 
     JZVideoPlayerStandard jzVideoPlayerStandard ;
 
+    public ImageView imagePostShare;
+    private PopupMenu popup;
+    public HomeService webService;
+    public PrefManager manager;
+    private String deviceId, profileId, token, userIds;
+    private Context mContext;
+    public static final String ITEM_KEY = "item_key";
 
-    public VideoHolder(View itemView) {
+    public VideoHolder(View itemView,Context context) {
         super(itemView);
+
+
+        mContext=context;
+        manager = new PrefManager(App.getAppContext());
+        deviceId = manager.getDeviceId();
+        profileId = manager.getProfileId();
+        token = manager.getToken();
+        userIds = manager.getProfileId();
+        webService = HomeService.mRetrofit.create(HomeService.class);
+        imagePostShare = (ImageView) itemView.findViewById(R.id.imagePostShare);
+
 
         tvPostUserName = (TextView) itemView.findViewById(R.id.tvPostUserName);
         imagePostUser = (CircleImageView) itemView.findViewById(R.id.imagePostUser);
@@ -370,6 +402,73 @@ public class VideoHolder extends RecyclerView.ViewHolder  {
 
         Glide.with(App.getAppContext()).load(videoPath).apply(new RequestOptions().override(50,50)).into(jzVideoPlayerStandard.thumbImageView);
 
+        imagePostShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                popup = new PopupMenu(App.getAppContext(), v);
+                popup.getMenuInflater().inflate(R.menu.share_menu, popup.getMenu());
+
+                popup.show();
+
+                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+                        int id = menuItem.getItemId();
+
+                        if (id == R.id.shareAsPost) {
+                            String postId = item.getSharedPostId();
+                            Call<PostShareItem> call = webService.getPostDetails(deviceId, profileId, token, userIds, postId);
+                            sendShareItemRequest(call);
+
+                        }
+
+                        if (id == R.id.shareFacebook) {
+
+                        }
+                        if (id == R.id.shareTwitter) {
+                            Toast.makeText(App.getAppContext(), "Removed : ", Toast.LENGTH_SHORT).show();
+
+                        }
+
+                        if (id == R.id.copyLink) {
+
+                        }
+                        return true;
+                    }
+                });
+
+            }
+        });
+
+    }
+
+    private void sendShareItemRequest(Call<PostShareItem> call) {
+
+
+        call.enqueue(new Callback<PostShareItem>() {
+
+            @Override
+            public void onResponse(Call<PostShareItem> call, Response<PostShareItem> response) {
+
+                PostShareItem postShareItem = response.body();
+                Log.d("Data", postShareItem.toString());
+                if (postShareItem != null) {
+                    //   adapter = new BreakingPostAdapter(getActivity(), postItemList);
+                    //  Toast.makeText(mContext, "item selected " + item.getItemName(), Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(mContext, PostShare.class);
+                    //intent.putExtra(ITEM_ID_KEY,item.getItemId());
+                    intent.putExtra(ITEM_KEY, (Parcelable) postShareItem);
+                    mContext.startActivity(intent);
+                }
+
+            }
+            @Override
+            public void onFailure(Call<PostShareItem> call, Throwable t) {
+                Log.d("MESSAGE: ", t.getMessage());
+
+            }
+        });
     }
 
 

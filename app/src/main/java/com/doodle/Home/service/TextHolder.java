@@ -62,7 +62,7 @@ import static java.lang.Integer.parseInt;
 public class TextHolder extends RecyclerView.ViewHolder {
 
 
-    public static final String ITEM_KEY = "item_key";
+
 
     public TextView tvHeaderInfo, tvPostTime, tvPostUserName, tvImgShareCount, tvPostLikeCount, tvLinkScriptText;
     public CircleImageView imagePostUser;
@@ -79,30 +79,34 @@ public class TextHolder extends RecyclerView.ViewHolder {
     List<String> mentions;
     ArrayList<String> mList;
     public String full_text;
+
     public ImageView imagePostShare;
     private PopupMenu popup;
     public HomeService webService;
     public PrefManager manager;
     private String deviceId, profileId, token, userIds;
     private Context mContext;
+    public static final String ITEM_KEY = "item_key";
 
     public TextHolder(View itemView,Context context) {
         super(itemView);
+
         mContext=context;
-        mentions = new ArrayList<>();
-        mList = new ArrayList<>();
         manager = new PrefManager(App.getAppContext());
         deviceId = manager.getDeviceId();
         profileId = manager.getProfileId();
         token = manager.getToken();
         userIds = manager.getProfileId();
         webService = HomeService.mRetrofit.create(HomeService.class);
+        imagePostShare = (ImageView) itemView.findViewById(R.id.imagePostShare);
+
+        mentions = new ArrayList<>();
+        mList = new ArrayList<>();
         tvPostUserName = (TextView) itemView.findViewById(R.id.tvPostUserName);
         imagePostUser = (CircleImageView) itemView.findViewById(R.id.imagePostUser);
         tvHeaderInfo = (TextView) itemView.findViewById(R.id.tvHeaderInfo);
         tvImgShareCount = (TextView) itemView.findViewById(R.id.tvImgShareCount);
         tvPostTime = (TextView) itemView.findViewById(R.id.tvPostTime);
-        imagePostShare = (ImageView) itemView.findViewById(R.id.imagePostShare);
         tvPostLikeCount = (TextView) itemView.findViewById(R.id.tvPostLikeCount);
         //tvPostContent = (ReadMoreTextView) itemView.findViewById(R.id.tvPostContent);
         tvPostContent = (ReadMoreTextView) itemView.findViewById(R.id.tvPostContent);

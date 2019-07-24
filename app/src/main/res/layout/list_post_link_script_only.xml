@@ -20,7 +20,7 @@
             android:orientation="vertical">
 
             <com.borjabravo.readmoretextview.ReadMoreTextView
-                android:id="@+id/tvPostContent"
+                android:id="@+id/tvPostContentLink"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/_5sdp"
@@ -34,7 +34,7 @@
                 tools:text="Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.vHere is my first post.Here is my first post.Here is my first post. " />
 
             <com.vanniktech.emoji.EmojiTextView
-                android:id="@+id/tvPostEmojiContent"
+                android:id="@+id/tvPostEmojiContentLink"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/_5sdp"

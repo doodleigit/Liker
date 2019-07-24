@@ -86,5 +86,7 @@ public class AppConstants {
 
     //Post share
     public static final String GET_POST_DETAILS = "get_postdetails";
+    public static final String ADD_SHARED_POST = "addSharedpost";
+    public static final String SEND_BROWSER_NOTIFICATION = "send_browser_notification";
 
 }

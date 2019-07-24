@@ -21,7 +21,7 @@
             >
 
             <com.borjabravo.readmoretextview.ReadMoreTextView
-                android:id="@+id/tvPostContent"
+                android:id="@+id/tvPostContentLinkYoutube"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:text="Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.vHere is my first post.Here is my first post.Here is my first post. "
@@ -34,7 +34,7 @@
                 app:trimLength="200"
                 app:trimMode="trimModeLength" />
             <com.vanniktech.emoji.EmojiTextView
-                android:id="@+id/tvPostEmojiContent"
+                android:id="@+id/tvPostEmojiContentLinkYoutube"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/_5sdp"
@@ -42,13 +42,13 @@
                 android:imeOptions="actionSend"
                 android:inputType="textCapSentences|textMultiLine" />
             <ImageView
-                android:id="@+id/imgLinkScript"
+                android:id="@+id/imgLinkScriptYoutube"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_200sdp"
                 android:src="#CC1212" />
 
             <TextView
-                android:id="@+id/tvPostLinkTitle"
+                android:id="@+id/tvPostLinkTitleYoutube"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_10sdp"
@@ -59,7 +59,7 @@
                 tools:text="Title" />
 
             <TextView
-                android:id="@+id/tvPostLinkDescription"
+                android:id="@+id/tvPostLinkDescriptionYoutube"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_5sdp"
@@ -69,7 +69,7 @@
                 tools:text="Description" />
 
             <TextView
-                android:id="@+id/tvPostLinkHost"
+                android:id="@+id/tvPostLinkHostYoutube"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_5sdp"

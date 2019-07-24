@@ -259,6 +259,7 @@
                     />
 
                 <ImageView
+                    android:visibility="gone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
@@ -270,7 +271,12 @@
 
         </LinearLayout>
 
-
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/main_activity_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_400sdp"
+            android:layout_above="@+id/main_activity_emoji_bar"
+            android:visibility="gone" />
     </RelativeLayout>
 
 

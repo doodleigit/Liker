@@ -127,7 +127,8 @@ import static com.doodle.utils.Utils.isNullOrEmpty;
 
 public class PostNew extends AppCompatActivity implements View.OnClickListener,
         PostPermission.BottomSheetListener,
-        Audience.BottomSheetListener, ContributorStatus.ContributorStatusListener {
+        Audience.BottomSheetListener,
+        ContributorStatus.ContributorStatusListener {
 
     // data to populate the RecyclerView with
 
@@ -1017,7 +1018,8 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                     hasMim//0
             );
             sendNewPostRequest(call);
-        } else {
+        }
+        else {
             Utils.showNetworkDialog(getSupportFragmentManager());
             progressView.setVisibility(View.GONE);
             progressView.stopAnimation();
@@ -1055,9 +1057,9 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                         makeText(this, "name exist!", LENGTH_SHORT).show();
                         String text = contentTitle;
 
-                        String lastPlainText = text.substring((text.indexOf(name)+name.length()));
-                        mentionMessage+=lastPlainText;
-                        contentTitle=mentionMessage;
+                        String lastPlainText = text.substring((text.indexOf(name) + name.length()));
+                        mentionMessage += lastPlainText;
+                        contentTitle = mentionMessage;
                     }
 
 

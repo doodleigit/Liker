@@ -53,23 +53,23 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         if (viewType == VIEW_TYPE_TEXT_IMAGE) {
 
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_post_image, parent, false);
-            return new ImageHolder(view);
+            return new ImageHolder(view,mContext);
         }
         if (viewType == VIEW_TYPE_TEXT_LINK_SCRIPT) {
 
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_post_link_script, parent, false);
-            return new LinkScriptHolder(view);
+            return new LinkScriptHolder(view,mContext);
         }
 
         if (viewType == VIEW_TYPE_TEXT_LINK_SCRIPT_YOUTUBE) {
 
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_post_link_script_youtube, parent, false);
-            return new LinkScriptYoutubeHolder(view);
+            return new LinkScriptYoutubeHolder(view,mContext);
         }
         if (viewType == VIEW_TYPE_VIDEO) {
 
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_post_video, parent, false);
-            return new VideoHolder(view);
+            return new VideoHolder(view,mContext);
         }
         return null;
     }
