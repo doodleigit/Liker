@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/signupContainer"
+    android:orientation="vertical">
+
+    <ViewFlipper
+        android:id="@+id/viewFlipperContent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include layout="@layout/welcome" />
+
+        <include
+            android:id="@+id/loginContent"
+            layout="@layout/login" />
+
+        <include layout="@layout/forgot_password" />
+
+        <include layout="@layout/otp" />
+
+        <include layout="@layout/reset_password" />
+
+        <!--<include layout="@layout/about" />-->
+
+    </ViewFlipper>
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:background="@color/colorPrimaryDark"
+        android:scaleType="fitXY"
+        android:visibility="gone"
+        app:srcCompat="@drawable/splashanimation" />
+</LinearLayout>

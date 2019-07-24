@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: com.leocardz:link-preview:2.0.0@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/cc259fd8eac19d234980bcad974ac827/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/cc259fd8eac19d234980bcad974ac827/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

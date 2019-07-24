@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="10dp"
+    tools:context=".Authentication.view.activity.Welcome">
+
+    <TextView
+        android:visibility="invisible"
+        android:id="@+id/tvOTPCancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="20dp"
+        android:layout_weight=".2"
+        android:text="Cancel"
+        android:textColor="#57A9DD" />
+
+    <ImageView
+        android:id="@+id/imgLogo"
+        android:layout_width="70dp"
+        android:layout_height="20dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_vertical"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:layout_weight=".3"
+        android:scaleType="fitXY"
+        android:src="@drawable/logo" />
+
+    <ImageView
+        android:visibility="invisible"
+        android:id="@+id/imgOTPAbout"
+        android:layout_width="40dp"
+        android:layout_height="30dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginRight="5dp"
+        android:layout_weight=".1"
+        android:src="@drawable/ic_list_black_24dp"
+        android:tint="#798A9A" />
+
+
+    <TextView
+        android:id="@+id/tvHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/imgLogo"
+        android:gravity="center_horizontal"
+        android:text="Sign up Account"
+        android:textColor="#333333"
+        android:textStyle="bold" />
+
+
+    <TextView
+        android:id="@+id/tvOTP"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvHeader"
+        android:text="@string/otp_string_signup"
+
+        />
+
+
+    <LinearLayout
+        android:id="@+id/otpContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvOTP"
+        android:gravity="center"
+        android:orientation="vertical"
+        tools:context="com.chaos.view.example.MainActivity">
+
+        <com.chaos.view.PinView
+            android:id="@+id/firstPinView"
+            style="@style/PinWidget.PinView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:cursorVisible="true"
+            android:hint="Hint."
+            android:inputType="text"
+            android:itemBackground="@mipmap/ic_launcher"
+            android:padding="5dp"
+            android:textColor="@color/text_colors"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:cursorColor="@color/line_selected"
+            app:cursorWidth="2dp"
+            app:itemCount="6"
+            app:itemHeight="48dp"
+            app:itemRadius="4dp"
+            app:itemSpacing="5dp"
+            app:itemWidth="48dp"
+            app:lineColor="@color/line_colors"
+            app:lineWidth="2dp"
+            app:viewType="rectangle">
+
+            <requestFocus />
+        </com.chaos.view.PinView>
+
+
+        <Button
+            android:id="@+id/btnOTPContinue"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/btn_round_outline_disable"
+            android:text="Continue"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_below="@id/otpContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textColor="#57A9DD"
+
+        android:text="I did not receive the email"
+        />
+
+
+</RelativeLayout>
+

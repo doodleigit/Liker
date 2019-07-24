@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#1483c9</color>
+    <!--<color name="colorPrimaryDark">#00574B</color>-->
+    <color name="colorPrimaryDark">#005798</color>
+    <color name="colorAccent">#60b2fc</color>
+    <color name="colortext">#100b20</color>
+    <color name="colorhint">#a9aaac</color>
+    <color name="colordefault">#8596A3</color>
+
+    <color name="text_selected">#b0003a</color>
+    <color name="text_focused">#E91E63</color>
+    <color name="text_default">#F8BBD0</color>
+    <color name="text_hint_default">#BDBDBD</color>
+    <color name="line_selected">#E91E63</color>
+    <color name="line_focused">#3F51B5</color>
+    <color name="line_default">#C5CAE9</color>
+
+    //Liker color
+    <color name="colorWhite">#fff</color>
+    <color name="colorBlack">#000</color>
+    <color name="colorMainBackground">#E9ECF5</color>
+    <color name="colorHighLightBackground">#DFE3E5</color>
+    <color name="colorHighLightBackgroundTwo">#FAFAFA</color>
+    <color name="colorBlackBackground">#353430</color>
+    <color name="colorBorderBackground">#D9DADF</color>
+    <color name="colorMainBorderBackground">#C2C4CE</color>
+    <color name="colorThemeBlue">#1483C9</color>
+    <color name="colorIconText">#788898</color>
+    <color name="colorPostText">#333333</color>
+    <color name="colorPermission">#8F9192</color>
+
+    //shimmer
+    <color name="colorPlaceholderBg">#dddddd</color>
+
+    //expandable list
+    <color name="colorgroup" >#ffffff</color>
+    <color name="colorchild" >#999898</color>
+
+    //Link MetaData
+    <color name="soft_grey_select_top">#e0dddd</color>
+    <color name="soft_grey_split">#d0d0d0</color>
+    <color name="soft_grey">#777</color>
+    <color name="soft_grey_choose">#aaa</color>
+    <color name="aa">#ff007de3</color>
+
+</resources>

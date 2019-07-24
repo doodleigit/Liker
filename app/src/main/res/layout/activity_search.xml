@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Search.view.SearchActivity">
+    <include
+        android:id="@+id/main_activiy_bar"
+        layout="@layout/myappbar" />
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:layout_below="@id/main_activiy_bar"
+        android:id="@+id/shimmer_view_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <include layout="@layout/advance_search_user_item_place_holder"/>
+            <include layout="@layout/advance_search_user_item_place_holder"/>
+            <include layout="@layout/advance_search_user_item_place_holder"/>
+            <include layout="@layout/advance_search_post_item_place_holder"/>
+            <include layout="@layout/advance_search_post_item_place_holder"/>
+            <include layout="@layout/advance_search_post_item_place_holder"/>
+
+        </LinearLayout>
+
+    </com.facebook.shimmer.ShimmerFrameLayout>
+    <android.support.v7.widget.RecyclerView
+        android:layout_below="@id/main_activiy_bar"
+        android:id="@+id/rvItems"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
+
+    <com.github.rahatarmanahmed.cpv.CircularProgressView xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/progress_view"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        app:cpv_indeterminate="true" />
+</RelativeLayout>

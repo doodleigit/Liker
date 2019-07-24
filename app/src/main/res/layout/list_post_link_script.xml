@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_marginBottom="@dimen/_8sdp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include
+            android:id="@+id/containerHeader"
+            layout="@layout/list_item_post_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+        </include>
+
+        <LinearLayout
+            android:id="@+id/postBodyLayer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_below="@id/containerHeader">
+
+            <com.borjabravo.readmoretextview.ReadMoreTextView
+                android:id="@+id/tvPostContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.vHere is my first post.Here is my first post.Here is my first post. "
+                android:textColor="#333"
+                android:textSize="14sp"
+                app:colorClickableText="@android:color/holo_blue_light"
+                app:trimCollapsedText="Show less"
+                app:trimExpandedText="Show more"
+                android:layout_margin="@dimen/_5sdp"
+                app:trimLength="200"
+                app:trimMode="trimModeLength" />
+            <com.vanniktech.emoji.EmojiTextView
+                android:id="@+id/tvPostEmojiContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:imeOptions="actionSend"
+                android:layout_margin="@dimen/_5sdp"
+                android:inputType="textCapSentences|textMultiLine" />
+            <ImageView
+                android:id="@+id/imgLinkScript"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_200sdp"
+                android:src="#009688" />
+
+            <TextView
+                android:id="@+id/tvPostLinkTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginLeft="@dimen/_5sdp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@android:color/black"
+                android:textStyle="bold"
+                tools:text="Title" />
+
+            <TextView
+                android:id="@+id/tvPostLinkDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_5sdp"
+                android:layout_marginLeft="@dimen/_5sdp"
+                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:textColor="@android:color/black"
+                tools:text="Description" />
+
+            <TextView
+                android:id="@+id/tvPostLinkHost"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/_5sdp"
+                android:layout_marginLeft="@dimen/_5sdp"
+                android:layout_marginBottom="@dimen/_5sdp"
+                android:drawablePadding="@dimen/_5sdp"
+                android:drawableLeft="@drawable/ic_language_black_24dp"
+                android:drawableTint="@color/colorIconText"
+                android:textAlignment="center"
+                android:textAllCaps="true" />
+
+
+        </LinearLayout>
+
+        <include
+            layout="@layout/list_item_post_footer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/postBodyLayer" />
+
+
+    </RelativeLayout>
+</android.support.v7.widget.CardView>

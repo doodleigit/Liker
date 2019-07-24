@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/tvLikeShare"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_1sdp"
+        android:background="@color/colorPlaceholderBg" />
+
+    <TextView
+        android:id="@+id/tvLike"
+        android:layout_width="@dimen/_50sdp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerInParent="true"
+        android:layout_margin="@dimen/_5sdp"
+        android:background="@color/colorPlaceholderBg"
+        android:textColor="#788B9A" />
+
+    <ImageView
+        android:id="@+id/imgLike"
+        android:layout_width="@dimen/_20sdp"
+        android:layout_height="@dimen/_20sdp"
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="@dimen/_5sdp"
+        android:layout_marginRight="@dimen/_5sdp"
+        android:layout_toRightOf="@id/tvLike"
+        android:background="@color/colorPlaceholderBg"/>
+
+    <TextView
+        android:id="@+id/tvPostLikeCount"
+        android:layout_width="@dimen/_50sdp"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="@dimen/_5sdp"
+        android:layout_marginRight="@dimen/_5sdp"
+        android:layout_toEndOf="@id/imgLike"
+        android:layout_toRightOf="@id/imgLike"
+        android:textColor="#788B9A"
+        android:background="@color/colorPlaceholderBg"
+    />
+
+
+    <ImageView
+        android:id="@+id/imagePostShare"
+        android:layout_width="@dimen/_20sdp"
+        android:layout_height="@dimen/_20sdp"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="@dimen/_5sdp"
+        android:layout_marginRight="@dimen/_15sdp"
+        android:layout_marginBottom="@dimen/_5sdp"
+        android:layout_toLeftOf="@id/tvImgShareCount"
+        android:background="@color/colorPlaceholderBg"
+         />
+
+    <TextView
+        android:id="@+id/tvImgShareCount"
+        android:layout_width="@dimen/_20sdp"
+        android:layout_height="@dimen/_20sdp"
+        android:layout_alignParentRight="true"
+        android:layout_centerInParent="true"
+        android:layout_marginRight="@dimen/_5sdp"
+        android:background="@color/colorPlaceholderBg"
+        android:textAlignment="center" />
+</RelativeLayout>

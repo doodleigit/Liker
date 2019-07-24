@@ -1,0 +1,109 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">Liker</string>
+    <string name="copyright"><![CDATA[Copyright &#169; 2019 Liker, LLC]]></string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="test_string" formatted="false">Copyright \u00A9 2019 Liker, LLC</string>
+    <string name="otp_string">A verifiction code hase been sent to the email address associated with your account.Please type the code to reset your password</string>
+    <string name="no_internet">No Internet</string>
+    <string name="facebook_app_id">1470061779929464</string>
+    <string name="fb_login_protocol_scheme">fb1470061779929464</string>
+    <string name="retry">RETRY</string>
+    <string name="ui_fist_name">First Name Empty</string>
+    <string name="btn_resend">RESEND</string>
+    <string name="com.twitter.sdk.android.CONSUMER_KEY" tools:ignore="ExtraTranslation">ko3F8utVGev4bn7v5YS554zIU</string>
+    <string name="com.twitter.sdk.android.CONSUMER_SECRET" tools:ignore="ExtraTranslation">PJUCYZZEZadnljLo8OQ22ApwG24QZx0wsbXqSnUUFBlAjHmkBY</string>
+    <string name="otp_string_signup">A verifiction code hase been sent to the email address associated with your account.Please type the code to Sign up your Account</string>
+
+    //menu_home
+    <string name="action_how_to_use_liker">How to use Liker</string>
+    <string name="action_account_setting">Account Settings</string>
+    <string name="action_find_friends">Find Friends</string>
+    <string name="action_privacy_security">Privacy &amp; Security</string>
+    <string name="action_notification_settings">Notification Settings</string>
+    <string name="action_contributor_settings">Contributor Settings</string>
+    <string name="action_log_out">Log Out</string>
+
+    //Expandale list
+    <string name="text_alcohol">Alcohol</string>
+    <string name="text_coffee">Coffee</string>
+    <string name="text_pasta">Pasta</string>
+    <string name="text_cold_drinks">Cold Drinks</string>
+    <string name="text_expanded">Expanded</string>
+    <string name="text_collapsed">Collapsed</string>
+    <string name="tvLikeCount"><u>10</u></string>
+    <string name="search_hint">Search</string>
+
+
+    <string-array name="string_array_alcohol">
+        <item>Vodka</item>
+        <item>Rum</item>
+        <item>Whiskey</item>
+        <item>Gin</item>
+        <item>Tequila</item>
+    </string-array>
+
+    <string-array name="string_array_coffee">
+        <item>Espresso</item>
+        <item>Macchiato</item>
+        <item>Cappuccino</item>
+        <item>Cafe Latte</item>
+        <item>Ristretto</item>
+    </string-array>
+
+    <string-array name="string_array_pasta">
+        <item>Carbonara</item>
+        <item>Capellini</item>
+        <item>Spaghetti</item>
+        <item>Gnocchi</item>
+        <item>Lasagnette</item>
+    </string-array>
+
+    <string-array name="string_array_cold_drinks">
+        <item>Cola</item>
+        <item>Lemonade</item>
+        <item>Citrus soda</item>
+        <item>Juice</item>
+        <item>Sparkling Water</item>
+    </string-array>
+
+    <string name="grant">permission granted</string>
+    <string name="permission_denied">permission denied</string>
+    <string name="gallery_granted">Gallery granted</string>
+    <string name="request_permission">You must grant permission!</string>
+
+    <string name="insert_url">Insert a text containing an url</string>
+    <string name="restart">Restart</string>
+    <string name="about">About</string>
+    <string name="preview_area">Preview Area</string>
+    <string name="post_area">Post Area</string>
+    <string name="no_urls">No urls has been found</string>
+    <string name="failed_preview">Preview failed.\nClick to dismiss.</string>
+    <string name="submit">Submit</string>
+    <string name="random">Random</string>
+    <string name="post">Post</string>
+    <string name="previous">←</string>
+    <string name="forward">→</string>
+    <string name="choose_thumbnail">Choose a thumbnail</string>
+    <string name="no_thumbnail">No thumbnail</string>
+    <string name="enter_title">Enter a title</string>
+    <string name="enter_description">Enter a description</string>
+    <string name="of">of</string>
+    <string name="title_activity_about">About</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Hello world!</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="font_fontFamily_medium">sans-serif</string>
+
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="share_as_a_post">Share as a Post</string>
+    <string name="share_on_facebook">Share on Facebook</string>
+    <string name="share_on_twitter">Share on Twitter</string>
+    <string name="copy_link">Copy Link</string>
+</resources>

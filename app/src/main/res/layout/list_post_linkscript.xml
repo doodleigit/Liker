@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/holdLinkScript"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp"
+    android:baselineAligned="false"
+    android:orientation="vertical"
+    android:visibility="gone"
+    android:weightSum="3">
+
+    <com.borjabravo.readmoretextview.ReadMoreTextView
+        android:id="@+id/tvLinkScriptText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.vHere is my first post.Here is my first post.Here is my first post. "
+        android:textColor="#333"
+        android:textSize="14sp"
+        app:colorClickableText="@android:color/holo_blue_light"
+        app:trimCollapsedText="Show less"
+        app:trimExpandedText="Show more"
+        app:trimLength="200"
+        app:trimMode="trimModeLength"
+        />
+
+    <ImageView
+
+        android:id="@+id/imgLinkScript"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_200sdp"
+        tools:src="@drawable/stackoverflow" />
+
+    <TextView
+        android:id="@+id/tvPostLinkTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_10sdp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@android:color/black"
+        android:textStyle="bold"
+        tools:text="Title" />
+
+    <TextView
+        android:id="@+id/tvPostLinkDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_5sdp"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@android:color/black"
+        tools:text="Description" />
+
+    <TextView
+        android:id="@+id/tvPostLinkHost"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_5sdp"
+        android:drawableLeft="@drawable/ic_language_black_24dp"
+        android:drawableTint="@color/colorIconText"
+        android:textAlignment="center"
+        android:textAllCaps="true" />
+</LinearLayout>

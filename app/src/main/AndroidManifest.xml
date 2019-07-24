@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.doodle">
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <application
+        android:name=".App"
+        android:allowBackup="true"
+        android:hardwareAccelerated="true"
+        android:icon="@drawable/logoliker"
+        android:label="@string/app_name"
+        android:largeHeap="true"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name=".Home.view.activity.PostShare"
+            android:theme="@style/AppTheme.NoActionBar"
+            />
+        <activity
+            android:name=".Post.view.activity.GalleryView"
+            android:parentActivityName=".Post.view.activity.PostNew"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Post.view.activity.PostCategory"
+            android:parentActivityName=".Post.view.activity.PostNew"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Post.view.activity.PostNew"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustResize">
+
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
+        </activity>
+        <activity
+            android:name=".Search.view.SearchActivity"
+            android:parentActivityName=".Home.view.activity.Home"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Authentication.view.activity.LoginAgain"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <provider
+            android:name=".Search.CouponsSearchContentProvider"
+            android:authorities="com.doodle" />
+
+        <activity
+            android:name=".Search.LikerSearch"
+            android:parentActivityName=".Home.view.activity.Home"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".Home.view.CheckedActivity" />
+        <activity
+            android:name=".Authentication.view.activity.MyTwitter"
+            android:parentActivityName=".Authentication.view.activity.Welcome"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Authentication.view.activity.TwitterAuthenticationActivity"
+            android:parentActivityName=".Authentication.view.activity.MyTwitter"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".Authentication.view.activity.TwitterLogin" />
+
+        <service
+            android:name=".Authentication.service.MyService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity
+            android:name=".Authentication.view.activity.FBLogin"
+            android:parentActivityName=".Authentication.view.activity.Signup"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Authentication.view.activity.Contact"
+            android:parentActivityName=".Authentication.view.activity.About"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Authentication.view.activity.Privacy"
+            android:parentActivityName=".Authentication.view.activity.About"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Authentication.view.activity.TermService"
+            android:parentActivityName=".Authentication.view.activity.About"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Authentication.view.activity.About"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Authentication.view.activity.Signup"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Authentication.view.activity.Welcome"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Home.view.activity.Home"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar">
+        <!--    <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>-->
+        </activity>
+        <activity
+            android:name=".Authentication.view.activity.Splash"
+            android:theme="@style/AppTheme.Launcher">
+            <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+
+
+            <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".Home.Liker"
+            android:theme="@style/AppTheme.NoActionBar">
+
+<!--
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+-->
+        </activity>
+
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/app_name" />
+        <activity
+            android:name="com.facebook.CustomTabActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="@string/fb_login_protocol_scheme" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>

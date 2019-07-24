@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:id="@+id/onlyText"
+    android:visibility="gone"
+    android:orientation="vertical">
+
+
+    <com.borjabravo.readmoretextview.ReadMoreTextView
+
+        android:id="@+id/tvPostContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_5sdp"
+        android:textColor="#333"
+        android:textSize="14sp"
+        app:colorClickableText="@android:color/holo_blue_light"
+        app:trimCollapsedText="Show less"
+        app:trimExpandedText="Show more"
+        app:trimLength="200"
+        app:trimMode="trimModeLength"
+        tools:text="Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.vHere is my first post.Here is my first post.Here is my first post. " />
+
+    <com.vanniktech.emoji.EmojiTextView
+
+        android:id="@+id/tvPostEmojiContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_5sdp"
+        android:background="@null"
+        android:imeOptions="actionSend"
+        android:inputType="textCapSentences|textMultiLine" />
+
+
+</LinearLayout>
+

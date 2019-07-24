@@ -1,0 +1,57 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <include
+        android:id="@+id/main_activiy_bar"
+        layout="@layout/myappbar" />
+    <TextView
+        android:visibility="gone"
+        android:id="@+id/rl_header"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:background="#067b16"
+        android:gravity="center"
+        android:textColor="#ffffff">
+
+
+    </TextView>
+
+    <RelativeLayout
+        android:visibility="gone"
+        android:id="@+id/rl_search"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_below="@+id/rl_header"
+        android:background="#EFEFF4">
+
+        <EditText
+
+            android:id="@+id/et_search"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_centerInParent="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/drawable_search"
+            android:drawableLeft="@android:drawable/ic_menu_search"
+            android:drawablePadding="10dp"
+            android:hint="Search"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp" />
+    </RelativeLayout>
+    <com.github.rahatarmanahmed.cpv.CircularProgressView xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/progress_view"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_centerInParent="true"
+        app:cpv_indeterminate="true" />
+    <ExpandableListView
+        android:id="@+id/ExpandableListView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:dividerHeight="3dp"
+        android:layout_below="@id/main_activiy_bar"
+         />
+
+</RelativeLayout>

@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Gradle: com.erikagtierrez.multiple_media_picker:multiple-media-picker:1.0.5@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/51e8af1ffa820215b0210160b51377d9/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/51e8af1ffa820215b0210160b51377d9/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.erikagtierrez.multiple_media_picker/multiple-media-picker/1.0.5/f811c25fe66dff7995f0f2fa40855014236cac3/multiple-media-picker-1.0.5-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
