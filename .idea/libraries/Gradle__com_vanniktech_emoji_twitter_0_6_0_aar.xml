@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="Gradle: com.vanniktech:emoji-twitter:0.6.0@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/8fedefdab481b4e0eb550dee4010742f/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/8fedefdab481b4e0eb550dee4010742f/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/f21f9b301817be82261b3302ef59d61f/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/f21f9b301817be82261b3302ef59d61f/jars/classes.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

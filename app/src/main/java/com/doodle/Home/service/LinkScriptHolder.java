@@ -1,5 +1,6 @@
 package com.doodle.Home.service;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -7,6 +8,9 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Parcelable;
+import android.support.v7.view.menu.MenuBuilder;
+import android.support.v7.view.menu.MenuPopupHelper;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -18,7 +22,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -67,8 +70,8 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
    public TextView tvPostLinkTitle,tvPostLinkDescription,tvPostLinkHost;
 
 
-    public ImageView imagePostShare;
-    private PopupMenu popup;
+    public ImageView imagePostShare,imagePermission;
+    private PopupMenu popup,popupMenu;
     public HomeService webService;
     public PrefManager manager;
     private String deviceId, profileId, token, userIds;
@@ -86,6 +89,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
         userIds = manager.getProfileId();
         webService = HomeService.mRetrofit.create(HomeService.class);
         imagePostShare = (ImageView) itemView.findViewById(R.id.imagePostShare);
+        imagePermission = (ImageView) itemView.findViewById(R.id.imagePermission);
 
 
         tvPostUserName = (TextView) itemView.findViewById(R.id.tvPostUserName);
@@ -380,13 +384,17 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
 
 
         imagePostShare.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("RestrictedApi")
             @Override
             public void onClick(View v) {
 
-                popup = new PopupMenu(App.getAppContext(), v);
+                popup = new PopupMenu(mContext, v);
                 popup.getMenuInflater().inflate(R.menu.share_menu, popup.getMenu());
 
-                popup.show();
+//                popup.show();
+                MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popup.getMenu(),v);
+                menuHelper.setForceShowIcon(true);
+                menuHelper.show();
 
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
@@ -417,6 +425,52 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
 
             }
         });
+        imagePermission.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("RestrictedApi")
+            @Override
+            public void onClick(View v) {
+
+                popupMenu = new PopupMenu(mContext, v);
+                popupMenu.getMenuInflater().inflate(R.menu.post_permission_menu, popupMenu.getMenu());
+
+//                popup.show();
+                MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popupMenu.getMenu(), v);
+                menuHelper.setForceShowIcon(true);
+                menuHelper.show();
+
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+                        int id = menuItem.getItemId();
+
+                        if (id == R.id.publics) {
+                            Toast.makeText(App.getAppContext(), "publics : ", Toast.LENGTH_SHORT).show();
+                        }
+
+                        if (id == R.id.friends) {
+                            Toast.makeText(App.getAppContext(), "friends : ", Toast.LENGTH_SHORT).show();
+                        }
+                        if (id == R.id.onlyMe) {
+                            Toast.makeText(App.getAppContext(), "onlyMe : ", Toast.LENGTH_SHORT).show();
+
+                        }
+
+                        if (id == R.id.edit) {
+                            Toast.makeText(App.getAppContext(), "edit : ", Toast.LENGTH_SHORT).show();
+                        }
+                        if (id == R.id.delete) {
+                            Toast.makeText(App.getAppContext(), "delete : ", Toast.LENGTH_SHORT).show();
+                        }
+                        if (id == R.id.turnOffNotification) {
+                            Toast.makeText(App.getAppContext(), "turnOffNotification : ", Toast.LENGTH_SHORT).show();
+                        }
+                        return true;
+                    }
+                });
+
+            }
+        });
+
     }
 
     private void sendShareItemRequest(Call<PostShareItem> call) {

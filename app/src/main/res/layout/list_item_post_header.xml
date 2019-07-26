@@ -75,7 +75,7 @@
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/profile_ima"
+            android:id="@+id/imagePermission"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"

@@ -546,8 +546,8 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
             @Override
             public void afterTextChanged(Editable s) {
                 if (!isNullOrEmpty(mentionMessage)) {
-                    mentionMessage += s;
-                    makeText(PostNew.this, "mention-data: " + mentionMessage, LENGTH_SHORT).show();
+                    //mentionMessage += s;
+//                    makeText(PostNew.this, "mention-data: " + mentionMessage, LENGTH_SHORT).show();
                 }
 
                 //  List<String> extractedUrls = extractUrls("Welcome to https://stackoverflow.com/ and here is another link http://www.google.com/ \n which is a great search engine");
@@ -1054,9 +1054,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                         name = temp;
                     }
                     if (contentTitle.contains(name)) {
-                        makeText(this, "name exist!", LENGTH_SHORT).show();
                         String text = contentTitle;
-
                         String lastPlainText = text.substring((text.indexOf(name) + name.length()));
                         mentionMessage += lastPlainText;
                         contentTitle = mentionMessage;

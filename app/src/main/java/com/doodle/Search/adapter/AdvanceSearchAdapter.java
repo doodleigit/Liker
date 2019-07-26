@@ -1,17 +1,23 @@
 package com.doodle.Search.adapter;
 
 import android.content.Context;
+import android.support.v4.widget.CircularProgressDrawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.Priority;
+import com.bumptech.glide.request.RequestOptions;
 import com.doodle.App;
 import com.doodle.R;
 import com.doodle.Search.model.Post;
 import com.doodle.Search.model.User;
+import com.doodle.utils.GlideApp;
+import com.doodle.utils.GlideImageLoader;
 import com.doodle.utils.Operation;
 import com.squareup.picasso.Picasso;
 
@@ -28,10 +34,13 @@ public class AdvanceSearchAdapter extends RecyclerView.Adapter<RecyclerView.View
     List<User> mUser;
     List<Post> mPost;
 
+
     public AdvanceSearchAdapter(Context context, List<User> mUser, List<Post> mPost) {
         this.context = context;
         this.mUser = mUser;
         this.mPost = mPost;
+
+
     }
 
     @Override
@@ -40,6 +49,7 @@ public class AdvanceSearchAdapter extends RecyclerView.Adapter<RecyclerView.View
         if (viewType == VIEW_TYPE_USER) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.advance_search_user_item, parent, false);
             //    return new AdvanceSearchAd.UserViewHolder(view);
+
             return new UserViewHolder(view);
         }
 
@@ -105,10 +115,18 @@ public class AdvanceSearchAdapter extends RecyclerView.Adapter<RecyclerView.View
             tvStar.setText(String.valueOf(totalStar) + " Stars");
             tvUserName.setText(user.getFullname());
             String imagePhoto = POST_IMAGES + user.getPhoto();
+
+            RequestOptions options = new RequestOptions()
+                    .centerCrop()
+                    .placeholder(R.drawable.circle)
+                    .error(R.drawable.ic_cancel_black_24dp)
+                    .priority(Priority.HIGH);
+
+
             if (imagePhoto != null && imagePhoto.length() > 0) {
                 Picasso.with(App.getAppContext())
                         .load(imagePhoto)
-                        .placeholder(R.drawable.profile)
+                        .placeholder(R.drawable.drawable_comment)
                         .into(imgUser);
 
             }
@@ -151,20 +169,26 @@ public class AdvanceSearchAdapter extends RecyclerView.Adapter<RecyclerView.View
             tvPostText.setText(post.getPostText());
             String imagePhoto = PROFILE_IMAGE + post.getPhoto();
             String imagePost = POST_IMAGES + post.getPostImage();
+
+            RequestOptions options = new RequestOptions()
+                    .centerCrop()
+                    .placeholder(R.drawable.circle)
+                    .error(R.drawable.ic_cancel_black_24dp)
+                    .priority(Priority.HIGH);
             if (imagePhoto != null && imagePhoto.length() > 0) {
                 Picasso.with(App.getAppContext())
                         .load(imagePhoto)
                         .noFade()
-                        .placeholder(R.drawable.profile)
+                        .placeholder(R.drawable.drawable_comment)
                         .into(imgPostUser);
+
 
             }
             if (imagePost != null && imagePost.length() > 0) {
                 Picasso.with(App.getAppContext())
                         .load(imagePost)
-                        .placeholder(R.drawable.profile)
+                        .placeholder(R.drawable.drawable_comment)
                         .into(imgPostImage);
-
             }
 
             int postPermission = Integer.parseInt(post.getPostPermission());

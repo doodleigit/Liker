@@ -1,5 +1,6 @@
 package com.doodle.Home.service;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -7,18 +8,25 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Parcelable;
+
+
+import android.support.v7.view.menu.MenuBuilder;
+import android.support.v7.view.menu.MenuPopupHelper;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
+import android.text.TextPaint;
 import android.text.style.ClickableSpan;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
+
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupMenu;
+
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,6 +53,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,8 +69,6 @@ import static com.doodle.utils.Utils.getSpannableStringBuilder;
 import static java.lang.Integer.parseInt;
 
 public class TextHolder extends RecyclerView.ViewHolder {
-
-
 
 
     public TextView tvHeaderInfo, tvPostTime, tvPostUserName, tvImgShareCount, tvPostLikeCount, tvLinkScriptText;
@@ -80,18 +87,18 @@ public class TextHolder extends RecyclerView.ViewHolder {
     ArrayList<String> mList;
     public String full_text;
 
-    public ImageView imagePostShare;
-    private PopupMenu popup;
+    public ImageView imagePostShare, imagePermission;
+    private PopupMenu popup,popupMenu;
     public HomeService webService;
     public PrefManager manager;
     private String deviceId, profileId, token, userIds;
     private Context mContext;
     public static final String ITEM_KEY = "item_key";
 
-    public TextHolder(View itemView,Context context) {
+    public TextHolder(View itemView, Context context) {
         super(itemView);
 
-        mContext=context;
+        mContext = context;
         manager = new PrefManager(App.getAppContext());
         deviceId = manager.getDeviceId();
         profileId = manager.getProfileId();
@@ -99,6 +106,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
         userIds = manager.getProfileId();
         webService = HomeService.mRetrofit.create(HomeService.class);
         imagePostShare = (ImageView) itemView.findViewById(R.id.imagePostShare);
+        imagePermission = (ImageView) itemView.findViewById(R.id.imagePermission);
 
         mentions = new ArrayList<>();
         mList = new ArrayList<>();
@@ -131,7 +139,6 @@ public class TextHolder extends RecyclerView.ViewHolder {
         star14 = itemView.findViewById(R.id.star14);
         star15 = itemView.findViewById(R.id.star15);
         star16 = itemView.findViewById(R.id.star16);
-
 
 
     }
@@ -247,9 +254,17 @@ public class TextHolder extends RecyclerView.ViewHolder {
                         public void onClick(View view) {
                             Toast.makeText(App.getAppContext(), "\"You click the text.\"", Toast.LENGTH_SHORT).show();
                         }
+
+                        @Override
+                        public void updateDrawState(TextPaint ds) {
+                            ds.setColor(ds.linkColor);    // you can use custom color
+                            ds.setUnderlineText(false);    // this remove the underline
+                        }
                     };
                     if (val >= 0) {
                         str.setSpan(clickableSpan, val, val + mList.get(k).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+//                        str.setSpan(new MyClickableSpan("mystring"), val, val + mList.get(k).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
                     }
 
                 }
@@ -440,13 +455,17 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
 
         imagePostShare.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("RestrictedApi")
             @Override
             public void onClick(View v) {
 
-                popup = new PopupMenu(App.getAppContext(), v);
+                popup = new PopupMenu(mContext, v);
                 popup.getMenuInflater().inflate(R.menu.share_menu, popup.getMenu());
 
-                popup.show();
+//                popup.show();
+                MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popup.getMenu(), v);
+                menuHelper.setForceShowIcon(true);
+                menuHelper.show();
 
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
@@ -477,6 +496,51 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
             }
         });
+        imagePermission.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("RestrictedApi")
+            @Override
+            public void onClick(View v) {
+
+                popupMenu = new PopupMenu(mContext, v);
+                popupMenu.getMenuInflater().inflate(R.menu.post_permission_menu, popupMenu.getMenu());
+
+//                popup.show();
+                MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popupMenu.getMenu(), v);
+                menuHelper.setForceShowIcon(true);
+                menuHelper.show();
+
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+                        int id = menuItem.getItemId();
+
+                        if (id == R.id.publics) {
+                            Toast.makeText(App.getAppContext(), "publics : ", Toast.LENGTH_SHORT).show();
+                        }
+
+                        if (id == R.id.friends) {
+                            Toast.makeText(App.getAppContext(), "friends : ", Toast.LENGTH_SHORT).show();
+                        }
+                        if (id == R.id.onlyMe) {
+                            Toast.makeText(App.getAppContext(), "onlyMe : ", Toast.LENGTH_SHORT).show();
+
+                        }
+
+                        if (id == R.id.edit) {
+                            Toast.makeText(App.getAppContext(), "edit : ", Toast.LENGTH_SHORT).show();
+                        }
+                        if (id == R.id.delete) {
+                            Toast.makeText(App.getAppContext(), "delete : ", Toast.LENGTH_SHORT).show();
+                        }
+                        if (id == R.id.turnOffNotification) {
+                            Toast.makeText(App.getAppContext(), "turnOffNotification : ", Toast.LENGTH_SHORT).show();
+                        }
+                        return true;
+                    }
+                });
+
+            }
+        });
 
     }
 
@@ -500,6 +564,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
                 }
 
             }
+
             @Override
             public void onFailure(Call<PostShareItem> call, Throwable t) {
                 Log.d("MESSAGE: ", t.getMessage());

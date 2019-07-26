@@ -106,4 +106,9 @@
     <string name="share_on_facebook">Share on Facebook</string>
     <string name="share_on_twitter">Share on Twitter</string>
     <string name="copy_link">Copy Link</string>
+    <string name="publics">Public</string>
+    <string name="friends">Friends</string>
+    <string name="only_me">Only Me</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
 </resources>

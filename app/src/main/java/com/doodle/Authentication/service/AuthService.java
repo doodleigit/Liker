@@ -8,6 +8,9 @@ import com.doodle.Authentication.model.LoginUser;
 import com.doodle.Authentication.model.ResendStatus;
 import com.doodle.utils.AppConstants;
 
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -15,10 +18,17 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 
 public interface AuthService {
+
+/*    OkHttpClient okHttpClient = new OkHttpClient.Builder()
+            .connectTimeout(1, TimeUnit.MINUTES)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(15, TimeUnit.SECONDS)
+            .build();*/
 
     Retrofit retrofitForCity = new Retrofit.Builder()
             .baseUrl(AppConstants.BASE_URL_LOCATION)
@@ -33,6 +43,7 @@ public interface AuthService {
             .baseUrl(AppConstants.BASE_URL_LOCATION)
             .addConverterFactory(GsonConverterFactory.create())
             .build();
+
     Retrofit retrofitBase = new Retrofit.Builder()
             .baseUrl(AppConstants.BASE_URL)
             .addConverterFactory(ScalarsConverterFactory.create())
@@ -71,7 +82,6 @@ public interface AuthService {
                               @Field("is_apps") String is_apps,
                               @Field("img_url") String img_url
     );
-
     @POST(AppConstants.LOGIN_NEW)
     @FormUrlEncoded
     Call<LoginUser> loginUser(
