@@ -12,7 +12,9 @@ import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextPaint;
+import android.text.format.DateFormat;
 import android.text.method.LinkMovementMethod;
+import android.text.style.CharacterStyle;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.text.style.URLSpan;
@@ -37,6 +39,10 @@ import com.doodle.utils.fragment.Network;
 import com.marcoscg.materialtoast.MaterialToast;
 import com.vanniktech.emoji.EmojiTextView;
 
+import org.joda.time.DateTime;
+import org.joda.time.Days;
+import org.joda.time.Hours;
+import org.joda.time.Minutes;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -51,7 +57,9 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -452,4 +460,60 @@ public class Utils {
         return text;
     }
 
+    public static String chatDateCompare(Context context, long chatTime) {
+        long today = Calendar.getInstance().getTimeInMillis();
+        DateTime newTime = new DateTime(today);
+        DateTime lastTime = new DateTime(chatTime * 1000);
+        Days days = Days.daysBetween(lastTime, newTime);
+        Minutes minutes = Minutes.minutesBetween(lastTime, newTime);
+        Hours hours = Hours.hoursBetween(lastTime, newTime);
+
+        if (minutes.getMinutes() <= 59) {
+            if (minutes.getMinutes() < 1) {
+                return context.getString(R.string.few_second_ago);
+            } else {
+                return (minutes.getMinutes() == 1 ? (minutes.getMinutes() + " " + context.getString(R.string.minute_ago)) : (minutes.getMinutes() + " " + context.getString(R.string.minutes_ago)));
+            }
+        } else if (hours.getHours() <= 23) {
+            return (hours.getHours() == 1 ? (hours.getHours() + " " + context.getString(R.string.hour_ago)) : (hours.getHours() + " " + context.getString(R.string.hours_ago)));
+        } else {
+            if (days.getDays() == 1) {
+                return context.getString(R.string.yesterday);
+            } else if (days.getDays() < 7) {
+                return getDate(chatTime);
+            } else {
+                return getDate(chatTime);
+            }
+        }
+    }
+
+    private static String getDate(long time) {
+        Calendar cal = Calendar.getInstance(Locale.ENGLISH);
+        cal.setTimeInMillis(time * 1000);
+        String date = DateFormat.format("MMM dd", cal).toString();
+        return date;
+    }
+
+
+    public static CharSequence colorBackground(String text) {
+
+        Pattern pattern = Pattern.compile("#(.*?)#");
+
+        SpannableStringBuilder ssb = new SpannableStringBuilder(text);
+
+        if (pattern != null) {
+            Matcher matcher = pattern.matcher(text);
+            int matchesSoFar = 0;
+            while (matcher.find()) {
+                int start = matcher.start() - (matchesSoFar * 2);
+                int end = matcher.end() - (matchesSoFar * 2);
+                CharacterStyle span = new ForegroundColorSpan(0xFF1483c9);
+                ssb.setSpan(span, start + 1, end - 1, 0);
+                ssb.delete(start, start + 1);
+                ssb.delete(end - 2, end - 1);
+                matchesSoFar++;
+            }
+        }
+        return ssb;
+    }
 }

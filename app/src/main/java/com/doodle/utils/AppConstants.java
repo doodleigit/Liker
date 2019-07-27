@@ -89,4 +89,14 @@ public class AppConstants {
     public static final String ADD_SHARED_POST = "addSharedpost";
     public static final String SEND_BROWSER_NOTIFICATION = "send_browser_notification";
 
+
+    public static final String NEW_MESSAGE_BROADCAST = "new_message_broadcast";
+    public static final String LIST_MESSAGE_BROADCAST = "list_message_broadcast";
+    public static final String NEW_NOTIFICATION_BROADCAST = "new_notification_broadcast";
+
+    public static final String NOTIFICATION = "newNotification";
+    public static final String CHAT_USERS = "get_chat_users";
+    public static final String CHAT_MESSAGES = "get_messages";
+    public static final String FRIEND_LIST = "friendlist";
+
 }

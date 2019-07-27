@@ -1,6 +1,9 @@
 package com.doodle.Home.view.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -26,6 +29,7 @@ import com.doodle.App;
 import com.doodle.Authentication.view.activity.LoginAgain;
 import com.doodle.Home.adapter.ViewPagerAdapter;
 import com.doodle.Home.model.TopContributorStatus;
+import com.doodle.Home.service.HomeService;
 import com.doodle.Home.service.SocketIOManager;
 import com.doodle.Home.view.fragment.BreakingPost;
 import com.doodle.Home.view.fragment.FollowingPost;
@@ -33,9 +37,12 @@ import com.doodle.Home.view.fragment.TabFragment;
 import com.doodle.Home.model.Headers;
 import com.doodle.Home.model.SetUser;
 import com.doodle.Home.view.fragment.TrendingPost;
+import com.doodle.Message.view.MessageActivity;
+import com.doodle.Notification.view.NotificationActivity;
 import com.doodle.Post.view.activity.PostNew;
 import com.doodle.R;
 import com.doodle.Search.LikerSearch;
+import com.doodle.utils.AppConstants;
 import com.doodle.utils.PrefManager;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
@@ -44,36 +51,46 @@ import cn.jzvd.JZVideoPlayer;
 import de.hdodenhof.circleimageview.CircleImageView;
 import io.socket.client.Ack;
 import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 
 
 public class Home extends AppCompatActivity implements View.OnClickListener {
+
 
     private TabLayout tabLayout;
     private Toolbar toolbar;
     private CircleImageView profileImage;
     private PrefManager manager;
     private String image_url;
-    private String token, deviceId, userId, socketId;
+    private String token, deviceId, userId, socketId, mSocketId;
+    int limit = 5;
+    int offset = 0;
     private boolean isApps = true;
-    private Socket socket;
+    private Socket socket, mSocket;
+    private HomeService webService;
     private static final String TAG = Home.class.getSimpleName();
     private SetUser setUser;
     private TopContributorStatus contributorStatus;
     private Headers headers;
     private String topContributorStatus;
 
-    private CircleImageView imageNewPost, imageNotification, imageFriendRequest, imageStarContributor;
+    private ImageView imageNewPost, imageNotification, imageFriendRequest, imageStarContributor;
+    private TextView newNotificationCount, newMessageNotificationCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         manager = new PrefManager(this);
+        webService = HomeService.mRetrofit.create(HomeService.class);
         setUser = new SetUser();
         headers = new Headers();
         contributorStatus = new TopContributorStatus();
         topContributorStatus = getIntent().getStringExtra("STATUS");
 
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(AppConstants.NEW_NOTIFICATION_BROADCAST);
+        registerReceiver(broadcastReceiver, filter);
 
         findViewById(R.id.tvSearchInput).setOnClickListener(this);
         imageNewPost = findViewById(R.id.imageNewPost);
@@ -83,13 +100,15 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
         imageFriendRequest = findViewById(R.id.imageFriendRequest);
         imageFriendRequest.setOnClickListener(this);
         imageStarContributor = findViewById(R.id.imageStarContributor);
-        imageStarContributor.setOnClickListener(this);
+// imageStarContributor.setOnClickListener(this);
         profileImage = findViewById(R.id.profile_image);
+        newNotificationCount = findViewById(R.id.newNotificationCount);
+        newMessageNotificationCount = findViewById(R.id.newMessageNotificationCount);
 
         setupViewPager();
 
         setupCollapsingToolbar();
-        setupToolbar();
+// setupToolbar();
 
         image_url = manager.getProfileImage();
         deviceId = manager.getDeviceId();
@@ -105,10 +124,11 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
         }
 
 
-//        SocketIOManager ioManager = SocketIOManager.getInstance();
-//        ioManager.start();
+// SocketIOManager ioManager = SocketIOManager.getInstance();
+// ioManager.start();
 
-        socket = new SocketIOManager().getSocketInstance();
+        socket = new SocketIOManager().getWSocketInstance();
+        mSocket = SocketIOManager.mSocket;
 
         if (topContributorStatus != null) {
             String categoryId = App.getCategoryId();
@@ -152,20 +172,60 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
                     });
                     Log.d("SERIALIZATION DATA", json);
                 }
+                mSocketId = App.getmSocketId();
+                if (mSocketId != null) {
+                    headers.setDeviceId(deviceId);
+                    headers.setIsApps(true);
+                    headers.setSecurityToken(token);
+                    setUser.setSocketId(App.getmSocketId());
+                    setUser.setUserId(userId);
+                    setUser.setHeaders(headers);
+                    Gson gson = new Gson();
+                    String json = gson.toJson(setUser);
+                    mSocket.emit("set_user", json, new Ack() {
+                        @Override
+                        public void call(Object... args) {
+                            if (args != null) {
+                                Log.e(TAG, "Event error: " + args[0].toString());
+                            }
+                        }
+                    });
+                    Log.d("SERIALIZATION DATA", json);
+                }
             }
         }, 5000);
 
+        socket.on("web_notification", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                sendBroadcast((new Intent().putExtra("type", "0")).setAction(AppConstants.NEW_NOTIFICATION_BROADCAST));
+            }
+        });
 
-        /**
-         * Either you can place socket.connect() and the corresponding methods here or leave
-         * it in the SocketIOManager class. Up to you. For complete persistance, use a service
-         */
+        mSocket.on("message", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                sendBroadcast((new Intent().putExtra("type", "1")).setAction(AppConstants.NEW_NOTIFICATION_BROADCAST));
+            }
+        });
+
+        mSocket.on("message_own", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                sendBroadcast((new Intent().putExtra("type", "1")).setAction(AppConstants.NEW_NOTIFICATION_BROADCAST));
+            }
+        });
+
+/**
+ * Either you can place socket.connect() and the corresponding methods here or leave
+ * it in the SocketIOManager class. Up to you. For complete persistance, use a service
+ */
 
 
-        /**
-         * Either you can place socket.connect() and the corresponding methods here or leave
-         * it in the SocketIOManager class. Up to you. For complete persistance, use a service
-         */
+/**
+ * Either you can place socket.connect() and the corresponding methods here or leave
+ * it in the SocketIOManager class. Up to you. For complete persistance, use a service
+ */
 
 
     }
@@ -176,7 +236,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
         getSupportActionBar().setTitle("TabbedCoordinatorLayout");
         Drawable drawable = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_arrow_drop_down);
         toolbar.setOverflowIcon(drawable);
-        //  getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+// getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     private void setupCollapsingToolbar() {
@@ -184,7 +244,6 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
                 R.id.collapse_toolbar);
         collapsingToolbar.setTitleEnabled(false);
     }
-
 
 
     /**
@@ -228,6 +287,26 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
         viewPager.setAdapter(adapter);
     }
 
+    private void setNotificationCount(int count) {
+        if (count > 0) {
+            newNotificationCount.setVisibility(View.VISIBLE);
+            newNotificationCount.setText(String.valueOf(count));
+        } else {
+            newNotificationCount.setVisibility(View.GONE);
+            newNotificationCount.setText("");
+        }
+    }
+
+    private void setMessageNotificationCount(int count) {
+        if (count > 0) {
+            newMessageNotificationCount.setVisibility(View.VISIBLE);
+            newMessageNotificationCount.setText(String.valueOf(count));
+        } else {
+            newMessageNotificationCount.setVisibility(View.GONE);
+            newMessageNotificationCount.setText("");
+        }
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.home_menu, menu);
@@ -261,28 +340,48 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
             case R.id.imageNewPost:
                 startActivity(new Intent(this, PostNew.class));
                 Toast.makeText(this, "new post", Toast.LENGTH_SHORT).show();
-                imageNewPost.setCircleBackgroundColor(getResources().getColor(R.color.colorWhite));
+// imageNewPost.setCircleBackgroundColor(getResources().getColor(R.color.colorWhite));
                 imageNewPost.setImageResource(R.drawable.ic_mode_edit_blue_24dp);
                 break;
             case R.id.imageNotification:
-                startActivity(new Intent(this, PostNew.class));
-                imageNotification.setCircleBackgroundColor(getResources().getColor(R.color.colorWhite));
-                imageNotification.setImageResource(R.drawable.ic_notifications_none_blue_24dp);
+                manager.setNotificationCountClear();
+                setNotificationCount(0);
+                startActivity(new Intent(this, NotificationActivity.class));
+// imageNotification.setCircleBackgroundColor(getResources().getColor(R.color.colorWhite));
+// imageNotification.setImageResource(R.drawable.ic_notifications_none_blue_24dp);
                 break;
 
             case R.id.imageFriendRequest:
-                startActivity(new Intent(this, PostNew.class));
-                imageFriendRequest.setCircleBackgroundColor(getResources().getColor(R.color.colorWhite));
-                imageFriendRequest.setImageResource(R.drawable.ic_people_outline_blue_24dp);
+                manager.setMessageNotificationCountClear();
+                setMessageNotificationCount(0);
+                startActivity(new Intent(this, MessageActivity.class));
+// imageFriendRequest.setCircleBackgroundColor(getResources().getColor(R.color.colorWhite));
+// imageFriendRequest.setImageResource(R.drawable.ic_people_outline_blue_24dp);
                 break;
 
             case R.id.imageStarContributor:
                 startActivity(new Intent(this, PostNew.class));
-                imageStarContributor.setCircleBackgroundColor(getResources().getColor(R.color.colorWhite));
-                imageStarContributor.setImageResource(R.drawable.ic_star_border_blue_24dp);
+// imageStarContributor.setCircleBackgroundColor(getResources().getColor(R.color.colorWhite));
+// imageStarContributor.setImageResource(R.drawable.ic_star_border_blue_24dp);
                 break;
         }
     }
+
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String type = intent.getStringExtra("type");
+            if (type.equals("0")) {
+                manager.setNotificationCount();
+                int newCount = manager.getNotificationCount();
+                setNotificationCount(newCount);
+            } else {
+                manager.setMessageNotificationCount();
+                int newCount = manager.getMessageNotificationCount();
+                setMessageNotificationCount(newCount);
+            }
+        }
+    };
 
     @Override
     public void onBackPressed() {
@@ -292,10 +391,19 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
         JZVideoPlayer.releaseAllVideos();
         super.onBackPressed();
     }
+
     @Override
     protected void onPause() {
         super.onPause();
         JZVideoPlayer.releaseAllVideos();
 
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(broadcastReceiver);
+        socket.off("web_notification");
+    }
+
 }

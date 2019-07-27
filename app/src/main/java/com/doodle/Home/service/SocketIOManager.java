@@ -3,8 +3,10 @@ package com.doodle.Home.service;
 import android.util.Log;
 
 import com.doodle.App;
+import com.doodle.Home.model.Headers;
 import com.doodle.utils.AppConstants;
 import com.doodle.utils.PrefManager;
+import com.google.gson.Gson;
 
 import java.net.URISyntaxException;
 import java.util.Map;
@@ -21,14 +23,13 @@ import io.socket.engineio.client.Transport;
 public class SocketIOManager {
     private static final String TAG = SocketIOManager.class.getSimpleName();
 
-
-
     private static SocketIOManager mInstance;
     //Added @null
-    private Socket mSocket = null;
+    public static Socket mSocket = null, wSocket = null;
     private PrefManager manager;
     private String token, deviceId, userId, socketId;
-    public Socket getSocketInstance() {
+
+    public Socket getMSocketInstance() {
         manager = new PrefManager(App.getInstance());
         // To ensure the SAME instance of socket can be called from any activity/ fragment in the app
         //IF this is not done as is, the methods will not be attached properly to the socket
@@ -38,8 +39,8 @@ public class SocketIOManager {
         token = manager.getToken();
         if (mSocket == null) {
             try {
-                mSocket = IO.socket(AppConstants.SOCKET_WEB);
-                initializeSocket();
+                mSocket = IO.socket(AppConstants.SOCKET_MESSAGE);
+                initializeMessageSocket();
             } catch (URISyntaxException e) {
                 e.printStackTrace();
             }
@@ -47,7 +48,64 @@ public class SocketIOManager {
         return mSocket;
     }
 
-    private void initializeSocket() {
+    public Socket getWSocketInstance() {
+        manager = new PrefManager(App.getInstance());
+        // To ensure the SAME instance of socket can be called from any activity/ fragment in the app
+        //IF this is not done as is, the methods will not be attached properly to the socket
+
+        deviceId = manager.getDeviceId();
+        userId = manager.getProfileId();
+        token = manager.getToken();
+        if (wSocket == null) {
+            try {
+                wSocket = IO.socket(AppConstants.SOCKET_WEB);
+                initializeWebSocket();
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+        }
+        getMSocketInstance();
+        return wSocket;
+    }
+
+    private void initializeWebSocket() {
+        /**
+         * In case you decide to add socket methods in different class, this can be ignored
+         */
+        wSocket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                Log.d(TAG, "EVENT connect");
+
+                String id = wSocket.connect().id();
+                App.setSocketId(id);
+                Log.d(TAG, "call: " + id);
+            }
+        }).on(Socket.EVENT_ERROR, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                if (args != null) {
+                    Log.e(TAG, "Event error: " + args[0].toString());
+                }
+            }
+        }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                Log.e("TAG", "Event disconnect, Socket is disconnected");
+            }
+        }).on("test", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                if (args != null) {
+                    Log.e(TAG, "Event error: " + args[0].toString());
+                }
+            }
+        });
+
+        wSocket.connect();
+    }
+
+    private void initializeMessageSocket() {
         /**
          * In case you decide to add socket methods in different class, this can be ignored
          */
@@ -57,7 +115,7 @@ public class SocketIOManager {
                 Log.d(TAG, "EVENT connect");
 
                 String id = mSocket.connect().id();
-                App.setSocketId(id);
+                App.setmSocketId(id);
                 Log.d(TAG, "call: " + id);
             }
         }).on(Socket.EVENT_ERROR, new Emitter.Listener() {
@@ -83,7 +141,6 @@ public class SocketIOManager {
 
         mSocket.connect();
     }
-
 
 //    private SocketIOManager() {
 //        try {

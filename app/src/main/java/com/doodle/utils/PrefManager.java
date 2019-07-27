@@ -42,6 +42,10 @@ public class PrefManager {
     private static final String TWITTER__IMAGE_URL = "image_url";
     private static final String POST_PERMISSION = "post_permission";
     private static final String POST_AUDIENCE = "post_audience";
+    private static final String NEW_NOTIFICATION = "new_notification";
+    private static final String NEW_MESSAGE_NOTIFICATION = "new_message_notification";
+
+
 
     public PrefManager(Context context) {
         this._context = context;
@@ -62,6 +66,34 @@ public class PrefManager {
     public void setSecondTimeLaunch(boolean isSecondtTime) {
         editor.putBoolean(IS_SECOND_TIME_LAUNCH, isSecondtTime);
         editor.apply();
+    }
+
+    public void setNotificationCount() {
+        editor.putInt(NEW_NOTIFICATION, getNotificationCount() + 1);
+        editor.apply();
+    }
+
+    public void setNotificationCountClear() {
+        editor.putInt(NEW_NOTIFICATION, 0);
+        editor.apply();
+    }
+
+    public void setMessageNotificationCount() {
+        editor.putInt(NEW_MESSAGE_NOTIFICATION, getMessageNotificationCount() + 1);
+        editor.apply();
+    }
+
+    public void setMessageNotificationCountClear() {
+        editor.putInt(NEW_MESSAGE_NOTIFICATION, 0);
+        editor.apply();
+    }
+
+    public int getNotificationCount() {
+        return pref.getInt(NEW_NOTIFICATION, 0);
+    }
+
+    public int getMessageNotificationCount() {
+        return pref.getInt(NEW_MESSAGE_NOTIFICATION, 0);
     }
 
 //    public boolean isFirstTimeLaunch() {

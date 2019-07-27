@@ -38,7 +38,7 @@ public class App extends Application {
     PrefManager manager;
     private static Category mCategory;
     private static Subcatg mSubcatg;
-
+    private static String mSocketId;
 
 
     private HttpProxyCacheServer proxy;
@@ -82,6 +82,14 @@ public class App extends Application {
 
     public static void setSocketId(String socketId) {
         App.socketId = socketId;
+    }
+
+    public static String getmSocketId() {
+        return mSocketId;
+    }
+
+    public static void setmSocketId(String mSocketId) {
+        App.mSocketId = mSocketId;
     }
 
     @Override

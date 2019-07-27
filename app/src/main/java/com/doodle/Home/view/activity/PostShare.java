@@ -139,7 +139,7 @@ public class PostShare extends AppCompatActivity implements
         if (item == null) {
             throw new AssertionError("Null data item received!");
         }
-        socket = new SocketIOManager().getSocketInstance();
+        socket = SocketIOManager.wSocket;
         headers = new Headers();
         postShares = new PostShares();
         networkOk = NetworkHelper.hasNetworkAccess(this);

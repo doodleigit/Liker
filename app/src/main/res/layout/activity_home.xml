@@ -31,6 +31,194 @@
                 android:visibility="gone"
                 app:layout_collapseMode="parallax" />
 
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_40sdp"
+                    android:background="@android:color/white"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:weightSum="4">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/selectable_background"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp">
+
+                        <ImageView
+
+                            android:id="@+id/imageNewPost"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:clickable="true"
+                            android:foreground="@drawable/my_selector"
+                            android:paddingLeft="@dimen/_2sdp"
+                            android:src="@drawable/post"
+                            android:text="New Post" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/new_post"
+                            android:textColor="@color/soft_grey"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:visibility="gone" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/selectable_background"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp">
+
+                        <RelativeLayout
+                            android:layout_width="40dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginEnd="10dp">
+
+                            <ImageView
+                                android:id="@+id/imageNotification"
+                                android:layout_width="30dp"
+                                android:layout_height="30dp"
+                                android:layout_centerInParent="true"
+                                android:layout_gravity="center"
+                                android:src="@drawable/notifications" />
+
+                            <TextView
+                                android:id="@+id/newNotificationCount"
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:layout_alignParentStart="true"
+                                android:layout_alignParentTop="true"
+                                android:background="@drawable/circle_red"
+                                android:gravity="center"
+                                android:text=""
+                                android:textColor="@android:color/white"
+                                android:textSize="8sp"
+                                android:textStyle="bold"
+                                android:visibility="invisible" />
+
+                        </RelativeLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/notifications"
+                            android:textColor="@color/soft_grey"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:visibility="gone" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/selectable_background"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp">
+
+                        <RelativeLayout
+                            android:layout_width="40dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginEnd="10dp">
+
+                            <ImageView
+                                android:id="@+id/imageFriendRequest"
+                                android:layout_width="30dp"
+                                android:layout_height="30dp"
+                                android:layout_centerInParent="true"
+                                android:layout_gravity="center"
+                                android:src="@drawable/message" />
+
+                            <TextView
+                                android:id="@+id/newMessageNotificationCount"
+                                android:layout_width="16dp"
+                                android:layout_height="16dp"
+                                android:layout_alignParentStart="true"
+                                android:layout_alignParentTop="true"
+                                android:background="@drawable/circle_red"
+                                android:gravity="center"
+                                android:text=""
+                                android:textColor="@android:color/white"
+                                android:textSize="8sp"
+                                android:textStyle="bold"
+                                android:visibility="invisible" />
+
+                        </RelativeLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/friend_requests"
+                            android:textColor="@color/soft_grey"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:visibility="gone" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:background="@drawable/selectable_background"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="10dp">
+
+                        <ImageView
+
+                            android:id="@+id/imageStarContributor"
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/star_contributors"
+                            android:text="Friend Request" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/star_contributors"
+                            android:textColor="@color/soft_grey"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:visibility="gone" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </RelativeLayout>
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -38,19 +226,19 @@
                 android:layout_height="wrap_content"
                 android:gravity="top"
                 android:minHeight="?attr/actionBarSize"
+                app:contentInsetStartWithNavigation="0dp"
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                 app:titleMarginTop="15dp">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingTop="8dp">
+                    android:layout_height="match_parent">
 
                     <LinearLayout
                         android:id="@+id/tools"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/_45sdp"
+                        android:layout_height="@dimen/_40sdp"
                         android:layout_alignParentStart="true"
                         android:layout_centerVertical="true"
                         android:orientation="horizontal"
@@ -70,18 +258,19 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginEnd="10dp"
                             android:layout_weight="1"
                             android:orientation="vertical">
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_gravity="center"
+                                android:layout_gravity="start|center"
                                 android:drawableLeft="@drawable/ic_search_black_24dp"
                                 android:drawableTint="@android:color/white"
                                 android:text="Search"
                                 android:textColor="@android:color/white" />
-
 
                             <View
                                 android:layout_width="wrap_content"
@@ -118,66 +307,6 @@
 
                     </LinearLayout>
 
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/tools"
-                        android:gravity="center"
-                        android:orientation="horizontal"
-
-                        android:paddingTop="15dp">
-
-
-                        <de.hdodenhof.circleimageview.CircleImageView
-
-                            android:id="@+id/imageNewPost"
-                            android:layout_width="@dimen/_20sdp"
-                            android:layout_height="@dimen/_20sdp"
-                            android:layout_gravity="center"
-                            android:layout_marginRight="30dp"
-                            android:clickable="true"
-                            android:foreground="@drawable/my_selector"
-                            android:paddingLeft="@dimen/_2sdp"
-                            android:src="@drawable/ic_mode_edit_black_24dp"
-                            android:text="New Post"
-                            app:civ_circle_background_color="@android:color/black" />
-
-                        <de.hdodenhof.circleimageview.CircleImageView
-
-                            android:id="@+id/imageNotification"
-                            android:layout_width="@dimen/_20sdp"
-                            android:layout_height="@dimen/_20sdp"
-                            android:layout_gravity="center"
-                            android:layout_marginRight="15dp"
-                            android:src="@drawable/ic_notifications_none_black_24dp"
-                            android:text="Notifications"
-                            app:civ_circle_background_color="@android:color/black"
-
-                            />
-
-                        <de.hdodenhof.circleimageview.CircleImageView
-
-                            android:id="@+id/imageFriendRequest"
-                            android:layout_width="@dimen/_20sdp"
-                            android:layout_height="@dimen/_20sdp"
-                            android:layout_gravity="center"
-                            android:layout_marginLeft="15dp"
-                            android:src="@drawable/ic_people_outline_black_24dp"
-                            android:text="Friend Request"
-                            app:civ_circle_background_color="@android:color/black" />
-
-                        <de.hdodenhof.circleimageview.CircleImageView
-
-                            android:id="@+id/imageStarContributor"
-                            android:layout_width="@dimen/_20sdp"
-                            android:layout_height="@dimen/_20sdp"
-                            android:layout_marginLeft="30dp"
-                            android:src="@drawable/ic_star_border_black_24dp"
-                            android:text="Friend Request"
-                            app:civ_circle_background_color="@android:color/black" />
-
-                    </LinearLayout>
 
                 </RelativeLayout>
 
