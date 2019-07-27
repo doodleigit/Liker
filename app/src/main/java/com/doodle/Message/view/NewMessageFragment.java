@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -95,6 +96,7 @@ public class NewMessageFragment extends Fragment {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
                 getActivity().onBackPressed();
             }
         });

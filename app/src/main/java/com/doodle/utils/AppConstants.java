@@ -1,18 +1,13 @@
 package com.doodle.utils;
 
-import android.widget.Button;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-
 public class AppConstants {
 
     //===============LOCAL SERVER==================
-//    public static final String BASE_URL = "http://192.168.0.99:8040/sites/likeropt/";
-//    public static final String BASE_URL_MEDIA = "http://192.168.0.99:8040/sites/likeropt/";
-//    public static final String SOCKET_WEB = "http://192.168.0.99:4001";
-//    public static final String SOCKET_MESSAGE = "http://192.168.0.99:4002";
-//    public static final String SOCKET_VIDEO = "http://192.168.0.99:4004";
+//    public static final String BASE_URL = "http://192.168.0.77:8040/sites/likeropt/";
+//    public static final String BASE_URL_MEDIA = "http://192.168.0.77:8040/sites/likeropt/";
+//    public static final String SOCKET_WEB = "http://192.168.0.77:4001";
+//    public static final String SOCKET_MESSAGE = "http://192.168.0.77:4002";
+//    public static final String SOCKET_VIDEO = "http://192.168.0.77:4004";
 
 
     //==========================STG SERVER=====================
@@ -76,6 +71,7 @@ public class AppConstants {
     public static final String SEARCH_MENTION_USER = "searchMentionUser";
     public static final String ADDED_POST_CONTRIBUTOR = "addedPostContributor";
     public static final String IS_DUPLICATE_FILE = "isDuplicateFile";
+    public static boolean IN_CHAT_MODE = false;
 
 
    // http://192.168.0.77:8040/sites/likeropt/isDuplicateFile
@@ -91,6 +87,7 @@ public class AppConstants {
 
 
     public static final String NEW_MESSAGE_BROADCAST = "new_message_broadcast";
+    public static final String NEW_MESSAGE_BROADCAST_FROM_HOME = "new_message_broadcast_from_home";
     public static final String LIST_MESSAGE_BROADCAST = "list_message_broadcast";
     public static final String NEW_NOTIFICATION_BROADCAST = "new_notification_broadcast";
 

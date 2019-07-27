@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
@@ -37,6 +38,8 @@ import com.doodle.Home.view.fragment.TabFragment;
 import com.doodle.Home.model.Headers;
 import com.doodle.Home.model.SetUser;
 import com.doodle.Home.view.fragment.TrendingPost;
+import com.doodle.Message.model.NewMessage;
+import com.doodle.Message.model.SenderData;
 import com.doodle.Message.view.MessageActivity;
 import com.doodle.Notification.view.NotificationActivity;
 import com.doodle.Post.view.activity.PostNew;
@@ -47,11 +50,16 @@ import com.doodle.utils.PrefManager;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import cn.jzvd.JZVideoPlayer;
 import de.hdodenhof.circleimageview.CircleImageView;
 import io.socket.client.Ack;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
+
+import static com.doodle.utils.AppConstants.IN_CHAT_MODE;
 
 
 public class Home extends AppCompatActivity implements View.OnClickListener {
@@ -123,10 +131,6 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
                     .into(profileImage);
         }
 
-
-// SocketIOManager ioManager = SocketIOManager.getInstance();
-// ioManager.start();
-
         socket = new SocketIOManager().getWSocketInstance();
         mSocket = SocketIOManager.mSocket;
 
@@ -195,39 +199,109 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
             }
         }, 5000);
 
-        socket.on("web_notification", new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-                sendBroadcast((new Intent().putExtra("type", "0")).setAction(AppConstants.NEW_NOTIFICATION_BROADCAST));
-            }
-        });
+        getData();
 
+    }
+
+    private void getData() {
         mSocket.on("message", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                sendBroadcast((new Intent().putExtra("type", "1")).setAction(AppConstants.NEW_NOTIFICATION_BROADCAST));
+                try {
+                    JSONObject messageJson = new JSONObject(args[0].toString());
+                    NewMessage newMessage = new NewMessage();
+
+                    newMessage.setUserId(messageJson.getString("user_id"));
+                    newMessage.setToUserId(messageJson.getString("to_user_id"));
+                    newMessage.setMessage(messageJson.getString("message"));
+                    newMessage.setReturnResult(messageJson.getBoolean("return_result"));
+                    newMessage.setTimePosted(messageJson.getString("time_posted"));
+                    newMessage.setInsertId(messageJson.getString("insert_id"));
+                    newMessage.setUnreadTotal(messageJson.getString("unread_total"));
+
+                    SenderData senderData = new SenderData();
+                    senderData.setId(messageJson.getJSONObject("user_data").getString("id"));
+                    senderData.setUserId(messageJson.getJSONObject("user_data").getString("user_id"));
+                    senderData.setUserName(messageJson.getJSONObject("user_data").getString("user_name"));
+                    senderData.setFirstName(messageJson.getJSONObject("user_data").getString("first_name"));
+                    senderData.setLastName(messageJson.getJSONObject("user_data").getString("last_name"));
+                    senderData.setTotalLikes(messageJson.getJSONObject("user_data").getString("total_likes"));
+                    senderData.setGoldStars(messageJson.getJSONObject("user_data").getString("gold_stars"));
+                    senderData.setSliverStars(messageJson.getJSONObject("user_data").getString("sliver_stars"));
+                    senderData.setPhoto(messageJson.getJSONObject("user_data").getString("photo"));
+                    senderData.setEmail(messageJson.getJSONObject("user_data").getString("email"));
+                    senderData.setDeactivated(messageJson.getJSONObject("user_data").getString("deactivated"));
+                    senderData.setFoundingUser(messageJson.getJSONObject("user_data").getString("founding_user"));
+                    senderData.setLearnAboutSite(messageJson.getJSONObject("user_data").getInt("learn_about_site"));
+                    senderData.setIsTopCommenter(messageJson.getJSONObject("user_data").getString("is_top_commenter"));
+                    senderData.setIsMaster(messageJson.getJSONObject("user_data").getString("is_master"));
+                    senderData.setDescription(messageJson.getJSONObject("user_data").getString("description"));
+
+                    newMessage.setSenderData(senderData);
+                    sendBroadcast((new Intent().putExtra("new_message", (Parcelable) newMessage).putExtra("type", 0)).setAction(AppConstants.NEW_MESSAGE_BROADCAST_FROM_HOME));
+
+//                    setNewMessageToList(newMessage, 0);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                if (!IN_CHAT_MODE)
+                    sendBroadcast((new Intent().putExtra("type", "1")).setAction(AppConstants.NEW_NOTIFICATION_BROADCAST));
             }
         });
 
         mSocket.on("message_own", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                sendBroadcast((new Intent().putExtra("type", "1")).setAction(AppConstants.NEW_NOTIFICATION_BROADCAST));
+                try {
+                    JSONObject messageJson = new JSONObject(args[0].toString());
+                    NewMessage newMessage = new NewMessage();
+
+                    newMessage.setUserId(messageJson.getString("user_id"));
+                    newMessage.setToUserId(messageJson.getString("to_user_id"));
+                    newMessage.setMessage(messageJson.getString("message"));
+                    newMessage.setReturnResult(messageJson.getBoolean("return_result"));
+                    newMessage.setTimePosted(messageJson.getString("time_posted"));
+                    newMessage.setInsertId(messageJson.getString("insert_id"));
+                    newMessage.setUnreadTotal(messageJson.getString("unread_total"));
+
+                    SenderData senderData = new SenderData();
+                    senderData.setId(messageJson.getJSONObject("to_user_data").getString("id"));
+                    senderData.setUserId(messageJson.getJSONObject("to_user_data").getString("user_id"));
+                    senderData.setUserName(messageJson.getJSONObject("to_user_data").getString("user_name"));
+                    senderData.setFirstName(messageJson.getJSONObject("to_user_data").getString("first_name"));
+                    senderData.setLastName(messageJson.getJSONObject("to_user_data").getString("last_name"));
+                    senderData.setTotalLikes(messageJson.getJSONObject("to_user_data").getString("total_likes"));
+                    senderData.setGoldStars(messageJson.getJSONObject("to_user_data").getString("gold_stars"));
+                    senderData.setSliverStars(messageJson.getJSONObject("to_user_data").getString("sliver_stars"));
+                    senderData.setPhoto(messageJson.getJSONObject("to_user_data").getString("photo"));
+                    senderData.setEmail(messageJson.getJSONObject("to_user_data").getString("email"));
+                    senderData.setDeactivated(messageJson.getJSONObject("to_user_data").getString("deactivated"));
+                    senderData.setFoundingUser(messageJson.getJSONObject("to_user_data").getString("founding_user"));
+                    senderData.setLearnAboutSite(messageJson.getJSONObject("to_user_data").getInt("learn_about_site"));
+                    senderData.setIsTopCommenter(messageJson.getJSONObject("to_user_data").getString("is_top_commenter"));
+                    senderData.setIsMaster(messageJson.getJSONObject("to_user_data").getString("is_master"));
+                    senderData.setDescription(messageJson.getJSONObject("to_user_data").getString("description"));
+
+                    newMessage.setSenderData(senderData);
+                    sendBroadcast((new Intent().putExtra("new_message", (Parcelable) newMessage).putExtra("type", 1)).setAction(AppConstants.NEW_MESSAGE_BROADCAST_FROM_HOME));
+
+//                    setNewMessageToList(newMessage, 1);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         });
+    }
 
-/**
- * Either you can place socket.connect() and the corresponding methods here or leave
- * it in the SocketIOManager class. Up to you. For complete persistance, use a service
- */
-
-
-/**
- * Either you can place socket.connect() and the corresponding methods here or leave
- * it in the SocketIOManager class. Up to you. For complete persistance, use a service
- */
-
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        socket.on("web_notification", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                sendBroadcast((new Intent().putExtra("type", "0")).setAction(AppConstants.NEW_NOTIFICATION_BROADCAST));
+            }
+        });
     }
 
     private void setupToolbar() {

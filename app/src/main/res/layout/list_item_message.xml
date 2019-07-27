@@ -60,6 +60,7 @@
             android:ellipsize="end"
             android:maxLines="2"
             android:text="hi"
+            android:textColor="@color/soft_grey_choose"
             android:textSize="14sp" />
 
     </LinearLayout>
@@ -68,7 +69,8 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginStart="70dp"
-        android:layout_below="@+id/userImage"
+        android:layout_marginTop="5dp"
+        android:layout_below="@+id/layout"
         android:background="@color/soft_grey_choose" />
 
 </RelativeLayout>

@@ -1,6 +1,7 @@
 package com.doodle.Message.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -57,9 +58,11 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
                 .into(viewHolder.ivUserImage);
 
         if (arrayList.get(i).getMessageData().getSeen().equals("1")) {
-            viewHolder.tvMessage.setTypeface(null, Typeface.NORMAL);
+//            viewHolder.tvMessage.setTypeface(null, Typeface.NORMAL);
+            viewHolder.tvMessage.setTextColor(Color.parseColor("#aaaaaa"));
         } else {
-            viewHolder.tvMessage.setTypeface(viewHolder.tvMessage.getTypeface(), Typeface.BOLD);
+//            viewHolder.tvMessage.setTypeface(viewHolder.tvMessage.getTypeface(), Typeface.BOLD);
+            viewHolder.tvMessage.setTextColor(Color.parseColor("#000000"));
         }
 
         viewHolder.mainLayout.setOnClickListener(new View.OnClickListener() {

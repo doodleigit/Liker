@@ -3,19 +3,17 @@ package com.doodle.Message.view;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import com.doodle.Home.service.SocketIOManager;
 import com.doodle.R;
 
-import io.socket.client.Socket;
+import static com.doodle.utils.AppConstants.IN_CHAT_MODE;
 
 public class MessageActivity extends AppCompatActivity {
-
-    public Socket socket;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_message);
+        IN_CHAT_MODE = true;
 
         initialFragment();
     }
@@ -26,4 +24,9 @@ public class MessageActivity extends AppCompatActivity {
         transaction.replace(R.id.container, messageListFragment).commit();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        IN_CHAT_MODE = false;
+    }
 }
