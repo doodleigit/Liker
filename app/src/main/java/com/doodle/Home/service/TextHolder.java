@@ -1,15 +1,16 @@
 package com.doodle.Home.service;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Handler;
+import android.net.Uri;
 import android.os.Parcelable;
-
-
 import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.view.menu.MenuPopupHelper;
 import android.support.v7.widget.PopupMenu;
@@ -21,19 +22,16 @@ import android.text.TextPaint;
 import android.text.style.ClickableSpan;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
-
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.borjabravo.readmoretextview.ReadMoreTextView;
 import com.bumptech.glide.Glide;
 import com.doodle.App;
-import com.doodle.Home.adapter.BreakingPostAdapter;
 import com.doodle.Home.model.PostFooter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.PostTextIndex;
@@ -45,6 +43,12 @@ import com.doodle.R;
 import com.doodle.utils.AppConstants;
 import com.doodle.utils.Operation;
 import com.doodle.utils.PrefManager;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.share.Sharer;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareDialog;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.vanniktech.emoji.EmojiTextView;
@@ -53,7 +57,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,10 +65,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.doodle.utils.AppConstants.FACEBOOK_SHARE;
 import static com.doodle.utils.Utils.containsIllegalCharacters;
 import static com.doodle.utils.Utils.extractMentionText;
 import static com.doodle.utils.Utils.extractUrls;
 import static com.doodle.utils.Utils.getSpannableStringBuilder;
+import static com.doodle.utils.Utils.isNullOrEmpty;
+import static com.doodle.utils.Utils.shareTwitter;
 import static java.lang.Integer.parseInt;
 
 public class TextHolder extends RecyclerView.ViewHolder {
@@ -88,17 +94,21 @@ public class TextHolder extends RecyclerView.ViewHolder {
     public String full_text;
 
     public ImageView imagePostShare, imagePermission;
-    private PopupMenu popup,popupMenu;
+    private PopupMenu popup, popupMenu;
     public HomeService webService;
     public PrefManager manager;
     private String deviceId, profileId, token, userIds;
     private Context mContext;
     public static final String ITEM_KEY = "item_key";
+    CallbackManager callbackManager;
+    ShareDialog shareDialog;
 
     public TextHolder(View itemView, Context context) {
         super(itemView);
 
         mContext = context;
+        callbackManager = CallbackManager.Factory.create();
+        shareDialog = new ShareDialog((Activity) context);
         manager = new PrefManager(App.getAppContext());
         deviceId = manager.getDeviceId();
         profileId = manager.getProfileId();
@@ -159,9 +169,12 @@ public class TextHolder extends RecyclerView.ViewHolder {
         }
     };
 
+    String text;
+
     public void setItem(final PostItem item) {
         this.item = item;
-        String text = item.getPostText();
+        text = item.getPostText();
+        String contentUrl = FACEBOOK_SHARE + item.getSharedPostId();
         StringBuilder nameBuilder = new StringBuilder();
         List<String> mentionUrl = extractUrls(item.getPostText());
 
@@ -223,6 +236,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
                         str.setSpan(clickableSpan, val, val + mList.get(k).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     }
                 }
+                text = str.toString();
                 tvPostEmojiContent.setText(str);
 
 
@@ -268,6 +282,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
                     }
 
                 }
+                text = str.toString();
                 tvPostContent.setText(str);
 
 
@@ -481,15 +496,52 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
                         if (id == R.id.shareFacebook) {
 
+                            shareDialog.registerCallback(callbackManager, new FacebookCallback<Sharer.Result>() {
+                                @Override
+                                public void onSuccess(Sharer.Result result) {
+
+                                    Toast.makeText(mContext, "Share successFull", Toast.LENGTH_SHORT).show();
+                                }
+
+                                @Override
+                                public void onCancel() {
+                                    Toast.makeText(mContext, "Share cancel", Toast.LENGTH_SHORT).show();
+                                }
+
+                                @Override
+                                public void onError(FacebookException error) {
+                                    Toast.makeText(mContext, error.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+
+                            if (!isNullOrEmpty(text)) {
+                                ShareLinkContent linkContent = new ShareLinkContent.Builder()
+                                        .setContentUrl(Uri.parse(contentUrl))
+                                        .setQuote(text)
+                                        .build();
+                                if (ShareDialog.canShow(ShareLinkContent.class)) {
+
+                                    shareDialog.show(linkContent);
+                                }
+                            }
+
+
                         }
                         if (id == R.id.shareTwitter) {
-                            Toast.makeText(App.getAppContext(), "Removed : ", Toast.LENGTH_SHORT).show();
-
+                            String url = "http://www.twitter.com/intent/tweet?url=" + contentUrl + "&text=" + text;
+                            Intent i = new Intent(Intent.ACTION_VIEW);
+                            i.setData(Uri.parse(url));
+                            mContext.startActivity(i);
                         }
 
                         if (id == R.id.copyLink) {
 
+                            ClipboardManager clipboard = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
+                            ClipData clip = ClipData.newPlainText("Copied Link", contentUrl);
+                            clipboard.setPrimaryClip(clip);
                         }
+
                         return true;
                     }
                 });

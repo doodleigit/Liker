@@ -21,6 +21,8 @@ public class AppConstants {
     public static final String SOCKET_WEB = "https://node.liker.com:7803";
     public static final String SOCKET_MESSAGE = "https://node.liker.com:7804";
     public static final String SOCKET_VIDEO = "https://node.liker.com:7807";
+    public static final String FACEBOOK_SHARE = "https://www.stg.liker.com/public/posts/";
+
 
     //=======================LIVE SERVER=============================
     //    public static final String BASE_URL = "https://www.liker.com/";

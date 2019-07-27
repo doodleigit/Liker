@@ -144,7 +144,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
             socket.emit("top_contributor", json, new Ack() {
                 @Override
                 public void call(Object... args) {
-
+                    Log.e(TAG, "Event error: " + args[0].toString());
                 }
             });
         }

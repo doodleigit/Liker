@@ -134,4 +134,7 @@ dependencies {
     implementation 'com.danikula:videocache:2.7.0'
     implementation 'joda-time:joda-time:2.10'
 
+    //Share Facebook===============================================
+    implementation 'com.facebook.android:facebook-share:[5,6)'
+
 }
