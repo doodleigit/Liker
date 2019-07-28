@@ -42,6 +42,7 @@ import com.doodle.utils.NetworkHelper;
 import com.doodle.utils.PrefManager;
 import com.doodle.utils.Utils;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
+import com.onesignal.OneSignal;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,6 +55,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.doodle.utils.AppConstants.POST_IMAGES;
+import static com.doodle.utils.Utils.isNullOrEmpty;
 
 public class Welcome extends AppCompatActivity implements View.OnClickListener, ResendEmail.BottomSheetListener {
 
@@ -90,7 +92,21 @@ public class Welcome extends AppCompatActivity implements View.OnClickListener, 
         networkOk = NetworkHelper.hasNetworkAccess(this);
         viewModel = ViewModelProviders.of(this).get(LoginViewModel.class);
         manager = new PrefManager(this);
-        mDeviceId = manager.getDeviceId();
+        OneSignal.startInit(this)
+                .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
+                .unsubscribeWhenNotificationsAreDisabled(true)
+                .init();
+
+        OneSignal.idsAvailable(new OneSignal.IdsAvailableHandler() {
+            @Override
+            public void idsAvailable(String userId, String registrationId) {
+                Log.d("debug", "User:" + userId);
+                manager.setDeviceId(userId);
+                if (registrationId != null)
+                    Log.d("debug", "registrationId:" + registrationId);
+
+            }
+        });
 
         try {
             PackageInfo info = getPackageManager().getPackageInfo(
@@ -378,6 +394,7 @@ public class Welcome extends AppCompatActivity implements View.OnClickListener, 
         int id = v.getId();
         switch (id) {
             case R.id.btnLogin:
+
                 if (flipperId == 0) {
                     flipperId++;
                     mViewFlipper.setInAnimation(slideLeftIn);
@@ -385,6 +402,8 @@ public class Welcome extends AppCompatActivity implements View.OnClickListener, 
                     mViewFlipper.showNext();
 
                 }
+
+
                 break;
 
             case R.id.tvForgot:
@@ -484,6 +503,7 @@ public class Welcome extends AppCompatActivity implements View.OnClickListener, 
                 if (networkOk) {
                     progressView.setVisibility(View.VISIBLE);
                     progressView.startAnimation();
+                    mDeviceId = manager.getDeviceId();
                     requestData(email, password, mDeviceId);
 
                 } else {
@@ -660,7 +680,7 @@ public class Welcome extends AppCompatActivity implements View.OnClickListener, 
                     manager.setProfileName(profileName);
                     manager.setProfileImage(POST_IMAGES + photo);
                     manager.setProfileId(profileId);
-                 //   startActivity(new Intent(Welcome.this, Liker.class));
+                    //   startActivity(new Intent(Welcome.this, Liker.class));
                     startActivity(new Intent(Welcome.this, Home.class));
                 } else {
                     String msg = "Username and password miss match";
@@ -688,7 +708,7 @@ public class Welcome extends AppCompatActivity implements View.OnClickListener, 
 
             @Override
             public void onFailure(Call<LoginUser> call, Throwable t) {
-                        Log.d("message",t.getMessage());
+                Log.d("message", t.getMessage());
                 progressView.setVisibility(View.GONE);
                 progressView.stopAnimation();
 

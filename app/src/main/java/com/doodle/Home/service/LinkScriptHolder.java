@@ -90,7 +90,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
     public static final String ITEM_KEY = "item_key";
     CallbackManager callbackManager;
     ShareDialog shareDialog;
-
+    String linkImage;
     public LinkScriptHolder(View itemView,Context context) {
         super(itemView);
 
@@ -350,14 +350,14 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
         } else {
             imgLinkScript.setVisibility(View.VISIBLE);
             if (item.getPostType().equalsIgnoreCase("3")) {
-                String linkImage = AppConstants.Link_IMAGE_PATH + item.getPostImage();
+                 linkImage= AppConstants.Link_IMAGE_PATH + item.getPostImage();
                 Glide.with(App.getAppContext())
                         .load(linkImage)
                         .centerCrop()
                         .dontAnimate()
                         .into(imgLinkScript);
             } else if (item.getPostType().equalsIgnoreCase("4")) {
-                String linkImage = AppConstants.YOUTUBE_IMAGE_PATH + item.getPostImage();
+                linkImage = AppConstants.YOUTUBE_IMAGE_PATH + item.getPostImage();
                 Glide.with(App.getAppContext())
                         .load(linkImage)
                         .centerCrop()
@@ -417,6 +417,13 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
                     public boolean onMenuItemClick(MenuItem menuItem) {
                         int id = menuItem.getItemId();
 
+                        if (id == R.id.shareAsPost) {
+                            String postId = item.getSharedPostId();
+                            Call<PostShareItem> call = webService.getPostDetails(deviceId, profileId, token, userIds, postId);
+                            sendShareItemRequest(call);
+
+                        }
+
                         if (id == R.id.shareFacebook) {
 
                             shareDialog.registerCallback(callbackManager, new FacebookCallback<Sharer.Result>() {
@@ -438,10 +445,10 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
                             });
 
 
-                            if (!isNullOrEmpty(text)) {
+                            if (!isNullOrEmpty(contentUrl)) {
                                 ShareLinkContent linkContent = new ShareLinkContent.Builder()
                                         .setContentUrl(Uri.parse(contentUrl))
-                                        .setQuote(text)
+                                        .setQuote("")
                                         .build();
                                 if (ShareDialog.canShow(ShareLinkContent.class)) {
 
@@ -464,6 +471,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
                             ClipData clip = ClipData.newPlainText("Copied Link", contentUrl);
                             clipboard.setPrimaryClip(clip);
                         }
+
                         return true;
                     }
                 });

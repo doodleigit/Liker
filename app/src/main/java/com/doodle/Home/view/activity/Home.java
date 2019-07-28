@@ -27,6 +27,7 @@ import android.widget.Toast;
 
 import com.doodle.App;
 import com.doodle.Authentication.view.activity.LoginAgain;
+import com.doodle.Authentication.view.fragment.ResendEmail;
 import com.doodle.Home.adapter.ViewPagerAdapter;
 import com.doodle.Home.model.TopContributorStatus;
 import com.doodle.Home.service.HomeService;
@@ -54,7 +55,7 @@ import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
 
-public class Home extends AppCompatActivity implements View.OnClickListener {
+public class Home extends AppCompatActivity implements View.OnClickListener, ResendEmail.BottomSheetListener  {
 
 
     private TabLayout tabLayout;
@@ -406,4 +407,8 @@ public class Home extends AppCompatActivity implements View.OnClickListener {
         socket.off("web_notification");
     }
 
+    @Override
+    public void onButtonClicked(String text) {
+        Toast.makeText(this, "worked perfectly!", Toast.LENGTH_SHORT).show();
+    }
 }

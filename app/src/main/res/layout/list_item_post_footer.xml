@@ -44,6 +44,17 @@
         android:textColor="#788B9A"
         android:visibility="gone" />
 
+    <ImageView
+        android:id="@+id/imagePostComment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="@dimen/_5sdp"
+        android:layout_marginRight="@dimen/_15sdp"
+        android:layout_marginBottom="@dimen/_5sdp"
+        android:layout_toLeftOf="@id/imagePostShare"
+        android:src="@drawable/ic_comment_black_24dp"
+        android:tint="#C4C9D4" />
 
     <ImageView
         android:id="@+id/imagePostShare"

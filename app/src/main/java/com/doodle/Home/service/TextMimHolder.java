@@ -431,10 +431,10 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                             });
 
 
-                            if (!isNullOrEmpty(text)) {
+                            if (!isNullOrEmpty(contentUrl)) {
                                 ShareLinkContent linkContent = new ShareLinkContent.Builder()
                                         .setContentUrl(Uri.parse(contentUrl))
-                                        .setQuote(text)
+                                        .setQuote("")
                                         .build();
                                 if (ShareDialog.canShow(ShareLinkContent.class)) {
 

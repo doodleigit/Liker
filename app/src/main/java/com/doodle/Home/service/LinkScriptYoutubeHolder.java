@@ -1,6 +1,9 @@
 package com.doodle.Home.service;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -34,6 +37,12 @@ import com.doodle.utils.AppConstants;
 import com.doodle.utils.Operation;
 import com.doodle.utils.PrefManager;
 import com.doodle.utils.Utils;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.share.Sharer;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareDialog;
 import com.vanniktech.emoji.EmojiTextView;
 
 import java.net.MalformedURLException;
@@ -43,9 +52,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.doodle.utils.AppConstants.FACEBOOK_SHARE;
 import static com.doodle.utils.Utils.containsIllegalCharacters;
 import static com.doodle.utils.Utils.getDomainName;
 import static com.doodle.utils.Utils.getSpannableStringBuilder;
+import static com.doodle.utils.Utils.isNullOrEmpty;
 import static java.lang.Integer.parseInt;
 
 public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
@@ -69,13 +80,15 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
     private String deviceId, profileId, token, userIds;
     private Context mContext;
     public static final String ITEM_KEY = "item_key";
-
+    ShareDialog shareDialog;
+    String linkImage;
+    CallbackManager callbackManager;
 
     public LinkScriptYoutubeHolder(View itemView,Context context) {
         super(itemView);
-
-
         mContext=context;
+        callbackManager = CallbackManager.Factory.create();
+        shareDialog = new ShareDialog((Activity) context);
         manager = new PrefManager(App.getAppContext());
         deviceId = manager.getDeviceId();
         profileId = manager.getProfileId();
@@ -126,6 +139,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
     public void setItem(PostItem item) {
         this.item = item;
         String text = item.getPostText();
+        String contentUrl = FACEBOOK_SHARE + item.getSharedPostId();
         if (containsIllegalCharacters(text)) {
             tvPostContent.setVisibility(View.GONE);
             tvPostEmojiContent.setVisibility(View.VISIBLE);
@@ -402,14 +416,50 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
 
                         if (id == R.id.shareFacebook) {
 
+                            shareDialog.registerCallback(callbackManager, new FacebookCallback<Sharer.Result>() {
+                                @Override
+                                public void onSuccess(Sharer.Result result) {
+
+                                    Toast.makeText(mContext, "Share successFull", Toast.LENGTH_SHORT).show();
+                                }
+
+                                @Override
+                                public void onCancel() {
+                                    Toast.makeText(mContext, "Share cancel", Toast.LENGTH_SHORT).show();
+                                }
+
+                                @Override
+                                public void onError(FacebookException error) {
+                                    Toast.makeText(mContext, error.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+
+                            if (!isNullOrEmpty(contentUrl)) {
+                                ShareLinkContent linkContent = new ShareLinkContent.Builder()
+                                        .setContentUrl(Uri.parse(contentUrl))
+                                        .setQuote("")
+                                        .build();
+                                if (ShareDialog.canShow(ShareLinkContent.class)) {
+
+                                    shareDialog.show(linkContent);
+                                }
+                            }
+
+
                         }
                         if (id == R.id.shareTwitter) {
-                            Toast.makeText(App.getAppContext(), "Removed : ", Toast.LENGTH_SHORT).show();
-
+                            String url = "http://www.twitter.com/intent/tweet?url=" + contentUrl + "&text=" + text;
+                            Intent i = new Intent(Intent.ACTION_VIEW);
+                            i.setData(Uri.parse(url));
+                            mContext.startActivity(i);
                         }
 
                         if (id == R.id.copyLink) {
 
+                            ClipboardManager clipboard = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
+                            ClipData clip = ClipData.newPlainText("Copied Link", contentUrl);
+                            clipboard.setPrimaryClip(clip);
                         }
                         return true;
                     }

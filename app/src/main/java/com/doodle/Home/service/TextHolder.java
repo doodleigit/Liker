@@ -32,6 +32,7 @@ import android.widget.Toast;
 import com.borjabravo.readmoretextview.ReadMoreTextView;
 import com.bumptech.glide.Glide;
 import com.doodle.App;
+import com.doodle.Comment.CommentPost;
 import com.doodle.Home.model.PostFooter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.PostTextIndex;
@@ -71,7 +72,6 @@ import static com.doodle.utils.Utils.extractMentionText;
 import static com.doodle.utils.Utils.extractUrls;
 import static com.doodle.utils.Utils.getSpannableStringBuilder;
 import static com.doodle.utils.Utils.isNullOrEmpty;
-import static com.doodle.utils.Utils.shareTwitter;
 import static java.lang.Integer.parseInt;
 
 public class TextHolder extends RecyclerView.ViewHolder {
@@ -100,8 +100,9 @@ public class TextHolder extends RecyclerView.ViewHolder {
     private String deviceId, profileId, token, userIds;
     private Context mContext;
     public static final String ITEM_KEY = "item_key";
-    CallbackManager callbackManager;
-    ShareDialog shareDialog;
+    public CallbackManager callbackManager;
+    public ShareDialog shareDialog;
+    public ImageView imagePostComment;
 
     public TextHolder(View itemView, Context context) {
         super(itemView);
@@ -117,6 +118,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
         webService = HomeService.mRetrofit.create(HomeService.class);
         imagePostShare = (ImageView) itemView.findViewById(R.id.imagePostShare);
         imagePermission = (ImageView) itemView.findViewById(R.id.imagePermission);
+        imagePostComment = (ImageView) itemView.findViewById(R.id.imagePostComment);
 
         mentions = new ArrayList<>();
         mList = new ArrayList<>();
@@ -469,6 +471,14 @@ public class TextHolder extends RecyclerView.ViewHolder {
                 .into(imagePostUser);
 
 
+        imagePostComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               // AppCompatActivity activity = (AppCompatActivity) v.getContext();
+                mContext.startActivity(new Intent(mContext, CommentPost.class));
+
+            }
+        });
         imagePostShare.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("RestrictedApi")
             @Override
@@ -515,10 +525,10 @@ public class TextHolder extends RecyclerView.ViewHolder {
                             });
 
 
-                            if (!isNullOrEmpty(text)) {
+                            if (!isNullOrEmpty(contentUrl)) {
                                 ShareLinkContent linkContent = new ShareLinkContent.Builder()
                                         .setContentUrl(Uri.parse(contentUrl))
-                                        .setQuote(text)
+                                        .setQuote("")
                                         .build();
                                 if (ShareDialog.canShow(ShareLinkContent.class)) {
 
@@ -647,6 +657,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
         return text;
     }
+
 
 
 }

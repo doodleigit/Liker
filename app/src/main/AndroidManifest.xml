@@ -21,9 +21,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".Home.view.activity.PostShare"
+        <activity android:name=".Comment.CommentPost"
             android:theme="@style/AppTheme.NoActionBar"
             />
+        <activity
+            android:name=".Home.view.activity.PostShare"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Post.view.activity.GalleryView"
             android:parentActivityName=".Post.view.activity.PostNew"
@@ -104,7 +107,8 @@
         <activity
             android:name=".Home.view.activity.Home"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -115,18 +119,25 @@
             android:name=".Authentication.view.activity.Splash"
             android:theme="@style/AppTheme.Launcher">
 
-        </activity>
-        <activity
-            android:name=".Home.Liker"
-            android:theme="@style/AppTheme.NoActionBar">
-
-<!--
+            <!--
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
--->
+            -->
+        </activity>
+        <activity
+            android:name=".Home.Liker"
+            android:theme="@style/AppTheme.NoActionBar">
+
+            <!--
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            -->
         </activity>
 
         <meta-data
@@ -149,17 +160,18 @@
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
-
-        <activity android:name=".Message.view.MessageActivity"
+        <activity
+            android:name=".Message.view.MessageActivity"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustResize"/>
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".Notification.view.NotificationActivity"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <provider android:authorities="com.facebook.app.FacebookContentProvider{@string/facebook_app_id}"
+        <provider
             android:name="com.facebook.FacebookContentProvider"
-            android:exported="true"/>
+            android:authorities="com.facebook.app.FacebookContentProvider{@string/facebook_app_id}"
+            android:exported="true" />
     </application>
 
 </manifest>
