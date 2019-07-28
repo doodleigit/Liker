@@ -83,5 +83,13 @@ public interface HomeService {
             @Field("type") String type
     );
 
+    @POST(AppConstants.GET_FILTER_CATEGORIES)
+    @FormUrlEncoded
+    Call<String> sendFilterCategories(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("user_id") String id
+    );
 
 }

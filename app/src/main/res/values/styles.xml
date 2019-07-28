@@ -41,6 +41,16 @@
         <item name="android:background">@android:color/transparent</item>
     </style>
 
+    <style name="CustomDialog" parent="@android:style/Theme.Dialog">
+        <item name="android:windowAnimationStyle">@style/CustomDialogAnimation</item>
+    </style>
+
+    <style name="CustomDialogAnimation">
+
+        <item name="android:windowEnterAnimation">@anim/slide_in_up</item>
+        <item name="android:windowExitAnimation">@anim/slide_out_left</item>
+    </style>
+
     <style name="layoutstyle">
         <item name="android:paddingBottom">16dp</item>
         <item name="android:paddingLeft">16dp</item>

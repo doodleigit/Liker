@@ -111,6 +111,9 @@
     <string name="hour_ago">hour ago</string>
     <string name="hours_ago">hours ago</string>
     <string name="yesterday">Yesterday</string>
+    <string name="choose_category">Choose Category</string>
+    <string name="done">done</string>
+    <string name="personalize_your_feed">Personalize your feed</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

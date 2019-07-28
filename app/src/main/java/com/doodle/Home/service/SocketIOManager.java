@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.doodle.App;
 import com.doodle.Home.model.Headers;
+import com.doodle.Home.model.SetUser;
 import com.doodle.utils.AppConstants;
 import com.doodle.utils.PrefManager;
 import com.google.gson.Gson;
@@ -37,7 +38,7 @@ public class SocketIOManager {
     //Added @null
     public static Socket mSocket = null, wSocket = null;
     private PrefManager manager;
-    private String token, deviceId, userId, socketId;
+    private String token, deviceId, userId, socketId, mSocketId;
 
     private void getMessageSocketClient() {
         try {
@@ -158,9 +159,7 @@ public class SocketIOManager {
         token = manager.getToken();
         if (wSocket == null) {
             getWebSocketClient();
-            initializeWebSocket();
         }
-        getMSocketInstance();
         return wSocket;
     }
 
@@ -175,6 +174,7 @@ public class SocketIOManager {
 
                 String id = wSocket.connect().id();
                 App.setSocketId(id);
+                setWUser();
                 Log.d(TAG, "call: " + id);
             }
         }).on(Socket.EVENT_ERROR, new Emitter.Listener() {
@@ -187,7 +187,7 @@ public class SocketIOManager {
         }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                Log.e("TAG", "Event disconnect, Socket is disconnected");
+                Log.e(TAG, "Event disconnect, Socket is disconnected");
             }
         }).on("test", new Emitter.Listener() {
             @Override
@@ -212,6 +212,7 @@ public class SocketIOManager {
 
                 String id = mSocket.connect().id();
                 App.setmSocketId(id);
+                setMUser();
                 Log.d(TAG, "call: " + id);
             }
         }).on(Socket.EVENT_ERROR, new Emitter.Listener() {
@@ -238,22 +239,55 @@ public class SocketIOManager {
         mSocket.connect();
     }
 
-//    private SocketIOManager() {
-//        try {
-//            mSocket = IO.socket(SOCKET_IO_SERVER);
-//        } catch (URISyntaxException e) {
-//            Log.e(TAG, "URL is not correct");
-//        }
-//    }
-//
-//    public synchronized static SocketIOManager getInstance() {
-//        if (mInstance != null) {
-//            return mInstance;
-//        }
-//
-//        mInstance =  new SocketIOManager();
-//        return mInstance;
-//    }
+    private void setWUser() {
+        Headers headers = new Headers();
+        SetUser setUser = new SetUser();
+        socketId = App.getSocketId();
+        if (socketId != null) {
+            headers.setDeviceId(deviceId);
+            headers.setIsApps(true);
+            headers.setSecurityToken(token);
+            setUser.setSocketId(App.getSocketId());
+            setUser.setUserId(userId);
+            setUser.setHeaders(headers);
+            Gson gson = new Gson();
+            String json = gson.toJson(setUser);
+            wSocket.emit("set_user", json, new Ack() {
+                @Override
+                public void call(Object... args) {
+                    if (args != null) {
+                        Log.e(TAG, "Event error: " + args[0].toString());
+                    }
+                }
+            });
+            Log.d("SERIALIZATION DATA", json);
+        }
+    }
+
+    private void setMUser() {
+        Headers headers = new Headers();
+        SetUser setUser = new SetUser();
+        mSocketId = App.getmSocketId();
+        if (mSocketId != null) {
+            headers.setDeviceId(deviceId);
+            headers.setIsApps(true);
+            headers.setSecurityToken(token);
+            setUser.setSocketId(App.getmSocketId());
+            setUser.setUserId(userId);
+            setUser.setHeaders(headers);
+            Gson gson = new Gson();
+            String json = gson.toJson(setUser);
+            mSocket.emit("set_user", json, new Ack() {
+                @Override
+                public void call(Object... args) {
+                    if (args != null) {
+                        Log.e(TAG, "Event error: " + args[0].toString());
+                    }
+                }
+            });
+            Log.d("SERIALIZATION DATA", json);
+        }
+    }
 
     public void stop() {
         Log.d(TAG, "stop socket...");

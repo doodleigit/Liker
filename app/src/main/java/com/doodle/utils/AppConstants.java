@@ -84,12 +84,14 @@ public class AppConstants {
     public static final String GET_POST_DETAILS = "get_postdetails";
     public static final String ADD_SHARED_POST = "addSharedpost";
     public static final String SEND_BROWSER_NOTIFICATION = "send_browser_notification";
+    public static final String GET_FILTER_CATEGORIES = "get_categories";
 
 
     public static final String NEW_MESSAGE_BROADCAST = "new_message_broadcast";
     public static final String NEW_MESSAGE_BROADCAST_FROM_HOME = "new_message_broadcast_from_home";
     public static final String LIST_MESSAGE_BROADCAST = "list_message_broadcast";
     public static final String NEW_NOTIFICATION_BROADCAST = "new_notification_broadcast";
+    public static final String RECONNECT_SOCKET_BROADCAST = "reconnect_socket_broadcast";
 
     public static final String NOTIFICATION = "newNotification";
     public static final String CHAT_USERS = "get_chat_users";
