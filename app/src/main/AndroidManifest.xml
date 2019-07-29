@@ -119,13 +119,11 @@
             android:name=".Authentication.view.activity.Splash"
             android:theme="@style/AppTheme.Launcher">
 
-            <!--
-            <intent-filter>
+         <!--   <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-            -->
+            </intent-filter>-->
         </activity>
         <activity
             android:name=".Home.Liker"

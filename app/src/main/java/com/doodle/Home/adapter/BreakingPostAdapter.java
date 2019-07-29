@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.doodle.Comment.model.Comment;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.service.ImageHolder;
 import com.doodle.Home.service.LinkScriptHolder;
@@ -18,6 +19,7 @@ import com.doodle.Post.model.Mim;
 import com.doodle.Post.service.DataProvider;
 import com.doodle.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -29,13 +31,15 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     final int VIEW_TYPE_TEX_MIM = 6;
 
     private List<PostItem> postItems;
+    private List<Comment> comments;
     List<Mim> viewColors = DataProvider.mimList;
     private Context mContext;
     Drawable mDrawable;
 
-    public BreakingPostAdapter(Context context, List<PostItem> postItems) {
+    public BreakingPostAdapter(Context context, List<PostItem> postItems, List<Comment> comments) {
         this.mContext = context;
         this.postItems = postItems;
+        this.comments = comments;
     }
 
     @Override
@@ -43,33 +47,33 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         View view;
         if (viewType == VIEW_TYPE_TEXT) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_post_text, parent, false);
-            return new TextHolder(view,mContext);
+            return new TextHolder(view, mContext);
         }
 
         if (viewType == VIEW_TYPE_TEX_MIM) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_post_text_mim, parent, false);
-            return new TextMimHolder(view,mContext);
+            return new TextMimHolder(view, mContext);
         }
         if (viewType == VIEW_TYPE_TEXT_IMAGE) {
 
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_post_image, parent, false);
-            return new ImageHolder(view,mContext);
+            return new ImageHolder(view, mContext);
         }
         if (viewType == VIEW_TYPE_TEXT_LINK_SCRIPT) {
 
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_post_link_script, parent, false);
-            return new LinkScriptHolder(view,mContext);
+            return new LinkScriptHolder(view, mContext);
         }
 
         if (viewType == VIEW_TYPE_TEXT_LINK_SCRIPT_YOUTUBE) {
 
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_post_link_script_youtube, parent, false);
-            return new LinkScriptYoutubeHolder(view,mContext);
+            return new LinkScriptYoutubeHolder(view, mContext);
         }
         if (viewType == VIEW_TYPE_VIDEO) {
 
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_post_video, parent, false);
-            return new VideoHolder(view,mContext);
+            return new VideoHolder(view, mContext);
         }
         return null;
     }
@@ -78,7 +82,7 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         if (viewHolder instanceof TextHolder) {
             TextHolder vh = (TextHolder) viewHolder;
-            vh.setItem(postItems.get(position));
+            vh.setItem(postItems.get(position), comments.get(position));
         }
         if (viewHolder instanceof TextMimHolder) {
             TextMimHolder vh = (TextMimHolder) viewHolder;
@@ -99,7 +103,7 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
         if (viewHolder instanceof VideoHolder) {
             VideoHolder vh = (VideoHolder) viewHolder;
-            vh.setItem(postItems.get(position));
+            vh.setItem(postItems.get(position), comments.get(position));
 
         }
     }
@@ -143,6 +147,15 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         for (PostItem temp : postItemList
         ) {
             postItems.add(temp);
+        }
+        notifyDataSetChanged();
+    }
+
+    public void addPagingCommentData(List<Comment> commentList) {
+
+        for (Comment temp : commentList
+        ) {
+            comments.add(temp);
         }
         notifyDataSetChanged();
     }

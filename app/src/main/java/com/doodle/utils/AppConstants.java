@@ -8,20 +8,23 @@ import java.util.HashMap;
 public class AppConstants {
 
     //===============LOCAL SERVER==================
-//    public static final String BASE_URL = "http://192.168.0.99:8040/sites/likeropt/";
-//    public static final String BASE_URL_MEDIA = "http://192.168.0.99:8040/sites/likeropt/";
-//    public static final String SOCKET_WEB = "http://192.168.0.99:4001";
-//    public static final String SOCKET_MESSAGE = "http://192.168.0.99:4002";
-//    public static final String SOCKET_VIDEO = "http://192.168.0.99:4004";
+    public static final String BASE_URL = "http://192.168.0.77:8040/sites/likerapp/";
+    public static final String BASE_URL_MEDIA = "http://192.168.0.77:8040/sites/likeropt/";
+    public static final String SOCKET_WEB = "http://192.168.0.77:4001";
+    public static final String SOCKET_MESSAGE = "http://192.168.0.77:4002";
+    public static final String SOCKET_VIDEO = "http://192.168.0.77:4004";
+    public static final String FACEBOOK_SHARE = "http://192.168.0.77:8040/sites/likerapp/public/posts/";
 
+
+    //http://192.168.0.77:8040/sites/likeropt/uploads/thumb/b3dae106729bc78378bd9566fe533a6f.jpg
 
     //==========================STG SERVER=====================
-    public static final String BASE_URL = "https://www.stg.liker.com/";
-    public static final String BASE_URL_MEDIA = "https://www.cdn-liker.com/stg-static/";
-    public static final String SOCKET_WEB = "https://node.liker.com:7803";
-    public static final String SOCKET_MESSAGE = "https://node.liker.com:7804";
-    public static final String SOCKET_VIDEO = "https://node.liker.com:7807";
-    public static final String FACEBOOK_SHARE = "https://www.stg.liker.com/public/posts/";
+//    public static final String BASE_URL = "https://www.stg.liker.com/";
+//    public static final String BASE_URL_MEDIA = "https://www.cdn-liker.com/stg-static/";
+//    public static final String SOCKET_WEB = "https://node.liker.com:7803";
+//    public static final String SOCKET_MESSAGE = "https://node.liker.com:7804";
+//    public static final String SOCKET_VIDEO = "https://node.liker.com:7807";
+//    public static final String FACEBOOK_SHARE = "https://www.stg.liker.com/public/posts/";
 
 
     //=======================LIVE SERVER=============================
@@ -85,6 +88,7 @@ public class AppConstants {
     //FEED
 
     public static final String FEED = "feed";
+    public static final String GET_POST_COMMENTS = "get_postscomments";
 
     //Post share
     public static final String GET_POST_DETAILS = "get_postdetails";

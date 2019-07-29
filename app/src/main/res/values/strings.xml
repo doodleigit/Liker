@@ -131,6 +131,8 @@
     <string name="only_me">Only Me</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
+    <string name="report_comment">Report Comment</string>
+    <string name="block_user">Block User</string>
 
 
 </resources>

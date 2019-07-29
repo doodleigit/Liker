@@ -1,5 +1,6 @@
 package com.doodle.Home.service;
 
+import com.doodle.Comment.model.CommentItem;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.postshare.PostShareItem;
 import com.doodle.utils.AppConstants;
@@ -39,6 +40,20 @@ public interface HomeService {
             @Field("filter") int filter,
             @Field("is_public") boolean isPublic
 
+    );
+    //https://www.stg.liker.com/get_postscomments
+    @POST(AppConstants.GET_POST_COMMENTS)
+    @FormUrlEncoded
+    Call<CommentItem> getPostComments(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("is_public") String isPublic,
+            @Field("limit") int limit,
+            @Field("offset") int offset,
+            @Field("orderby") String orderBy,
+            @Field("post_id") String feed,
+            @Field("user_id") String userIds
     );
 
     @POST(AppConstants.GET_POST_DETAILS)

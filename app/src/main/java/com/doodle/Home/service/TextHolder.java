@@ -26,6 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,6 +34,8 @@ import com.borjabravo.readmoretextview.ReadMoreTextView;
 import com.bumptech.glide.Glide;
 import com.doodle.App;
 import com.doodle.Comment.CommentPost;
+import com.doodle.Comment.model.Comment;
+import com.doodle.Comment.model.Comment_;
 import com.doodle.Home.model.PostFooter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.PostTextIndex;
@@ -44,6 +47,7 @@ import com.doodle.R;
 import com.doodle.utils.AppConstants;
 import com.doodle.utils.Operation;
 import com.doodle.utils.PrefManager;
+import com.doodle.utils.Utils;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -67,6 +71,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.doodle.utils.AppConstants.FACEBOOK_SHARE;
+import static com.doodle.utils.AppConstants.PROFILE_IMAGE;
 import static com.doodle.utils.Utils.containsIllegalCharacters;
 import static com.doodle.utils.Utils.extractMentionText;
 import static com.doodle.utils.Utils.extractUrls;
@@ -103,6 +108,19 @@ public class TextHolder extends RecyclerView.ViewHolder {
     public CallbackManager callbackManager;
     public ShareDialog shareDialog;
     public ImageView imagePostComment;
+
+    //Comment
+    Comment commentItem;
+    private List<Comment_> comments = new ArrayList<Comment_>();
+    private String commentPostId;
+    RelativeLayout commentHold;
+    private String commentText, commentUserName, commentUserImage, commentImage, commentTime;
+    public EmojiTextView tvCommentMessage;
+    public ImageView imagePostCommenting, imageCommentLikeThumb, imageCommentSettings;
+    public CircleImageView imageCommentUser;
+    public TextView tvCommentUserName, tvCommentTime, tvCommentLike, tvCommentReply, tvCountCommentLike;
+    private String userPostId;
+    private PopupMenu popupCommentMenu;
 
     public TextHolder(View itemView, Context context) {
         super(itemView);
@@ -152,6 +170,20 @@ public class TextHolder extends RecyclerView.ViewHolder {
         star15 = itemView.findViewById(R.id.star15);
         star16 = itemView.findViewById(R.id.star16);
 
+        //Comment
+        tvCommentMessage = itemView.findViewById(R.id.tvCommentMessage);
+        commentHold = (RelativeLayout) itemView.findViewById(R.id.commentHold);
+        imagePostCommenting = itemView.findViewById(R.id.imagePostCommenting);
+        imageCommentLikeThumb = itemView.findViewById(R.id.imageCommentLikeThumb);
+        imageCommentSettings = itemView.findViewById(R.id.imageCommentSettings);
+        imageCommentUser = itemView.findViewById(R.id.imageCommentUser);
+        tvCommentUserName = itemView.findViewById(R.id.tvCommentUserName);
+        tvCommentTime = itemView.findViewById(R.id.tvCommentTime);
+        tvCommentLike = itemView.findViewById(R.id.tvCommentLike);
+        tvCommentReply = itemView.findViewById(R.id.tvCommentReply);
+        tvCountCommentLike = itemView.findViewById(R.id.tvCountCommentLike);
+        imageCommentLikeThumb.setVisibility(View.GONE);
+        tvCountCommentLike.setVisibility(View.GONE);
 
     }
 
@@ -173,8 +205,60 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
     String text;
 
-    public void setItem(final PostItem item) {
+    public void setItem(final PostItem item, Comment commentItem) {
         this.item = item;
+        this.commentItem = commentItem;
+        userPostId = item.getPostId();
+        commentPostId = commentItem.getPostId();
+        comments = commentItem.getComments();
+
+        if (!comments.isEmpty()) {
+            commentHold.setVisibility(View.VISIBLE);
+            for (Comment_ temp : comments) {
+                commentText = temp.getCommentText();
+                commentUserName = temp.getUserFirstName() + " " + temp.getUserLastName();
+                commentUserImage = temp.getUserPhoto();
+                commentImage = temp.getCommentImage();
+                commentTime = temp.getDateTime();
+            }
+
+            if (isNullOrEmpty(commentImage)) {
+                imagePostCommenting.setVisibility(View.GONE);
+            } else {
+                imagePostCommenting.setVisibility(View.VISIBLE);
+            }
+
+            tvCommentUserName.setText(commentUserName);
+            tvCommentMessage.setText(commentText);
+            tvCommentTime.setText(Utils.chatDateCompare(mContext, Long.valueOf(commentTime)));
+
+            String commentUserImageUrl = PROFILE_IMAGE + commentUserImage;
+            Glide.with(App.getAppContext())
+                    .load(commentUserImageUrl)
+                    .centerCrop()
+                    .dontAnimate()
+                    .into(imageCommentUser);
+
+        } else {
+            commentHold.setVisibility(View.GONE);
+        }
+
+
+        tvCommentLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (tvCountCommentLike.getText().toString().isEmpty()) {
+                    imageCommentLikeThumb.setVisibility(View.VISIBLE);
+                    tvCountCommentLike.setVisibility(View.VISIBLE);
+                    tvCountCommentLike.setText("1");
+                } else {
+                    tvCountCommentLike.setText("");
+                    imageCommentLikeThumb.setVisibility(View.GONE);
+                    tvCountCommentLike.setVisibility(View.GONE);
+                }
+            }
+        });
         text = item.getPostText();
         String contentUrl = FACEBOOK_SHARE + item.getSharedPostId();
         StringBuilder nameBuilder = new StringBuilder();
@@ -597,6 +681,60 @@ public class TextHolder extends RecyclerView.ViewHolder {
                         if (id == R.id.turnOffNotification) {
                             Toast.makeText(App.getAppContext(), "turnOffNotification : ", Toast.LENGTH_SHORT).show();
                         }
+                        return true;
+                    }
+                });
+
+            }
+        });
+        imageCommentSettings.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("RestrictedApi")
+            @Override
+            public void onClick(View v) {
+
+                popupCommentMenu = new PopupMenu(mContext, v);
+                popupCommentMenu.getMenuInflater().inflate(R.menu.post_comment_menu, popupCommentMenu.getMenu());
+
+                if(userPostId.equalsIgnoreCase(commentPostId)){
+                    popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(false);
+                    popupCommentMenu.getMenu().findItem(R.id.blockUser).setVisible(false);
+                    popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(true);
+                    popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(true);
+                }else {
+                    popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(true);
+                    popupCommentMenu.getMenu().findItem(R.id.blockUser).setVisible(true);
+                    popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(false);
+                    popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(false);
+                }
+
+
+//                popup.show();
+                MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popupCommentMenu.getMenu(), v);
+                menuHelper.setForceShowIcon(true);
+                menuHelper.show();
+
+                popupCommentMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+                        int id = menuItem.getItemId();
+
+                        if (id == R.id.reportComment) {
+
+                            Toast.makeText(App.getAppContext(), "reportComment : ", Toast.LENGTH_SHORT).show();
+                        }
+
+                        if (id == R.id.blockUser) {
+                            Toast.makeText(App.getAppContext(), "blockUser : ", Toast.LENGTH_SHORT).show();
+                        }
+                        if (id == R.id.editComment) {
+                            Toast.makeText(App.getAppContext(), "editComment : ", Toast.LENGTH_SHORT).show();
+
+                        }
+
+                        if (id == R.id.deleteComment) {
+                            Toast.makeText(App.getAppContext(), "deleteComment : ", Toast.LENGTH_SHORT).show();
+                        }
+
                         return true;
                     }
                 });

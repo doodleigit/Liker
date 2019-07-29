@@ -1,80 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/tvLikeShare"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@android:color/white">
+    android:background="@android:color/white"
+    android:orientation="vertical">
 
-    <View
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/_1sdp"
-        android:background="#EDF0F1" />
+        android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/tvLike"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_centerInParent="true"
-        android:layout_margin="@dimen/_5sdp"
-        android:text="Like"
-        android:textColor="#788B9A" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_1sdp"
+            android:background="#EDF0F1" />
 
-    <ImageView
-        android:id="@+id/imgLike"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_marginLeft="@dimen/_5sdp"
-        android:layout_marginRight="@dimen/_5sdp"
-        android:layout_toRightOf="@id/tvLike"
-        android:src="@drawable/like_normal" />
+        <TextView
+            android:id="@+id/tvLike"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true"
+            android:layout_margin="@dimen/_5sdp"
+            android:text="Like"
+            android:textColor="#788B9A" />
 
-    <TextView
-        android:id="@+id/tvPostLikeCount"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_marginLeft="@dimen/_5sdp"
-        android:layout_marginRight="@dimen/_5sdp"
-        android:layout_toEndOf="@id/imgLike"
-        android:layout_toRightOf="@id/imgLike"
-        android:text="34"
-        android:textColor="#788B9A"
-        android:visibility="gone" />
+        <ImageView
+            android:id="@+id/imgLike"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginLeft="@dimen/_5sdp"
+            android:layout_marginRight="@dimen/_5sdp"
+            android:layout_toRightOf="@id/tvLike"
+            android:src="@drawable/like_normal" />
 
-    <ImageView
-        android:id="@+id/imagePostComment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_marginTop="@dimen/_5sdp"
-        android:layout_marginRight="@dimen/_15sdp"
-        android:layout_marginBottom="@dimen/_5sdp"
-        android:layout_toLeftOf="@id/imagePostShare"
-        android:src="@drawable/ic_comment_black_24dp"
-        android:tint="#C4C9D4" />
+        <TextView
+            android:id="@+id/tvPostLikeCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginLeft="@dimen/_5sdp"
+            android:layout_marginRight="@dimen/_5sdp"
+            android:layout_toEndOf="@id/imgLike"
+            android:layout_toRightOf="@id/imgLike"
+            android:text="34"
+            android:textColor="#788B9A"
+            android:visibility="gone" />
 
-    <ImageView
-        android:id="@+id/imagePostShare"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_marginTop="@dimen/_5sdp"
-        android:layout_marginRight="@dimen/_15sdp"
-        android:layout_marginBottom="@dimen/_5sdp"
-        android:layout_toLeftOf="@id/tvImgShareCount"
-        android:src="@drawable/ic_share_black_24dp"
-        android:tint="#C4C9D4" />
+        <ImageView
+            android:id="@+id/imagePostComment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:layout_marginRight="@dimen/_15sdp"
+            android:layout_marginBottom="@dimen/_5sdp"
+            android:layout_toLeftOf="@id/imagePostShare"
+            android:src="@drawable/ic_comment_black_24dp"
+            android:tint="#C4C9D4" />
 
-    <TextView
-        android:id="@+id/tvImgShareCount"
-        android:layout_width="wrap_content"
+        <ImageView
+            android:id="@+id/imagePostShare"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:layout_marginRight="@dimen/_15sdp"
+            android:layout_marginBottom="@dimen/_5sdp"
+            android:layout_toLeftOf="@id/tvImgShareCount"
+            android:src="@drawable/ic_share_black_24dp"
+            android:tint="#C4C9D4" />
+
+        <TextView
+            android:id="@+id/tvImgShareCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            android:layout_marginRight="@dimen/_5sdp"
+            android:background="@drawable/share_count_box"
+            android:textAlignment="center" />
+    </RelativeLayout>
+
+    <include
+        layout="@layout/list_item_comment_text"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_centerInParent="true"
-        android:layout_marginRight="@dimen/_5sdp"
-        android:background="@drawable/share_count_box"
-        android:textAlignment="center" />
-</RelativeLayout>
+        android:orientation="vertical" />
+</LinearLayout>
+
+
+
+
