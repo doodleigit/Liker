@@ -4,4 +4,6 @@ public interface SelectChangeListener {
 
     void onSelectChange(boolean isSelect);
 
+    void onSelectClear();
+
 }

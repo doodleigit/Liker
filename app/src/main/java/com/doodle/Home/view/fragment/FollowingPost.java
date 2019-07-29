@@ -1,7 +1,10 @@
 package com.doodle.Home.view.fragment;
 
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -20,6 +23,7 @@ import com.doodle.Home.adapter.BreakingPostAdapter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.service.HomeService;
 import com.doodle.R;
+import com.doodle.utils.AppConstants;
 import com.doodle.utils.NetworkHelper;
 import com.doodle.utils.PrefManager;
 import com.doodle.utils.Utils;
@@ -27,6 +31,7 @@ import com.facebook.shimmer.ShimmerFrameLayout;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 
 import java.util.List;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -60,6 +65,7 @@ public class FollowingPost extends Fragment {
     private boolean isScrolling;
     int limit = 5;
     int offset = 0;
+    private String catIds = "";
     private ShimmerFrameLayout shimmerFrameLayout;
 
     @Override
@@ -70,6 +76,11 @@ public class FollowingPost extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(AppConstants.CATEGORY_CHANGE_BROADCAST);
+        Objects.requireNonNull(getActivity()).registerReceiver(broadcastReceiver, intentFilter);
+
         manager = new PrefManager(getActivity());
         deviceId = manager.getDeviceId();
         profileId = manager.getProfileId();
@@ -91,19 +102,10 @@ public class FollowingPost extends Fragment {
         progressView = (CircularProgressView) root.findViewById(R.id.progress_view);
         shimmerFrameLayout = (ShimmerFrameLayout) root.findViewById(R.id.shimmer_view_post_container);
         recyclerView = (RecyclerView) root.findViewById(R.id.rvBreakingPost);
-
-        if (networkOk) {
-            progressView.setVisibility(View.VISIBLE);
-            progressView.startAnimation();
-            Call<List<PostItem>> call = webService.feed(deviceId, profileId, token, userIds, limit, offset, "following", "", 1, false);
-            sendPostItemRequest(call);
-        } else {
-            Utils.showNetworkDialog(getActivity().getSupportFragmentManager());
-            progressView.setVisibility(View.GONE);
-            progressView.stopAnimation();
-
-        }
         recyclerView.setLayoutManager(layoutManager);
+
+        getData();
+
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
@@ -131,6 +133,20 @@ public class FollowingPost extends Fragment {
 
 
         return root;
+    }
+
+    private void getData() {
+        if (networkOk) {
+            progressView.setVisibility(View.VISIBLE);
+            progressView.startAnimation();
+            Call<List<PostItem>> call = webService.feed(deviceId, profileId, token, userIds, limit, offset, "following", "", 1, false);
+            sendPostItemRequest(call);
+        } else {
+            Utils.showNetworkDialog(getActivity().getSupportFragmentManager());
+            progressView.setVisibility(View.GONE);
+            progressView.stopAnimation();
+
+        }
     }
 
     private void PerformPagination() {
@@ -248,6 +264,20 @@ public class FollowingPost extends Fragment {
         } else {
             isViewShown = false;
         }
+    }
+
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            catIds = intent.getStringExtra("category_ids");
+
+        }
+    };
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Objects.requireNonNull(getActivity()).unregisterReceiver(broadcastReceiver);
     }
 
 }

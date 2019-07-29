@@ -10,7 +10,9 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuCompat;
@@ -28,18 +30,22 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.doodle.App;
 import com.doodle.Authentication.view.activity.LoginAgain;
+import com.doodle.Home.adapter.CategoryTitleAdapter;
 import com.doodle.Home.adapter.SubCategoryAdapter;
 import com.doodle.Home.adapter.ViewPagerAdapter;
+import com.doodle.Home.model.CommonCategory;
 import com.doodle.Home.model.PostFilterCategory;
 import com.doodle.Home.model.PostFilterItem;
 import com.doodle.Home.model.PostFilterSubCategory;
 import com.doodle.Home.model.TopContributorStatus;
+import com.doodle.Home.service.CategoryRemoveListener;
 import com.doodle.Home.service.FilterClickListener;
 import com.doodle.Home.service.HomeService;
 import com.doodle.Home.service.SocketIOManager;
@@ -59,6 +65,7 @@ import com.doodle.Search.LikerSearch;
 import com.doodle.utils.AppConstants;
 import com.doodle.utils.PrefManager;
 import com.doodle.utils.ScreenOnOffBroadcast;
+import com.doodle.utils.Utils;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
@@ -79,9 +86,7 @@ import retrofit2.Response;
 
 import static com.doodle.utils.AppConstants.IN_CHAT_MODE;
 
-
-public class Home extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemClickListener {
-
+public class Home extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     private TabLayout tabLayout;
     private Toolbar toolbar;
@@ -89,7 +94,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
     private Spinner categorySpinner;
     private PrefManager manager;
     private String image_url;
-    private String token, deviceId, userId, socketId, mSocketId;
+    private String token, deviceId, userId, socketId, mSocketId, selectedCategory = "";
     int categoryPosition = 0;
     int limit = 5;
     int offset = 0;
@@ -104,9 +109,12 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
     private BroadcastReceiver mReceiver;
     private ArrayList<PostFilterCategory> categories;
     private ArrayList<PostFilterSubCategory> subCategories, multipleSubCategories;
+    private ArrayList<CommonCategory> commonCategories;
+    private CategoryTitleAdapter categoryTitleAdapter;
 
     private ImageView imageNewPost, imageNotification, imageFriendRequest, imageStarContributor;
-    private TextView newNotificationCount, newMessageNotificationCount;
+    private TextView newNotificationCount, newMessageNotificationCount, filterItem;
+    private RecyclerView categoryRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,6 +156,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
         categories = new ArrayList<>();
         subCategories = new ArrayList<>();
         multipleSubCategories = new ArrayList<>();
+        commonCategories = new ArrayList<>();
         contributorStatus = new TopContributorStatus();
         topContributorStatus = getIntent().getStringExtra("STATUS");
 
@@ -169,8 +178,12 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
 // imageStarContributor.setOnClickListener(this);
         profileImage = findViewById(R.id.profile_image);
         categorySpinner = findViewById(R.id.spinnerCategoryType);
+        categorySpinner.setOnItemSelectedListener(this);
         newNotificationCount = findViewById(R.id.newNotificationCount);
         newMessageNotificationCount = findViewById(R.id.newMessageNotificationCount);
+        filterItem = findViewById(R.id.filterItem);
+        categoryRecyclerView = findViewById(R.id.categoryRecyclerView);
+        categoryRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         setupViewPager();
 
@@ -192,13 +205,23 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
 
         socket = new SocketIOManager().getWSocketInstance();
         mSocket = new SocketIOManager().getMSocketInstance();
+
+        filterItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (categoryPosition == 2) {
+                    showSingleFilterDialog();
+                } else {
+                    showMultipleFilterDialog();
+                }
+            }
+        });
     }
 
     private void setData() {
-        ArrayList<PostFilterSubCategory> postFilterSubCategories = new ArrayList<>();
-        categories.add(new PostFilterCategory("1", "All Category", postFilterSubCategories));
-        categories.add(new PostFilterCategory("2", "My Category", postFilterSubCategories));
-        categories.add(new PostFilterCategory("3", "Single Category", postFilterSubCategories));
+        categories.add(new PostFilterCategory("1", "All Category", new ArrayList<>()));
+        categories.add(new PostFilterCategory("2", "My Category", new ArrayList<>()));
+        categories.add(new PostFilterCategory("3", "Single Category", new ArrayList<>()));
         categoryFilter();
     }
 
@@ -309,15 +332,18 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
                                 JSONObject jsonObject = jsonArray.getJSONObject(i);
                                 String subCatId = jsonObject.getString("category_id");
                                 String subCatName = jsonObject.getString("category_name");
-                                ArrayList<PostFilterItem> arrayList = new ArrayList<>();
+                                ArrayList<PostFilterItem> singleArrayList = new ArrayList<>();
+                                ArrayList<PostFilterItem> multipleArrayList = new ArrayList<>();
                                 JSONArray array = jsonObject.getJSONArray("subcatg");
                                 for (int j = 0; j < array.length(); j++) {
-                                    String itemId = jsonObject.getString("sub_category_id");
-                                    String itemName = jsonObject.getString("sub_category_name");
-                                    arrayList.add(new PostFilterItem("", subCatId, itemId, itemName, false));
+                                    JSONObject obj = array.getJSONObject(j);
+                                    String itemId = obj.getString("sub_category_id");
+                                    String itemName = obj.getString("sub_category_name");
+                                    singleArrayList.add(new PostFilterItem("", subCatId, itemId, itemName, false));
+                                    multipleArrayList.add(new PostFilterItem("", subCatId, itemId, itemName, false));
                                 }
-                                subCategories.add(new PostFilterSubCategory("", subCatId, subCatName, false, arrayList));
-                                multipleSubCategories.add(new PostFilterSubCategory("", subCatId, subCatName, false, arrayList));
+                                subCategories.add(new PostFilterSubCategory("", subCatId, subCatName, false, singleArrayList));
+                                multipleSubCategories.add(new PostFilterSubCategory("", subCatId, subCatName, false, multipleArrayList));
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -337,6 +363,51 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
     }
 
     private void categoryFilter() {
+        CategoryRemoveListener categoryRemoveListener = new CategoryRemoveListener() {
+            @Override
+            public void onCategoryRemove(CommonCategory commonCategory) {
+                for (int i = 0; i < categories.get(categoryPosition).getPostFilterSubCategories().size(); i++) {
+                    if (categories.get(categoryPosition).getPostFilterSubCategories().get(i).getSubCatId().equals(commonCategory.getCatId())) {
+                        categories.get(categoryPosition).getPostFilterSubCategories().get(i).setSelectedAll(false);
+                        break;
+                    }
+                    for (int j = 0; j < categories.get(categoryPosition).getPostFilterSubCategories().get(i).getPostFilterItems().size(); j++) {
+                        if (categories.get(categoryPosition).getPostFilterSubCategories().get(i).getPostFilterItems().get(j).getItemId().equals(commonCategory.getCatId())) {
+                            categories.get(categoryPosition).getPostFilterSubCategories().get(i).getPostFilterItems().remove(j);
+                            break;
+                        }
+                    }
+                }
+                for (int i = 0; i < multipleSubCategories.size(); i++) {
+                    if (multipleSubCategories.get(i).getSubCatId().equals(commonCategory.getCatId())) {
+                        multipleSubCategories.get(i).setSelectedAll(false);
+                        break;
+                    }
+                    for (int j = 0; j < multipleSubCategories.get(i).getPostFilterItems().size(); j++) {
+                        if (multipleSubCategories.get(i).getPostFilterItems().get(j).getItemId().equals(commonCategory.getCatId())) {
+                            multipleSubCategories.get(i).getPostFilterItems().get(j).setSelected(false);
+                            break;
+                        }
+                    }
+                }
+
+                ArrayList<String> arrayList = new ArrayList<>();
+                commonCategories.clear();
+                for (PostFilterSubCategory postFilterSubCategory : categories.get(categoryPosition).getPostFilterSubCategories()) {
+                    if (postFilterSubCategory.isSelectedAll()) {
+                        arrayList.add(postFilterSubCategory.getSubCatId());
+                        commonCategories.add(new CommonCategory(postFilterSubCategory.getSubCatId(), postFilterSubCategory.getSubCatName()));
+                    }
+                    for (PostFilterItem postFilterItem : postFilterSubCategory.getPostFilterItems()) {
+                        arrayList.add(postFilterItem.getItemId());
+                        commonCategories.add(new CommonCategory(postFilterItem.getItemId(), postFilterItem.getItemName()));
+                    }
+                }
+                sendBroadcast((new Intent().putExtra("category_ids", Utils.setCategoryIds(arrayList))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
+
+            }
+        };
+
         ArrayList<String> arrayList = new ArrayList<>();
         for (PostFilterCategory postFilterCategory : categories) {
             arrayList.add(postFilterCategory.getCatName());
@@ -347,11 +418,14 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
 
         categorySpinner.setAdapter(dataAdapter);
 
+        categoryTitleAdapter = new CategoryTitleAdapter(this, commonCategories, categoryRemoveListener);
+        categoryRecyclerView.setAdapter(categoryTitleAdapter);
+
 //        showFilterDialog();
     }
 
     private void showSingleFilterDialog() {
-        Dialog dialog = new Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+        Dialog dialog = new Dialog(this, R.style.Theme_Dialog);
         dialog.setContentView(R.layout.single_post_category_filter_layout);
 
         Toolbar toolbar = dialog.findViewById(R.id.toolbar);
@@ -364,19 +438,33 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
 
         tvCategoryName.setText(categories.get(categoryPosition).getCatName());
         if (categoryPosition == 2) {
-            tvFilterItemName.setText(subCategories.get(0).getPostFilterItems().get(0).getItemName());
+            tvFilterItemName.setText(selectedCategory.isEmpty() ? subCategories.get(0).getSubCatName() : selectedCategory);
         } else {
             tvFilterItemName.setText(getString(R.string.personalize_your_feed));
         }
 
         FilterClickListener filterClickListener = new FilterClickListener() {
             @Override
-            public void onSingleSubCategorySelect(PostFilterSubCategory postFilterSubCategory) {
+            public void onSingleSubCategorySelect(PostFilterSubCategory filterSubCategory) {
                 categories.get(categoryPosition).getPostFilterSubCategories().clear();
-                categories.get(categoryPosition).getPostFilterSubCategories().add(postFilterSubCategory);
+                categories.get(categoryPosition).getPostFilterSubCategories().add(filterSubCategory);
+                ArrayList<String> arrayList = new ArrayList<>();
+                commonCategories.clear();
+                for (PostFilterSubCategory postFilterSubCategory : categories.get(categoryPosition).getPostFilterSubCategories()) {
+                    if (postFilterSubCategory.isSelectedAll()) {
+                        arrayList.add(postFilterSubCategory.getSubCatId());
+                        commonCategories.add(new CommonCategory(postFilterSubCategory.getSubCatId(), postFilterSubCategory.getSubCatName()));
+                    }
+                    for (PostFilterItem postFilterItem : postFilterSubCategory.getPostFilterItems()) {
+                        arrayList.add(postFilterItem.getItemId());
+                        commonCategories.add(new CommonCategory(postFilterItem.getItemId(), postFilterItem.getItemName()));
+                    }
+                }
                 dialog.dismiss();
-                //Api Request
-                //Progress Dialog
+                categoryTitleAdapter.notifyDataSetChanged();
+                selectedCategory = filterSubCategory.getSubCatName();
+                filterItem.setText(selectedCategory);
+                sendBroadcast((new Intent().putExtra("category_ids", Utils.setCategoryIds(arrayList))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
 
             }
 
@@ -391,10 +479,26 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
             }
 
             @Override
-            public void onSingleFilterItemSelect(PostFilterSubCategory postFilterSubCategory) {
+            public void onSingleFilterItemSelect(PostFilterSubCategory filterSubCategory) {
                 categories.get(categoryPosition).getPostFilterSubCategories().clear();
-                categories.get(categoryPosition).getPostFilterSubCategories().add(postFilterSubCategory);
+                categories.get(categoryPosition).getPostFilterSubCategories().add(filterSubCategory);
+                ArrayList<String> arrayList = new ArrayList<>();
+                commonCategories.clear();
+                for (PostFilterSubCategory postFilterSubCategory : categories.get(categoryPosition).getPostFilterSubCategories()) {
+                    if (postFilterSubCategory.isSelectedAll()) {
+                        arrayList.add(postFilterSubCategory.getSubCatId());
+                        commonCategories.add(new CommonCategory(postFilterSubCategory.getSubCatId(), postFilterSubCategory.getSubCatName()));
+                    }
+                    for (PostFilterItem postFilterItem : postFilterSubCategory.getPostFilterItems()) {
+                        arrayList.add(postFilterItem.getItemId());
+                        commonCategories.add(new CommonCategory(postFilterItem.getItemId(), postFilterItem.getItemName()));
+                    }
+                }
                 dialog.dismiss();
+                categoryTitleAdapter.notifyDataSetChanged();
+                selectedCategory = filterSubCategory.getSubCatName();
+                filterItem.setText(selectedCategory);
+                sendBroadcast((new Intent().putExtra("category_ids", Utils.setCategoryIds(arrayList))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
                 //Api Request
                 //Progress Dialog
 
@@ -411,9 +515,10 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
             @Override
             public void onSingleFilterItemDeselect(PostFilterSubCategory postFilterSubCategory) {
 //                for (int i = 0; i < categories.get(categoryPosition).getPostFilterSubCategories().size(); i++) {
-//                    if (categories.get(categoryPosition).getPostFilterSubCategories().get(i).getSubCatId().equals(postFilterItem.getSubCatId())) {
+//                    if (categories.get(categoryPosition).getPostFilterSubCategories().get(i).getSubCatId().equals(postFilterSubCategory.getSubCatId())) {
+//                        categories.get(categoryPosition).getPostFilterSubCategories().get(i).setSelectedAll(false);
 //                        for (int j = 0; j < categories.get(categoryPosition).getPostFilterSubCategories().get(i).getPostFilterItems().size(); j++) {
-//                            if (categories.get(categoryPosition).getPostFilterSubCategories().get(i).getPostFilterItems().get(j).getItemId().equals(postFilterItem.getItemId())) {
+//                            if (categories.get(categoryPosition).getPostFilterSubCategories().get(i).getPostFilterItems().get(j).getItemId().equals(postFilterSubCategory.getPostFilterItems().get(0).getItemId())) {
 //                                categories.get(categoryPosition).getPostFilterSubCategories().get(i).getPostFilterItems().remove(j);
 //                                break;
 //                            }
@@ -424,7 +529,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
             }
         };
 
-        SubCategoryAdapter subCategoryAdapter = new SubCategoryAdapter(this, subCategories, filterClickListener);
+        SubCategoryAdapter subCategoryAdapter = new SubCategoryAdapter(this, subCategories, filterClickListener, 0);
         recyclerView.setAdapter(subCategoryAdapter);
 
         toolbar.setOnClickListener(new View.OnClickListener() {
@@ -438,21 +543,22 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
     }
 
     private void showMultipleFilterDialog() {
-        Dialog dialog = new Dialog(this, android.R.style.Theme_Black_NoTitleBar_Fullscreen);
+        Dialog dialog = new Dialog(this, R.style.Theme_Dialog);
         dialog.setContentView(R.layout.multiple_post_category_filter_layout);
 
         Toolbar toolbar = dialog.findViewById(R.id.toolbar);
-        TextView tvCategoryName, tvFilterItemName, tvDone;
+        TextView tvCategoryName, tvFilterItemName;
+        FloatingActionButton done;
         RecyclerView recyclerView;
         tvCategoryName = dialog.findViewById(R.id.categoryName);
         tvFilterItemName = dialog.findViewById(R.id.filterItem);
-        tvDone = dialog.findViewById(R.id.done);
+        done = dialog.findViewById(R.id.done);
         recyclerView = dialog.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         tvCategoryName.setText(categories.get(categoryPosition).getCatName());
         if (categoryPosition == 2) {
-            tvFilterItemName.setText(multipleSubCategories.get(0).getPostFilterItems().get(0).getItemName());
+            tvFilterItemName.setText(multipleSubCategories.get(0).getSubCatName());
         } else {
             tvFilterItemName.setText(getString(R.string.personalize_your_feed));
         }
@@ -460,14 +566,14 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
         FilterClickListener filterClickListener = new FilterClickListener() {
             @Override
             public void onSingleSubCategorySelect(PostFilterSubCategory postFilterSubCategory) {
-                categories.get(categoryPosition).getPostFilterSubCategories().add(postFilterSubCategory);
+                categories.get(1).getPostFilterSubCategories().add(postFilterSubCategory);
             }
 
             @Override
             public void onSingleSubCategoryDeselect(PostFilterSubCategory postFilterSubCategory) {
-                for (int i = 0; i < categories.get(categoryPosition).getPostFilterSubCategories().size(); i++) {
-                    if (categories.get(categoryPosition).getPostFilterSubCategories().get(i).getSubCatId().equals(postFilterSubCategory.getSubCatId())) {
-                        categories.get(categoryPosition).getPostFilterSubCategories().remove(i);
+                for (int i = 0; i < categories.get(1).getPostFilterSubCategories().size(); i++) {
+                    if (categories.get(1).getPostFilterSubCategories().get(i).getSubCatId().equals(postFilterSubCategory.getSubCatId())) {
+                        categories.get(1).getPostFilterSubCategories().remove(i);
                         break;
                     }
                 }
@@ -484,28 +590,30 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
 //                    }
 //                }
 
-                for (int i = 0; i < categories.get(categoryPosition).getPostFilterSubCategories().size(); i++) {
-                    if (categories.get(categoryPosition).getPostFilterSubCategories().get(i).getSubCatId().equals(postFilterSubCategory.getSubCatId())) {
-                        categories.get(categoryPosition).getPostFilterSubCategories().get(i).getPostFilterItems().add(postFilterSubCategory.getPostFilterItems().get(0));
+                for (int i = 0; i < categories.get(1).getPostFilterSubCategories().size(); i++) {
+                    if (categories.get(1).getPostFilterSubCategories().get(i).getSubCatId().equals(postFilterSubCategory.getSubCatId())) {
+                        categories.get(1).getPostFilterSubCategories().get(i).getPostFilterItems().add(postFilterSubCategory.getPostFilterItems().get(0));
                         isNotExist = false;
                         break;
                     }
                 }
                 if (isNotExist) {
-                    categories.get(categoryPosition).getPostFilterSubCategories().add(postFilterSubCategory);
+                    categories.get(1).getPostFilterSubCategories().add(postFilterSubCategory);
                 }
             }
 
             @Override
             public void onSingleFilterItemDeselect(PostFilterSubCategory postFilterSubCategory) {
-                for (int i = 0; i < categories.get(categoryPosition).getPostFilterSubCategories().size(); i++) {
-                    if (categories.get(categoryPosition).getPostFilterSubCategories().get(i).getSubCatId().equals(postFilterSubCategory.getSubCatId())) {
-                        for (int j = 0; j < categories.get(categoryPosition).getPostFilterSubCategories().get(i).getPostFilterItems().size(); j++) {
-                            if (categories.get(categoryPosition).getPostFilterSubCategories().get(i).getPostFilterItems().get(j).getItemId().equals(postFilterSubCategory.getPostFilterItems().get(0).getItemId())) {
-                                categories.get(categoryPosition).getPostFilterSubCategories().get(i).getPostFilterItems().remove(j);
+                for (int i = 0; i < categories.get(1).getPostFilterSubCategories().size(); i++) {
+                    if (categories.get(1).getPostFilterSubCategories().get(i).getSubCatId().equals(postFilterSubCategory.getSubCatId())) {
+                        categories.get(1).getPostFilterSubCategories().get(i).setSelectedAll(false);
+                        for (int j = 0; j < categories.get(1).getPostFilterSubCategories().get(i).getPostFilterItems().size(); j++) {
+                            if (categories.get(1).getPostFilterSubCategories().get(i).getPostFilterItems().get(j).getItemId().equals(postFilterSubCategory.getPostFilterItems().get(0).getItemId())) {
+                                categories.get(1).getPostFilterSubCategories().get(i).getPostFilterItems().remove(j);
                                 break;
                             }
                         }
+                        break;
                     }
                 }
 
@@ -524,7 +632,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
             }
         };
 
-        SubCategoryAdapter subCategoryAdapter = new SubCategoryAdapter(this, multipleSubCategories, filterClickListener);
+        SubCategoryAdapter subCategoryAdapter = new SubCategoryAdapter(this, multipleSubCategories, filterClickListener, 1);
         recyclerView.setAdapter(subCategoryAdapter);
 
         toolbar.setOnClickListener(new View.OnClickListener() {
@@ -534,12 +642,27 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
             }
         });
 
-        tvDone.setOnClickListener(new View.OnClickListener() {
+        done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 categorySpinner.setSelection(1);
                 categoryPosition = 1;
+                ArrayList<String> arrayList = new ArrayList<>();
+                commonCategories.clear();
+                for (PostFilterSubCategory postFilterSubCategory : categories.get(categoryPosition).getPostFilterSubCategories()) {
+                    if (postFilterSubCategory.isSelectedAll()) {
+                        arrayList.add(postFilterSubCategory.getSubCatId());
+                        commonCategories.add(new CommonCategory(postFilterSubCategory.getSubCatId(), postFilterSubCategory.getSubCatName()));
+                    }
+                    for (PostFilterItem postFilterItem : postFilterSubCategory.getPostFilterItems()) {
+                        arrayList.add(postFilterItem.getItemId());
+                        commonCategories.add(new CommonCategory(postFilterItem.getItemId(), postFilterItem.getItemName()));
+                    }
+                }
                 dialog.dismiss();
+                categoryTitleAdapter.notifyDataSetChanged();
+                filterItem.setText(getString(R.string.personalize_your_feed));
+                sendBroadcast((new Intent().putExtra("category_ids", Utils.setCategoryIds(arrayList))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
             }
         });
 
@@ -573,9 +696,23 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
     }
 
     private void setupCollapsingToolbar() {
-        final CollapsingToolbarLayout collapsingToolbar = (CollapsingToolbarLayout) findViewById(
-                R.id.collapse_toolbar);
+        final CollapsingToolbarLayout collapsingToolbar = findViewById(R.id.collapse_toolbar);
+        LinearLayout viewCategory = findViewById(R.id.viewCategory);
+        final AppBarLayout appBarLayout = findViewById(R.id.app_bar_layout);
         collapsingToolbar.setTitleEnabled(false);
+        appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+            @Override
+            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+
+                if (Math.abs(verticalOffset) - appBarLayout.getTotalScrollRange() == 0) {
+                    //  Collapsed
+                    viewCategory.setVisibility(View.GONE);
+                } else {
+                    //Expanded
+                    viewCategory.setVisibility(View.VISIBLE);
+                }
+            }
+        });
     }
 
     /**
@@ -608,7 +745,6 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
         setupTabIcons();
 
     }
-
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
@@ -756,11 +892,38 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
     }
 
     @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        String item = adapterView.getItemAtPosition(i).toString();
-        categoryPosition = i;
-
-        // Showing selected spinner item
-        Toast.makeText(adapterView.getContext(), "Selected: " + item, Toast.LENGTH_LONG).show();
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        ((TextView) parent.getChildAt(0)).setTextColor(Color.WHITE);
+        categoryPosition = position;
+        if (position == 1) {
+            categoryRecyclerView.setVisibility(View.VISIBLE);
+        } else {
+            categoryRecyclerView.setVisibility(View.GONE);
+        }
+        if (position == 2) {
+            filterItem.setText(selectedCategory.isEmpty() ? subCategories.get(0).getSubCatName() : selectedCategory);
+        } else {
+            filterItem.setText(getString(R.string.personalize_your_feed));
+        }
+        ArrayList<String> arrayList = new ArrayList<>();
+        commonCategories.clear();
+        for (PostFilterSubCategory postFilterSubCategory : categories.get(categoryPosition).getPostFilterSubCategories()) {
+            if (postFilterSubCategory.isSelectedAll()) {
+                arrayList.add(postFilterSubCategory.getSubCatId());
+                commonCategories.add(new CommonCategory(postFilterSubCategory.getSubCatId(), postFilterSubCategory.getSubCatName()));
+            }
+            for (PostFilterItem postFilterItem : postFilterSubCategory.getPostFilterItems()) {
+                arrayList.add(postFilterItem.getItemId());
+                commonCategories.add(new CommonCategory(postFilterItem.getItemId(), postFilterItem.getItemName()));
+            }
+        }
+        categoryTitleAdapter.notifyDataSetChanged();
+        sendBroadcast((new Intent().putExtra("category_ids", Utils.setCategoryIds(arrayList))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
     }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> adapterView) {
+
+    }
+
 }

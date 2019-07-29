@@ -3,19 +3,19 @@ package com.doodle.utils;
 public class AppConstants {
 
     //===============LOCAL SERVER==================
-//    public static final String BASE_URL = "http://192.168.0.77:8040/sites/likeropt/";
-//    public static final String BASE_URL_MEDIA = "http://192.168.0.77:8040/sites/likeropt/";
-//    public static final String SOCKET_WEB = "http://192.168.0.77:4001";
-//    public static final String SOCKET_MESSAGE = "http://192.168.0.77:4002";
-//    public static final String SOCKET_VIDEO = "http://192.168.0.77:4004";
+    public static final String BASE_URL = "http://192.168.0.99:8040/sites/likeropt/";
+    public static final String BASE_URL_MEDIA = "http://192.168.0.99:8040/sites/likeropt/";
+    public static final String SOCKET_WEB = "http://192.168.0.99:4001";
+    public static final String SOCKET_MESSAGE = "http://192.168.0.99:4002";
+    public static final String SOCKET_VIDEO = "http://192.168.0.99:4004";
 
 
     //==========================STG SERVER=====================
-    public static final String BASE_URL = "https://www.stg.liker.com/";
-    public static final String BASE_URL_MEDIA = "https://www.cdn-liker.com/stg-static/";
-    public static final String SOCKET_WEB = "https://node.liker.com:7803";
-    public static final String SOCKET_MESSAGE = "https://node.liker.com:7804";
-    public static final String SOCKET_VIDEO = "https://node.liker.com:7807";
+//    public static final String BASE_URL = "https://www.stg.liker.com/";
+//    public static final String BASE_URL_MEDIA = "https://www.cdn-liker.com/stg-static/";
+//    public static final String SOCKET_WEB = "https://node.liker.com:7803";
+//    public static final String SOCKET_MESSAGE = "https://node.liker.com:7804";
+//    public static final String SOCKET_VIDEO = "https://node.liker.com:7807";
 
     //=======================LIVE SERVER=============================
     //    public static final String BASE_URL = "https://www.liker.com/";
@@ -92,6 +92,7 @@ public class AppConstants {
     public static final String LIST_MESSAGE_BROADCAST = "list_message_broadcast";
     public static final String NEW_NOTIFICATION_BROADCAST = "new_notification_broadcast";
     public static final String RECONNECT_SOCKET_BROADCAST = "reconnect_socket_broadcast";
+    public static final String CATEGORY_CHANGE_BROADCAST = "category_change_broadcast";
 
     public static final String NOTIFICATION = "newNotification";
     public static final String CHAT_USERS = "get_chat_users";

@@ -1,7 +1,10 @@
 package com.doodle.Home.view.fragment;
 
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -27,6 +30,7 @@ import com.doodle.Post.service.PostService;
 import com.doodle.Post.view.fragment.ContributorStatus;
 import com.doodle.R;
 import com.doodle.Search.model.AdvanceSearches;
+import com.doodle.utils.AppConstants;
 import com.doodle.utils.NetworkHelper;
 import com.doodle.utils.PrefManager;
 import com.doodle.utils.Utils;
@@ -39,6 +43,7 @@ import org.jsoup.nodes.Document;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 import cn.jzvd.JZVideoPlayer;
 import retrofit2.Call;
@@ -73,6 +78,7 @@ public class BreakingPost extends Fragment {
     private boolean isScrolling;
     int limit = 5;
     int offset = 0;
+    private String catIds = "";
     private ShimmerFrameLayout shimmerFrameLayout;
 
     @Override
@@ -83,6 +89,11 @@ public class BreakingPost extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(AppConstants.CATEGORY_CHANGE_BROADCAST);
+        Objects.requireNonNull(getActivity()).registerReceiver(broadcastReceiver, intentFilter);
+
         manager = new PrefManager(getActivity());
         deviceId = manager.getDeviceId();
         profileId = manager.getProfileId();
@@ -104,19 +115,10 @@ public class BreakingPost extends Fragment {
         progressView = (CircularProgressView) root.findViewById(R.id.progress_view);
         shimmerFrameLayout = (ShimmerFrameLayout) root.findViewById(R.id.shimmer_view_post_container);
         recyclerView = (RecyclerView) root.findViewById(R.id.rvBreakingPost);
-
-        if (networkOk) {
-            progressView.setVisibility(View.VISIBLE);
-            progressView.startAnimation();
-            Call<List<PostItem>> call = webService.feed(deviceId, profileId, token, userIds, limit, offset, "breaking", "", 1, false);
-            sendPostItemRequest(call);
-        } else {
-            Utils.showNetworkDialog(getActivity().getSupportFragmentManager());
-            progressView.setVisibility(View.GONE);
-            progressView.stopAnimation();
-
-        }
         recyclerView.setLayoutManager(layoutManager);
+
+        getData();
+
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
@@ -146,6 +148,20 @@ public class BreakingPost extends Fragment {
         return root;
     }
 
+    private void getData() {
+        if (networkOk) {
+            progressView.setVisibility(View.VISIBLE);
+            progressView.startAnimation();
+            Call<List<PostItem>> call = webService.feed(deviceId, profileId, token, userIds, limit, offset, "breaking", catIds, 1, false);
+            sendPostItemRequest(call);
+        } else {
+            Utils.showNetworkDialog(getActivity().getSupportFragmentManager());
+            progressView.setVisibility(View.GONE);
+            progressView.stopAnimation();
+
+        }
+    }
+
     private void PerformPagination() {
         progressView.setVisibility(View.VISIBLE);
         progressView.startAnimation();
@@ -154,7 +170,7 @@ public class BreakingPost extends Fragment {
             public void run() {
                 if (networkOk) {
                     String queryResult = App.getQueryResult();
-                    Call<List<PostItem>> call = webService.feed(deviceId, profileId, token, userIds, limit, offset, "breaking", "", 1, false);
+                    Call<List<PostItem>> call = webService.feed(deviceId, profileId, token, userIds, limit, offset, "breaking", catIds, 1, false);
                     PostItemPagingRequest(call);
 
                 } else {
@@ -258,5 +274,20 @@ public class BreakingPost extends Fragment {
         } else {
             isViewShown = false;
         }
+    }
+
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            catIds = intent.getStringExtra("category_ids");
+            getData();
+
+        }
+    };
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Objects.requireNonNull(getActivity()).unregisterReceiver(broadcastReceiver);
     }
 }

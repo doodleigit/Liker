@@ -3,6 +3,7 @@ package com.doodle.Home.adapter;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,8 +27,9 @@ public class FilterItemAdapter extends RecyclerView.Adapter<FilterItemAdapter.Vi
     private ArrayList<PostFilterItem> arrayList;
     private FilterClickListener filterClickListener;
     private SelectChangeListener selectChangeListener;
+    private int type;
 
-    public FilterItemAdapter(Context context, PostFilterSubCategory postFilterSubCategory, FilterClickListener filterClickListener, SelectChangeListener selectChangeListener) {
+    public FilterItemAdapter(Context context, PostFilterSubCategory postFilterSubCategory, FilterClickListener filterClickListener, SelectChangeListener selectChangeListener, int type) {
         this.context = context;
         this.catId = postFilterSubCategory.getCatId();
         this.subCatId = postFilterSubCategory.getSubCatId();
@@ -36,6 +38,7 @@ public class FilterItemAdapter extends RecyclerView.Adapter<FilterItemAdapter.Vi
         this.arrayList = postFilterSubCategory.getPostFilterItems();
         this.selectChangeListener = selectChangeListener;
         this.filterClickListener = filterClickListener;
+        this.type = type;
     }
 
     @NonNull
@@ -47,8 +50,10 @@ public class FilterItemAdapter extends RecyclerView.Adapter<FilterItemAdapter.Vi
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
+    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
+        int i = viewHolder.getAdapterPosition();
         viewHolder.tvName.setText(arrayList.get(i).getItemName());
+        Log.d("filer_item", subCatName + " " + arrayList.get(i).getItemName());
 
         if (arrayList.get(i).isSelected()) {
             viewHolder.ivAdd.setImageResource(R.drawable.ok);
@@ -59,19 +64,54 @@ public class FilterItemAdapter extends RecyclerView.Adapter<FilterItemAdapter.Vi
         viewHolder.ivAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (arrayList.get(i).isSelected()) {
-                    viewHolder.ivAdd.setImageResource(R.drawable.plus);
-                    arrayList.get(i).setSelected(false);
-                    ArrayList<PostFilterItem> postFilterItems = new ArrayList<>();
-                    postFilterItems.add(arrayList.get(i));
-                    selectChangeListener.onSelectChange(false);
-                    filterClickListener.onSingleFilterItemDeselect(new PostFilterSubCategory(catId, subCatId, subCatName, isSelectedAll, postFilterItems));
-                } else {
+                if (type == 0) {
+                    isSelectedAll = false;
+                    selectChangeListener.onSelectClear();
                     viewHolder.ivAdd.setImageResource(R.drawable.ok);
                     arrayList.get(i).setSelected(true);
                     ArrayList<PostFilterItem> postFilterItems = new ArrayList<>();
-                    postFilterItems.add(arrayList.get(i));
+                    String categoryId, subCategoryId, itemId, itemName;
+                    boolean isSelected;
+                    categoryId = "";
+                    subCategoryId = arrayList.get(i).getSubCatId();
+                    itemId = arrayList.get(i).getItemId();
+                    itemName = arrayList.get(i).getItemName();
+                    isSelected = arrayList.get(i).isSelected();
+                    PostFilterItem postFilterItem = new PostFilterItem(categoryId, subCategoryId, itemId, itemName, isSelected);
+                    postFilterItems.add(postFilterItem);
                     filterClickListener.onSingleFilterItemSelect(new PostFilterSubCategory(catId, subCatId, subCatName, isSelectedAll, postFilterItems));
+                } else {
+                    if (arrayList.get(i).isSelected()) {
+                        viewHolder.ivAdd.setImageResource(R.drawable.plus);
+                        arrayList.get(i).setSelected(false);
+                        ArrayList<PostFilterItem> postFilterItems = new ArrayList<>();
+                        String categoryId, subCategoryId, itemId, itemName;
+                        boolean isSelected;
+                        categoryId = "";
+                        subCategoryId = arrayList.get(i).getSubCatId();
+                        itemId = arrayList.get(i).getItemId();
+                        itemName = arrayList.get(i).getItemName();
+                        isSelected = arrayList.get(i).isSelected();
+                        PostFilterItem postFilterItem = new PostFilterItem(categoryId, subCategoryId, itemId, itemName, isSelected);
+                        postFilterItems.add(postFilterItem);
+                        selectChangeListener.onSelectChange(false);
+                        filterClickListener.onSingleFilterItemDeselect(new PostFilterSubCategory(catId, subCatId, subCatName, isSelectedAll, postFilterItems));
+                    } else {
+                        isSelectedAll = false;
+                        viewHolder.ivAdd.setImageResource(R.drawable.ok);
+                        arrayList.get(i).setSelected(true);
+                        ArrayList<PostFilterItem> postFilterItems = new ArrayList<>();
+                        String categoryId, subCategoryId, itemId, itemName;
+                        boolean isSelected;
+                        categoryId = "";
+                        subCategoryId = arrayList.get(i).getSubCatId();
+                        itemId = arrayList.get(i).getItemId();
+                        itemName = arrayList.get(i).getItemName();
+                        isSelected = arrayList.get(i).isSelected();
+                        PostFilterItem postFilterItem = new PostFilterItem(categoryId, subCategoryId, itemId, itemName, isSelected);
+                        postFilterItems.add(postFilterItem);
+                        filterClickListener.onSingleFilterItemSelect(new PostFilterSubCategory(catId, subCatId, subCatName, isSelectedAll, postFilterItems));
+                    }
                 }
             }
         });

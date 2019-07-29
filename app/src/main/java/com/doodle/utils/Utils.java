@@ -57,6 +57,7 @@ import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -77,11 +78,10 @@ public class Utils {
         }
 
 
-
         return false;
     }
 
-    public static void toastMatCol(Context context,String message,int image,int color) {
+    public static void toastMatCol(Context context, String message, int image, int color) {
 //        MaterialToast.makeText(this, "Hello, I'm a material toast!",
 //                R.mipmap.ic_launcher, Toast.LENGTH_SHORT).setBackgroundColor(Color.RED).show();
 
@@ -92,7 +92,8 @@ public class Utils {
                 .setBackgroundColor(color)
                 .show();
     }
-    public static void toast(Context context,String message,int image) {
+
+    public static void toast(Context context, String message, int image) {
 
         new MaterialToast(context)
                 .setMessage(message)
@@ -102,9 +103,7 @@ public class Utils {
     }
 
 
-
-
-    public static void showCustomToast(Context context,View views,String message,int gravity) {
+    public static void showCustomToast(Context context, View views, String message, int gravity) {
 
 
         LayoutInflater inflater = LayoutInflater.from(context);
@@ -116,7 +115,7 @@ public class Utils {
 
         Toast toast = new Toast(context);
         toast.setDuration(Toast.LENGTH_LONG);
-        toast.setGravity(gravity| Gravity.CENTER, 0, 120);
+        toast.setGravity(gravity | Gravity.CENTER, 0, 120);
         toast.setView(view);
         toast.show();
 
@@ -161,7 +160,7 @@ public class Utils {
         tvPostContent.setText(s);
     }
 
-    private void setupAnimation(Context context,View view, final Animation animation,
+    private void setupAnimation(Context context, View view, final Animation animation,
                                 final int animationID) {
         view.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -175,19 +174,19 @@ public class Utils {
     }
 
 
-    public static void textLinkup(String originalText,String url, TextView tvContributorStatus) {
+    public static void textLinkup(String originalText, String url, TextView tvContributorStatus) {
         SpannableString spannableStr = new SpannableString(originalText);
 
         URLSpan urlSpan = new URLSpan(url);
 
-        spannableStr.setSpan(urlSpan, originalText.length()-22, originalText.length()-1, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+        spannableStr.setSpan(urlSpan, originalText.length() - 22, originalText.length() - 1, Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         tvContributorStatus.setMovementMethod(LinkMovementMethod.getInstance());
         tvContributorStatus.setText(spannableStr);
     }
 
     public static SpannableStringBuilder getSpannableStringBuilder(PostItem object) {
 
-        String content=object.getPostText();
+        String content = object.getPostText();
         SpannableStringBuilder builder = new SpannableStringBuilder();
         SpannableString spannableUserStr = new SpannableString(content);
         builder.append(spannableUserStr);
@@ -220,7 +219,7 @@ public class Utils {
                 spannableString.setSpan(new StyleSpan(Typeface.BOLD), 0, content.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                 builder.append(spannableString);
                 return builder;
-            }else {
+            } else {
                 return builder;
             }
 
@@ -271,6 +270,7 @@ public class Utils {
             ds.setUnderlineText(false);
         }
     }
+
     public static String getDomainName(String url) throws MalformedURLException {
         if (!url.startsWith("http") && !url.startsWith("https")) {
             url = "http://" + url;
@@ -322,11 +322,10 @@ public class Utils {
     }
 
     public static boolean isNullOrEmpty(String str) {
-        if(str != null && !str.isEmpty())
+        if (str != null && !str.isEmpty())
             return false;
         return true;
     }
-
 
 
     public static SpannableStringBuilder getSpannableStringBuilder(String likes, String followers, int totalStars, String categoryName) {
@@ -342,7 +341,7 @@ public class Utils {
     }
 
 
-    public static String getMD5EncryptedString(String encTarget){
+    public static String getMD5EncryptedString(String encTarget) {
         MessageDigest mdEnc = null;
         try {
             mdEnc = MessageDigest.getInstance("MD5");
@@ -352,12 +351,11 @@ public class Utils {
         } // Encryption algorithm
         mdEnc.update(encTarget.getBytes(), 0, encTarget.length());
         String md5 = new BigInteger(1, mdEnc.digest()).toString(16);
-        while ( md5.length() < 32 ) {
-            md5 = "0"+md5;
+        while (md5.length() < 32) {
+            md5 = "0" + md5;
         }
         return md5;
     }
-
 
 
     public static String extractMentionText(PostItem item) {
@@ -378,6 +376,7 @@ public class Utils {
         return text;
 
     }
+
     public static String extractMentionText(PostShareItem item) {
 
         String mentionString = item.getPostText();
@@ -516,4 +515,23 @@ public class Utils {
         }
         return ssb;
     }
+
+    public static String setCategoryIds(ArrayList<String> arrayList) {
+        StringBuilder stringBuilder = new StringBuilder();
+        String categories = "";
+        for (int i = 0; i < arrayList.size(); i++) {
+            stringBuilder.append(arrayList.get(i)).append(",");
+        }
+
+        String holder = stringBuilder.toString();
+
+        if (holder.length() > 0) {
+            categories = holder.substring(0, holder.length() - 1);
+        } else {
+            categories = "";
+        }
+
+        return categories;
+    }
+
 }

@@ -648,7 +648,6 @@ public class Welcome extends AppCompatActivity implements View.OnClickListener, 
                 LoginUser loginUser = response.body();
                 boolean status = loginUser.isStatus();
 
-
                 if (status) {
                     String mToken = loginUser.getToken();
                     manager.setToken(mToken);

@@ -47,7 +47,7 @@
 
     <style name="CustomDialogAnimation">
 
-        <item name="android:windowEnterAnimation">@anim/slide_in_up</item>
+        <item name="android:windowEnterAnimation">@anim/slide_in_right</item>
         <item name="android:windowExitAnimation">@anim/slide_out_left</item>
     </style>
 
@@ -64,7 +64,8 @@
         <item name="android:textColor">@android:color/black</item>
     </style>
 
-//Animation Between Activity
+    //Animation Between Activity
+
     <style name="CustomActivityAnimation" parent="@android:style/Animation.Activity">
         <item name="android:activityOpenEnterAnimation">@anim/slide_in_right</item>
         <item name="android:activityOpenExitAnimation">@anim/slide_out_left</item>
@@ -78,14 +79,14 @@
     </style>
 
 
-
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <!--Splash screen theme. You should use it in your manifest file for your Splash Activity-->
     <style name="AppTheme.Launcher">
-        <item name="android:windowBackground">@drawable/splash_background</item> <!--Also available: @drawable:launcher_screen_with_background-->
+        <item name="android:windowBackground">@drawable/splash_background
+        </item> <!--Also available: @drawable:launcher_screen_with_background-->
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowActionBar">false</item>
         <item name="android:windowFullscreen">true</item>
@@ -101,8 +102,14 @@
         <item name="android:popupBackground">@android:color/white</item>
     </style>
 
-    <style name="AppSearchView" parent="Widget.AppCompat.SearchView" >
+    <style name="AppSearchView" parent="Widget.AppCompat.SearchView">
         <item name="android:textSize">10sp</item>
+    </style>
+
+    <style name="Theme_Dialog">
+        <item name="android:windowMinWidthMajor">100%</item>
+        <item name="android:windowMinWidthMinor">100%</item>
+        <item name="android:windowAnimationStyle">@style/CustomDialogAnimation</item>
     </style>
 
 </resources>
