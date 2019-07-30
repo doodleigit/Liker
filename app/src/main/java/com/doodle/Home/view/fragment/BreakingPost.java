@@ -25,6 +25,7 @@ import com.doodle.Home.model.DataItem;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.service.HomeService;
 import com.doodle.Home.service.TextHolder;
+import com.doodle.Home.view.activity.Home;
 import com.doodle.Post.model.CategoryItem;
 import com.doodle.Post.service.PostService;
 import com.doodle.Post.view.fragment.ContributorStatus;
@@ -237,6 +238,7 @@ public class BreakingPost extends Fragment {
                     progressView.setVisibility(View.GONE);
                     progressView.stopAnimation();
                 }
+                ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(1);
 
             }
 
@@ -245,6 +247,8 @@ public class BreakingPost extends Fragment {
                 Log.d("MESSAGE: ", t.getMessage());
                 progressView.setVisibility(View.GONE);
                 progressView.stopAnimation();
+                ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(1);
+
             }
         });
 
@@ -279,6 +283,7 @@ public class BreakingPost extends Fragment {
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadInitial();
             catIds = intent.getStringExtra("category_ids");
             getData();
 

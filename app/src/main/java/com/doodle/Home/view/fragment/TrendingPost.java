@@ -22,6 +22,7 @@ import com.doodle.App;
 import com.doodle.Home.adapter.BreakingPostAdapter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.service.HomeService;
+import com.doodle.Home.view.activity.Home;
 import com.doodle.R;
 import com.doodle.utils.AppConstants;
 import com.doodle.utils.NetworkHelper;
@@ -102,19 +103,10 @@ public class TrendingPost extends Fragment {
         progressView = (CircularProgressView) root.findViewById(R.id.progress_view);
         shimmerFrameLayout = (ShimmerFrameLayout) root.findViewById(R.id.shimmer_view_post_container);
         recyclerView = (RecyclerView) root.findViewById(R.id.rvBreakingPost);
-
-        if (networkOk) {
-            progressView.setVisibility(View.VISIBLE);
-            progressView.startAnimation();
-            Call<List<PostItem>> call = webService.feed(deviceId, profileId, token, userIds, limit, offset, "trending", catIds, 1, false);
-            sendPostItemRequest(call);
-        } else {
-            Utils.showNetworkDialog(getActivity().getSupportFragmentManager());
-            progressView.setVisibility(View.GONE);
-            progressView.stopAnimation();
-
-        }
         recyclerView.setLayoutManager(layoutManager);
+
+        getData();
+
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
@@ -142,6 +134,20 @@ public class TrendingPost extends Fragment {
 
 
         return root;
+    }
+
+    private void getData() {
+        if (networkOk) {
+            progressView.setVisibility(View.VISIBLE);
+            progressView.startAnimation();
+            Call<List<PostItem>> call = webService.feed(deviceId, profileId, token, userIds, limit, offset, "trending", catIds, 1, false);
+            sendPostItemRequest(call);
+        } else {
+            Utils.showNetworkDialog(getActivity().getSupportFragmentManager());
+            progressView.setVisibility(View.GONE);
+            progressView.stopAnimation();
+
+        }
     }
 
     private void PerformPagination() {
@@ -218,6 +224,7 @@ public class TrendingPost extends Fragment {
                     //  Log.d("PostItem: ", categoryItem.toString() + "");
                     progressView.setVisibility(View.GONE);
                     progressView.stopAnimation();
+                    ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(0);
                 }
 
             }
@@ -227,6 +234,7 @@ public class TrendingPost extends Fragment {
                 Log.d("MESSAGE: ", t.getMessage());
                 progressView.setVisibility(View.GONE);
                 progressView.stopAnimation();
+                ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(0);
             }
         });
 
@@ -265,7 +273,8 @@ public class TrendingPost extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             catIds = intent.getStringExtra("category_ids");
-
+            ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadInitial();
+            getData();
         }
     };
 

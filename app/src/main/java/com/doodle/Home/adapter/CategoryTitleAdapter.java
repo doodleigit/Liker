@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.doodle.Home.model.CommonCategory;
@@ -20,6 +21,7 @@ public class CategoryTitleAdapter extends RecyclerView.Adapter<CategoryTitleAdap
     private Context context;
     private ArrayList<CommonCategory> arrayList;
     private CategoryRemoveListener categoryRemoveListener;
+    private int position = -1;
 
     public CategoryTitleAdapter(Context context, ArrayList<CommonCategory> arrayList, CategoryRemoveListener categoryRemoveListener) {
         this.context = context;
@@ -39,12 +41,35 @@ public class CategoryTitleAdapter extends RecyclerView.Adapter<CategoryTitleAdap
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
 
         viewHolder.tvCatName.setText(arrayList.get(i).getCatName());
+        viewHolder.mainLayout.setBackgroundResource(R.drawable.rectangle_corner_round_five);
         viewHolder.ivClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 categoryRemoveListener.onCategoryRemove(arrayList.get(i));
                 arrayList.remove(i);
                 notifyDataSetChanged();
+            }
+        });
+
+        viewHolder.mainLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (position == -1) {
+                    position = i;
+                    categoryRemoveListener.onCategorySelect(arrayList.get(i));
+                    viewHolder.mainLayout.setBackgroundResource(R.drawable.rectangle_round_corner_six);
+                } else {
+                    if (position == i) {
+                        position = -1;
+                        categoryRemoveListener.onCategoryDeSelect();
+                        viewHolder.mainLayout.setBackgroundResource(R.drawable.rectangle_corner_round_five);
+                    } else {
+                        notifyItemChanged(position);
+                        position = i;
+                        categoryRemoveListener.onCategorySelect(arrayList.get(i));
+                        viewHolder.mainLayout.setBackgroundResource(R.drawable.rectangle_round_corner_six);
+                    }
+                }
             }
         });
 
@@ -57,12 +82,14 @@ public class CategoryTitleAdapter extends RecyclerView.Adapter<CategoryTitleAdap
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
+        LinearLayout mainLayout;
         TextView tvCatName;
         ImageView ivClose;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
+            mainLayout = itemView.findViewById(R.id.main_layout);
             tvCatName = itemView.findViewById(R.id.categoryName);
             ivClose = itemView.findViewById(R.id.close);
         }

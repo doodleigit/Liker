@@ -22,6 +22,7 @@ import com.doodle.App;
 import com.doodle.Home.adapter.BreakingPostAdapter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.service.HomeService;
+import com.doodle.Home.view.activity.Home;
 import com.doodle.R;
 import com.doodle.utils.AppConstants;
 import com.doodle.utils.NetworkHelper;
@@ -224,6 +225,7 @@ public class FollowingPost extends Fragment {
                     progressView.setVisibility(View.GONE);
                     progressView.stopAnimation();
                 }
+                ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(2);
 
             }
 
@@ -232,6 +234,7 @@ public class FollowingPost extends Fragment {
                 Log.d("MESSAGE: ", t.getMessage());
                 progressView.setVisibility(View.GONE);
                 progressView.stopAnimation();
+                ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(2);
             }
         });
 
@@ -270,7 +273,8 @@ public class FollowingPost extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             catIds = intent.getStringExtra("category_ids");
-
+            ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadInitial();
+            getData();
         }
     };
 

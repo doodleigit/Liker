@@ -1,6 +1,7 @@
 package com.doodle.Home.view.activity;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -48,6 +49,7 @@ import com.doodle.Home.model.TopContributorStatus;
 import com.doodle.Home.service.CategoryRemoveListener;
 import com.doodle.Home.service.FilterClickListener;
 import com.doodle.Home.service.HomeService;
+import com.doodle.Home.service.LoadCompleteListener;
 import com.doodle.Home.service.SocketIOManager;
 import com.doodle.Home.view.fragment.BreakingPost;
 import com.doodle.Home.view.fragment.FollowingPost;
@@ -89,9 +91,11 @@ import static com.doodle.utils.AppConstants.IN_CHAT_MODE;
 public class Home extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     private TabLayout tabLayout;
+    private ViewPager viewPager;
     private Toolbar toolbar;
     private CircleImageView profileImage;
     private Spinner categorySpinner;
+    private ProgressDialog progressDialog;
     private PrefManager manager;
     private String image_url;
     private String token, deviceId, userId, socketId, mSocketId, selectedCategory = "";
@@ -115,6 +119,8 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
     private ImageView imageNewPost, imageNotification, imageFriendRequest, imageStarContributor;
     private TextView newNotificationCount, newMessageNotificationCount, filterItem;
     private RecyclerView categoryRecyclerView;
+
+    public LoadCompleteListener loadCompleteListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,6 +155,9 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
     }
 
     private void initialComponent() {
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage(getString(R.string.loading));
+        progressDialog.show();
         manager = new PrefManager(this);
         webService = HomeService.mRetrofit.create(HomeService.class);
         setUser = new SetUser();
@@ -216,6 +225,19 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
                 }
             }
         });
+
+        loadCompleteListener = new LoadCompleteListener() {
+            @Override
+            public void onLoadInitial() {
+                showProgressBar();
+            }
+
+            @Override
+            public void onLoadComplete(int position) {
+                if (viewPager.getCurrentItem() == position)
+                    hideProgressBar();
+            }
+        };
     }
 
     private void setData() {
@@ -404,6 +426,26 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
                     }
                 }
                 sendBroadcast((new Intent().putExtra("category_ids", Utils.setCategoryIds(arrayList))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
+            }
+
+            @Override
+            public void onCategorySelect(CommonCategory commonCategory) {
+                ArrayList<String> arrayList = new ArrayList<>();
+                arrayList.add(commonCategory.getCatId());
+                sendBroadcast((new Intent().putExtra("category_ids", Utils.setCategoryIds(arrayList))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
+            }
+
+            @Override
+            public void onCategoryDeSelect() {
+                ArrayList<String> arrayList = new ArrayList<>();
+                for (CommonCategory commonCategory : commonCategories) {
+                    arrayList.add(commonCategory.getCatId());
+                }
+                sendBroadcast((new Intent().putExtra("category_ids", Utils.setCategoryIds(arrayList))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
+            }
+
+            @Override
+            public void onCategorySelectChange(CommonCategory oldCommonCategory, CommonCategory newCommonCategory) {
 
             }
         };
@@ -669,6 +711,14 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
         dialog.show();
     }
 
+    private void showProgressBar() {
+        progressDialog.show();
+    }
+
+    private void hideProgressBar() {
+        progressDialog.hide();
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -707,7 +757,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
                 if (Math.abs(verticalOffset) - appBarLayout.getTotalScrollRange() == 0) {
                     //  Collapsed
                     viewCategory.setVisibility(View.GONE);
-                } else {
+                } else if (Math.abs(verticalOffset) - appBarLayout.getTotalScrollRange() <= -200) {
                     //Expanded
                     viewCategory.setVisibility(View.VISIBLE);
                 }
@@ -737,7 +787,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
     }
 
     private void setupViewPager() {
-        final ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+        viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
 
         tabLayout = (TabLayout) findViewById(R.id.tabs);
@@ -782,7 +832,6 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
 
         return true;
     }
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -901,6 +950,9 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
             categoryRecyclerView.setVisibility(View.GONE);
         }
         if (position == 2) {
+            if (selectedCategory.isEmpty()) {
+                showSingleFilterDialog();
+            }
             filterItem.setText(selectedCategory.isEmpty() ? subCategories.get(0).getSubCatName() : selectedCategory);
         } else {
             filterItem.setText(getString(R.string.personalize_your_feed));
