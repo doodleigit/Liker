@@ -839,6 +839,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
         int id = item.getItemId();
         switch (id) {
             case R.id.action_log_out:
+                manager.pref.edit().clear().apply();
                 startActivity(new Intent(this, LoginAgain.class));
                 finish();
                 return true;

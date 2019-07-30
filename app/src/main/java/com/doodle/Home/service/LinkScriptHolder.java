@@ -201,10 +201,22 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
                 imagePostCommenting.setVisibility(View.GONE);
             } else {
                 imagePostCommenting.setVisibility(View.VISIBLE);
+                imagePostCommenting.setVisibility(View.VISIBLE);
+                String commentImageUrl = PROFILE_IMAGE + commentImage;
+                Glide.with(App.getAppContext())
+                        .load(commentImageUrl)
+                        .centerCrop()
+                        .dontAnimate()
+                        .into(imagePostCommenting);
             }
 
             tvCommentUserName.setText(commentUserName);
-            tvCommentMessage.setText(commentText);
+            if(!isNullOrEmpty(commentText)){
+                tvCommentMessage.setVisibility(View.VISIBLE);
+                tvCommentMessage.setText(commentText);
+            }else {
+                tvCommentMessage.setVisibility(View.GONE);
+            }
             tvCommentTime.setText(Utils.chatDateCompare(mContext, Long.valueOf(commentTime)));
 
             String commentUserImageUrl = PROFILE_IMAGE + commentUserImage;

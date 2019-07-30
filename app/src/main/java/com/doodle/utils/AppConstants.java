@@ -8,22 +8,21 @@ import java.util.HashMap;
 public class AppConstants {
 
     //===============LOCAL SERVER==================
-    public static final String BASE_URL = "http://192.168.0.99:8040/sites/likerapp/";
-//    public static final String BASE_URL = " http://192.168.0.99:8040/sites/likeropt/";
-    public static final String BASE_URL_MEDIA = "http://192.168.0.99:8040/sites/likeropt/";
-    public static final String SOCKET_WEB = "http://192.168.0.99:4001";
-    public static final String SOCKET_MESSAGE = "http://192.168.0.99:4002";
-    public static final String SOCKET_VIDEO = "http://192.168.0.99:4004";
-    public static final String FACEBOOK_SHARE = "http://192.168.0.99:8040/sites/likerapp/public/posts/";
-
+//    public static final String BASE_URL = "http://192.168.0.99:8040/sites/likerapp/";
+//    public static final String BASE_URL_MEDIA = "http://192.168.0.99:8040/sites/likeropt/";
+//    public static final String SOCKET_WEB = "http://192.168.0.99:4001";
+//    public static final String SOCKET_MESSAGE = "http://192.168.0.99:4002";
+//    public static final String SOCKET_VIDEO = "http://192.168.0.99:4004";
+//    public static final String FACEBOOK_SHARE = "http://192.168.0.99:8040/sites/likerapp/public/posts/";
+//https://www.cdn-liker.com/stg-static/uploads/thumb/5d4025287ba0e.gif
 
     //==========================STG SERVER=====================
-//    public static final String BASE_URL = "https://www.stg.liker.com/";
-//    public static final String BASE_URL_MEDIA = "https://www.cdn-liker.com/stg-static/";
-//    public static final String SOCKET_WEB = "https://node.liker.com:7803";
-//    public static final String SOCKET_MESSAGE = "https://node.liker.com:7804";
-//    public static final String SOCKET_VIDEO = "https://node.liker.com:7807";
-
+    public static final String BASE_URL = "https://www.stg.liker.com/";
+    public static final String BASE_URL_MEDIA = "https://www.cdn-liker.com/";
+    public static final String SOCKET_WEB = "https://node.liker.com:7803";
+    public static final String SOCKET_MESSAGE = "https://node.liker.com:7804";
+    public static final String SOCKET_VIDEO = "https://node.liker.com:7807";
+    public static final String FACEBOOK_SHARE = "https://www.stg.liker.com/public/posts/";
     //=======================LIVE SERVER=============================
     //    public static final String BASE_URL = "https://www.liker.com/";
     //    public static final String BASE_URL_MEDIA = "https://www.cdn-liker.com/";

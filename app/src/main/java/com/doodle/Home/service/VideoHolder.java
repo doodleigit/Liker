@@ -208,7 +208,13 @@ public class VideoHolder extends RecyclerView.ViewHolder {
             }
 
             tvCommentUserName.setText(commentUserName);
-            tvCommentMessage.setText(commentText);
+            if(!isNullOrEmpty(commentText)){
+                tvCommentMessage.setVisibility(View.VISIBLE);
+                tvCommentMessage.setText(commentText);
+            }else {
+                tvCommentMessage.setVisibility(View.GONE);
+            }
+
             tvCommentTime.setText(Utils.chatDateCompare(mContext, Long.valueOf(commentTime)));
 
             String commentUserImageUrl = PROFILE_IMAGE + commentUserImage;

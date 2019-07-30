@@ -9,7 +9,7 @@ import android.content.SharedPreferences;
  */
 public class PrefManager {
 
-    SharedPreferences pref;
+    public SharedPreferences pref;
     SharedPreferences.Editor editor;
     Context _context;
     // shared pref mode
