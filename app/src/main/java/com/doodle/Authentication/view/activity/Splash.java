@@ -4,16 +4,25 @@ import android.content.Intent;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
 import com.doodle.R;
+import com.doodle.utils.PrefManager;
+import com.onesignal.OneSignal;
+
+import static com.doodle.utils.Utils.isNullOrEmpty;
 
 public class Splash extends AppCompatActivity {
+
+
+    PrefManager manager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        manager=new PrefManager(this);
 //        requestWindowFeature(Window.FEATURE_NO_TITLE);
 //        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
 //                WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -27,8 +36,10 @@ public class Splash extends AppCompatActivity {
 //                finish();
 //            }
 //        },2000);
-
         startActivity(new Intent(Splash.this, Welcome.class));
         finish();
+
+
+
     }
 }

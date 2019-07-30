@@ -1,11 +1,15 @@
 package com.doodle.Home.service;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Parcelable;
 import android.support.v7.view.menu.MenuBuilder;
@@ -22,6 +26,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.MediaController;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -31,6 +36,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.danikula.videocache.HttpProxyCacheServer;
 import com.doodle.App;
+import com.doodle.Comment.model.Comment;
+import com.doodle.Comment.model.Comment_;
 import com.doodle.Home.model.PostFooter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.postshare.PostShareItem;
@@ -40,9 +47,18 @@ import com.doodle.utils.AppConstants;
 import com.doodle.utils.Operation;
 import com.doodle.utils.PrefManager;
 import com.doodle.utils.Utils;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.share.Sharer;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareDialog;
 import com.vanniktech.emoji.EmojiTextView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+
 import cn.jzvd.JZVideoPlayerStandard;
 import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
@@ -50,15 +66,18 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.doodle.App.getProxy;
+import static com.doodle.utils.AppConstants.FACEBOOK_SHARE;
+import static com.doodle.utils.AppConstants.PROFILE_IMAGE;
 import static com.doodle.utils.Utils.containsIllegalCharacters;
 import static com.doodle.utils.Utils.getSpannableStringBuilder;
+import static com.doodle.utils.Utils.isNullOrEmpty;
 import static com.facebook.FacebookSdk.getApplicationContext;
 import static java.lang.Integer.parseInt;
 
-public class VideoHolder extends RecyclerView.ViewHolder  {
+public class VideoHolder extends RecyclerView.ViewHolder {
 
 
-    public TextView tvHeaderInfo, tvPostTime, tvPostUserName, tvImgShareCount, tvPostLikeCount, tvLinkScriptText;
+    public TextView tvHeaderInfo, tvPostTime, tvPostUserName, tvImgShareCount, tvPostLikeCount, tvLinkScriptText,tvCommentCount;
     public CircleImageView imagePostUser;
     public ReadMoreTextView tvPostContent;
     public EmojiTextView tvPostEmojiContent;
@@ -69,22 +88,38 @@ public class VideoHolder extends RecyclerView.ViewHolder  {
     public LinearLayout postBodyLayer;
     PostItem item;
 
+    JZVideoPlayerStandard jzVideoPlayerStandard;
 
-    JZVideoPlayerStandard jzVideoPlayerStandard ;
-
-    public ImageView imagePostShare,imagePermission;
-    private PopupMenu popup,popupMenu;
+    public ImageView imagePostShare, imagePermission;
+    private PopupMenu popup, popupMenu;
     public HomeService webService;
     public PrefManager manager;
     private String deviceId, profileId, token, userIds;
     private Context mContext;
     public static final String ITEM_KEY = "item_key";
+    CallbackManager callbackManager;
+    ShareDialog shareDialog;
 
-    public VideoHolder(View itemView,Context context) {
+    //Comment
+    Comment commentItem;
+    private List<Comment_> comments = new ArrayList<Comment_>();
+    private String commentPostId;
+    RelativeLayout commentHold;
+    private String commentText, commentUserName, commentUserImage, commentImage, commentTime;
+    public EmojiTextView tvCommentMessage;
+    public ImageView imagePostCommenting, imageCommentLikeThumb, imageCommentSettings;
+    public CircleImageView imageCommentUser;
+    public TextView tvCommentUserName, tvCommentTime, tvCommentLike, tvCommentReply, tvCountCommentLike;
+    private String userPostId;
+    private PopupMenu popupCommentMenu;
+
+    public VideoHolder(View itemView, Context context) {
         super(itemView);
 
 
-        mContext=context;
+        mContext = context;
+        callbackManager = CallbackManager.Factory.create();
+        shareDialog = new ShareDialog((Activity) context);
         manager = new PrefManager(App.getAppContext());
         deviceId = manager.getDeviceId();
         profileId = manager.getProfileId();
@@ -106,6 +141,8 @@ public class VideoHolder extends RecyclerView.ViewHolder  {
         tvLinkScriptText = (ReadMoreTextView) itemView.findViewById(R.id.tvLinkScriptText);
         tvPostEmojiContent = (EmojiTextView) itemView.findViewById(R.id.tvPostEmojiContent);
         postBodyLayer = (LinearLayout) itemView.findViewById(R.id.postBodyLayer);
+        tvCommentCount =  itemView.findViewById(R.id.tvCommentCount);
+
 
 
         star1 = itemView.findViewById(R.id.star1);
@@ -125,16 +162,85 @@ public class VideoHolder extends RecyclerView.ViewHolder  {
         star15 = itemView.findViewById(R.id.star15);
         star16 = itemView.findViewById(R.id.star16);
 
-        thumbnailView  = itemView.findViewById(R.id.videoView_thumbnail);
-        videoView  = itemView.findViewById(R.id.video_view);
+        thumbnailView = itemView.findViewById(R.id.videoView_thumbnail);
+        videoView = itemView.findViewById(R.id.video_view);
         jzVideoPlayerStandard = itemView.findViewById(R.id.videoplayer);
 
+        //Comment
+        tvCommentMessage = itemView.findViewById(R.id.tvCommentMessage);
+        commentHold = (RelativeLayout) itemView.findViewById(R.id.commentHold);
+        imagePostCommenting = itemView.findViewById(R.id.imagePostCommenting);
+        imageCommentLikeThumb = itemView.findViewById(R.id.imageCommentLikeThumb);
+        imageCommentSettings = itemView.findViewById(R.id.imageCommentSettings);
+        imageCommentUser = itemView.findViewById(R.id.imageCommentUser);
+        tvCommentUserName = itemView.findViewById(R.id.tvCommentUserName);
+        tvCommentTime = itemView.findViewById(R.id.tvCommentTime);
+        tvCommentLike = itemView.findViewById(R.id.tvCommentLike);
+        tvCommentReply = itemView.findViewById(R.id.tvCommentReply);
+        tvCountCommentLike = itemView.findViewById(R.id.tvCountCommentLike);
+        imageCommentLikeThumb.setVisibility(View.GONE);
+        tvCountCommentLike.setVisibility(View.GONE);
 
     }
 
 
-    public void setItem(PostItem item) {
+    public void setItem(PostItem item, Comment commentItem) {
         this.item = item;
+        this.commentItem = commentItem;
+        userPostId = item.getPostId();
+        commentPostId = commentItem.getPostId();
+        comments = commentItem.getComments();
+
+        if (!comments.isEmpty()) {
+            commentHold.setVisibility(View.VISIBLE);
+            for (Comment_ temp : comments) {
+                commentText = temp.getCommentText();
+                commentUserName = temp.getUserFirstName() + " " + temp.getUserLastName();
+                commentUserImage = temp.getUserPhoto();
+                commentImage = temp.getCommentImage();
+                commentTime = temp.getDateTime();
+            }
+
+            if (isNullOrEmpty(commentImage)) {
+                imagePostCommenting.setVisibility(View.GONE);
+            } else {
+                imagePostCommenting.setVisibility(View.VISIBLE);
+            }
+
+            tvCommentUserName.setText(commentUserName);
+            tvCommentMessage.setText(commentText);
+            tvCommentTime.setText(Utils.chatDateCompare(mContext, Long.valueOf(commentTime)));
+
+            String commentUserImageUrl = PROFILE_IMAGE + commentUserImage;
+            Glide.with(App.getAppContext())
+                    .load(commentUserImageUrl)
+                    .centerCrop()
+                    .dontAnimate()
+                    .into(imageCommentUser);
+
+        } else {
+            commentHold.setVisibility(View.GONE);
+        }
+
+
+        tvCommentLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (tvCountCommentLike.getText().toString().isEmpty()) {
+                    imageCommentLikeThumb.setVisibility(View.VISIBLE);
+                    tvCountCommentLike.setVisibility(View.VISIBLE);
+                    tvCountCommentLike.setText("1");
+                } else {
+                    tvCountCommentLike.setText("");
+                    imageCommentLikeThumb.setVisibility(View.GONE);
+                    tvCountCommentLike.setVisibility(View.GONE);
+                }
+            }
+        });
+
+
+        String contentUrl = FACEBOOK_SHARE + item.getSharedPostId();
         String text = item.getPostText();
         if (containsIllegalCharacters(text)) {
             tvPostContent.setVisibility(View.GONE);
@@ -152,6 +258,10 @@ public class VideoHolder extends RecyclerView.ViewHolder  {
             //set user name in blue color and remove underline from the textview
             Utils.stripUnderlines(tvPostContent);
 
+        }
+
+        if(!isNullOrEmpty(item.getTotalComment())&& !"0".equalsIgnoreCase(item.getTotalComment())){
+            tvCommentCount.setText(item.getTotalComment());
         }
 
 
@@ -324,13 +434,12 @@ public class VideoHolder extends RecyclerView.ViewHolder  {
         }
 
 
-        String userImageUrl = AppConstants.PROFILE_IMAGE + item.getUesrProfileImg();
+        String userImageUrl = PROFILE_IMAGE + item.getUesrProfileImg();
         Glide.with(App.getAppContext())
                 .load(userImageUrl)
                 .centerCrop()
                 .dontAnimate()
                 .into(imagePostUser);
-
 
 
 //        Glide.with(App.getAppContext())
@@ -340,7 +449,7 @@ public class VideoHolder extends RecyclerView.ViewHolder  {
 //                .into(videoImage);
 
 
-       String videoPath = AppConstants.POST_VIDEOS + item.getVideoName();
+        String videoPath = AppConstants.POST_VIDEOS + item.getVideoName();
 
    /*      Bitmap bitmap;
         try {
@@ -366,7 +475,7 @@ public class VideoHolder extends RecyclerView.ViewHolder  {
         Glide.with(getApplicationContext()).load(videoPath).into(thumbnailView);
         //you can add progress dialog here until video is start playing;
 
-        MediaController    mediaController= new MediaController(App.getAppContext());
+        MediaController mediaController = new MediaController(App.getAppContext());
         mediaController.setAnchorView(videoView);
         videoView.setMediaController(mediaController);
         videoView.setKeepScreenOn(true);
@@ -390,21 +499,18 @@ public class VideoHolder extends RecyclerView.ViewHolder  {
             }
         });
 
-       // String videoFile = "/sdcard/blonde.mp4";
+        // String videoFile = "/sdcard/blonde.mp4";
 //        Bitmap thumbnail = ThumbnailUtils.createVideoThumbnail(videoPath,
 //                MediaStore.Images.Thumbnails.MINI_KIND);
 //        videoImage.setImageBitmap(thumbnail);
 
 
-
-
-
-        HttpProxyCacheServer proxy =getProxy(App.getAppContext());
+        HttpProxyCacheServer proxy = getProxy(App.getAppContext());
         jzVideoPlayerStandard.setUp(proxy.getProxyUrl(videoPath)
                 , JZVideoPlayerStandard.SCREEN_LAYOUT_LIST, "");
 
 
-        Glide.with(App.getAppContext()).load(videoPath).apply(new RequestOptions().override(50,50)).into(jzVideoPlayerStandard.thumbImageView);
+        Glide.with(App.getAppContext()).load(videoPath).apply(new RequestOptions().override(50, 50)).into(jzVideoPlayerStandard.thumbImageView);
 
         imagePostShare.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("RestrictedApi")
@@ -415,7 +521,7 @@ public class VideoHolder extends RecyclerView.ViewHolder  {
                 popup.getMenuInflater().inflate(R.menu.share_menu, popup.getMenu());
 
 //                popup.show();
-                MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popup.getMenu(),v);
+                MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popup.getMenu(), v);
                 menuHelper.setForceShowIcon(true);
                 menuHelper.show();
 
@@ -433,14 +539,50 @@ public class VideoHolder extends RecyclerView.ViewHolder  {
 
                         if (id == R.id.shareFacebook) {
 
+                            shareDialog.registerCallback(callbackManager, new FacebookCallback<Sharer.Result>() {
+                                @Override
+                                public void onSuccess(Sharer.Result result) {
+
+                                    Toast.makeText(mContext, "Share successFull", Toast.LENGTH_SHORT).show();
+                                }
+
+                                @Override
+                                public void onCancel() {
+                                    Toast.makeText(mContext, "Share cancel", Toast.LENGTH_SHORT).show();
+                                }
+
+                                @Override
+                                public void onError(FacebookException error) {
+                                    Toast.makeText(mContext, error.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+
+                            if (!isNullOrEmpty(contentUrl)) {
+                                ShareLinkContent linkContent = new ShareLinkContent.Builder()
+                                        .setContentUrl(Uri.parse(contentUrl))
+                                        .setQuote("")
+                                        .build();
+                                if (ShareDialog.canShow(ShareLinkContent.class)) {
+
+                                    shareDialog.show(linkContent);
+                                }
+                            }
+
+
                         }
                         if (id == R.id.shareTwitter) {
-                            Toast.makeText(App.getAppContext(), "Removed : ", Toast.LENGTH_SHORT).show();
-
+                            String url = "http://www.twitter.com/intent/tweet?url=" + contentUrl + "&text=" + text;
+                            Intent i = new Intent(Intent.ACTION_VIEW);
+                            i.setData(Uri.parse(url));
+                            mContext.startActivity(i);
                         }
 
                         if (id == R.id.copyLink) {
 
+                            ClipboardManager clipboard = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
+                            ClipData clip = ClipData.newPlainText("Copied Link", contentUrl);
+                            clipboard.setPrimaryClip(clip);
                         }
                         return true;
                     }
@@ -493,6 +635,61 @@ public class VideoHolder extends RecyclerView.ViewHolder  {
 
             }
         });
+        imageCommentSettings.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("RestrictedApi")
+            @Override
+            public void onClick(View v) {
+
+                popupCommentMenu = new PopupMenu(mContext, v);
+                popupCommentMenu.getMenuInflater().inflate(R.menu.post_comment_menu, popupCommentMenu.getMenu());
+
+                if(userPostId.equalsIgnoreCase(commentPostId)){
+                    popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(false);
+                    popupCommentMenu.getMenu().findItem(R.id.blockUser).setVisible(false);
+                    popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(true);
+                    popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(true);
+                }else {
+                    popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(true);
+                    popupCommentMenu.getMenu().findItem(R.id.blockUser).setVisible(true);
+                    popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(false);
+                    popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(false);
+                }
+
+
+//                popup.show();
+                MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popupCommentMenu.getMenu(), v);
+                menuHelper.setForceShowIcon(true);
+                menuHelper.show();
+
+                popupCommentMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+                        int id = menuItem.getItemId();
+
+                        if (id == R.id.reportComment) {
+
+                            Toast.makeText(App.getAppContext(), "reportComment : ", Toast.LENGTH_SHORT).show();
+                        }
+
+                        if (id == R.id.blockUser) {
+                            Toast.makeText(App.getAppContext(), "blockUser : ", Toast.LENGTH_SHORT).show();
+                        }
+                        if (id == R.id.editComment) {
+                            Toast.makeText(App.getAppContext(), "editComment : ", Toast.LENGTH_SHORT).show();
+
+                        }
+
+                        if (id == R.id.deleteComment) {
+                            Toast.makeText(App.getAppContext(), "deleteComment : ", Toast.LENGTH_SHORT).show();
+                        }
+
+                        return true;
+                    }
+                });
+
+            }
+        });
+
 
     }
 
@@ -516,6 +713,7 @@ public class VideoHolder extends RecyclerView.ViewHolder  {
                 }
 
             }
+
             @Override
             public void onFailure(Call<PostShareItem> call, Throwable t) {
                 Log.d("MESSAGE: ", t.getMessage());
@@ -523,9 +721,6 @@ public class VideoHolder extends RecyclerView.ViewHolder  {
             }
         });
     }
-
-
-
 
 
     public static Bitmap retriveVideoFrameFromVideo(String videoPath)
@@ -553,7 +748,6 @@ public class VideoHolder extends RecyclerView.ViewHolder  {
         }
         return bitmap;
     }
-
 
 
 }

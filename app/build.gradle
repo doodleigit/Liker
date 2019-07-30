@@ -81,6 +81,7 @@ dependencies {
     annotationProcessor "android.arch.lifecycle:compiler:$lifecycle_version"
     implementation 'com.squareup.retrofit2:retrofit:2.5.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
+    implementation 'com.squareup.okhttp3:okhttp:3.13.1'
     // Retrofit Scalars Converter
     implementation 'com.squareup.retrofit2:converter-scalars:2.5.0'
     //validator
@@ -134,4 +135,7 @@ dependencies {
     implementation 'com.danikula:videocache:2.7.0'
     implementation 'joda-time:joda-time:2.10'
 
+    //Share Facebook===============================================
+    implementation 'com.facebook.android:facebook-share:[5,6)'
+    //implementation 'com.android.support:multidex:1.0.3'
 }

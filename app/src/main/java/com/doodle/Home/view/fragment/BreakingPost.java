@@ -19,9 +19,9 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 
 import com.doodle.App;
+import com.doodle.Comment.model.Comment;
+import com.doodle.Comment.model.CommentItem;
 import com.doodle.Home.adapter.BreakingPostAdapter;
-import com.doodle.Home.adapter.PostAdapter;
-import com.doodle.Home.model.DataItem;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.service.HomeService;
 import com.doodle.Home.service.TextHolder;
@@ -38,15 +38,10 @@ import com.doodle.utils.Utils;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import cn.jzvd.JZVideoPlayer;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -62,6 +57,7 @@ public class BreakingPost extends Fragment {
     }
 
     public List<PostItem> postItemList;
+    private List<Comment> comments = new ArrayList<Comment>();
     private HomeService webService;
     private PrefManager manager;
     private String deviceId, profileId, token, userIds;
@@ -81,6 +77,9 @@ public class BreakingPost extends Fragment {
     int offset = 0;
     private String catIds = "";
     private ShimmerFrameLayout shimmerFrameLayout;
+
+    private String friends;
+    List<String> friendSet = new ArrayList<>();
 
     @Override
     public void onAttach(Context context) {
@@ -193,9 +192,55 @@ public class BreakingPost extends Fragment {
 
                 postItemList = response.body();
                 if (postItemList != null) {
-                    adapter.addPagingData(postItemList);
-                    offset += 5;
 
+                    for (PostItem temp : postItemList) {
+
+                        friendSet.add(temp.getPostId());
+                    }
+                    String separator = ", ";
+                    int total = friendSet.size() * separator.length();
+                    for (String s : friendSet) {
+                        total += s.length();
+                    }
+
+                    StringBuilder sb = new StringBuilder(total);
+                    for (String s : friendSet) {
+                        sb.append(separator).append(s);
+                    }
+
+                    friends = sb.substring(separator.length()).replaceAll("\\s+", "");
+                    Log.d("friends", friends);
+                    Call<CommentItem> mCall = webService.getPostComments(deviceId, profileId, token, "false", 1, 0, "DESC", friends, userIds);
+                    sendCommentItemPagingRequest(mCall);
+
+
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<List<PostItem>> call, Throwable t) {
+                Log.d("MESSAGE: ", t.getMessage());
+                progressView.setVisibility(View.GONE);
+                progressView.stopAnimation();
+            }
+        });
+    }
+
+    private void sendCommentItemPagingRequest(Call<CommentItem> mCall) {
+
+        mCall.enqueue(new Callback<CommentItem>() {
+
+            @Override
+            public void onResponse(Call<CommentItem> mCall, Response<CommentItem> response) {
+
+                CommentItem commentItem = response.body();
+                comments = commentItem.getComments();
+                Log.d("commentItem", commentItem.toString());
+                if (postItemList != null && comments != null) {
+                    adapter.addPagingData(postItemList);
+                    adapter.addPagingCommentData(comments);
+                    offset += 5;
                     progressView.setVisibility(View.GONE);
                     progressView.stopAnimation();
                 }
@@ -203,7 +248,7 @@ public class BreakingPost extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<List<PostItem>> call, Throwable t) {
+            public void onFailure(Call<CommentItem> mCall, Throwable t) {
                 Log.d("MESSAGE: ", t.getMessage());
                 progressView.setVisibility(View.GONE);
                 progressView.stopAnimation();
@@ -220,19 +265,39 @@ public class BreakingPost extends Fragment {
 
                 postItemList = response.body();
                 if (postItemList != null) {
-                    adapter = new BreakingPostAdapter(getActivity(), postItemList);
+                    for (PostItem temp : postItemList) {
 
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            shimmerFrameLayout.stopShimmer();
-                            shimmerFrameLayout.setVisibility(View.GONE);
+                        friendSet.add(temp.getPostId());
+                    }
+                    String separator = ", ";
+                    int total = friendSet.size() * separator.length();
+                    for (String s : friendSet) {
+                        total += s.length();
+                    }
 
-                            recyclerView.setVisibility(View.VISIBLE);
-                            recyclerView.setAdapter(adapter);
-                        }
-                    }, 5000);
+                    StringBuilder sb = new StringBuilder(total);
+                    for (String s : friendSet) {
+                        sb.append(separator).append(s);
+                    }
 
+                    friends = sb.substring(separator.length()).replaceAll("\\s+", "");
+                    Log.d("friends", friends);
+                    Call<CommentItem> mCall = webService.getPostComments(deviceId, profileId, token, "false", 1, 0, "DESC", friends, userIds);
+                    sendCommentItemRequest(mCall);
+
+//             adapter = new BreakingPostAdapter(getActivity(), postItemList);
+//
+//                    new Handler().postDelayed(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            shimmerFrameLayout.stopShimmer();
+//                            shimmerFrameLayout.setVisibility(View.GONE);
+//
+//                            recyclerView.setVisibility(View.VISIBLE);
+//                            recyclerView.setAdapter(adapter);
+//                        }
+//                    }, 5000);
+//
 
                     //  Log.d("PostItem: ", categoryItem.toString() + "");
                     progressView.setVisibility(View.GONE);
@@ -254,6 +319,47 @@ public class BreakingPost extends Fragment {
 
     }
 
+    private void sendCommentItemRequest(Call<CommentItem> mCall) {
+
+        mCall.enqueue(new Callback<CommentItem>() {
+
+            @Override
+            public void onResponse(Call<CommentItem> mCall, Response<CommentItem> response) {
+
+                CommentItem commentItem = response.body();
+                comments = commentItem.getComments();
+                Log.d("commentItem", commentItem.toString());
+                if (postItemList != null && comments != null) {
+                    adapter = new BreakingPostAdapter(getActivity(), postItemList,comments);
+
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            shimmerFrameLayout.stopShimmer();
+                            shimmerFrameLayout.setVisibility(View.GONE);
+
+                            recyclerView.setVisibility(View.VISIBLE);
+                            recyclerView.setAdapter(adapter);
+                        }
+                    }, 5000);
+
+
+                    //  Log.d("PostItem: ", categoryItem.toString() + "");
+                    progressView.setVisibility(View.GONE);
+                    progressView.stopAnimation();
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<CommentItem> mCall, Throwable t) {
+                Log.d("MESSAGE: ", t.getMessage());
+                progressView.setVisibility(View.GONE);
+                progressView.stopAnimation();
+            }
+        });
+    }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -265,6 +371,7 @@ public class BreakingPost extends Fragment {
         super.onPause();
         shimmerFrameLayout.stopShimmer();
     }
+
     private boolean isViewShown = false;
 
     @Override

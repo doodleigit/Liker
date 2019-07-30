@@ -1,13 +1,20 @@
 package com.doodle.utils;
 
+import android.widget.Button;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class AppConstants {
 
     //===============LOCAL SERVER==================
-    public static final String BASE_URL = "http://192.168.0.99:8040/sites/likeropt/";
+    public static final String BASE_URL = "http://192.168.0.99:8040/sites/likerapp/";
+//    public static final String BASE_URL = " http://192.168.0.99:8040/sites/likeropt/";
     public static final String BASE_URL_MEDIA = "http://192.168.0.99:8040/sites/likeropt/";
     public static final String SOCKET_WEB = "http://192.168.0.99:4001";
     public static final String SOCKET_MESSAGE = "http://192.168.0.99:4002";
     public static final String SOCKET_VIDEO = "http://192.168.0.99:4004";
+    public static final String FACEBOOK_SHARE = "http://192.168.0.99:8040/sites/likerapp/public/posts/";
 
 
     //==========================STG SERVER=====================
@@ -79,6 +86,7 @@ public class AppConstants {
     //FEED
 
     public static final String FEED = "feed";
+    public static final String GET_POST_COMMENTS = "get_postscomments";
 
     //Post share
     public static final String GET_POST_DETAILS = "get_postdetails";

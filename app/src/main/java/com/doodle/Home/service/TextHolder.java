@@ -1,15 +1,16 @@
 package com.doodle.Home.service;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Handler;
+import android.net.Uri;
 import android.os.Parcelable;
-
-
 import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.view.menu.MenuPopupHelper;
 import android.support.v7.widget.PopupMenu;
@@ -21,19 +22,20 @@ import android.text.TextPaint;
 import android.text.style.ClickableSpan;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
-
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.borjabravo.readmoretextview.ReadMoreTextView;
 import com.bumptech.glide.Glide;
 import com.doodle.App;
-import com.doodle.Home.adapter.BreakingPostAdapter;
+import com.doodle.Comment.CommentPost;
+import com.doodle.Comment.model.Comment;
+import com.doodle.Comment.model.Comment_;
 import com.doodle.Home.model.PostFooter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.PostTextIndex;
@@ -45,6 +47,13 @@ import com.doodle.R;
 import com.doodle.utils.AppConstants;
 import com.doodle.utils.Operation;
 import com.doodle.utils.PrefManager;
+import com.doodle.utils.Utils;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.share.Sharer;
+import com.facebook.share.model.ShareLinkContent;
+import com.facebook.share.widget.ShareDialog;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.vanniktech.emoji.EmojiTextView;
@@ -53,7 +62,6 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,16 +70,19 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.doodle.utils.AppConstants.FACEBOOK_SHARE;
+import static com.doodle.utils.AppConstants.PROFILE_IMAGE;
 import static com.doodle.utils.Utils.containsIllegalCharacters;
 import static com.doodle.utils.Utils.extractMentionText;
 import static com.doodle.utils.Utils.extractUrls;
 import static com.doodle.utils.Utils.getSpannableStringBuilder;
+import static com.doodle.utils.Utils.isNullOrEmpty;
 import static java.lang.Integer.parseInt;
 
 public class TextHolder extends RecyclerView.ViewHolder {
 
 
-    public TextView tvHeaderInfo, tvPostTime, tvPostUserName, tvImgShareCount, tvPostLikeCount, tvLinkScriptText;
+    public TextView tvHeaderInfo, tvPostTime, tvPostUserName, tvImgShareCount, tvPostLikeCount, tvLinkScriptText,tvCommentCount;
     public CircleImageView imagePostUser;
     public ReadMoreTextView tvPostContent;
     public EmojiTextView tvPostEmojiContent;
@@ -88,17 +99,35 @@ public class TextHolder extends RecyclerView.ViewHolder {
     public String full_text;
 
     public ImageView imagePostShare, imagePermission;
-    private PopupMenu popup,popupMenu;
+    private PopupMenu popup, popupMenu;
     public HomeService webService;
     public PrefManager manager;
     private String deviceId, profileId, token, userIds;
     private Context mContext;
     public static final String ITEM_KEY = "item_key";
+    public CallbackManager callbackManager;
+    public ShareDialog shareDialog;
+    public ImageView imagePostComment;
+
+    //Comment
+    Comment commentItem;
+    private List<Comment_> comments = new ArrayList<Comment_>();
+    private String commentPostId;
+    RelativeLayout commentHold;
+    private String commentText, commentUserName, commentUserImage, commentImage, commentTime;
+    public EmojiTextView tvCommentMessage;
+    public ImageView imagePostCommenting, imageCommentLikeThumb, imageCommentSettings;
+    public CircleImageView imageCommentUser;
+    public TextView tvCommentUserName, tvCommentTime, tvCommentLike, tvCommentReply, tvCountCommentLike;
+    private String userPostId;
+    private PopupMenu popupCommentMenu;
 
     public TextHolder(View itemView, Context context) {
         super(itemView);
 
         mContext = context;
+        callbackManager = CallbackManager.Factory.create();
+        shareDialog = new ShareDialog((Activity) context);
         manager = new PrefManager(App.getAppContext());
         deviceId = manager.getDeviceId();
         profileId = manager.getProfileId();
@@ -107,6 +136,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
         webService = HomeService.mRetrofit.create(HomeService.class);
         imagePostShare = (ImageView) itemView.findViewById(R.id.imagePostShare);
         imagePermission = (ImageView) itemView.findViewById(R.id.imagePermission);
+        imagePostComment = (ImageView) itemView.findViewById(R.id.imagePostComment);
 
         mentions = new ArrayList<>();
         mList = new ArrayList<>();
@@ -121,6 +151,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
         tvLinkScriptText = (ReadMoreTextView) itemView.findViewById(R.id.tvLinkScriptText);
         tvPostEmojiContent = (EmojiTextView) itemView.findViewById(R.id.tvPostEmojiContent);
         postBodyLayer = (LinearLayout) itemView.findViewById(R.id.postBodyLayer);
+        tvCommentCount = (TextView) itemView.findViewById(R.id.tvCommentCount);
 
 
         star1 = itemView.findViewById(R.id.star1);
@@ -140,6 +171,20 @@ public class TextHolder extends RecyclerView.ViewHolder {
         star15 = itemView.findViewById(R.id.star15);
         star16 = itemView.findViewById(R.id.star16);
 
+        //Comment
+        tvCommentMessage = itemView.findViewById(R.id.tvCommentMessage);
+        commentHold = (RelativeLayout) itemView.findViewById(R.id.commentHold);
+        imagePostCommenting = itemView.findViewById(R.id.imagePostCommenting);
+        imageCommentLikeThumb = itemView.findViewById(R.id.imageCommentLikeThumb);
+        imageCommentSettings = itemView.findViewById(R.id.imageCommentSettings);
+        imageCommentUser = itemView.findViewById(R.id.imageCommentUser);
+        tvCommentUserName = itemView.findViewById(R.id.tvCommentUserName);
+        tvCommentTime = itemView.findViewById(R.id.tvCommentTime);
+        tvCommentLike = itemView.findViewById(R.id.tvCommentLike);
+        tvCommentReply = itemView.findViewById(R.id.tvCommentReply);
+        tvCountCommentLike = itemView.findViewById(R.id.tvCountCommentLike);
+        imageCommentLikeThumb.setVisibility(View.GONE);
+        tvCountCommentLike.setVisibility(View.GONE);
 
     }
 
@@ -159,9 +204,64 @@ public class TextHolder extends RecyclerView.ViewHolder {
         }
     };
 
-    public void setItem(final PostItem item) {
+    String text;
+
+    public void setItem(final PostItem item, Comment commentItem) {
         this.item = item;
-        String text = item.getPostText();
+        this.commentItem = commentItem;
+        userPostId = item.getPostId();
+        commentPostId = commentItem.getPostId();
+        comments = commentItem.getComments();
+
+        if (!comments.isEmpty()) {
+            commentHold.setVisibility(View.VISIBLE);
+            for (Comment_ temp : comments) {
+                commentText = temp.getCommentText();
+                commentUserName = temp.getUserFirstName() + " " + temp.getUserLastName();
+                commentUserImage = temp.getUserPhoto();
+                commentImage = temp.getCommentImage();
+                commentTime = temp.getDateTime();
+            }
+
+            if (isNullOrEmpty(commentImage)) {
+                imagePostCommenting.setVisibility(View.GONE);
+            } else {
+                imagePostCommenting.setVisibility(View.VISIBLE);
+            }
+
+            tvCommentUserName.setText(commentUserName);
+            tvCommentMessage.setText(commentText);
+            tvCommentTime.setText(Utils.chatDateCompare(mContext, Long.valueOf(commentTime)));
+
+            String commentUserImageUrl = PROFILE_IMAGE + commentUserImage;
+            Glide.with(App.getAppContext())
+                    .load(commentUserImageUrl)
+                    .centerCrop()
+                    .dontAnimate()
+                    .into(imageCommentUser);
+
+        } else {
+            commentHold.setVisibility(View.GONE);
+        }
+
+
+        tvCommentLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (tvCountCommentLike.getText().toString().isEmpty()) {
+                    imageCommentLikeThumb.setVisibility(View.VISIBLE);
+                    tvCountCommentLike.setVisibility(View.VISIBLE);
+                    tvCountCommentLike.setText("1");
+                } else {
+                    tvCountCommentLike.setText("");
+                    imageCommentLikeThumb.setVisibility(View.GONE);
+                    tvCountCommentLike.setVisibility(View.GONE);
+                }
+            }
+        });
+        text = item.getPostText();
+        String contentUrl = FACEBOOK_SHARE + item.getSharedPostId();
         StringBuilder nameBuilder = new StringBuilder();
         List<String> mentionUrl = extractUrls(item.getPostText());
 
@@ -223,6 +323,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
                         str.setSpan(clickableSpan, val, val + mList.get(k).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     }
                 }
+                text = str.toString();
                 tvPostEmojiContent.setText(str);
 
 
@@ -268,6 +369,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
                     }
 
                 }
+                text = str.toString();
                 tvPostContent.setText(str);
 
 
@@ -442,7 +544,9 @@ public class TextHolder extends RecyclerView.ViewHolder {
             tvPostLikeCount.setVisibility(View.VISIBLE);
             tvPostLikeCount.setText(content);
         }
-
+        if(!isNullOrEmpty(item.getTotalComment())&& !"0".equalsIgnoreCase(item.getTotalComment())){
+            tvCommentCount.setText(item.getTotalComment());
+        }
 
         String userImageUrl = AppConstants.PROFILE_IMAGE + item.getUesrProfileImg();
         Glide.with(App.getAppContext())
@@ -454,6 +558,14 @@ public class TextHolder extends RecyclerView.ViewHolder {
                 .into(imagePostUser);
 
 
+        imagePostComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               // AppCompatActivity activity = (AppCompatActivity) v.getContext();
+                mContext.startActivity(new Intent(mContext, CommentPost.class));
+
+            }
+        });
         imagePostShare.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("RestrictedApi")
             @Override
@@ -481,15 +593,52 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
                         if (id == R.id.shareFacebook) {
 
+                            shareDialog.registerCallback(callbackManager, new FacebookCallback<Sharer.Result>() {
+                                @Override
+                                public void onSuccess(Sharer.Result result) {
+
+                                    Toast.makeText(mContext, "Share successFull", Toast.LENGTH_SHORT).show();
+                                }
+
+                                @Override
+                                public void onCancel() {
+                                    Toast.makeText(mContext, "Share cancel", Toast.LENGTH_SHORT).show();
+                                }
+
+                                @Override
+                                public void onError(FacebookException error) {
+                                    Toast.makeText(mContext, error.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+
+                            if (!isNullOrEmpty(contentUrl)) {
+                                ShareLinkContent linkContent = new ShareLinkContent.Builder()
+                                        .setContentUrl(Uri.parse(contentUrl))
+                                        .setQuote("")
+                                        .build();
+                                if (ShareDialog.canShow(ShareLinkContent.class)) {
+
+                                    shareDialog.show(linkContent);
+                                }
+                            }
+
+
                         }
                         if (id == R.id.shareTwitter) {
-                            Toast.makeText(App.getAppContext(), "Removed : ", Toast.LENGTH_SHORT).show();
-
+                            String url = "http://www.twitter.com/intent/tweet?url=" + contentUrl + "&text=" + text;
+                            Intent i = new Intent(Intent.ACTION_VIEW);
+                            i.setData(Uri.parse(url));
+                            mContext.startActivity(i);
                         }
 
                         if (id == R.id.copyLink) {
 
+                            ClipboardManager clipboard = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
+                            ClipData clip = ClipData.newPlainText("Copied Link", contentUrl);
+                            clipboard.setPrimaryClip(clip);
                         }
+
                         return true;
                     }
                 });
@@ -535,6 +684,60 @@ public class TextHolder extends RecyclerView.ViewHolder {
                         if (id == R.id.turnOffNotification) {
                             Toast.makeText(App.getAppContext(), "turnOffNotification : ", Toast.LENGTH_SHORT).show();
                         }
+                        return true;
+                    }
+                });
+
+            }
+        });
+        imageCommentSettings.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("RestrictedApi")
+            @Override
+            public void onClick(View v) {
+
+                popupCommentMenu = new PopupMenu(mContext, v);
+                popupCommentMenu.getMenuInflater().inflate(R.menu.post_comment_menu, popupCommentMenu.getMenu());
+
+                if(userPostId.equalsIgnoreCase(commentPostId)){
+                    popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(false);
+                    popupCommentMenu.getMenu().findItem(R.id.blockUser).setVisible(false);
+                    popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(true);
+                    popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(true);
+                }else {
+                    popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(true);
+                    popupCommentMenu.getMenu().findItem(R.id.blockUser).setVisible(true);
+                    popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(false);
+                    popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(false);
+                }
+
+
+//                popup.show();
+                MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popupCommentMenu.getMenu(), v);
+                menuHelper.setForceShowIcon(true);
+                menuHelper.show();
+
+                popupCommentMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+                        int id = menuItem.getItemId();
+
+                        if (id == R.id.reportComment) {
+
+                            Toast.makeText(App.getAppContext(), "reportComment : ", Toast.LENGTH_SHORT).show();
+                        }
+
+                        if (id == R.id.blockUser) {
+                            Toast.makeText(App.getAppContext(), "blockUser : ", Toast.LENGTH_SHORT).show();
+                        }
+                        if (id == R.id.editComment) {
+                            Toast.makeText(App.getAppContext(), "editComment : ", Toast.LENGTH_SHORT).show();
+
+                        }
+
+                        if (id == R.id.deleteComment) {
+                            Toast.makeText(App.getAppContext(), "deleteComment : ", Toast.LENGTH_SHORT).show();
+                        }
+
                         return true;
                     }
                 });
@@ -595,6 +798,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
         return text;
     }
+
 
 
 }

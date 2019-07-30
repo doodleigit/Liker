@@ -1,11 +1,14 @@
 package com.doodle.Home.service;
 
+import com.doodle.Comment.model.CommentItem;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.postshare.PostShareItem;
 import com.doodle.utils.AppConstants;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -18,8 +21,15 @@ import retrofit2.http.POST;
 public interface HomeService {
 
 
+    OkHttpClient okHttpClient = new OkHttpClient.Builder()
+            .connectTimeout(1, TimeUnit.MINUTES)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(15, TimeUnit.SECONDS)
+            .build();
+
     Retrofit mRetrofit = new Retrofit.Builder()
             .baseUrl(AppConstants.BASE_URL)
+            .client(okHttpClient)
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
             .build();
@@ -39,6 +49,20 @@ public interface HomeService {
             @Field("filter") int filter,
             @Field("is_public") boolean isPublic
 
+    );
+    //https://www.stg.liker.com/get_postscomments
+    @POST(AppConstants.GET_POST_COMMENTS)
+    @FormUrlEncoded
+    Call<CommentItem> getPostComments(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("is_public") String isPublic,
+            @Field("limit") int limit,
+            @Field("offset") int offset,
+            @Field("orderby") String orderBy,
+            @Field("post_id") String feed,
+            @Field("user_id") String userIds
     );
 
     @POST(AppConstants.GET_POST_DETAILS)

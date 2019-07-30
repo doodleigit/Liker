@@ -40,6 +40,7 @@ import com.doodle.App;
 import com.doodle.Authentication.view.activity.LoginAgain;
 import com.doodle.Home.adapter.CategoryTitleAdapter;
 import com.doodle.Home.adapter.SubCategoryAdapter;
+import com.doodle.Authentication.view.fragment.ResendEmail;
 import com.doodle.Home.adapter.ViewPagerAdapter;
 import com.doodle.Home.model.CommonCategory;
 import com.doodle.Home.model.PostFilterCategory;
