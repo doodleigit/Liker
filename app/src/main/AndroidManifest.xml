@@ -13,6 +13,7 @@
     <application
         android:name=".App"
         android:allowBackup="true"
+        android:vmSafeMode="true"
         android:hardwareAccelerated="true"
         android:icon="@drawable/logoliker"
         android:label="@string/app_name"
@@ -119,7 +120,7 @@
             android:name=".Authentication.view.activity.Splash"
             android:theme="@style/AppTheme.Launcher">
 
-         <!--   <intent-filter>
+     <!--       <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -129,13 +130,11 @@
             android:name=".Home.Liker"
             android:theme="@style/AppTheme.NoActionBar">
 
-            <!--
-            <intent-filter>
+    <!--        <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-            -->
+            </intent-filter>-->
         </activity>
 
         <meta-data

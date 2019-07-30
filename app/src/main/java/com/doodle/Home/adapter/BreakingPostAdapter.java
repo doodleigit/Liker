@@ -86,19 +86,19 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
         if (viewHolder instanceof TextMimHolder) {
             TextMimHolder vh = (TextMimHolder) viewHolder;
-            vh.setItem(postItems.get(position));
+            vh.setItem(postItems.get(position), comments.get(position));
         }
         if (viewHolder instanceof LinkScriptHolder) {
             LinkScriptHolder vh = (LinkScriptHolder) viewHolder;
-            vh.setItem(postItems.get(position));
+            vh.setItem(postItems.get(position), comments.get(position));
         }
         if (viewHolder instanceof LinkScriptYoutubeHolder) {
             LinkScriptYoutubeHolder vh = (LinkScriptYoutubeHolder) viewHolder;
-            vh.setItem(postItems.get(position));
+            vh.setItem(postItems.get(position), comments.get(position));
         }
         if (viewHolder instanceof ImageHolder) {
             ImageHolder vh = (ImageHolder) viewHolder;
-            vh.setItem(postItems.get(position));
+            vh.setItem(postItems.get(position), comments.get(position));
 
         }
         if (viewHolder instanceof VideoHolder) {

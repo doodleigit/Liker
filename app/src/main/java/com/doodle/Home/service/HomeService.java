@@ -6,7 +6,9 @@ import com.doodle.Home.model.postshare.PostShareItem;
 import com.doodle.utils.AppConstants;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -19,8 +21,15 @@ import retrofit2.http.POST;
 public interface HomeService {
 
 
+    OkHttpClient okHttpClient = new OkHttpClient.Builder()
+            .connectTimeout(1, TimeUnit.MINUTES)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(15, TimeUnit.SECONDS)
+            .build();
+
     Retrofit mRetrofit = new Retrofit.Builder()
             .baseUrl(AppConstants.BASE_URL)
+            .client(okHttpClient)
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
             .build();

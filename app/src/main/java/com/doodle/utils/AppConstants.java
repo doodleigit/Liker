@@ -8,12 +8,13 @@ import java.util.HashMap;
 public class AppConstants {
 
     //===============LOCAL SERVER==================
-    public static final String BASE_URL = "http://192.168.0.77:8040/sites/likerapp/";
-    public static final String BASE_URL_MEDIA = "http://192.168.0.77:8040/sites/likeropt/";
-    public static final String SOCKET_WEB = "http://192.168.0.77:4001";
-    public static final String SOCKET_MESSAGE = "http://192.168.0.77:4002";
-    public static final String SOCKET_VIDEO = "http://192.168.0.77:4004";
-    public static final String FACEBOOK_SHARE = "http://192.168.0.77:8040/sites/likerapp/public/posts/";
+    public static final String BASE_URL = "http://192.168.0.99:8040/sites/likerapp/";
+//    public static final String BASE_URL = " http://192.168.0.99:8040/sites/likeropt/";
+    public static final String BASE_URL_MEDIA = "http://192.168.0.99:8040/sites/likeropt/";
+    public static final String SOCKET_WEB = "http://192.168.0.99:4001";
+    public static final String SOCKET_MESSAGE = "http://192.168.0.99:4002";
+    public static final String SOCKET_VIDEO = "http://192.168.0.99:4004";
+    public static final String FACEBOOK_SHARE = "http://192.168.0.99:8040/sites/likerapp/public/posts/";
 
 
     //http://192.168.0.77:8040/sites/likeropt/uploads/thumb/b3dae106729bc78378bd9566fe533a6f.jpg
@@ -26,6 +27,14 @@ public class AppConstants {
 //    public static final String SOCKET_VIDEO = "https://node.liker.com:7807";
 //    public static final String FACEBOOK_SHARE = "https://www.stg.liker.com/public/posts/";
 
+    //==========================D SERVER===========================
+
+//    public static final String BASE_URL = "https://www.d.liker.com/";
+//    public static final String BASE_URL_MEDIA = "https://www.cdn-liker.com/d-static/";
+//    public static final String SOCKET_WEB = "https://node.liker.com:7803";
+//    public static final String SOCKET_MESSAGE = "https://node.liker.com:7804";
+//    public static final String SOCKET_VIDEO = "https://node.liker.com:7807";
+//    public static final String FACEBOOK_SHARE = "https://www.d.liker.com/public/posts/";
 
     //=======================LIVE SERVER=============================
     //    public static final String BASE_URL = "https://www.liker.com/";
@@ -62,8 +71,8 @@ public class AppConstants {
     public static final String MIM_IMAGE = BASE_URL_MEDIA + "assets/nimg/";
     public static final String Link_IMAGE_PATH = BASE_URL_MEDIA + "uploads/link_images/";
     public static final String YOUTUBE_IMAGE_PATH = BASE_URL_MEDIA + "uploads/youtube/main_img/";
-   //https://www.cdn-liker.com/stg-static/uploads/post_images/5d2dafdfe9487.jpg
-   //https://www.cdn-liker.com/stg-static/uploads/post_videos/thumb/1ovh2hg2jy5qwenx.png
+    //https://www.cdn-liker.com/stg-static/uploads/post_images/5d2dafdfe9487.jpg
+    //https://www.cdn-liker.com/stg-static/uploads/post_videos/thumb/1ovh2hg2jy5qwenx.png
 
     //ADVANCE SEARCH
 
@@ -83,7 +92,7 @@ public class AppConstants {
     public static final String IS_DUPLICATE_FILE = "isDuplicateFile";
 
 
-   // http://192.168.0.77:8040/sites/likeropt/isDuplicateFile
+    // http://192.168.0.77:8040/sites/likeropt/isDuplicateFile
 
     //FEED
 

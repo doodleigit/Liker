@@ -77,7 +77,7 @@ import static java.lang.Integer.parseInt;
 public class VideoHolder extends RecyclerView.ViewHolder {
 
 
-    public TextView tvHeaderInfo, tvPostTime, tvPostUserName, tvImgShareCount, tvPostLikeCount, tvLinkScriptText;
+    public TextView tvHeaderInfo, tvPostTime, tvPostUserName, tvImgShareCount, tvPostLikeCount, tvLinkScriptText,tvCommentCount;
     public CircleImageView imagePostUser;
     public ReadMoreTextView tvPostContent;
     public EmojiTextView tvPostEmojiContent;
@@ -141,6 +141,7 @@ public class VideoHolder extends RecyclerView.ViewHolder {
         tvLinkScriptText = (ReadMoreTextView) itemView.findViewById(R.id.tvLinkScriptText);
         tvPostEmojiContent = (EmojiTextView) itemView.findViewById(R.id.tvPostEmojiContent);
         postBodyLayer = (LinearLayout) itemView.findViewById(R.id.postBodyLayer);
+        tvCommentCount =  itemView.findViewById(R.id.tvCommentCount);
 
 
 
@@ -257,6 +258,10 @@ public class VideoHolder extends RecyclerView.ViewHolder {
             //set user name in blue color and remove underline from the textview
             Utils.stripUnderlines(tvPostContent);
 
+        }
+
+        if(!isNullOrEmpty(item.getTotalComment())&& !"0".equalsIgnoreCase(item.getTotalComment())){
+            tvCommentCount.setText(item.getTotalComment());
         }
 
 

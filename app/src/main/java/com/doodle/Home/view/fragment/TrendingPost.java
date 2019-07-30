@@ -169,11 +169,25 @@ public class TrendingPost extends Fragment {
 
                 postItemList = response.body();
                 if (postItemList != null) {
-                    adapter.addPagingData(postItemList);
-                    offset += 5;
+                    for (PostItem temp : postItemList) {
 
-                    progressView.setVisibility(View.GONE);
-                    progressView.stopAnimation();
+                        friendSet.add(temp.getPostId());
+                    }
+                    String separator = ", ";
+                    int total = friendSet.size() * separator.length();
+                    for (String s : friendSet) {
+                        total += s.length();
+                    }
+
+                    StringBuilder sb = new StringBuilder(total);
+                    for (String s : friendSet) {
+                        sb.append(separator).append(s);
+                    }
+
+                    friends = sb.substring(separator.length()).replaceAll("\\s+", "");
+                    Log.d("friends", friends);
+                    Call<CommentItem> mCall = webService.getPostComments(deviceId, profileId, token, "false", 1, 0, "DESC", friends, userIds);
+                    sendCommentItemPagingRequest(mCall);
                 }
 
             }
@@ -187,6 +201,34 @@ public class TrendingPost extends Fragment {
         });
     }
 
+    private void sendCommentItemPagingRequest(Call<CommentItem> mCall) {
+
+        mCall.enqueue(new Callback<CommentItem>() {
+
+            @Override
+            public void onResponse(Call<CommentItem> mCall, Response<CommentItem> response) {
+
+                CommentItem commentItem = response.body();
+                comments = commentItem.getComments();
+                Log.d("commentItem", commentItem.toString());
+                if (postItemList != null && comments != null) {
+                    adapter.addPagingData(postItemList);
+                    adapter.addPagingCommentData(comments);
+                    offset += 5;
+                    progressView.setVisibility(View.GONE);
+                    progressView.stopAnimation();
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<CommentItem> mCall, Throwable t) {
+                Log.d("MESSAGE: ", t.getMessage());
+                progressView.setVisibility(View.GONE);
+                progressView.stopAnimation();
+            }
+        });
+    }
     private void sendPostItemRequest(Call<List<PostItem>> call) {
 
         call.enqueue(new Callback<List<PostItem>>() {

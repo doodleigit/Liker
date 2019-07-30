@@ -82,7 +82,7 @@ import static java.lang.Integer.parseInt;
 public class TextHolder extends RecyclerView.ViewHolder {
 
 
-    public TextView tvHeaderInfo, tvPostTime, tvPostUserName, tvImgShareCount, tvPostLikeCount, tvLinkScriptText;
+    public TextView tvHeaderInfo, tvPostTime, tvPostUserName, tvImgShareCount, tvPostLikeCount, tvLinkScriptText,tvCommentCount;
     public CircleImageView imagePostUser;
     public ReadMoreTextView tvPostContent;
     public EmojiTextView tvPostEmojiContent;
@@ -151,6 +151,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
         tvLinkScriptText = (ReadMoreTextView) itemView.findViewById(R.id.tvLinkScriptText);
         tvPostEmojiContent = (EmojiTextView) itemView.findViewById(R.id.tvPostEmojiContent);
         postBodyLayer = (LinearLayout) itemView.findViewById(R.id.postBodyLayer);
+        tvCommentCount = (TextView) itemView.findViewById(R.id.tvCommentCount);
 
 
         star1 = itemView.findViewById(R.id.star1);
@@ -543,7 +544,9 @@ public class TextHolder extends RecyclerView.ViewHolder {
             tvPostLikeCount.setVisibility(View.VISIBLE);
             tvPostLikeCount.setText(content);
         }
-
+        if(!isNullOrEmpty(item.getTotalComment())&& !"0".equalsIgnoreCase(item.getTotalComment())){
+            tvCommentCount.setText(item.getTotalComment());
+        }
 
         String userImageUrl = AppConstants.PROFILE_IMAGE + item.getUesrProfileImg();
         Glide.with(App.getAppContext())
