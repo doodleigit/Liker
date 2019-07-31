@@ -86,6 +86,7 @@ public class AppConstants {
 
     public static final String FEED = "feed";
     public static final String GET_POST_COMMENTS = "get_postscomments";
+    public static final String ADDED_COMMENTS = "added_comment";
 
     //Post share
     public static final String GET_POST_DETAILS = "get_postdetails";

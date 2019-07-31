@@ -37,6 +37,7 @@
                     android:textStyle="bold" />
 
                 <LinearLayout
+                    android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
@@ -88,6 +89,7 @@
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
             android:layout_above="@+id/bottom_bar"
             android:layout_below="@+id/progress_bar" />
 
@@ -135,7 +137,7 @@
                 android:tint="@color/colorThemeBlue" />
             </LinearLayout>
             <EditText
-                android:id="@+id/reply"
+                android:id="@+id/etComment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_centerInParent="true"
@@ -155,7 +157,7 @@
 
             <ImageView
 
-                android:id="@+id/send"
+                android:id="@+id/imageSendComment"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_alignParentEnd="true"

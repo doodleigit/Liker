@@ -97,6 +97,15 @@
             android:layout_marginRight="@dimen/_5sdp"
             android:background="@drawable/share_count_box"
             android:textAlignment="center" />
+
+        <!-- TODO: Update blank fragment layout -->
+        <com.github.rahatarmanahmed.cpv.CircularProgressView xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/progress_view"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="bottom|center"
+            app:cpv_indeterminate="true" />
+
     </RelativeLayout>
 
     <include

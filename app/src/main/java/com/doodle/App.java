@@ -2,13 +2,19 @@ package com.doodle;
 
 import android.app.Application;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.StrictMode;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatDelegate;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.danikula.videocache.HttpProxyCacheServer;
 import com.doodle.Post.model.Category;
 import com.doodle.Post.model.Subcatg;
+import com.doodle.utils.Operation;
 import com.doodle.utils.PrefManager;
 import com.onesignal.OneSignal;
 import com.twitter.sdk.android.core.DefaultLogger;
@@ -39,6 +45,8 @@ public class App extends Application {
     private static Category mCategory;
     private static Subcatg mSubcatg;
     private static String mSocketId;
+
+
 
 
     private HttpProxyCacheServer proxy;
@@ -201,4 +209,21 @@ public class App extends Application {
     public static void setIsValidate(boolean isValidate) {
         App.isValidate = isValidate;
     }
+
+
+    public static void toggleCustomise(Context context, ActionBarDrawerToggle toggle, String userId ) {
+        if (!TextUtils.isEmpty(userId)) {
+
+            Bitmap bitmap = Operation.getFacebookProfilePicture(userId);
+            Bitmap bitmapResized = Bitmap.createScaledBitmap(bitmap, 90, 90, false);
+            RoundedBitmapDrawable roundedBitmapDrawable = RoundedBitmapDrawableFactory.create(context.getResources(), bitmapResized);
+            roundedBitmapDrawable.setCornerRadius(Math.max(bitmap.getWidth(), bitmap.getHeight()) / 2.0f);
+            roundedBitmapDrawable.setCircular(true);
+            toggle.setHomeAsUpIndicator(roundedBitmapDrawable);
+        } else {
+            toggle.setHomeAsUpIndicator(R.drawable.ic_sentiment_satisfied_black_24dp);
+
+        }
+    }
+
 }

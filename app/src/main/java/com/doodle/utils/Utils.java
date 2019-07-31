@@ -369,20 +369,23 @@ public class Utils {
 
     public static String extractMentionText(PostItem item) {
 
-        String mentionString = item.getPostText();
-        // String html = "<p>An <a href='http://example.com/'><b>example</b></a> link.</p>";
-        Document doc = Jsoup.parse(mentionString);
-        Element link = doc.select("a").first();
+            String mentionString = item.getPostText();
+            // String html = "<p>An <a href='http://example.com/'><b>example</b></a> link.</p>";
+            Document doc = Jsoup.parse(mentionString);
+            Element link = doc.select("a").first();
 
-        String text = doc.body().text(); // "An example link"
-        Log.d("Text", text);
-        String linkHref = link.attr("href"); // "http://example.com/"
-        Log.d("URL: ", linkHref);
-        String linkText = link.text(); // "example""
-        String linkOuterH = link.outerHtml();
-        // "<a href="http://example.com"><b>example</b></a>"
-        String linkInnerH = link.html(); // "<b>example</b>"
-        return text;
+            String text = doc.body().text(); // "An example link"
+            Log.d("Text", text);
+           /* String linkHref = link.attr("href"); // "http://example.com/"
+            Log.d("URL: ", linkHref);
+            String linkText = link.text(); // "example""
+            String linkOuterH = link.outerHtml();
+            // "<a href="http://example.com"><b>example</b></a>"
+            String linkInnerH = link.html(); // "<b>example</b>"*/
+            return text;
+
+
+
 
     }
     public static String extractMentionText(PostShareItem item) {

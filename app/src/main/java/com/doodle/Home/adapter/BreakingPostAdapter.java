@@ -142,21 +142,18 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
 
-    public void addPagingData(List<PostItem> postItemList) {
+    public void addPagingData(List<PostItem> postItemList,List<Comment> commentList) {
 
         for (PostItem temp : postItemList
         ) {
             postItems.add(temp);
         }
-        notifyDataSetChanged();
-    }
-
-    public void addPagingCommentData(List<Comment> commentList) {
-
         for (Comment temp : commentList
         ) {
             comments.add(temp);
         }
         notifyDataSetChanged();
     }
+
+
 }

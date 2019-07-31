@@ -28,7 +28,9 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Comment.CommentPost"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".Home.view.activity.Home"
+            />
         <activity
             android:name=".Post.view.activity.GalleryView"
             android:parentActivityName=".Post.view.activity.PostNew"
