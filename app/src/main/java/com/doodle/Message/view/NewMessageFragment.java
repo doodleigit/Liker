@@ -1,6 +1,7 @@
 package com.doodle.Message.view;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -32,6 +34,7 @@ import com.doodle.utils.PrefManager;
 import com.doodle.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -87,6 +90,9 @@ public class NewMessageFragment extends Fragment {
         layoutManager = new LinearLayoutManager(getContext());
         toolbar = view.findViewById(R.id.toolbar);
         svToUser = view.findViewById(R.id.to_user);
+        svToUser.setIconifiedByDefault(true);
+        svToUser.setFocusable(true);
+        svToUser.setIconified(false);
         progressBar = view.findViewById(R.id.progress_bar);
         recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(layoutManager);
@@ -96,7 +102,11 @@ public class NewMessageFragment extends Fragment {
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+                View view = getActivity().getCurrentFocus();
+                if (view != null) {
+                    InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+                }
                 getActivity().onBackPressed();
             }
         });
@@ -135,7 +145,7 @@ public class NewMessageFragment extends Fragment {
                 if (newText.isEmpty()) {
                     Call<AllFriends> call = messageService.getAllFriends(deviceId, token, userIds, profileId, userIds, limit, offset);
                     sendSuggestedListRequest(call);
-                } else if (newText.length() >= 2){
+                } else if (newText.length() >= 2) {
                     getSuggestedList(newText);
                 }
                 return false;
@@ -199,6 +209,7 @@ public class NewMessageFragment extends Fragment {
                     friends = allFriends.getFriends();
                     suggestedListAdapter = new SuggestedListAdapter(getActivity(), friends, suggestedListClickResponseService);
                     recyclerView.setAdapter(suggestedListAdapter);
+                    offset += 10;
                 }
                 progressDialog.hide();
             }
@@ -262,4 +273,10 @@ public class NewMessageFragment extends Fragment {
 
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Objects.requireNonNull(getActivity()).getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+    }
 }

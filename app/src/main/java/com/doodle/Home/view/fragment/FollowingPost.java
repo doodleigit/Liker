@@ -297,7 +297,6 @@ public class FollowingPost extends Fragment {
                     progressView.setVisibility(View.GONE);
                     progressView.stopAnimation();
                 }
-                ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(2);
 
             }
 
@@ -334,13 +333,14 @@ public class FollowingPost extends Fragment {
                             recyclerView.setVisibility(View.VISIBLE);
                             recyclerView.setAdapter(adapter);
                         }
-                    }, 5000);
+                    }, 1000);
 
 
                     //  Log.d("PostItem: ", categoryItem.toString() + "");
                     progressView.setVisibility(View.GONE);
                     progressView.stopAnimation();
                 }
+                ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(2);
 
             }
 
@@ -349,6 +349,7 @@ public class FollowingPost extends Fragment {
                 Log.d("MESSAGE: ", t.getMessage());
                 progressView.setVisibility(View.GONE);
                 progressView.stopAnimation();
+                ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(2);
             }
         });
     }

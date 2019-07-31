@@ -878,7 +878,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
                 break;
 
             case R.id.imageStarContributor:
-                startActivity(new Intent(this, PostNew.class));
+//                startActivity(new Intent(this, PostNew.class));
 // imageStarContributor.setCircleBackgroundColor(getResources().getColor(R.color.colorWhite));
 // imageStarContributor.setImageResource(R.drawable.ic_star_border_blue_24dp);
                 break;
@@ -956,6 +956,11 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
             }
             filterItem.setText(selectedCategory.isEmpty() ? subCategories.get(0).getSubCatName() : selectedCategory);
         } else {
+            if (position == 1) {
+                if (categories.get(categoryPosition).getPostFilterSubCategories().size() == 0) {
+                    showMultipleFilterDialog();
+                }
+            }
             filterItem.setText(getString(R.string.personalize_your_feed));
         }
         ArrayList<String> arrayList = new ArrayList<>();

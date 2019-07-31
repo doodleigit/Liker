@@ -82,7 +82,7 @@ import static java.lang.Integer.parseInt;
 public class TextHolder extends RecyclerView.ViewHolder {
 
 
-    public TextView tvHeaderInfo, tvPostTime, tvPostUserName, tvImgShareCount, tvPostLikeCount, tvLinkScriptText,tvCommentCount;
+    public TextView tvHeaderInfo, tvPostTime, tvPostUserName, tvImgShareCount, tvPostLikeCount, tvLinkScriptText, tvCommentCount;
     public CircleImageView imagePostUser;
     public ReadMoreTextView tvPostContent;
     public EmojiTextView tvPostEmojiContent;
@@ -544,7 +544,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
             tvPostLikeCount.setVisibility(View.VISIBLE);
             tvPostLikeCount.setText(content);
         }
-        if(!isNullOrEmpty(item.getTotalComment())&& !"0".equalsIgnoreCase(item.getTotalComment())){
+        if (!isNullOrEmpty(item.getTotalComment()) && !"0".equalsIgnoreCase(item.getTotalComment())) {
             tvCommentCount.setText(item.getTotalComment());
         }
 
@@ -561,7 +561,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
         imagePostComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               // AppCompatActivity activity = (AppCompatActivity) v.getContext();
+                // AppCompatActivity activity = (AppCompatActivity) v.getContext();
                 mContext.startActivity(new Intent(mContext, CommentPost.class));
 
             }
@@ -698,12 +698,12 @@ public class TextHolder extends RecyclerView.ViewHolder {
                 popupCommentMenu = new PopupMenu(mContext, v);
                 popupCommentMenu.getMenuInflater().inflate(R.menu.post_comment_menu, popupCommentMenu.getMenu());
 
-                if(userPostId.equalsIgnoreCase(commentPostId)){
+                if (userPostId.equalsIgnoreCase(commentPostId)) {
                     popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(false);
                     popupCommentMenu.getMenu().findItem(R.id.blockUser).setVisible(false);
                     popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(true);
                     popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(true);
-                }else {
+                } else {
                     popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(true);
                     popupCommentMenu.getMenu().findItem(R.id.blockUser).setVisible(true);
                     popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(false);
@@ -798,7 +798,6 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
         return text;
     }
-
 
 
 }

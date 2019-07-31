@@ -110,6 +110,7 @@ public class TrendingPost extends Fragment {
         shimmerFrameLayout = (ShimmerFrameLayout) root.findViewById(R.id.shimmer_view_post_container);
         recyclerView = (RecyclerView) root.findViewById(R.id.rvBreakingPost);
         recyclerView.setLayoutManager(layoutManager);
+        adapter = new BreakingPostAdapter(getActivity(), postItemList,comments);
 
         getData();
 
@@ -293,7 +294,6 @@ public class TrendingPost extends Fragment {
                     //  Log.d("PostItem: ", categoryItem.toString() + "");
                     progressView.setVisibility(View.GONE);
                     progressView.stopAnimation();
-                    ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(0);
                 }
 
             }
@@ -331,13 +331,14 @@ public class TrendingPost extends Fragment {
                             recyclerView.setVisibility(View.VISIBLE);
                             recyclerView.setAdapter(adapter);
                         }
-                    }, 5000);
+                    }, 1000);
 
 
                     //  Log.d("PostItem: ", categoryItem.toString() + "");
                     progressView.setVisibility(View.GONE);
                     progressView.stopAnimation();
                 }
+                ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(0);
 
             }
 
@@ -346,6 +347,7 @@ public class TrendingPost extends Fragment {
                 Log.d("MESSAGE: ", t.getMessage());
                 progressView.setVisibility(View.GONE);
                 progressView.stopAnimation();
+                ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(0);
             }
         });
     }
