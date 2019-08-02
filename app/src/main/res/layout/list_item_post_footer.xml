@@ -109,7 +109,7 @@
     </RelativeLayout>
 
     <include
-        layout="@layout/list_item_comment_text"
+        layout="@layout/list_item_single_comment_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical" />

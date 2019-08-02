@@ -63,9 +63,9 @@ public interface CommentService {
             @Field("comment_image") String commentImage,
             @Field("comment_text") String commentText,
             @Field("comment_type") int commentType,
-            @Field("has_mention") String hasMention,
+            @Field("has_mention") int hasMention,
             @Field("link_url") String linkUrl,
-            @Field("mention") String mention,
+            @Field("mention") int mention,
             @Field("post_id") String postId,
             @Field("user_id") String userIds
     );

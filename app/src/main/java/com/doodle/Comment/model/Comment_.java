@@ -17,6 +17,9 @@ public class Comment_ implements Serializable, Parcelable
     @SerializedName("id")
     @Expose
     private String id;
+    @SerializedName("insert_id")
+    @Expose
+    private int insertId;
     @SerializedName("post_id")
     @Expose
     private String postId;
@@ -103,6 +106,7 @@ public class Comment_ implements Serializable, Parcelable
 
     protected Comment_(Parcel in) {
         this.id = ((String) in.readValue((String.class.getClassLoader())));
+        this.insertId = ((Integer) in.readValue((Integer.class.getClassLoader())));
         this.postId = ((String) in.readValue((String.class.getClassLoader())));
         this.userId = ((String) in.readValue((String.class.getClassLoader())));
         this.commentType = ((String) in.readValue((String.class.getClassLoader())));
@@ -128,6 +132,14 @@ public class Comment_ implements Serializable, Parcelable
     }
 
     public Comment_() {
+    }
+
+    public int getInsertId() {
+        return insertId;
+    }
+
+    public void setInsertId(int insertId) {
+        this.insertId = insertId;
     }
 
     public String getId() {
@@ -317,6 +329,7 @@ public class Comment_ implements Serializable, Parcelable
 
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeValue(id);
+        dest.writeValue(insertId);
         dest.writeValue(postId);
         dest.writeValue(userId);
         dest.writeValue(commentType);
