@@ -283,7 +283,7 @@ public class BreakingPost extends Fragment {
                     totalPostIDs = sb.substring(separator.length()).replaceAll("\\s+", "");
                     Log.d("friends", totalPostIDs);
                     Call<CommentItem> mCall = webService.getPostComments(deviceId, profileId, token, "false", 1, 0, "DESC", totalPostIDs, userIds);
-                    sendCommentItemRequest(mCall);
+                     sendCommentItemRequest(mCall);
 
 //             adapter = new BreakingPostAdapter(getActivity(), postItemList);
 //

@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Handler;
 import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.MenuBuilder;
@@ -37,17 +38,22 @@ import com.doodle.App;
 import com.doodle.Comment.CommentPost;
 import com.doodle.Comment.FullBottomSheetDialogFragment;
 import com.doodle.Comment.model.Comment;
+import com.doodle.Comment.model.CommentItem;
 import com.doodle.Comment.model.Comment_;
+import com.doodle.Comment.service.CommentService;
+import com.doodle.Home.adapter.BreakingPostAdapter;
 import com.doodle.Home.model.PostFooter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.PostTextIndex;
 import com.doodle.Home.model.postshare.PostShareItem;
+import com.doodle.Home.view.activity.Home;
 import com.doodle.Home.view.activity.PostShare;
 import com.doodle.Post.model.Mim;
 import com.doodle.Post.service.DataProvider;
 import com.doodle.Post.view.fragment.PostPermission;
 import com.doodle.R;
 import com.doodle.utils.AppConstants;
+import com.doodle.utils.NetworkHelper;
 import com.doodle.utils.Operation;
 import com.doodle.utils.PrefManager;
 import com.doodle.utils.Utils;
@@ -57,6 +63,7 @@ import com.facebook.FacebookException;
 import com.facebook.share.Sharer;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
+import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.vanniktech.emoji.EmojiTextView;
@@ -67,6 +74,7 @@ import org.jsoup.nodes.Element;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
@@ -85,7 +93,7 @@ import static java.lang.Integer.parseInt;
 public class TextHolder extends RecyclerView.ViewHolder {
 
 
-    public TextView tvHeaderInfo, tvPostTime, tvPostUserName, tvImgShareCount, tvPostLikeCount, tvLinkScriptText, tvCommentCount;
+    public TextView tvHeaderInfo, tvPostTime, tvPostUserName, tvImgShareCount, tvPostLikeCount, tvLinkScriptText,tvCommentCount;
     public CircleImageView imagePostUser;
     public ReadMoreTextView tvPostContent;
     public EmojiTextView tvPostEmojiContent;
@@ -108,6 +116,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
     private String deviceId, profileId, token, userIds;
     private Context mContext;
     public static final String ITEM_KEY = "item_key";
+    public static final String COMMENT_ITEM_KEY = "comment_item_key";
     public CallbackManager callbackManager;
     public ShareDialog shareDialog;
     public ImageView imagePostComment;
@@ -124,6 +133,17 @@ public class TextHolder extends RecyclerView.ViewHolder {
     public TextView tvCommentUserName, tvCommentTime, tvCommentLike, tvCommentReply, tvCountCommentLike;
     private String userPostId;
     private PopupMenu popupCommentMenu;
+
+
+    //SHOW ALL COMMENTS
+    private CommentService commentService;
+    int limit = 10;
+    int offset = 1;
+    boolean networkOk;
+    CircularProgressView progressView;
+    LinearLayout commentBox;
+
+
 
     public TextHolder(View itemView, Context context) {
         super(itemView);
@@ -188,6 +208,13 @@ public class TextHolder extends RecyclerView.ViewHolder {
         tvCountCommentLike = itemView.findViewById(R.id.tvCountCommentLike);
         imageCommentLikeThumb.setVisibility(View.GONE);
         tvCountCommentLike.setVisibility(View.GONE);
+
+
+        //All comment post
+        commentService = CommentService.mRetrofit.create(CommentService.class);
+        networkOk = NetworkHelper.hasNetworkAccess(mContext);
+        progressView = (CircularProgressView) itemView.findViewById(R.id.progress_view);
+        commentBox=itemView.findViewById(R.id.commentBox);
 
     }
 
@@ -576,11 +603,48 @@ public class TextHolder extends RecyclerView.ViewHolder {
         imagePostComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               // AppCompatActivity activity = (AppCompatActivity) v.getContext();
-                mContext.startActivity(new Intent(mContext, CommentPost.class));
+               AppCompatActivity activity = (AppCompatActivity) v.getContext();
+              //  mContext.startActivity(new Intent(mContext, CommentPost.class));
+//                FullBottomSheetDialogFragment postPermissions = new FullBottomSheetDialogFragment();
+//                postPermissions.show(activity.getSupportFragmentManager(), "PostPermission");
+
+                if (networkOk) {
+                    progressView.setVisibility(View.VISIBLE);
+                    progressView.startAnimation();
+
+                    Call<CommentItem> call = commentService.getAllPostComments(deviceId, profileId, token, "false", limit, offset, "DESC", commentPostId, userIds);
+                    sendAllCommentItemRequest(call);
+                } else {
+                    Utils.showNetworkDialog(activity.getSupportFragmentManager());
+                    progressView.setVisibility(View.GONE);
+                    progressView.stopAnimation();
+
+                }
 
             }
         });
+
+        commentBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AppCompatActivity activity = (AppCompatActivity) v.getContext();
+
+                if (networkOk) {
+                    progressView.setVisibility(View.VISIBLE);
+                    progressView.startAnimation();
+
+
+                    Call<CommentItem> call = commentService.getAllPostComments(deviceId, profileId, token, "false", limit, offset, "DESC", commentPostId, userIds);
+                    sendAllCommentItemRequest(call);
+                } else {
+                    Utils.showNetworkDialog(activity.getSupportFragmentManager());
+                    progressView.setVisibility(View.GONE);
+                    progressView.stopAnimation();
+
+                }
+            }
+        });
+
         imagePostShare.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("RestrictedApi")
             @Override
@@ -757,6 +821,41 @@ public class TextHolder extends RecyclerView.ViewHolder {
                     }
                 });
 
+            }
+        });
+
+    }
+
+    private void sendAllCommentItemRequest(Call<CommentItem> call) {
+
+        call.enqueue(new Callback<CommentItem>() {
+
+            @Override
+            public void onResponse(Call<CommentItem> mCall, Response<CommentItem> response) {
+
+
+                if(response.body()!=null){
+                    CommentItem commentItem = response.body();
+                    Intent intent = new Intent(mContext, CommentPost.class);
+                    intent.putExtra(COMMENT_ITEM_KEY, (Parcelable) commentItem);
+                    intent.putExtra(ITEM_KEY, (Parcelable) item);
+
+                    mContext.startActivity(intent);
+                    progressView.setVisibility(View.GONE);
+                    progressView.stopAnimation();
+
+                    ((Home) Objects.requireNonNull(mContext)).loadCompleteListener.onLoadComplete(1);
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call<CommentItem> call, Throwable t) {
+                Log.d("MESSAGE: ", t.getMessage());
+                progressView.setVisibility(View.GONE);
+                progressView.stopAnimation();
+                ((Home) Objects.requireNonNull(mContext)).loadCompleteListener.onLoadComplete(1);
             }
         });
 
