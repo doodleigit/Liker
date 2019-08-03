@@ -13,8 +13,8 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
-        initialComponent();
-        initialFragment();
+//        initialComponent();
+//        initialFragment();
     }
 
     private void initialComponent() {

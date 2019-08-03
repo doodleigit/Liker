@@ -22,7 +22,8 @@
         android:theme="@style/AppTheme"
         android:vmSafeMode="true"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".Profile.view.ProfileActivity"></activity>
+        <activity android:name=".Profile.view.ProfileActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".Home.view.activity.PostShare"
             android:theme="@style/AppTheme.NoActionBar" />

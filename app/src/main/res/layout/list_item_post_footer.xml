@@ -55,12 +55,11 @@
             android:id="@+id/tvCommentCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:text="1"
             android:layout_marginTop="@dimen/_5sdp"
             android:layout_marginRight="@dimen/_5sdp"
             android:layout_marginBottom="@dimen/_5sdp"
             android:layout_toLeftOf="@id/imagePostComment"
-            />
+            tools:text="1" />
 
         <ImageView
             android:id="@+id/imagePostComment"
@@ -73,7 +72,6 @@
             android:layout_toLeftOf="@id/imagePostShare"
             android:src="@drawable/ic_comment_black_24dp"
             android:tint="#C4C9D4" />
-
 
 
         <ImageView
@@ -108,16 +106,12 @@
 
     </RelativeLayout>
 
-    <!--<include-->
-        <!--layout="@layout/list_item_single_comment_text"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:orientation="vertical" />-->
+    <include
+        layout="@layout/list_item_single_comment_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
 
-    <RelativeLayout
-        android:id="@+id/commentHold"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
 </LinearLayout>
 
 
