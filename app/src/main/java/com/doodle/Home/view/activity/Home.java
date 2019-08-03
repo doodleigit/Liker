@@ -242,6 +242,10 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
     }
 
     private void setData() {
+        int newNotificationCount = manager.getNotificationCount();
+        setNotificationCount(newNotificationCount);
+        int newMessageCount = manager.getMessageNotificationCount();
+        setMessageNotificationCount(newMessageCount);
         categories.add(new PostFilterCategory("1", "All Category", new ArrayList<>()));
         categories.add(new PostFilterCategory("2", "My Category", new ArrayList<>()));
         categories.add(new PostFilterCategory("3", "Single Category", new ArrayList<>()));
@@ -481,7 +485,11 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
 
         tvCategoryName.setText(categories.get(categoryPosition).getCatName());
         if (categoryPosition == 2) {
-            tvFilterItemName.setText(selectedCategory.isEmpty() ? subCategories.get(0).getSubCatName() : selectedCategory);
+            if (subCategories.size() != 0) {
+                tvFilterItemName.setText(selectedCategory.isEmpty() ? subCategories.get(0).getSubCatName() : selectedCategory);
+            } else {
+                tvFilterItemName.setText("No Category");
+            }
         } else {
             tvFilterItemName.setText(getString(R.string.personalize_your_feed));
         }
@@ -839,6 +847,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
         int id = item.getItemId();
         switch (id) {
             case R.id.action_log_out:
+                manager.pref.edit().clear().apply();
                 startActivity(new Intent(this, LoginAgain.class));
                 finish();
                 return true;

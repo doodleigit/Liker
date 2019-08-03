@@ -57,7 +57,7 @@ public class CategoryTitleAdapter extends RecyclerView.Adapter<CategoryTitleAdap
                 if (position == -1) {
                     position = i;
                     categoryRemoveListener.onCategorySelect(arrayList.get(i));
-                    viewHolder.mainLayout.setBackgroundResource(R.drawable.rectangle_round_corner_six);
+                    viewHolder.mainLayout.setBackgroundResource(R.drawable.rectangle_corner_round_six);
                 } else {
                     if (position == i) {
                         position = -1;
@@ -67,7 +67,7 @@ public class CategoryTitleAdapter extends RecyclerView.Adapter<CategoryTitleAdap
                         notifyItemChanged(position);
                         position = i;
                         categoryRemoveListener.onCategorySelect(arrayList.get(i));
-                        viewHolder.mainLayout.setBackgroundResource(R.drawable.rectangle_round_corner_six);
+                        viewHolder.mainLayout.setBackgroundResource(R.drawable.rectangle_corner_round_six);
                     }
                 }
             }

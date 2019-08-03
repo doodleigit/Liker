@@ -11,6 +11,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Parcelable;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.view.menu.MenuPopupHelper;
 import android.support.v7.widget.PopupMenu;
@@ -34,6 +35,7 @@ import com.borjabravo.readmoretextview.ReadMoreTextView;
 import com.bumptech.glide.Glide;
 import com.doodle.App;
 import com.doodle.Comment.CommentPost;
+import com.doodle.Comment.FullBottomSheetDialogFragment;
 import com.doodle.Comment.model.Comment;
 import com.doodle.Comment.model.Comment_;
 import com.doodle.Home.model.PostFooter;
@@ -43,6 +45,7 @@ import com.doodle.Home.model.postshare.PostShareItem;
 import com.doodle.Home.view.activity.PostShare;
 import com.doodle.Post.model.Mim;
 import com.doodle.Post.service.DataProvider;
+import com.doodle.Post.view.fragment.PostPermission;
 import com.doodle.R;
 import com.doodle.utils.AppConstants;
 import com.doodle.utils.Operation;
@@ -227,10 +230,22 @@ public class TextHolder extends RecyclerView.ViewHolder {
                 imagePostCommenting.setVisibility(View.GONE);
             } else {
                 imagePostCommenting.setVisibility(View.VISIBLE);
+                imagePostCommenting.setVisibility(View.VISIBLE);
+                String commentImageUrl = PROFILE_IMAGE + commentImage;
+                Glide.with(App.getAppContext())
+                        .load(commentImageUrl)
+                        .centerCrop()
+                        .dontAnimate()
+                        .into(imagePostCommenting);
             }
 
             tvCommentUserName.setText(commentUserName);
-            tvCommentMessage.setText(commentText);
+            if(!isNullOrEmpty(commentText)){
+                tvCommentMessage.setVisibility(View.VISIBLE);
+                tvCommentMessage.setText(commentText);
+            }else {
+                tvCommentMessage.setVisibility(View.GONE);
+            }
             tvCommentTime.setText(Utils.chatDateCompare(mContext, Long.valueOf(commentTime)));
 
             String commentUserImageUrl = PROFILE_IMAGE + commentUserImage;
@@ -544,7 +559,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
             tvPostLikeCount.setVisibility(View.VISIBLE);
             tvPostLikeCount.setText(content);
         }
-        if (!isNullOrEmpty(item.getTotalComment()) && !"0".equalsIgnoreCase(item.getTotalComment())) {
+        if(!isNullOrEmpty(item.getTotalComment())&& !"0".equalsIgnoreCase(item.getTotalComment())){
             tvCommentCount.setText(item.getTotalComment());
         }
 
@@ -561,7 +576,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
         imagePostComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // AppCompatActivity activity = (AppCompatActivity) v.getContext();
+               // AppCompatActivity activity = (AppCompatActivity) v.getContext();
                 mContext.startActivity(new Intent(mContext, CommentPost.class));
 
             }
@@ -698,12 +713,12 @@ public class TextHolder extends RecyclerView.ViewHolder {
                 popupCommentMenu = new PopupMenu(mContext, v);
                 popupCommentMenu.getMenuInflater().inflate(R.menu.post_comment_menu, popupCommentMenu.getMenu());
 
-                if (userPostId.equalsIgnoreCase(commentPostId)) {
+                if(userPostId.equalsIgnoreCase(commentPostId)){
                     popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(false);
                     popupCommentMenu.getMenu().findItem(R.id.blockUser).setVisible(false);
                     popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(true);
                     popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(true);
-                } else {
+                }else {
                     popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(true);
                     popupCommentMenu.getMenu().findItem(R.id.blockUser).setVisible(true);
                     popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(false);
@@ -798,6 +813,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
         return text;
     }
+
 
 
 }

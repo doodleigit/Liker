@@ -72,8 +72,7 @@ public class TrendingPost extends Fragment {
     private String catIds = "";
     private ShimmerFrameLayout shimmerFrameLayout;
 
-    private String friends;
-    List<String> friendSet = new ArrayList<>();
+
     private List<Comment> comments = new ArrayList<Comment>();
     @Override
     public void onAttach(Context context) {
@@ -110,7 +109,6 @@ public class TrendingPost extends Fragment {
         shimmerFrameLayout = (ShimmerFrameLayout) root.findViewById(R.id.shimmer_view_post_container);
         recyclerView = (RecyclerView) root.findViewById(R.id.rvBreakingPost);
         recyclerView.setLayoutManager(layoutManager);
-        adapter = new BreakingPostAdapter(getActivity(), postItemList,comments);
 
         getData();
 
@@ -187,24 +185,26 @@ public class TrendingPost extends Fragment {
 
                 postItemList = response.body();
                 if (postItemList != null) {
+                    String totalPostIDs;
+                    List<String> postIdSet = new ArrayList<>();
                     for (PostItem temp : postItemList) {
 
-                        friendSet.add(temp.getPostId());
+                        postIdSet.add(temp.getPostId());
                     }
                     String separator = ", ";
-                    int total = friendSet.size() * separator.length();
-                    for (String s : friendSet) {
+                    int total = postIdSet.size() * separator.length();
+                    for (String s : postIdSet) {
                         total += s.length();
                     }
 
                     StringBuilder sb = new StringBuilder(total);
-                    for (String s : friendSet) {
+                    for (String s : postIdSet) {
                         sb.append(separator).append(s);
                     }
 
-                    friends = sb.substring(separator.length()).replaceAll("\\s+", "");
-                    Log.d("friends", friends);
-                    Call<CommentItem> mCall = webService.getPostComments(deviceId, profileId, token, "false", 1, 0, "DESC", friends, userIds);
+                    totalPostIDs = sb.substring(separator.length()).replaceAll("\\s+", "");
+                    Log.d("friends", totalPostIDs);
+                    Call<CommentItem> mCall = webService.getPostComments(deviceId, profileId, token, "false", 1, 0, "DESC", totalPostIDs, userIds);
                     sendCommentItemPagingRequest(mCall);
                 }
 
@@ -230,8 +230,8 @@ public class TrendingPost extends Fragment {
                 comments = commentItem.getComments();
                 Log.d("commentItem", commentItem.toString());
                 if (postItemList != null && comments != null) {
-                    adapter.addPagingData(postItemList);
-                    adapter.addPagingCommentData(comments);
+                    adapter.addPagingData(postItemList,comments);
+                   // adapter.addPagingCommentData(comments);
                     offset += 5;
                     progressView.setVisibility(View.GONE);
                     progressView.stopAnimation();
@@ -256,25 +256,26 @@ public class TrendingPost extends Fragment {
 
                 postItemList = response.body();
                 if (postItemList != null) {
-
+                    String totalPostIDs;
+                    List<String> postIdSet = new ArrayList<>();
                     for (PostItem temp : postItemList) {
 
-                        friendSet.add(temp.getPostId());
+                        postIdSet.add(temp.getPostId());
                     }
                     String separator = ", ";
-                    int total = friendSet.size() * separator.length();
-                    for (String s : friendSet) {
+                    int total = postIdSet.size() * separator.length();
+                    for (String s : postIdSet) {
                         total += s.length();
                     }
 
                     StringBuilder sb = new StringBuilder(total);
-                    for (String s : friendSet) {
+                    for (String s : postIdSet) {
                         sb.append(separator).append(s);
                     }
 
-                    friends = sb.substring(separator.length()).replaceAll("\\s+", "");
-                    Log.d("friends", friends);
-                    Call<CommentItem> mCall = webService.getPostComments(deviceId, profileId, token, "false", 3, 0, "DESC", friends, userIds);
+                    totalPostIDs = sb.substring(separator.length()).replaceAll("\\s+", "");
+                    Log.d("friends", totalPostIDs);
+                    Call<CommentItem> mCall = webService.getPostComments(deviceId, profileId, token, "false", 3, 0, "DESC", totalPostIDs, userIds);
                     sendCommentItemRequest(mCall);
 
                 /*    adapter = new BreakingPostAdapter(getActivity(), postItemList);
