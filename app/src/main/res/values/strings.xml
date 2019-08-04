@@ -136,5 +136,9 @@
     <string name="delete">Delete</string>
     <string name="report_comment">Report Comment</string>
     <string name="block_user">Block User</string>
+    <string name="photos">photos</string>
+    <string name="uploading">Uploading…</string>
+    <string name="select_profile_picture">Select Profile Picture</string>
+    <string name="capture_profile_picture">Capture Profile Picture</string>
 
 </resources>

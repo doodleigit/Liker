@@ -9,6 +9,7 @@ import android.view.Window;
 import android.view.WindowManager;
 
 import com.doodle.Home.view.activity.Home;
+import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.R;
 import com.doodle.utils.PrefManager;
 import com.onesignal.OneSignal;
@@ -37,11 +38,14 @@ public class Splash extends AppCompatActivity {
 //                finish();
 //            }
 //        },2000);
-        if (manager.getProfileId().isEmpty()) {
-            startActivity(new Intent(Splash.this, Welcome.class));
-        } else {
-            startActivity(new Intent(Splash.this, Home.class));
-        }
+//        if (manager.getProfileId().isEmpty()) {
+//            startActivity(new Intent(Splash.this, Welcome.class));
+//        } else {
+//            startActivity(new Intent(Splash.this, Home.class));
+//        }
+
+        startActivity(new Intent(Splash.this, ProfileActivity.class));
+
         finish();
 
 

@@ -31,8 +31,8 @@
                     android:iconifiedByDefault="false"
                     android:paddingStart="-16dp"
                     android:paddingEnd="-16dp"
-                    android:queryHint="@string/search_hint"
-                    android:queryBackground="@android:color/transparent" />
+                    android:queryBackground="@android:color/transparent"
+                    android:queryHint="@string/search_hint" />
 
             </RelativeLayout>
 
@@ -49,7 +49,7 @@
         <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="5dp">
+            app:cardCornerRadius="0dp">
 
             <RelativeLayout
                 android:layout_width="match_parent"
@@ -60,10 +60,27 @@
                     android:layout_width="match_parent"
                     android:layout_height="100dp">
 
-                    <ImageView
+                    <RelativeLayout
+                        android:id="@+id/cover_image_layout"
                         android:layout_width="match_parent"
-                        android:layout_height="100dp"
-                        android:src="@color/com_facebook_blue" />
+                        android:layout_height="wrap_content">
+
+                        <ImageView
+                            android:id="@+id/cover_image"
+                            android:layout_width="match_parent"
+                            android:layout_height="100dp"
+                            android:src="@color/com_facebook_blue" />
+
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:id="@+id/change_cover_image"
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:layout_margin="10dp"
+                            android:layout_alignEnd="@+id/cover_image"
+                            android:layout_alignParentTop="@+id/cover_image"
+                            android:src="@drawable/ic_photo_camera_black_24dp" />
+
+                    </RelativeLayout>
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -105,16 +122,16 @@
                             android:id="@+id/follow_layout"
                             android:layout_width="80dp"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="5dp"
                             android:layout_marginEnd="10dp"
+                            android:layout_marginBottom="5dp"
                             android:background="@drawable/rectangle_corner_round_seven"
                             android:gravity="center"
                             android:orientation="horizontal"
                             android:padding="5dp">
 
                             <ImageView
-                                android:layout_width="15dp"
-                                android:layout_height="15dp"
+                                android:layout_width="12dp"
+                                android:layout_height="12dp"
                                 android:src="@drawable/friend_requests" />
 
                             <TextView
@@ -123,7 +140,7 @@
                                 android:layout_marginStart="5dp"
                                 android:text="Follow"
                                 android:textColor="@color/colorWhite"
-                                android:textSize="12sp" />
+                                android:textSize="10sp" />
 
                         </LinearLayout>
 
@@ -137,8 +154,8 @@
                             android:padding="5dp">
 
                             <ImageView
-                                android:layout_width="15dp"
-                                android:layout_height="15dp"
+                                android:layout_width="12dp"
+                                android:layout_height="12dp"
                                 android:src="@drawable/friend_requests" />
 
                             <TextView
@@ -147,7 +164,7 @@
                                 android:layout_marginStart="5dp"
                                 android:text="More"
                                 android:textColor="@color/colorWhite"
-                                android:textSize="12sp" />
+                                android:textSize="10sp" />
 
                         </LinearLayout>
 
@@ -162,7 +179,7 @@
                     android:layout_marginStart="10dp"
                     android:layout_marginTop="10dp"
                     android:layout_marginBottom="20dp"
-                    android:layout_toEndOf="@+id/profile_image"
+                    android:layout_toEndOf="@+id/profile_image_layout"
                     android:orientation="vertical">
 
                     <TextView
@@ -171,7 +188,7 @@
                         android:layout_height="wrap_content"
                         android:text="User Name"
                         android:textColor="@color/colorPrimary"
-                        android:textSize="16sp" />
+                        android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/total_info_count"
@@ -182,13 +199,28 @@
 
                 </LinearLayout>
 
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:id="@+id/profile_image"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
+                <RelativeLayout
+                    android:id="@+id/profile_image_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_marginStart="15dp"
-                    android:layout_marginTop="60dp"
-                    android:src="@drawable/profile" />
+                    android:layout_marginTop="60dp">
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/profile_image"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:src="@drawable/profile" />
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/change_profile_image"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_alignEnd="@+id/profile_image"
+                        android:layout_alignBottom="@+id/profile_image"
+                        android:src="@drawable/ic_photo_camera_black_24dp" />
+
+                </RelativeLayout>
 
             </RelativeLayout>
 
@@ -202,7 +234,8 @@
             android:background="@android:color/white"
             app:tabGravity="fill"
             app:tabIndicatorColor="@color/colorAccent"
-            app:tabMode="fixed" />
+            app:tabMode="fixed"
+            app:tabTextAppearance="@style/MyTabLayoutTextAppearance" />
 
         <android.support.v4.view.ViewPager
             android:id="@+id/viewpager"

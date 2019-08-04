@@ -216,6 +216,7 @@
     <orderEntry type="library" name="Gradle: com.android.support:appcompat-v7:28.0.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.github.marcoscgdev:MaterialToast:1.0.1@aar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.android.support:multidex-instrumentation:1.0.2@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.soundcloud.android:android-crop:1.0.1@aar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.google.firebase:firebase-common:12.0.1@aar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.google.firebase:firebase-iid:12.0.1@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:collections:28.0.0@jar" level="project" />

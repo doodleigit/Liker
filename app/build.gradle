@@ -138,4 +138,5 @@ dependencies {
     //Share Facebook===============================================
     implementation 'com.facebook.android:facebook-share:[5,6)'
     //implementation 'com.android.support:multidex:1.0.3'
+    implementation 'com.soundcloud.android:android-crop:1.0.1@aar'
 }
