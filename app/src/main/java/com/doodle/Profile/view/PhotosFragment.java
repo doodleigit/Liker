@@ -85,6 +85,7 @@ public class PhotosFragment extends Fragment {
         photoRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL));
 
         albumRecyclerView.setAdapter(albumAdapter);
+        photoRecyclerView.setAdapter(photoAdapter);
     }
 
     private void getData() {
