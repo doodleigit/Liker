@@ -55,7 +55,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:textAllCaps="true"
             android:text="BSC"
             android:textSize="14sp"/>
 
@@ -64,7 +63,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:textAllCaps="true"
             android:text="CSE GPA-3.54 From 2012 to 2016"
             android:textSize="14sp"/>
 

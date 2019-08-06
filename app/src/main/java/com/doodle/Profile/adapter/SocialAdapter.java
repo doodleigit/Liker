@@ -1,6 +1,8 @@
 package com.doodle.Profile.adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,6 +13,7 @@ import android.widget.TextView;
 
 import com.doodle.Profile.model.Links;
 import com.doodle.R;
+import com.doodle.utils.Utils;
 
 import java.util.ArrayList;
 
@@ -24,7 +27,6 @@ public class SocialAdapter extends RecyclerView.Adapter<SocialAdapter.ViewHolder
         this.arrayList = arrayList;
     }
 
-
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
@@ -35,7 +37,27 @@ public class SocialAdapter extends RecyclerView.Adapter<SocialAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
+        String socialLinkType, link;
 
+        socialLinkType = arrayList.get(i).getType();
+        link = arrayList.get(i).getLink();
+
+        viewHolder.tvSocialLinkType.setText(Utils.getProfileType(socialLinkType));
+
+        if (!link.isEmpty()) {
+            if (!link.startsWith("http://") && !link.startsWith("https://")) {
+                link = "http://" + link;
+            }
+        }
+
+        String finalInstituteSite = link;
+        viewHolder.tvSocialLinkType.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(finalInstituteSite));
+                context.startActivity(browserIntent);
+            }
+        });
     }
 
     @Override

@@ -94,4 +94,14 @@ public interface ProfileService {
 
     );
 
+    @POST(AppConstants.GET_PROFILE_INFO)
+    @FormUrlEncoded
+    Call<String> getProfileInfo(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("profile_user_id") String profileUserId,
+            @Field("user_id") String userIds
+    );
+
 }

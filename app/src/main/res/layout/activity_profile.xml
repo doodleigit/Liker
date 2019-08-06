@@ -1,254 +1,266 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:orientation="vertical">
 
-        <LinearLayout
+        <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:theme="@style/AppTheme.AppBarOverlay">
 
-            <android.support.v7.widget.CardView
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:cardCornerRadius="0dp">
+                android:layout_height="?attr/actionBarSize"
+                android:background="?attr/colorPrimary"
+                app:contentInsetLeft="0dp"
+                app:contentInsetStart="0dp"
+                app:contentInsetStartWithNavigation="0dp"
+                app:navigationIcon="?attr/homeAsUpIndicator"
+                app:popupTheme="@style/AppTheme.PopupOverlay">
 
                 <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="match_parent">
+
+                    <SearchView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:iconifiedByDefault="false"
+                        android:paddingStart="-16dp"
+                        android:paddingEnd="-16dp"
+                        android:queryBackground="@android:color/transparent"
+                        android:queryHint="@string/search_hint" />
+
+                </RelativeLayout>
+
+            </android.support.v7.widget.Toolbar>
+
+        </android.support.design.widget.AppBarLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <android.support.v7.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="0dp">
 
                     <RelativeLayout
-                        android:id="@+id/profile_top_bar"
                         android:layout_width="match_parent"
-                        android:layout_height="100dp">
+                        android:layout_height="wrap_content">
 
                         <RelativeLayout
-                            android:id="@+id/cover_image_layout"
+                            android:id="@+id/profile_top_bar"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content">
+                            android:layout_height="100dp">
 
-                            <ImageView
-                                android:id="@+id/cover_image"
+                            <RelativeLayout
+                                android:id="@+id/cover_image_layout"
                                 android:layout_width="match_parent"
-                                android:layout_height="100dp"
-                                android:src="@color/com_facebook_blue" />
+                                android:layout_height="wrap_content">
 
-                            <de.hdodenhof.circleimageview.CircleImageView
-                                android:id="@+id/change_cover_image"
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
-                                android:layout_alignEnd="@+id/cover_image"
-                                android:layout_alignParentTop="@+id/cover_image"
-                                android:layout_margin="10dp"
-                                android:src="@drawable/ic_photo_camera_black_24dp" />
+                                <ImageView
+                                    android:id="@+id/cover_image"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="100dp"
+                                    android:src="@color/com_facebook_blue" />
+
+                                <de.hdodenhof.circleimageview.CircleImageView
+                                    android:id="@+id/change_cover_image"
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:layout_alignEnd="@+id/cover_image"
+                                    android:layout_alignParentTop="@+id/cover_image"
+                                    android:layout_margin="10dp"
+                                    android:src="@drawable/ic_photo_camera_black_24dp" />
+
+                            </RelativeLayout>
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true"
+                                android:layout_alignParentBottom="true"
+                                android:layout_marginEnd="10dp"
+                                android:layout_marginBottom="5dp"
+                                android:orientation="horizontal">
+
+                                <!--<LinearLayout-->
+                                <!--android:layout_width="match_parent"-->
+                                <!--android:layout_height="wrap_content"-->
+                                <!--android:layout_marginBottom="5dp"-->
+                                <!--android:background="@drawable/rectangle_corner_round_seven"-->
+                                <!--android:gravity="center"-->
+                                <!--android:orientation="horizontal"-->
+                                <!--android:paddingStart="5dp"-->
+                                <!--android:paddingTop="3dp"-->
+                                <!--android:paddingEnd="5dp"-->
+                                <!--android:paddingBottom="3dp">-->
+
+                                <!--<ImageView-->
+                                <!--android:layout_width="15dp"-->
+                                <!--android:layout_height="15dp"-->
+                                <!--android:src="@drawable/friend_requests" />-->
+
+                                <!--<TextView-->
+                                <!--android:layout_width="wrap_content"-->
+                                <!--android:layout_height="wrap_content"-->
+                                <!--android:layout_marginStart="5dp"-->
+                                <!--android:text="Add Friend"-->
+                                <!--android:textColor="@color/colorWhite"-->
+                                <!--android:textSize="12sp" />-->
+
+                                <!--</LinearLayout>-->
+
+                                <LinearLayout
+                                    android:id="@+id/follow_layout"
+                                    android:layout_width="80dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="10dp"
+                                    android:layout_marginBottom="5dp"
+                                    android:background="@drawable/rectangle_corner_round_seven"
+                                    android:gravity="center"
+                                    android:orientation="horizontal"
+                                    android:padding="5dp">
+
+                                    <ImageView
+                                        android:layout_width="12dp"
+                                        android:layout_height="12dp"
+                                        android:src="@drawable/friend_requests" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="5dp"
+                                        android:text="Follow"
+                                        android:textColor="@color/colorWhite"
+                                        android:textSize="10sp" />
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:id="@+id/more_layout"
+                                    android:layout_width="80dp"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/rectangle_corner_round_seven"
+                                    android:gravity="center"
+                                    android:orientation="horizontal"
+                                    android:padding="5dp">
+
+                                    <ImageView
+                                        android:layout_width="12dp"
+                                        android:layout_height="12dp"
+                                        android:src="@drawable/friend_requests" />
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="5dp"
+                                        android:text="More"
+                                        android:textColor="@color/colorWhite"
+                                        android:textSize="10sp" />
+
+                                </LinearLayout>
+
+                            </LinearLayout>
 
                         </RelativeLayout>
 
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"
-                            android:layout_alignParentBottom="true"
-                            android:layout_marginEnd="10dp"
-                            android:layout_marginBottom="5dp"
-                            android:orientation="horizontal">
+                            android:layout_below="@+id/profile_top_bar"
+                            android:layout_marginStart="10dp"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginBottom="20dp"
+                            android:layout_toEndOf="@+id/profile_image_layout"
+                            android:orientation="vertical">
 
-                            <!--<LinearLayout-->
-                            <!--android:layout_width="match_parent"-->
-                            <!--android:layout_height="wrap_content"-->
-                            <!--android:layout_marginBottom="5dp"-->
-                            <!--android:background="@drawable/rectangle_corner_round_seven"-->
-                            <!--android:gravity="center"-->
-                            <!--android:orientation="horizontal"-->
-                            <!--android:paddingStart="5dp"-->
-                            <!--android:paddingTop="3dp"-->
-                            <!--android:paddingEnd="5dp"-->
-                            <!--android:paddingBottom="3dp">-->
-
-                            <!--<ImageView-->
-                            <!--android:layout_width="15dp"-->
-                            <!--android:layout_height="15dp"-->
-                            <!--android:src="@drawable/friend_requests" />-->
-
-                            <!--<TextView-->
-                            <!--android:layout_width="wrap_content"-->
-                            <!--android:layout_height="wrap_content"-->
-                            <!--android:layout_marginStart="5dp"-->
-                            <!--android:text="Add Friend"-->
-                            <!--android:textColor="@color/colorWhite"-->
-                            <!--android:textSize="12sp" />-->
-
-                            <!--</LinearLayout>-->
-
-                            <LinearLayout
-                                android:id="@+id/follow_layout"
-                                android:layout_width="80dp"
+                            <TextView
+                                android:id="@+id/user_name"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginEnd="10dp"
-                                android:layout_marginBottom="5dp"
-                                android:background="@drawable/rectangle_corner_round_seven"
-                                android:gravity="center"
-                                android:orientation="horizontal"
-                                android:padding="5dp">
+                                android:text="User Name"
+                                android:textColor="@color/colorPrimary"
+                                android:textSize="14sp" />
 
-                                <ImageView
-                                    android:layout_width="12dp"
-                                    android:layout_height="12dp"
-                                    android:src="@drawable/friend_requests" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginStart="5dp"
-                                    android:text="Follow"
-                                    android:textColor="@color/colorWhite"
-                                    android:textSize="10sp" />
-
-                            </LinearLayout>
-
-                            <LinearLayout
-                                android:id="@+id/more_layout"
-                                android:layout_width="80dp"
+                            <TextView
+                                android:id="@+id/total_info_count"
+                                android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:background="@drawable/rectangle_corner_round_seven"
-                                android:gravity="center"
-                                android:orientation="horizontal"
-                                android:padding="5dp">
-
-                                <ImageView
-                                    android:layout_width="12dp"
-                                    android:layout_height="12dp"
-                                    android:src="@drawable/friend_requests" />
-
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:layout_marginStart="5dp"
-                                    android:text="More"
-                                    android:textColor="@color/colorWhite"
-                                    android:textSize="10sp" />
-
-                            </LinearLayout>
+                                android:text="10 Likes | 29 Stars | 4 Followers"
+                                android:textSize="12sp" />
 
                         </LinearLayout>
 
-                    </RelativeLayout>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/profile_top_bar"
-                        android:layout_marginStart="10dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginBottom="20dp"
-                        android:layout_toEndOf="@+id/profile_image_layout"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/user_name"
+                        <RelativeLayout
+                            android:id="@+id/profile_image_layout"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="User Name"
-                            android:textColor="@color/colorPrimary"
-                            android:textSize="14sp" />
+                            android:layout_marginStart="15dp"
+                            android:layout_marginTop="60dp">
 
-                        <TextView
-                            android:id="@+id/total_info_count"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="10 Likes | 29 Stars | 4 Followers"
-                            android:textSize="12sp" />
+                            <de.hdodenhof.circleimageview.CircleImageView
+                                android:id="@+id/profile_image"
+                                android:layout_width="80dp"
+                                android:layout_height="80dp"
+                                android:src="@drawable/profile" />
 
-                    </LinearLayout>
+                            <de.hdodenhof.circleimageview.CircleImageView
+                                android:id="@+id/change_profile_image"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_alignEnd="@+id/profile_image"
+                                android:layout_alignBottom="@+id/profile_image"
+                                android:src="@drawable/ic_photo_camera_black_24dp" />
 
-                    <RelativeLayout
-                        android:id="@+id/profile_image_layout"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="15dp"
-                        android:layout_marginTop="60dp">
-
-                        <de.hdodenhof.circleimageview.CircleImageView
-                            android:id="@+id/profile_image"
-                            android:layout_width="80dp"
-                            android:layout_height="80dp"
-                            android:src="@drawable/profile" />
-
-                        <de.hdodenhof.circleimageview.CircleImageView
-                            android:id="@+id/change_profile_image"
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:layout_alignEnd="@+id/profile_image"
-                            android:layout_alignBottom="@+id/profile_image"
-                            android:src="@drawable/ic_photo_camera_black_24dp" />
+                        </RelativeLayout>
 
                     </RelativeLayout>
 
-                </RelativeLayout>
+                </android.support.v7.widget.CardView>
 
-            </android.support.v7.widget.CardView>
-
-            <android.support.design.widget.TabLayout
-                android:id="@+id/tabs"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:layout_gravity="bottom"
-                android:background="@android:color/white"
-                app:tabGravity="fill"
-                app:tabIndicatorColor="@color/colorAccent"
-                app:tabMode="fixed"
-                app:tabTextAppearance="@style/MyTabLayoutTextAppearance" />
-
-            <android.support.v4.view.ViewPager
-                android:id="@+id/viewpager"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-
-        </LinearLayout>
-
-    </ScrollView>
-
-    <android.support.design.widget.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:contentInsetLeft="0dp"
-            app:contentInsetStart="0dp"
-            app:contentInsetStartWithNavigation="0dp"
-            app:navigationIcon="?attr/homeAsUpIndicator"
-            app:popupTheme="@style/AppTheme.PopupOverlay">
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <SearchView
+                <android.support.design.widget.TabLayout
+                    android:id="@+id/tabs"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:iconifiedByDefault="false"
-                    android:paddingStart="-16dp"
-                    android:paddingEnd="-16dp"
-                    android:queryBackground="@android:color/transparent"
-                    android:queryHint="@string/search_hint" />
+                    android:layout_height="?attr/actionBarSize"
+                    android:layout_gravity="bottom"
+                    android:background="@android:color/white"
+                    app:tabGravity="fill"
+                    app:tabIndicatorColor="@color/colorAccent"
+                    app:tabMode="scrollable"
+                    app:tabTextAppearance="@style/MyTabLayoutTextAppearance" />
 
-            </RelativeLayout>
+                <!--<android.support.v4.view.ViewPager-->
+                    <!--android:id="@+id/viewpager"-->
+                    <!--android:layout_width="match_parent"-->
+                    <!--android:layout_height="match_parent" />-->
 
-        </android.support.v7.widget.Toolbar>
+                <FrameLayout
+                    android:id="@+id/container"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
 
-    </android.support.design.widget.AppBarLayout>
+            </LinearLayout>
 
-</android.support.design.widget.CoordinatorLayout>
+        </ScrollView>
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>

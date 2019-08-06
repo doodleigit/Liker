@@ -64,12 +64,14 @@
                     android:textStyle="bold" />
 
                 <Spinner
+                    android:id="@+id/institute_spinner"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:layout_marginTop="5dp"
                     android:background="@drawable/rectangle_corner_round_five" />
 
                 <TextView
+                    android:id="@+id/institute_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
@@ -98,6 +100,7 @@
                     android:textStyle="bold" />
 
                 <EditText
+                    android:id="@+id/search_place"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:layout_marginTop="5dp"
@@ -133,6 +136,7 @@
                         android:text="http://www." />
 
                     <EditText
+                        android:id="@+id/site_address"
                         android:layout_width="match_parent"
                         android:layout_height="30dp"
                         android:background="@android:color/transparent"
@@ -153,6 +157,7 @@
                     android:textStyle="bold" />
 
                 <EditText
+                    android:id="@+id/degree"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:layout_marginTop="5dp"
@@ -172,6 +177,7 @@
                     android:textStyle="bold" />
 
                 <EditText
+                    android:id="@+id/study_major"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:layout_marginTop="5dp"
@@ -191,6 +197,7 @@
                     android:textStyle="bold" />
 
                 <EditText
+                    android:id="@+id/grade"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:layout_marginTop="5dp"
@@ -210,6 +217,7 @@
                     android:textStyle="bold" />
 
                 <Spinner
+                    android:id="@+id/from_year_appiner"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:layout_marginTop="5dp"
@@ -225,6 +233,7 @@
                     android:textStyle="bold" />
 
                 <Spinner
+                    android:id="@+id/to_year_spinner"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:layout_marginTop="5dp"
@@ -240,6 +249,7 @@
                     android:textStyle="bold" />
 
                 <EditText
+                    android:id="@+id/summary"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
@@ -254,6 +264,7 @@
         </android.support.v4.widget.NestedScrollView>
 
         <android.support.design.widget.FloatingActionButton
+            android:id="@+id/add"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -271,6 +282,7 @@
             app:cardCornerRadius="20dp">
 
             <Spinner
+                android:id="@+id/privacy_spinner"
                 android:layout_width="match_parent"
                 android:layout_height="30dp"/>
 

@@ -44,8 +44,8 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.ViewHold
         stars = arrayList.get(i).getGoldStars();
 
         viewHolder.userName.setText(fullName);
-        viewHolder.likes.setText(likes + context.getString(R.string.likes));
-        viewHolder.stars.setText(stars + context.getString(R.string.stars));
+        viewHolder.likes.setText(likes + " " + context.getString(R.string.likes));
+        viewHolder.stars.setText(stars + " " + context.getString(R.string.stars));
 
         Glide.with(App.getAppContext())
                 .load(photo)

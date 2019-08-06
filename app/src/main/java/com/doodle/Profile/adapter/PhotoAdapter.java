@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide;
 import com.doodle.App;
 import com.doodle.Profile.model.RecentPhoto;
 import com.doodle.R;
+import com.doodle.utils.AppConstants;
 
 import java.util.ArrayList;
 
@@ -35,8 +36,9 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
+        String url = AppConstants.USER_UPLOADED_IMAGES + arrayList.get(i).getImageName();
         Glide.with(App.getAppContext())
-                .load(arrayList.get(i).getImageName())
+                .load(url)
                 .placeholder(R.drawable.photo)
                 .error(R.drawable.photo)
                 .centerCrop()

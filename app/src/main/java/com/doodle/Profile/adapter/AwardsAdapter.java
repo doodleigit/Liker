@@ -11,8 +11,10 @@ import android.widget.TextView;
 
 import com.doodle.Profile.model.Awards;
 import com.doodle.R;
+import com.doodle.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class AwardsAdapter extends RecyclerView.Adapter<AwardsAdapter.ViewHolder> {
 
@@ -35,7 +37,15 @@ public class AwardsAdapter extends RecyclerView.Adapter<AwardsAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
+        String awardsName, instituteNameDuration, summary;
 
+        awardsName = arrayList.get(i).getAwardName();
+        instituteNameDuration = arrayList.get(i).getInstituteName() + " - " + Utils.getMonth(arrayList.get(i).getMonth()) + " " + arrayList.get(i).getYear();
+        summary = arrayList.get(i).getDescription();
+
+        viewHolder.tvAwardsName.setText(awardsName);
+        viewHolder.tvInstituteNameDuration.setText(instituteNameDuration);
+        viewHolder.tvSummary.setText(summary);
     }
 
     @Override

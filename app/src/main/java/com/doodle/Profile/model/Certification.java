@@ -2,18 +2,17 @@ package com.doodle.Profile.model;
 
 public class Certification {
 
-    private String id, userId, certificationId, instituteId, licenseNumber, permissionType, toDate, certificationUrl, mediaId, entryDate, modifyDate, instituteName, locationId, locationName,
+    private String id, userId, certificationId, instituteId, licenseNumber, permissionType, certificationUrl, mediaId, entryDate, modifyDate, instituteName, locationId, locationName,
      websiteUrl, instituteType, certificationName, imageName, fromYear, fromMonth, toYear, toMonth, mediaType;
     private boolean isExpired;
 
-    public Certification(String id, String userId, String certificationId, String instituteId, String licenseNumber, String permissionType, String toDate, Boolean isExpired, String certificationUrl, String mediaId, String entryDate, String modifyDate, String instituteName, String locationId, String locationName, String websiteUrl, String instituteType, String certificationName, String imageName, String fromYear, String fromMonth, String toYear, String toMonth, String mediaType) {
+    public Certification(String id, String userId, String certificationId, String instituteId, String licenseNumber, String permissionType, Boolean isExpired, String certificationUrl, String mediaId, String entryDate, String modifyDate, String instituteName, String locationId, String locationName, String websiteUrl, String instituteType, String certificationName, String imageName, String fromYear, String fromMonth, String toYear, String toMonth, String mediaType) {
         this.id = id;
         this.userId = userId;
         this.certificationId = certificationId;
         this.instituteId = instituteId;
         this.licenseNumber = licenseNumber;
         this.permissionType = permissionType;
-        this.toDate = toDate;
         this.isExpired = isExpired;
         this.certificationUrl = certificationUrl;
         this.mediaId = mediaId;
@@ -79,14 +78,6 @@ public class Certification {
 
     public void setPermissionType(String permissionType) {
         this.permissionType = permissionType;
-    }
-
-    public String getToDate() {
-        return toDate;
-    }
-
-    public void setToDate(String toDate) {
-        this.toDate = toDate;
     }
 
     public Boolean getIsExpired() {

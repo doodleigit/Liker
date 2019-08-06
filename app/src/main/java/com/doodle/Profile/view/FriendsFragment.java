@@ -61,6 +61,7 @@ public class FriendsFragment extends Fragment {
 
         recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setNestedScrollingEnabled(false);
 
         recyclerView.setAdapter(friendsAdapter);
     }
@@ -79,7 +80,7 @@ public class FriendsFragment extends Fragment {
 
                 AllFriend allFriend = response.body();
                 if (allFriend != null) {
-                    friends = allFriend.getFriends();
+                    friends.addAll(allFriend.getFriends());
                     friendsAdapter.notifyDataSetChanged();
                     offset += 10;
                 }

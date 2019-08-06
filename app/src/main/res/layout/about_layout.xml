@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -155,7 +156,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="5dp"
-                        android:gravity="center"
                         android:orientation="horizontal">
 
                         <TextView
@@ -167,14 +167,12 @@
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
-                        <TextView
-                            android:id="@+id/email"
+                        <android.support.v7.widget.RecyclerView
+                            android:id="@+id/email_recycler_view"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="10dp"
-                            android:layout_weight="1"
-                            android:text="user@liker.com"
-                            android:textSize="14sp" />
+                            android:layout_weight="1" />
 
                     </LinearLayout>
 
@@ -183,7 +181,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="5dp"
-                        android:gravity="center"
                         android:orientation="horizontal">
 
                         <TextView
@@ -195,14 +192,12 @@
                             android:textSize="14sp"
                             android:textStyle="bold" />
 
-                        <TextView
-                            android:id="@+id/phone"
+                        <android.support.v7.widget.RecyclerView
+                            android:id="@+id/phone_recycler_view"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="10dp"
-                            android:layout_weight="1"
-                            android:text="01785646526"
-                            android:textSize="14sp" />
+                            android:layout_weight="1" />
 
                     </LinearLayout>
 
@@ -264,7 +259,10 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_margin="5dp"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginBottom="5dp"
                         android:gravity="center"
                         android:orientation="horizontal">
 
@@ -288,40 +286,10 @@
 
                     </LinearLayout>
 
-                    <LinearLayout
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/storyRecyclerView"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="10dp"
-                        android:gravity="start|center"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Intro"
-                            android:textSize="16sp"
-                            android:textStyle="bold" />
-
-                        <ImageView
-                            android:layout_width="15dp"
-                            android:layout_height="15dp"
-                            android:layout_marginStart="5dp"
-                            android:src="@drawable/profile" />
-
-                    </LinearLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="0.5dp"
-                        android:background="@color/colorBorderBackground" />
-
-                    <TextView
-                        android:id="@+id/intro"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="10dp"
-                        android:text="The questions asked at tonight’s debate were REALLY bad. To the point that I wouldn’t be surprised."
-                        android:textSize="12sp" />
+                        android:layout_height="wrap_content"/>
 
                 </LinearLayout>
 
@@ -372,7 +340,7 @@
                     android:id="@+id/educationRecyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"/>
+                    android:visibility="visible"/>
 
             </LinearLayout>
 
@@ -421,7 +389,7 @@
                     android:id="@+id/experienceRecyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"/>
+                    android:visibility="visible"/>
 
             </LinearLayout>
 
@@ -470,7 +438,7 @@
                     android:id="@+id/awardsRecyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"/>
+                    android:visibility="visible"/>
 
             </LinearLayout>
 
@@ -519,7 +487,7 @@
                     android:id="@+id/certificationRecyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"/>
+                    android:visibility="visible"/>
 
             </LinearLayout>
 
@@ -568,7 +536,7 @@
                     android:id="@+id/socialRecyclerView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="gone"/>
+                    android:visibility="visible"/>
 
             </LinearLayout>
 

@@ -8,7 +8,25 @@ public class Experience {
 
     public Experience(String id, String userId, String designationId, String instituteId, String locationId, String permissionType, String introStatus, String description, String entryDate, String modifyDate,
                       String designationName, String companyName, String websiteUrl, String locationName, String fromYear, String fromMonth, String toYear, String toMonth, boolean currentlyWorked) {
-
+        this.id = id;
+        this.userId = userId;
+        this.designationId = designationId;
+        this.instituteId = instituteId;
+        this.locationId = locationId;
+        this.permissionType = permissionType;
+        this.introStatus = introStatus;
+        this.description = description;
+        this.entryDate = entryDate;
+        this.modifyDate = modifyDate;
+        this.designationName = designationName;
+        this.companyName = companyName;
+        this.websiteUrl = websiteUrl;
+        this.locationName = locationName;
+        this.fromYear = fromYear;
+        this.fromMonth = fromMonth;
+        this.toYear = toYear;
+        this.toMonth = toMonth;
+        this.currentlyWorked = currentlyWorked;
     }
 
     public String getId() {

@@ -20,6 +20,7 @@ public class AppConstants {
     //==========================STG SERVER=====================
     public static final String BASE_URL = "https://www.stg.liker.com/";
     public static final String BASE_URL_MEDIA = "https://www.cdn-liker.com/stg-static/";
+    public static final String BASE_URL_IMAGES = "https://www.cdn-liker.com/";
     public static final String SOCKET_WEB = "https://node.liker.com:7803";
     public static final String SOCKET_MESSAGE = "https://node.liker.com:7804";
     public static final String SOCKET_VIDEO = "https://node.liker.com:7807";
@@ -57,6 +58,7 @@ public class AppConstants {
     public static final String POST_VIDEOS = BASE_URL_MEDIA + "uploads/post_videos/";
     public static final String PROFILE_IMAGE = BASE_URL_MEDIA + "uploads/thumb/";
     public static final String POST_IMAGES = BASE_URL_MEDIA + "uploads/post_images/";
+    public static final String USER_UPLOADED_IMAGES = BASE_URL_IMAGES + "uploads/post_images/";
     public static final String MIM_IMAGE = BASE_URL_MEDIA + "assets/nimg/";
     public static final String Link_IMAGE_PATH = BASE_URL_MEDIA + "uploads/link_images/";
     public static final String YOUTUBE_IMAGE_PATH = BASE_URL_MEDIA + "uploads/youtube/main_img/";
@@ -111,5 +113,6 @@ public class AppConstants {
     public static final String VIEW_ALBUMS = "view_albums";
     public static final String GET_ALBUM_PHOTOS = "get_album_photos";
     public static final String GET_RECENT_PHOTOS = "get_recent_photos";
+    public static final String GET_PROFILE_INFO = "get_profile_info_app";
 
 }

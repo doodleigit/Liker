@@ -15,6 +15,7 @@ import com.doodle.App;
 import com.doodle.Profile.model.PhotoAlbum;
 import com.doodle.Profile.service.PhotoAlbumClickListener;
 import com.doodle.R;
+import com.doodle.utils.AppConstants;
 
 import java.util.ArrayList;
 
@@ -40,11 +41,13 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
+        String url = AppConstants.USER_UPLOADED_IMAGES + arrayList.get(i).getImageName();
+
         viewHolder.title.setText(arrayList.get(i).getTitle());
         viewHolder.count.setText(arrayList.get(i).getTotalImages() + " " + context.getString(R.string.photos));
 
         Glide.with(App.getAppContext())
-                .load(arrayList.get(i).getImageName())
+                .load(url)
                 .placeholder(R.drawable.photo)
                 .error(R.drawable.photo)
                 .centerCrop()

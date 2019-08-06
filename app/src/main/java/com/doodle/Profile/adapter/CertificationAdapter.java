@@ -1,6 +1,8 @@
 package com.doodle.Profile.adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,6 +13,7 @@ import android.widget.TextView;
 
 import com.doodle.Profile.model.Certification;
 import com.doodle.R;
+import com.doodle.utils.Utils;
 
 import java.util.ArrayList;
 
@@ -35,7 +38,34 @@ public class CertificationAdapter extends RecyclerView.Adapter<CertificationAdap
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
+        String certificateName, instituteName, instituteSite, duration;
 
+        certificateName = arrayList.get(i).getCertificationName();
+        instituteName = arrayList.get(i).getInstituteName();
+        instituteSite = arrayList.get(i).getCertificationUrl();
+        duration = Utils.getMonth(arrayList.get(i).getFromMonth()) + " " + arrayList.get(i).getFromYear() + " Licence " + arrayList.get(i).getLicenseNumber();
+
+        viewHolder.tvCertificateName.setText(certificateName);
+        viewHolder.tvInstituteName.setText(instituteName);
+        viewHolder.tvDuration.setText(duration);
+
+        if (!instituteSite.isEmpty()) {
+            if (!instituteSite.startsWith("http://") && !instituteSite.startsWith("https://")) {
+                instituteSite = "http://" + instituteSite;
+            }
+            viewHolder.tvInstituteSite.setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.tvInstituteSite.setVisibility(View.GONE);
+        }
+
+        String finalInstituteSite = instituteSite;
+        viewHolder.tvInstituteSite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(finalInstituteSite));
+                context.startActivity(browserIntent);
+            }
+        });
     }
 
     @Override
@@ -45,7 +75,7 @@ public class CertificationAdapter extends RecyclerView.Adapter<CertificationAdap
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView tvCertificateName, tvInstituteName, tvSummary, tvDuration;
+        TextView tvCertificateName, tvInstituteName, tvInstituteSite, tvDuration;
         ImageView ivEdit;
 
         public ViewHolder(@NonNull View itemView) {
@@ -53,7 +83,7 @@ public class CertificationAdapter extends RecyclerView.Adapter<CertificationAdap
 
             tvCertificateName = itemView.findViewById(R.id.certificate_name);
             tvInstituteName = itemView.findViewById(R.id.institute_name);
-            tvSummary = itemView.findViewById(R.id.summary);
+            tvInstituteSite = itemView.findViewById(R.id.institute_site);
             tvDuration = itemView.findViewById(R.id.duration);
             ivEdit = itemView.findViewById(R.id.edit);
         }

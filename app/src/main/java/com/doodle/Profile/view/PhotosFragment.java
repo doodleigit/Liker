@@ -82,7 +82,9 @@ public class PhotosFragment extends Fragment {
         albumRecyclerView = view.findViewById(R.id.albumRecyclerView);
         photoRecyclerView = view.findViewById(R.id.photoRecyclerView);
         albumRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
+        albumRecyclerView.setNestedScrollingEnabled(false);
         photoRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL));
+        photoRecyclerView.setNestedScrollingEnabled(false);
 
         albumRecyclerView.setAdapter(albumAdapter);
         photoRecyclerView.setAdapter(photoAdapter);
@@ -97,7 +99,7 @@ public class PhotosFragment extends Fragment {
 
     private void showAlbumPhotos(PhotoAlbum photoAlbum) {
         Dialog dialog = new Dialog(getActivity(), R.style.Theme_Dialog);
-        dialog.setContentView(R.layout.multiple_post_category_filter_layout);
+        dialog.setContentView(R.layout.album_photo_list_layout);
 
         ArrayList<AlbumPhoto> albumPhotos = new ArrayList<>();
         AlbumPhotoAdapter albumPhotoAdapter = new AlbumPhotoAdapter(getActivity(), albumPhotos);

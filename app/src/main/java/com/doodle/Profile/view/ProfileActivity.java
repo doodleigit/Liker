@@ -12,6 +12,7 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -51,7 +52,7 @@ import static android.widget.Toast.makeText;
 public class ProfileActivity extends AppCompatActivity {
 
     private TabLayout tabLayout;
-    private ViewPager viewPager;
+//    private ViewPager viewPager;
     private Toolbar toolbar;
     private RelativeLayout coverImageLayout, profileImageLayout;
     private ImageView ivCoverImage, ivProfileImage, ivChangeCoverImage, ivChangeProfileImage;
@@ -73,7 +74,8 @@ public class ProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile);
         initialComponent();
 
-        setupViewPager();
+//        setupViewPager();
+        setupTabIcons();
 
     }
 
@@ -92,7 +94,7 @@ public class ProfileActivity extends AppCompatActivity {
         ivChangeCoverImage = findViewById(R.id.change_cover_image);
         ivChangeProfileImage = findViewById(R.id.change_profile_image);
         tabLayout = findViewById(R.id.tabs);
-        viewPager = findViewById(R.id.viewpager);
+//        viewPager = findViewById(R.id.viewpager);
 
         profileService = ProfileService.mRetrofit.create(ProfileService.class);
         progressDialog = new ProgressDialog(this);
@@ -121,13 +123,12 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
-    private void initialFragment() {
+    private void initialFragment(Fragment fragment) {
         Bundle bundle = new Bundle();
         bundle.putString("user_id", profileUserId);
-        ProfileFragment profileFragment = new ProfileFragment();
         android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        profileFragment.setArguments(bundle);
-        transaction.replace(R.id.container, profileFragment).commit();
+        fragment.setArguments(bundle);
+        transaction.replace(R.id.container, fragment).commit();
     }
 
     private void selectImageSource(View view) {
@@ -276,19 +277,47 @@ public class ProfileActivity extends AppCompatActivity {
         viewPager.setAdapter(adapter);
     }
 
-    private void setupViewPager() {
-        viewPager = (ViewPager) findViewById(R.id.viewpager);
-        setupViewPager(viewPager);
-        tabLayout.setupWithViewPager(viewPager);
-        setupTabIcons();
-    }
+//    private void setupViewPager() {
+//        viewPager = findViewById(R.id.viewpager);
+//        setupViewPager(viewPager);
+//        tabLayout.setupWithViewPager(viewPager);
+//        setupTabIcons();
+//    }
 
     private void setupTabIcons() {
-        tabLayout.getTabAt(0).setText("Posts");
-        tabLayout.getTabAt(1).setText("About");
-        tabLayout.getTabAt(2).setText("Friends");
-        tabLayout.getTabAt(3).setText("Photos");
-        tabLayout.getTabAt(4).setText("Stars");
+        tabLayout.addTab(tabLayout.newTab().setText("Posts"));
+        tabLayout.addTab(tabLayout.newTab().setText("About"));
+        tabLayout.addTab(tabLayout.newTab().setText("Friends"));
+        tabLayout.addTab(tabLayout.newTab().setText("Photos"));
+        tabLayout.addTab(tabLayout.newTab().setText("Stars"));
+        initialFragment(new PostFragment());
+
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                if (tab.getPosition() == 0) {
+                    initialFragment(new PostFragment());
+                } else if (tab.getPosition() == 1) {
+                    initialFragment(new AboutFragment());
+                } else if (tab.getPosition() == 2) {
+                    initialFragment(new FriendsFragment());
+                } else if (tab.getPosition() == 3) {
+                    initialFragment(new PhotosFragment());
+                } else if (tab.getPosition() == 4) {
+                    initialFragment(new StarFragment());
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
     }
 
 }

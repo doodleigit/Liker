@@ -69,6 +69,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.DateFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -715,4 +716,80 @@ public class Utils {
     public static boolean isGooglePhotosUri(Uri uri) {
         return "com.google.android.apps.photos.content".equals(uri.getAuthority());
     }
+
+    public static String getMonth(String month) {
+        int index;
+        try {
+            index = Integer.parseInt(month);
+            return new DateFormatSymbols().getMonths()[index-1];
+        } catch (NumberFormatException e) {
+            return "";
+        }
+    }
+
+    public static String getProfileType(String type) {
+        String profile = "profile";
+        switch (type) {
+            case "1":
+                profile = "Website profile";
+                break;
+            case "2":
+                profile = "Facebook profile";
+                break;
+            case "3":
+                profile = "Twitter profile";
+                break;
+            case "4":
+                profile = "Linkedin profile";
+                break;
+            case "5":
+                profile = "Instagram profile";
+                break;
+            case "6":
+                profile = "Skype profile";
+                break;
+            case "7":
+                profile = "Pinterest profile";
+                break;
+            case "8":
+                profile = "Google Plus profile";
+                break;
+            case "9":
+                profile = "YouTube profile";
+                break;
+        }
+        return profile;
+    }
+
+    public static String getStoryType(String type) {
+        String title = "";
+        switch (type) {
+            case "1":
+                title = "About You";
+                break;
+            case "2":
+                title = "Early life";
+                break;
+            case "3":
+                title = "Family";
+                break;
+            case "4":
+                title = "Career";
+                break;
+            case "5":
+                title = "Background";
+                break;
+            case "6":
+                title = "Childhood";
+                break;
+            case "7":
+                title = "Personal life";
+                break;
+            case "8":
+                title = "intro";
+                break;
+        }
+        return title;
+    }
+
 }

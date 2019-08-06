@@ -17,7 +17,7 @@ public class ProfileInfo {
     private ArrayList<Links> links;
 
     public ProfileInfo(String userName, String firstName, String lastName, String headLine, String sex, String birthYear, String birthMonth, String birthDate, String yearPermission, String dayMonthPermission,
-                       String address, String currentCityId, String currentCityLocationName, String currentCityCountryId, String currentCityCityId, String currentCityCity, String currentCityCountry,
+                       String address, String currentCityId, String currentCityLocationName, String currentCityCountryId, String currentCityCityId, String currentCityCity, String currentCityCountry, String intro,
                        ArrayList<Email> emails, ArrayList<Phone> phones, ArrayList<Story> stories, ArrayList<Education> educations, ArrayList<Experience> experiences, ArrayList<Awards> awards,
                        ArrayList<Certification> certifications, ArrayList<Links> links) {
         this.userName = userName;

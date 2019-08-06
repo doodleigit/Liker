@@ -1,6 +1,8 @@
 package com.doodle.Profile.adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -35,7 +37,36 @@ public class EducationAdapter extends RecyclerView.Adapter<EducationAdapter.View
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
+        String instituteName, instituteSite, degree, studyInfo, summary;
 
+        instituteName = arrayList.get(i).getInstituteName();
+        instituteSite = arrayList.get(i).getWebsiteUrl();
+        degree = arrayList.get(i).getDegreeName();
+        studyInfo = arrayList.get(i).getFieldStudyName() + " GPA-" + arrayList.get(i).getGrade() + " From " + arrayList.get(i).getStartYear() + " to " + arrayList.get(i).getEndYear();
+        summary = arrayList.get(i).getDescription();
+
+        viewHolder.tvInstituteName.setText(instituteName);
+        viewHolder.tvDegree.setText(degree);
+        viewHolder.tvStudyInfo.setText(studyInfo);
+        viewHolder.tvSummary.setText(summary);
+
+        if (!instituteSite.isEmpty()) {
+            if (!instituteSite.startsWith("http://") && !instituteSite.startsWith("https://")) {
+                instituteSite = "http://" + instituteSite;
+            }
+            viewHolder.tvInstituteSite.setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.tvInstituteSite.setVisibility(View.GONE);
+        }
+
+        String finalInstituteSite = instituteSite;
+        viewHolder.tvInstituteSite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(finalInstituteSite));
+                context.startActivity(browserIntent);
+            }
+        });
     }
 
     @Override
