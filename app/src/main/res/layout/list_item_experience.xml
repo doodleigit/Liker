@@ -37,7 +37,8 @@
                 android:layout_height="40dp"
                 android:layout_alignParentEnd="true"
                 android:padding="10dp"
-                android:src="@drawable/plus" />
+                android:src="@drawable/plus"
+                android:visibility="invisible"/>
 
         </RelativeLayout>
 

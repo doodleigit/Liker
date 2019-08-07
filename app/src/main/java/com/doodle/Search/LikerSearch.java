@@ -326,7 +326,7 @@ public class LikerSearch extends AppCompatActivity implements View.OnClickListen
             case android.R.id.home:
                 closeSearch();
                // startActivity(new Intent(LikerSearch.this, Liker.class));
-                startActivity(new Intent(LikerSearch.this, Home.class));
+                finish();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

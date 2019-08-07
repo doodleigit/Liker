@@ -63,6 +63,7 @@ import com.doodle.Message.model.SenderData;
 import com.doodle.Message.view.MessageActivity;
 import com.doodle.Notification.view.NotificationActivity;
 import com.doodle.Post.view.activity.PostNew;
+import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.R;
 import com.doodle.Search.LikerSearch;
 import com.doodle.utils.AppConstants;
@@ -117,7 +118,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
     private ArrayList<CommonCategory> commonCategories;
     private CategoryTitleAdapter categoryTitleAdapter;
 
-    private ImageView imageNewPost, imageNotification, imageFriendRequest, imageStarContributor;
+    private ImageView imageNewPost, imageNotification, imageFriendRequest, imageProfile, imageStarContributor;
     private TextView newNotificationCount, newMessageNotificationCount, filterItem;
     private RecyclerView categoryRecyclerView;
 
@@ -184,6 +185,8 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
         imageNotification.setOnClickListener(this);
         imageFriendRequest = findViewById(R.id.imageFriendRequest);
         imageFriendRequest.setOnClickListener(this);
+        imageProfile = findViewById(R.id.imageProfile);
+        imageProfile.setOnClickListener(this);
         imageStarContributor = findViewById(R.id.imageStarContributor);
 // imageStarContributor.setOnClickListener(this);
         profileImage = findViewById(R.id.profile_image);
@@ -884,6 +887,10 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
                 startActivity(new Intent(this, MessageActivity.class));
 // imageFriendRequest.setCircleBackgroundColor(getResources().getColor(R.color.colorWhite));
 // imageFriendRequest.setImageResource(R.drawable.ic_people_outline_blue_24dp);
+                break;
+
+            case R.id.imageProfile:
+                startActivity(new Intent(this, ProfileActivity.class));
                 break;
 
             case R.id.imageStarContributor:

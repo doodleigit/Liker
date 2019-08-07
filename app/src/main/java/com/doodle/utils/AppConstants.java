@@ -114,5 +114,14 @@ public class AppConstants {
     public static final String GET_ALBUM_PHOTOS = "get_album_photos";
     public static final String GET_RECENT_PHOTOS = "get_recent_photos";
     public static final String GET_PROFILE_INFO = "get_profile_info_app";
+    public static final String GET_EDUCATION_SUGGESTION = "get_education_suggestions";
+    public static final String GET_EXPERIENCE_SUGGESTION = "get_experience_suggestions";
+    public static final String GET_AWARDS_SUGGESTION = "get_award_suggestions";
+    public static final String GET_CERTIFICATE_SUGGESTION = "get_certification_suggestions";
+    public static final String INSERT_EDUCATION = "insert_education";
+    public static final String INSERT_EXPERIENCE = "insert_experience";
+    public static final String INSERT_AWARDS = "insert_award";
+    public static final String INSERT_CERTIFICATE = "insert_certification";
+    public static final String INSERT_LINK = "link_add";
 
 }

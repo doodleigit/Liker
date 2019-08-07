@@ -69,6 +69,48 @@
         <item>Sparkling Water</item>
     </string-array>
 
+    <string-array name="privacy_list">
+        <item>Public</item>
+        <item>Only Me</item>
+        <item>Friends</item>
+    </string-array>
+
+    <string-array name="institute_list">
+        <item>Select</item>
+        <item>High School</item>
+        <item>Collage</item>
+        <item>University</item>
+    </string-array>
+
+    <string-array name="month_list">
+        <item>Select</item>
+        <item>January</item>
+        <item>February</item>
+        <item>March</item>
+        <item>April</item>
+        <item>May</item>
+        <item>June</item>
+        <item>July</item>
+        <item>August</item>
+        <item>September</item>
+        <item>October</item>
+        <item>November</item>
+        <item>December</item>
+    </string-array>
+
+    <string-array name="url_type_list">
+        <item>Select Type</item>
+        <item>Website</item>
+        <item>Facebook</item>
+        <item>Twitter</item>
+        <item>Linkedin</item>
+        <item>Instagram</item>
+        <item>Skype</item>
+        <item>Pinterest</item>
+        <item>Google Plus</item>
+        <item>YouTube</item>
+    </string-array>
+
     <string name="grant">permission granted</string>
     <string name="permission_denied">permission denied</string>
     <string name="gallery_granted">Gallery granted</string>
@@ -140,5 +182,6 @@
     <string name="uploading">Uploading…</string>
     <string name="select_profile_picture">Select Profile Picture</string>
     <string name="capture_profile_picture">Capture Profile Picture</string>
+    <string name="select_year">Select Year</string>
 
 </resources>

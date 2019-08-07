@@ -26,20 +26,27 @@
                 app:navigationIcon="?attr/homeAsUpIndicator"
                 app:popupTheme="@style/AppTheme.PopupOverlay">
 
-                <RelativeLayout
+                <LinearLayout
+                    android:id="@+id/search_layout"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="match_parent"
+                    android:gravity="start|center"
+                    android:orientation="horizontal">
 
-                    <SearchView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:iconifiedByDefault="false"
-                        android:paddingStart="-16dp"
-                        android:paddingEnd="-16dp"
-                        android:queryBackground="@android:color/transparent"
-                        android:queryHint="@string/search_hint" />
+                    <ImageView
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:src="@drawable/search"/>
 
-                </RelativeLayout>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:hint="Search"
+                        android:textSize="16sp"
+                        android:textColorHint="#E0E0E0"/>
+
+                </LinearLayout>
 
             </android.support.v7.widget.Toolbar>
 
@@ -99,7 +106,8 @@
                                 android:layout_alignParentBottom="true"
                                 android:layout_marginEnd="10dp"
                                 android:layout_marginBottom="5dp"
-                                android:orientation="horizontal">
+                                android:orientation="horizontal"
+                                android:visibility="invisible">
 
                                 <!--<LinearLayout-->
                                 <!--android:layout_width="match_parent"-->
@@ -224,11 +232,11 @@
 
                             <de.hdodenhof.circleimageview.CircleImageView
                                 android:id="@+id/change_profile_image"
-                                android:layout_width="20dp"
-                                android:layout_height="20dp"
+                                android:layout_width="25dp"
+                                android:layout_height="25dp"
                                 android:layout_alignEnd="@+id/profile_image"
                                 android:layout_alignBottom="@+id/profile_image"
-                                android:src="@drawable/ic_photo_camera_black_24dp" />
+                                android:src="@drawable/camera" />
 
                         </RelativeLayout>
 

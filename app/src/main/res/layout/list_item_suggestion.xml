@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main_layout"
+    android:layout_width="match_parent"
+    android:layout_height="30dp"
+    android:background="@color/colorBorderBackground">
+
+    <TextView
+        android:id="@+id/suggestion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start|center"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:text="Suggestion"
+        android:textSize="14sp"/>
+
+</FrameLayout>

@@ -71,7 +71,6 @@
                     android:background="@drawable/rectangle_corner_round_five" />
 
                 <TextView
-                    android:id="@+id/institute_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
@@ -81,6 +80,7 @@
                     android:textStyle="bold" />
 
                 <EditText
+                    android:id="@+id/institute_name"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:layout_marginTop="5dp"
@@ -89,6 +89,11 @@
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
                     android:textSize="14sp" />
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/institution_name_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -109,6 +114,11 @@
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
                     android:textSize="14sp" />
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/search_place_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -217,7 +227,7 @@
                     android:textStyle="bold" />
 
                 <Spinner
-                    android:id="@+id/from_year_appiner"
+                    android:id="@+id/from_year_spinner"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:layout_marginTop="5dp"
@@ -264,7 +274,7 @@
         </android.support.v4.widget.NestedScrollView>
 
         <android.support.design.widget.FloatingActionButton
-            android:id="@+id/add"
+            android:id="@+id/done"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -273,17 +283,17 @@
             android:src="@drawable/ok"/>
 
         <android.support.v7.widget.CardView
-            android:layout_width="120dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:layout_alignParentBottom="true"
             android:layout_margin="20dp"
             app:cardBackgroundColor="@color/colorWhite"
-            app:cardCornerRadius="20dp">
+            app:cardCornerRadius="5dp">
 
             <Spinner
                 android:id="@+id/privacy_spinner"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="30dp"/>
 
         </android.support.v7.widget.CardView>

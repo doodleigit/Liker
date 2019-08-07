@@ -21,15 +21,20 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.doodle.App;
 import com.doodle.Post.service.PostService;
 import com.doodle.Profile.adapter.ViewPagerAdapter;
 import com.doodle.Profile.service.ProfileService;
 import com.doodle.R;
+import com.doodle.Search.LikerSearch;
+import com.doodle.utils.AppConstants;
 import com.doodle.utils.PrefManager;
 import com.doodle.utils.Utils;
 import com.soundcloud.android.crop.Crop;
@@ -54,8 +59,10 @@ public class ProfileActivity extends AppCompatActivity {
     private TabLayout tabLayout;
 //    private ViewPager viewPager;
     private Toolbar toolbar;
+    LinearLayout searchLayout;
     private RelativeLayout coverImageLayout, profileImageLayout;
     private ImageView ivCoverImage, ivProfileImage, ivChangeCoverImage, ivChangeProfileImage;
+    private TextView tvUserName;
 
     private ProfileService profileService;
     private ProgressDialog progressDialog;
@@ -66,14 +73,14 @@ public class ProfileActivity extends AppCompatActivity {
     private final int REQUEST_TAKE_CAMERA = 101;
     private final int REQUEST_TAKE_GALLERY_IMAGE = 102;
     private int uploadContentType = 0;
-    private String deviceId, profileId, token;
+    private String deviceId, profileId, token, fullName, profileImage, coverImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         initialComponent();
-
+        setData();
 //        setupViewPager();
         setupTabIcons();
 
@@ -85,14 +92,18 @@ public class ProfileActivity extends AppCompatActivity {
         deviceId = manager.getDeviceId();
         profileId = manager.getProfileId();
         token = manager.getToken();
+        fullName = manager.getProfileName();
+        profileImage = AppConstants.PROFILE_IMAGE + manager.getProfileImage();
 
         toolbar = findViewById(R.id.toolbar);
+        searchLayout = findViewById(R.id.search_layout);
         coverImageLayout = findViewById(R.id.cover_image_layout);
         profileImageLayout = findViewById(R.id.profile_image_layout);
         ivCoverImage = findViewById(R.id.cover_image);
         ivProfileImage = findViewById(R.id.profile_image);
         ivChangeCoverImage = findViewById(R.id.change_cover_image);
         ivChangeProfileImage = findViewById(R.id.change_profile_image);
+        tvUserName = findViewById(R.id.user_name);
         tabLayout = findViewById(R.id.tabs);
 //        viewPager = findViewById(R.id.viewpager);
 
@@ -100,9 +111,17 @@ public class ProfileActivity extends AppCompatActivity {
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage(getString(R.string.uploading));
 
+        searchLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(ProfileActivity.this, LikerSearch.class));
+            }
+        });
+
         coverImageLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                uploadContentType = 1;
                 selectImageSource(ivChangeCoverImage);
             }
         });
@@ -110,6 +129,7 @@ public class ProfileActivity extends AppCompatActivity {
         profileImageLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                uploadContentType = 0;
                 selectImageSource(ivChangeProfileImage);
 //                Crop.of(inputUri, outputUri).asSquare().start(this);
             }
@@ -121,6 +141,17 @@ public class ProfileActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    private void setData() {
+        tvUserName.setText(fullName);
+        Glide.with(App.getAppContext())
+                .load(profileImage)
+                .placeholder(R.drawable.profile)
+                .error(R.drawable.profile)
+                .centerCrop()
+                .dontAnimate()
+                .into(ivProfileImage);
     }
 
     private void initialFragment(Fragment fragment) {
@@ -231,7 +262,7 @@ public class ProfileActivity extends AppCompatActivity {
         }
         if (requestCode == REQUEST_TAKE_CAMERA) {
             if (resultCode == RESULT_OK) {
-                Crop.of(imageUri, imageUri).asSquare().start(this);
+                cropImage(imageUri, imageUri);
             } else {
                 Toast.makeText(this, "Cancel Camera Capture", Toast.LENGTH_SHORT).show();
             }
@@ -260,10 +291,18 @@ public class ProfileActivity extends AppCompatActivity {
                 ClipData.Item item = clipData.getItemAt(i);
                 uri = item.getUri();
             }
-            Crop.of(uri, imageUri).asSquare().start(this);
+            cropImage(uri, imageUri);
         } else {
             Uri uri = data.getData();
-            Crop.of(uri, imageUri).asSquare().start(this);
+            cropImage(uri, imageUri);
+        }
+    }
+
+    private void cropImage(Uri uri, Uri uriImage) {
+        if (uploadContentType == 0) {
+            Crop.of(uri, uriImage).asSquare().start(this);
+        } else {
+            Crop.of(uri, uriImage).withAspect(5, 1).start(this);
         }
     }
 
