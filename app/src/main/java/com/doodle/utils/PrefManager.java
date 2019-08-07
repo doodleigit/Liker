@@ -44,6 +44,7 @@ public class PrefManager {
     private static final String POST_AUDIENCE = "post_audience";
     private static final String NEW_NOTIFICATION = "new_notification";
     private static final String NEW_MESSAGE_NOTIFICATION = "new_message_notification";
+    private static final String USER_INFO = "user_info";
 
 
 
@@ -75,6 +76,7 @@ public class PrefManager {
 
     public void setNotificationCountClear() {
         editor.putInt(NEW_NOTIFICATION, 0);
+
         editor.apply();
     }
 
@@ -253,6 +255,16 @@ public class PrefManager {
         editor.apply();
     }
 
+    public void setUserInfo(String userInfo) {
+        editor.putString(USER_INFO, userInfo);
+        editor.apply();
+    }
+
+
+    public String getUserInfo() {
+
+        return pref.getString(USER_INFO, "");
+    }
 
     public String getFbFirstName() {
 

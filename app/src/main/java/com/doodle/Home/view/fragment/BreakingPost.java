@@ -57,7 +57,7 @@ public class BreakingPost extends Fragment {
     }
 
     public List<PostItem> postItemList;
-    private List<Comment> comments = new ArrayList<Comment>();
+  //  private List<Comment> comments = new ArrayList<Comment>();
     private HomeService webService;
     private PrefManager manager;
     private String deviceId, profileId, token, userIds;
@@ -233,10 +233,10 @@ public class BreakingPost extends Fragment {
             public void onResponse(Call<CommentItem> mCall, Response<CommentItem> response) {
 
                 CommentItem commentItem = response.body();
-                comments = commentItem.getComments();
+              //  comments = commentItem.getComments();
                 Log.d("commentItem", commentItem.toString());
-                if (postItemList != null && comments != null) {
-                    adapter.addPagingData(postItemList, comments);
+                if (postItemList != null) {
+                    adapter.addPagingData(postItemList);
                     offset += 5;
                     progressView.setVisibility(View.GONE);
                     progressView.stopAnimation();
@@ -326,11 +326,11 @@ public class BreakingPost extends Fragment {
             public void onResponse(Call<CommentItem> mCall, Response<CommentItem> response) {
 
                 CommentItem commentItem = response.body();
-                comments = commentItem.getComments();
+              //  comments = commentItem.getComments();
                 Log.d("commentItem", commentItem.toString());
-                if (postItemList != null && comments != null) {
-                    adapter = new BreakingPostAdapter(getActivity(), postItemList, comments);
-
+                if (postItemList != null ) {
+                    adapter = new BreakingPostAdapter(getActivity(), postItemList);
+                    offset += 5;
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {

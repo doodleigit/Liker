@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.os.Handler;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.text.Spannable;
@@ -41,6 +42,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.borjabravo.readmoretextview.ReadMoreTextView;
+import com.doodle.Authentication.service.MyService;
+import com.doodle.Comment.model.Comment_;
 import com.doodle.Home.adapter.PostAdapter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.PostTextIndex;
@@ -396,6 +399,31 @@ public class Utils {
 
 
     }
+
+        public static String extractMentionText(Comment_ item) {
+
+        String mentionString = item.getCommentText();
+        // String html = "<p>An <a href='http://example.com/'><b>example</b></a> link.</p>";
+        Document doc = Jsoup.parse(mentionString);
+        Element link = doc.select("a").first();
+
+        String text = doc.body().text(); // "An example link"
+        Log.d("Text", text);
+           /* String linkHref = link.attr("href"); // "http://example.com/"
+            Log.d("URL: ", linkHref);
+            String linkText = link.text(); // "example""
+            String linkOuterH = link.outerHtml();
+            // "<a href="http://example.com"><b>example</b></a>"
+            String linkInnerH = link.html(); // "<b>example</b>"*/
+        return text;
+
+
+
+
+    }
+
+
+
     public static String extractMentionText(PostShareItem item) {
 
         String mentionString = item.getPostText();
@@ -792,4 +820,39 @@ public class Utils {
         return title;
     }
 
+
+    /**
+     * This method returns true if the objet is null.
+     * @param object
+     * @return true | false
+     */
+    public static boolean isEmpty( Object object ){
+        if( object == null ){
+            return true;
+        }
+        return false;
+    }
+
+
+    public static void delayLoadComment(View view) {
+        displayProgressBar(true, view);
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                Log.i(MyService.TAG, "run: runnable complete");
+                displayProgressBar(false, view);
+            }
+        };
+        Handler handler = new Handler();
+        handler.postDelayed(runnable, 3000);
+    }
+
+    @SuppressWarnings("unused")
+    public static void displayProgressBar(boolean display,View view) {
+        if (display) {
+            view.setVisibility(View.VISIBLE);
+        } else {
+            view.setVisibility(View.INVISIBLE);
+        }
+    }
 }

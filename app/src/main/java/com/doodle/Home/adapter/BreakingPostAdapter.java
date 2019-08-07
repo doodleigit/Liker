@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.doodle.Comment.adapter.AllCommentAdapter;
 import com.doodle.Comment.model.Comment;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.service.ImageHolder;
@@ -31,15 +32,15 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     final int VIEW_TYPE_TEX_MIM = 6;
 
     private List<PostItem> postItems;
-    private List<Comment> comments;
     List<Mim> viewColors = DataProvider.mimList;
     private Context mContext;
     Drawable mDrawable;
 
-    public BreakingPostAdapter(Context context, List<PostItem> postItems, List<Comment> comments) {
+
+    public BreakingPostAdapter(Context context, List<PostItem> postItems) {
         this.mContext = context;
         this.postItems = postItems;
-        this.comments = comments;
+
     }
 
     @Override
@@ -82,28 +83,28 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         if (viewHolder instanceof TextHolder) {
             TextHolder vh = (TextHolder) viewHolder;
-            vh.setItem(postItems.get(position), comments.get(position));
+            vh.setItem(postItems.get(position));
         }
         if (viewHolder instanceof TextMimHolder) {
             TextMimHolder vh = (TextMimHolder) viewHolder;
-            vh.setItem(postItems.get(position), comments.get(position));
+            vh.setItem(postItems.get(position));
         }
         if (viewHolder instanceof LinkScriptHolder) {
             LinkScriptHolder vh = (LinkScriptHolder) viewHolder;
-            vh.setItem(postItems.get(position), comments.get(position));
+            vh.setItem(postItems.get(position));
         }
         if (viewHolder instanceof LinkScriptYoutubeHolder) {
             LinkScriptYoutubeHolder vh = (LinkScriptYoutubeHolder) viewHolder;
-            vh.setItem(postItems.get(position), comments.get(position));
+            vh.setItem(postItems.get(position));
         }
         if (viewHolder instanceof ImageHolder) {
             ImageHolder vh = (ImageHolder) viewHolder;
-            vh.setItem(postItems.get(position), comments.get(position));
+            vh.setItem(postItems.get(position));
 
         }
         if (viewHolder instanceof VideoHolder) {
             VideoHolder vh = (VideoHolder) viewHolder;
-            vh.setItem(postItems.get(position), comments.get(position));
+            vh.setItem(postItems.get(position));
 
         }
     }
@@ -142,16 +143,13 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
 
-    public void addPagingData(List<PostItem> postItemList,List<Comment> commentList) {
+    public void addPagingData(List<PostItem> postItemList) {
 
         for (PostItem temp : postItemList
         ) {
             postItems.add(temp);
         }
-        for (Comment temp : commentList
-        ) {
-            comments.add(temp);
-        }
+
         notifyDataSetChanged();
     }
 

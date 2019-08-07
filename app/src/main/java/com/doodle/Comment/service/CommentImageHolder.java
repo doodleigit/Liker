@@ -2,24 +2,36 @@ package com.doodle.Comment.service;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Parcelable;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.view.menu.MenuPopupHelper;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.borjabravo.readmoretextview.ReadMoreTextView;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
 import com.doodle.App;
 import com.doodle.Comment.model.Comment_;
+import com.doodle.Comment.model.Reply;
+import com.doodle.Comment.view.activity.ReplyPost;
+import com.doodle.Home.model.PostItem;
 import com.doodle.Home.service.HomeService;
 import com.doodle.R;
 import com.doodle.utils.AppConstants;
@@ -31,9 +43,16 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.vanniktech.emoji.EmojiTextView;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.hdodenhof.circleimageview.CircleImageView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static com.doodle.utils.AppConstants.PROFILE_IMAGE;
+import static com.doodle.utils.Utils.delayLoadComment;
 import static com.doodle.utils.Utils.isNullOrEmpty;
 import static java.lang.Integer.parseInt;
 
@@ -73,9 +92,17 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
     //SHOW ALL COMMENTS
     private CommentService commentService;
     int limit = 10;
-    int offset = 1;
+    int offset = 0;
     boolean networkOk;
-    CircularProgressView progressView;
+
+    ProgressBar mProgressView;
+
+    //ReplyAllComment
+    private ProgressBar mProgressBar;
+    public static final String REPLY_ITEM_KEY = "reply_item_key";
+    public static final String COMMENT_ITEM_KEY = "comment_item_key";
+    public static final String POST_ITEM_KEY = "post_item_key";
+    PostItem postItem;
 
 
     public CommentImageHolder(View itemView, Context context) {
@@ -87,7 +114,6 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
         profileId = manager.getProfileId();
         token = manager.getToken();
         userIds = manager.getProfileId();
-
 
         //tvPostContent = (ReadMoreTextView) itemView.findViewById(R.id.tvPostContent);
 
@@ -111,6 +137,7 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
         //Comment
         tvCommentMessage = itemView.findViewById(R.id.tvCommentMessage);
         imagePostUser = itemView.findViewById(R.id.imagePostUser);
+        mProgressView = itemView.findViewById(R.id.progress_bar);
 
         imagePostCommenting = itemView.findViewById(R.id.imagePostCommenting);
         imageCommentLikeThumb = itemView.findViewById(R.id.imageCommentLikeThumb);
@@ -128,7 +155,8 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
         //All comment post
         commentService = CommentService.mRetrofit.create(CommentService.class);
         networkOk = NetworkHelper.hasNetworkAccess(mContext);
-        progressView = (CircularProgressView) itemView.findViewById(R.id.progress_view);
+
+        mProgressBar = (ProgressBar) itemView.findViewById(R.id.ProgressBar);
 
     }
 
@@ -152,9 +180,10 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
     int goldStar;
     int silverStar;
 
-    public void setItem(Comment_ commentItem) {
+    public void setItem(Comment_ commentItem, PostItem postItem) {
 
         this.commentItem = commentItem;
+        this.postItem = postItem;
         //  userPostId = item.getPostId();
         commentPostId = commentItem.getPostId();
 
@@ -182,10 +211,29 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
             imagePostCommenting.setVisibility(View.VISIBLE);
             imagePostCommenting.setVisibility(View.VISIBLE);
             String commentImageUrl = PROFILE_IMAGE + commentImage;
-            Glide.with(App.getAppContext())
+         /*   Glide.with(App.getAppContext())
                     .load(commentImageUrl)
                     .centerCrop()
                     .dontAnimate()
+                    .into(imagePostCommenting);*/
+
+            Glide.with(App.getAppContext())
+                    .load(commentImageUrl)
+                    .listener(new RequestListener<Drawable>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, com.bumptech.glide.request.target.Target<Drawable> target, boolean isFirstResource) {
+                            mProgressView.setVisibility(View.GONE);
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Drawable resource, Object model, com.bumptech.glide.request.target.Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                            mProgressView.setVisibility(View.GONE);
+                            return false;
+                        }
+
+
+                    })
                     .into(imagePostCommenting);
         }
 
@@ -362,19 +410,18 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
 
                 popupCommentMenu = new PopupMenu(mContext, v);
                 popupCommentMenu.getMenuInflater().inflate(R.menu.post_comment_menu, popupCommentMenu.getMenu());
-
-             /*   if(userPostId.equalsIgnoreCase(commentPostId)){
+                String commentUserId = commentItem.getUserId();
+                if(userIds.equalsIgnoreCase(commentUserId)){
                     popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(false);
                     popupCommentMenu.getMenu().findItem(R.id.blockUser).setVisible(false);
-                    popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(true);
+                    popupCommentMenu.getMenu().findItem(R.id.editComment).setVisible(true);
                     popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(true);
                 }else {
                     popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(true);
                     popupCommentMenu.getMenu().findItem(R.id.blockUser).setVisible(true);
-                    popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(false);
+                    popupCommentMenu.getMenu().findItem(R.id.editComment).setVisible(false);
                     popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(false);
                 }
-*/
 
 //                popup.show();
                 MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popupCommentMenu.getMenu(), v);
@@ -410,6 +457,59 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
             }
         });
 
+        tvCommentReply.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AppCompatActivity activity = (AppCompatActivity) v.getContext();
+
+                if (networkOk) {
+
+                    Call<List<Reply>> call = commentService.getPostCommentReplyList(deviceId, profileId, token, commentItem.getId(), "false", limit, offset, commentItem.getPostId(), userIds);
+                    sendAllCommentReplyListRequest(call);
+                    delayLoadComment(mProgressBar);
+                } else {
+                    Utils.showNetworkDialog(activity.getSupportFragmentManager());
+
+
+                }
+
+            }
+        });
+
+
+    }
+    private void sendAllCommentReplyListRequest(Call<List<Reply>> call) {
+
+        call.enqueue(new Callback<List<Reply>>() {
+
+            @Override
+            public void onResponse(Call<List<Reply>> mCall, Response<List<Reply>> response) {
+
+
+                if(response.body()!=null){
+                    List<Reply> replyItem = response.body();
+                    Log.d("replyItem ",replyItem.toString());
+
+                    Intent intent = new Intent(mContext, ReplyPost.class);
+                    intent.putExtra(COMMENT_ITEM_KEY, (Parcelable) commentItem);
+                    intent.putExtra(POST_ITEM_KEY, (Parcelable) postItem);
+                    intent.putParcelableArrayListExtra(REPLY_ITEM_KEY, (ArrayList<? extends Parcelable>) replyItem);
+                    mContext.startActivity(intent);
+
+                }else {
+                    Intent intent = new Intent(mContext, ReplyPost.class);
+                    mContext.startActivity(intent);
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call<List<Reply>> call, Throwable t) {
+                Log.d("MESSAGE: ", t.getMessage());
+
+            }
+        });
     }
 
 

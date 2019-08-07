@@ -37,7 +37,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.doodle.App;
+import com.doodle.Authentication.model.UserInfo;
 import com.doodle.Authentication.view.activity.LoginAgain;
+import com.doodle.Comment.adapter.AllCommentAdapter;
+import com.doodle.Comment.model.CommentItem;
 import com.doodle.Home.adapter.CategoryTitleAdapter;
 import com.doodle.Home.adapter.SubCategoryAdapter;
 import com.doodle.Authentication.view.fragment.ResendEmail;
@@ -88,9 +91,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.doodle.Authentication.view.activity.Welcome.USER_INFO_ITEM_KEY;
+import static com.doodle.Home.service.TextHolder.ITEM_KEY;
 import static com.doodle.utils.AppConstants.IN_CHAT_MODE;
 
-public class Home extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
+public class Home extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener{
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
@@ -123,13 +128,22 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
     private RecyclerView categoryRecyclerView;
 
     public LoadCompleteListener loadCompleteListener;
-
+    public UserInfo userInfo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+//        userInfo = getIntent().getExtras().getParcelable(USER_INFO_ITEM_KEY);
+//        if (userInfo == null) {
+//            throw new AssertionError("Null data item received!");
+//        }
+
+
         initialComponent();
+
+
+
 
         if (topContributorStatus != null) {
             String categoryId = App.getCategoryId();
@@ -154,6 +168,9 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
         setData();
         setBroadcast();
         sendCategoryListRequest();
+
+
+
     }
 
     private void initialComponent() {
@@ -242,6 +259,9 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
                     hideProgressBar();
             }
         };
+
+
+
     }
 
     private void setData() {
@@ -999,5 +1019,6 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
     public void onNothingSelected(AdapterView<?> adapterView) {
 
     }
+
 
 }

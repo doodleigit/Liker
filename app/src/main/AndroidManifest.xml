@@ -27,14 +27,16 @@
 
         <activity android:name=".Profile.view.ProfileActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".Comment.view.activity.ReplyPost"
+            android:parentActivityName=".Home.view.activity.Home"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".Home.view.activity.PostShare"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".Comment.CommentPost"
-            android:theme="@style/AppTheme.NoActionBar"
+            android:name=".Comment.view.activity.CommentPost"
             android:parentActivityName=".Home.view.activity.Home"
-            />
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Post.view.activity.GalleryView"
             android:parentActivityName=".Post.view.activity.PostNew"
