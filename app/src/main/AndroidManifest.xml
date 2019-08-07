@@ -22,15 +22,17 @@
         android:theme="@style/AppTheme"
         android:vmSafeMode="true"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".Profile.view.ProfileActivity"></activity>
+        <activity android:name=".Comment.view.activity.ReplyPost"
+            android:parentActivityName=".Home.view.activity.Home"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".Profile.view.ProfileActivity" />
         <activity
             android:name=".Home.view.activity.PostShare"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".Comment.CommentPost"
-            android:theme="@style/AppTheme.NoActionBar"
+            android:name=".Comment.view.activity.CommentPost"
             android:parentActivityName=".Home.view.activity.Home"
-            />
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Post.view.activity.GalleryView"
             android:parentActivityName=".Post.view.activity.PostNew"
@@ -113,18 +115,19 @@
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustResize">
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
 
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.MAIN" /> -->
+
+
+            <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
+            <!-- </intent-filter> -->
         </activity>
         <activity
             android:name=".Authentication.view.activity.Splash"
             android:theme="@style/AppTheme.Launcher">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>

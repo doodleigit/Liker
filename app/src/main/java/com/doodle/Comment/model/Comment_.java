@@ -4,15 +4,16 @@ package com.doodle.Comment.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.Parcelable.Creator;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 
-public class Comment_ implements Serializable, Parcelable
-{
+public class Comment_ implements Serializable, Parcelable {
 
     @SerializedName("id")
     @Expose
@@ -79,7 +80,7 @@ public class Comment_ implements Serializable, Parcelable
     private String deactivated;
     @SerializedName("link_data")
     @Expose
-    private LinkData linkData;
+    private LinkData linkData = new LinkData();
     @SerializedName("like_user_status")
     @Expose
     private boolean likeUserStatus;
@@ -90,7 +91,7 @@ public class Comment_ implements Serializable, Parcelable
 
 
         @SuppressWarnings({
-            "unchecked"
+                "unchecked"
         })
         public Comment_ createFromParcel(Parcel in) {
             return new Comment_(in);
@@ -100,8 +101,7 @@ public class Comment_ implements Serializable, Parcelable
             return (new Comment_[size]);
         }
 
-    }
-    ;
+    };
     private final static long serialVersionUID = 6073528936061608029L;
 
     protected Comment_(Parcel in) {
@@ -355,7 +355,7 @@ public class Comment_ implements Serializable, Parcelable
     }
 
     public int describeContents() {
-        return  0;
+        return 0;
     }
 
 }

@@ -28,6 +28,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,13 +36,12 @@ import android.widget.Toast;
 import com.borjabravo.readmoretextview.ReadMoreTextView;
 import com.bumptech.glide.Glide;
 import com.doodle.App;
-import com.doodle.Comment.CommentPost;
-import com.doodle.Comment.FullBottomSheetDialogFragment;
+import com.doodle.Comment.adapter.AllCommentAdapter;
+import com.doodle.Comment.view.activity.CommentPost;
 import com.doodle.Comment.model.Comment;
 import com.doodle.Comment.model.CommentItem;
 import com.doodle.Comment.model.Comment_;
 import com.doodle.Comment.service.CommentService;
-import com.doodle.Home.adapter.BreakingPostAdapter;
 import com.doodle.Home.model.PostFooter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.PostTextIndex;
@@ -50,7 +50,6 @@ import com.doodle.Home.view.activity.Home;
 import com.doodle.Home.view.activity.PostShare;
 import com.doodle.Post.model.Mim;
 import com.doodle.Post.service.DataProvider;
-import com.doodle.Post.view.fragment.PostPermission;
 import com.doodle.R;
 import com.doodle.utils.AppConstants;
 import com.doodle.utils.NetworkHelper;
@@ -81,9 +80,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.doodle.Authentication.service.MyService.TAG;
 import static com.doodle.utils.AppConstants.FACEBOOK_SHARE;
-import static com.doodle.utils.AppConstants.PROFILE_IMAGE;
 import static com.doodle.utils.Utils.containsIllegalCharacters;
+import static com.doodle.utils.Utils.delayLoadComment;
+import static com.doodle.utils.Utils.displayProgressBar;
 import static com.doodle.utils.Utils.extractMentionText;
 import static com.doodle.utils.Utils.extractUrls;
 import static com.doodle.utils.Utils.getSpannableStringBuilder;
@@ -93,7 +94,7 @@ import static java.lang.Integer.parseInt;
 public class TextHolder extends RecyclerView.ViewHolder {
 
 
-    public TextView tvHeaderInfo, tvPostTime, tvPostUserName, tvImgShareCount, tvPostLikeCount, tvLinkScriptText,tvCommentCount;
+    public TextView tvHeaderInfo, tvPostTime, tvPostUserName, tvImgShareCount, tvPostLikeCount, tvLinkScriptText, tvCommentCount;
     public CircleImageView imagePostUser;
     public ReadMoreTextView tvPostContent;
     public EmojiTextView tvPostEmojiContent;
@@ -116,10 +117,10 @@ public class TextHolder extends RecyclerView.ViewHolder {
     private String deviceId, profileId, token, userIds;
     private Context mContext;
     public static final String ITEM_KEY = "item_key";
-    public static final String COMMENT_ITEM_KEY = "comment_item_key";
+
     public CallbackManager callbackManager;
     public ShareDialog shareDialog;
-    public ImageView imagePostComment;
+
 
     //Comment
     Comment commentItem;
@@ -138,11 +139,12 @@ public class TextHolder extends RecyclerView.ViewHolder {
     //SHOW ALL COMMENTS
     private CommentService commentService;
     int limit = 10;
-    int offset = 1;
+    int offset = 0;
     boolean networkOk;
-    CircularProgressView progressView;
-    LinearLayout commentBox;
 
+    public ImageView imagePostComment;
+    public static final String COMMENT_KEY = "comment_item_key";
+    private ProgressBar mProgressBar;
 
 
     public TextHolder(View itemView, Context context) {
@@ -159,7 +161,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
         webService = HomeService.mRetrofit.create(HomeService.class);
         imagePostShare = (ImageView) itemView.findViewById(R.id.imagePostShare);
         imagePermission = (ImageView) itemView.findViewById(R.id.imagePermission);
-        imagePostComment = (ImageView) itemView.findViewById(R.id.imagePostComment);
+
 
         mentions = new ArrayList<>();
         mList = new ArrayList<>();
@@ -213,9 +215,8 @@ public class TextHolder extends RecyclerView.ViewHolder {
         //All comment post
         commentService = CommentService.mRetrofit.create(CommentService.class);
         networkOk = NetworkHelper.hasNetworkAccess(mContext);
-        progressView = (CircularProgressView) itemView.findViewById(R.id.progress_view);
-        commentBox=itemView.findViewById(R.id.commentBox);
-
+        imagePostComment = (ImageView) itemView.findViewById(R.id.imagePostComment);
+        mProgressBar = (ProgressBar) itemView.findViewById(R.id.ProgressBar);
     }
 
 
@@ -236,55 +237,12 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
     String text;
 
-    public void setItem(final PostItem item, Comment commentItem) {
+    public void setItem(final PostItem item) {
         this.item = item;
-        this.commentItem = commentItem;
-        userPostId = item.getPostId();
-        commentPostId = commentItem.getPostId();
-        comments = commentItem.getComments();
 
-        if (!comments.isEmpty()) {
-            commentHold.setVisibility(View.VISIBLE);
-            for (Comment_ temp : comments) {
-                commentText = temp.getCommentText();
-                commentUserName = temp.getUserFirstName() + " " + temp.getUserLastName();
-                commentUserImage = temp.getUserPhoto();
-                commentImage = temp.getCommentImage();
-                commentTime = temp.getDateTime();
-            }
-
-            if (isNullOrEmpty(commentImage)) {
-                imagePostCommenting.setVisibility(View.GONE);
-            } else {
-                imagePostCommenting.setVisibility(View.VISIBLE);
-                imagePostCommenting.setVisibility(View.VISIBLE);
-                String commentImageUrl = PROFILE_IMAGE + commentImage;
-                Glide.with(App.getAppContext())
-                        .load(commentImageUrl)
-                        .centerCrop()
-                        .dontAnimate()
-                        .into(imagePostCommenting);
-            }
-
-            tvCommentUserName.setText(commentUserName);
-            if(!isNullOrEmpty(commentText)){
-                tvCommentMessage.setVisibility(View.VISIBLE);
-                tvCommentMessage.setText(commentText);
-            }else {
-                tvCommentMessage.setVisibility(View.GONE);
-            }
-            tvCommentTime.setText(Utils.chatDateCompare(mContext, Long.valueOf(commentTime)));
-
-            String commentUserImageUrl = PROFILE_IMAGE + commentUserImage;
-            Glide.with(App.getAppContext())
-                    .load(commentUserImageUrl)
-                    .centerCrop()
-                    .dontAnimate()
-                    .into(imageCommentUser);
-
-        } else {
-            commentHold.setVisibility(View.GONE);
-        }
+//        userPostId = item.getPostId();
+        userPostId = item.getPostUserid();
+//        commentPostId = commentItem.getPostId();
 
 
         tvCommentLike.setOnClickListener(new View.OnClickListener() {
@@ -586,9 +544,17 @@ public class TextHolder extends RecyclerView.ViewHolder {
             tvPostLikeCount.setVisibility(View.VISIBLE);
             tvPostLikeCount.setText(content);
         }
-        if(!isNullOrEmpty(item.getTotalComment())&& !"0".equalsIgnoreCase(item.getTotalComment())){
+        if (!isNullOrEmpty(item.getTotalComment()) && !"0".equalsIgnoreCase(item.getTotalComment())) {
             tvCommentCount.setText(item.getTotalComment());
         }
+
+//        if(!isNullOrEmpty(item.getTotalComment())&& !"0".equalsIgnoreCase(item.getTotalComment())){
+//            tvCommentCount.setText(item.getTotalComment());
+//        }else if(App.getCommentCount()==1){
+//            int uploadComment=Integer.parseInt(item.getTotalComment());
+//            int totalComment=uploadComment+App.getCommentCount();
+//            tvCommentCount.setText(totalComment);
+//        }
 
         String userImageUrl = AppConstants.PROFILE_IMAGE + item.getUesrProfileImg();
         Glide.with(App.getAppContext())
@@ -603,45 +569,23 @@ public class TextHolder extends RecyclerView.ViewHolder {
         imagePostComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               AppCompatActivity activity = (AppCompatActivity) v.getContext();
-              //  mContext.startActivity(new Intent(mContext, CommentPost.class));
+                AppCompatActivity activity = (AppCompatActivity) v.getContext();
+                //  mContext.startActivity(new Intent(mContext, CommentPost.class));
 //                FullBottomSheetDialogFragment postPermissions = new FullBottomSheetDialogFragment();
 //                postPermissions.show(activity.getSupportFragmentManager(), "PostPermission");
-
                 if (networkOk) {
-                    progressView.setVisibility(View.VISIBLE);
-                    progressView.startAnimation();
 
-                    Call<CommentItem> call = commentService.getAllPostComments(deviceId, profileId, token, "false", limit, offset, "DESC", commentPostId, userIds);
+                    Call<CommentItem> call = commentService.getAllPostComments(deviceId, profileId, token, "false", limit, offset, "DESC", item.getPostId(), userIds);
                     sendAllCommentItemRequest(call);
+
+                    //    log("Running code");
+                    delayLoadComment(mProgressBar);
                 } else {
                     Utils.showNetworkDialog(activity.getSupportFragmentManager());
-                    progressView.setVisibility(View.GONE);
-                    progressView.stopAnimation();
+
 
                 }
 
-            }
-        });
-
-        commentBox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AppCompatActivity activity = (AppCompatActivity) v.getContext();
-
-                if (networkOk) {
-                    progressView.setVisibility(View.VISIBLE);
-                    progressView.startAnimation();
-
-
-                    Call<CommentItem> call = commentService.getAllPostComments(deviceId, profileId, token, "false", limit, offset, "DESC", commentPostId, userIds);
-                    sendAllCommentItemRequest(call);
-                } else {
-                    Utils.showNetworkDialog(activity.getSupportFragmentManager());
-                    progressView.setVisibility(View.GONE);
-                    progressView.stopAnimation();
-
-                }
             }
         });
 
@@ -777,16 +721,17 @@ public class TextHolder extends RecyclerView.ViewHolder {
                 popupCommentMenu = new PopupMenu(mContext, v);
                 popupCommentMenu.getMenuInflater().inflate(R.menu.post_comment_menu, popupCommentMenu.getMenu());
 
-                if(userPostId.equalsIgnoreCase(commentPostId)){
+
+                if (userIds.equalsIgnoreCase(commentPostId)) {
                     popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(false);
                     popupCommentMenu.getMenu().findItem(R.id.blockUser).setVisible(false);
                     popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(true);
-                    popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(true);
-                }else {
+                    popupCommentMenu.getMenu().findItem(R.id.editComment).setVisible(true);
+                } else {
                     popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(true);
                     popupCommentMenu.getMenu().findItem(R.id.blockUser).setVisible(true);
                     popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(false);
-                    popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(false);
+                    popupCommentMenu.getMenu().findItem(R.id.editComment).setVisible(false);
                 }
 
 
@@ -826,6 +771,8 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
     }
 
+
+
     private void sendAllCommentItemRequest(Call<CommentItem> call) {
 
         call.enqueue(new Callback<CommentItem>() {
@@ -834,17 +781,13 @@ public class TextHolder extends RecyclerView.ViewHolder {
             public void onResponse(Call<CommentItem> mCall, Response<CommentItem> response) {
 
 
-                if(response.body()!=null){
+                if (response.body() != null) {
                     CommentItem commentItem = response.body();
                     Intent intent = new Intent(mContext, CommentPost.class);
-                    intent.putExtra(COMMENT_ITEM_KEY, (Parcelable) commentItem);
+                    intent.putExtra(COMMENT_KEY, (Parcelable) commentItem);
                     intent.putExtra(ITEM_KEY, (Parcelable) item);
-
                     mContext.startActivity(intent);
-                    progressView.setVisibility(View.GONE);
-                    progressView.stopAnimation();
 
-                    ((Home) Objects.requireNonNull(mContext)).loadCompleteListener.onLoadComplete(1);
                 }
 
 
@@ -853,9 +796,8 @@ public class TextHolder extends RecyclerView.ViewHolder {
             @Override
             public void onFailure(Call<CommentItem> call, Throwable t) {
                 Log.d("MESSAGE: ", t.getMessage());
-                progressView.setVisibility(View.GONE);
-                progressView.stopAnimation();
-                ((Home) Objects.requireNonNull(mContext)).loadCompleteListener.onLoadComplete(1);
+
+
             }
         });
 
@@ -912,7 +854,6 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
         return text;
     }
-
 
 
 }

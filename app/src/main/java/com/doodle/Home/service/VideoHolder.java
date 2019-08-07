@@ -12,6 +12,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Parcelable;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.view.menu.MenuPopupHelper;
 import android.support.v7.widget.PopupMenu;
@@ -26,6 +27,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.MediaController;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,14 +38,19 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.danikula.videocache.HttpProxyCacheServer;
 import com.doodle.App;
+import com.doodle.Comment.view.activity.CommentPost;
 import com.doodle.Comment.model.Comment;
+import com.doodle.Comment.model.CommentItem;
 import com.doodle.Comment.model.Comment_;
+import com.doodle.Comment.service.CommentService;
 import com.doodle.Home.model.PostFooter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.postshare.PostShareItem;
+import com.doodle.Home.view.activity.Home;
 import com.doodle.Home.view.activity.PostShare;
 import com.doodle.R;
 import com.doodle.utils.AppConstants;
+import com.doodle.utils.NetworkHelper;
 import com.doodle.utils.Operation;
 import com.doodle.utils.PrefManager;
 import com.doodle.utils.Utils;
@@ -53,11 +60,13 @@ import com.facebook.FacebookException;
 import com.facebook.share.Sharer;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
+import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.vanniktech.emoji.EmojiTextView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 import cn.jzvd.JZVideoPlayerStandard;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -69,6 +78,7 @@ import static com.doodle.App.getProxy;
 import static com.doodle.utils.AppConstants.FACEBOOK_SHARE;
 import static com.doodle.utils.AppConstants.PROFILE_IMAGE;
 import static com.doodle.utils.Utils.containsIllegalCharacters;
+import static com.doodle.utils.Utils.delayLoadComment;
 import static com.doodle.utils.Utils.getSpannableStringBuilder;
 import static com.doodle.utils.Utils.isNullOrEmpty;
 import static com.facebook.FacebookSdk.getApplicationContext;
@@ -107,11 +117,21 @@ public class VideoHolder extends RecyclerView.ViewHolder {
     RelativeLayout commentHold;
     private String commentText, commentUserName, commentUserImage, commentImage, commentTime;
     public EmojiTextView tvCommentMessage;
-    public ImageView imagePostCommenting, imageCommentLikeThumb, imageCommentSettings;
+    public ImageView imagePostCommenting, imageCommentLikeThumb, imageCommentSettings,imagePostComment;
     public CircleImageView imageCommentUser;
     public TextView tvCommentUserName, tvCommentTime, tvCommentLike, tvCommentReply, tvCountCommentLike;
     private String userPostId;
     private PopupMenu popupCommentMenu;
+
+
+    //SHOW ALL COMMENTS
+    private CommentService commentService;
+    int limit = 10;
+    int offset = 0;
+    boolean networkOk;
+    ProgressBar mProgressBar;
+    LinearLayout commentBox;
+    public static final String COMMENT_KEY = "comment_item_key";
 
     public VideoHolder(View itemView, Context context) {
         super(itemView);
@@ -181,52 +201,17 @@ public class VideoHolder extends RecyclerView.ViewHolder {
         imageCommentLikeThumb.setVisibility(View.GONE);
         tvCountCommentLike.setVisibility(View.GONE);
 
+        //ALL Comment
+        imagePostComment = (ImageView) itemView.findViewById(R.id.imagePostComment);
+        commentService = CommentService.mRetrofit.create(CommentService.class);
+        networkOk = NetworkHelper.hasNetworkAccess(mContext);
+        mProgressBar = (ProgressBar) itemView.findViewById(R.id.ProgressBar);
     }
 
 
-    public void setItem(PostItem item, Comment commentItem) {
+    public void setItem(PostItem item) {
         this.item = item;
-        this.commentItem = commentItem;
         userPostId = item.getPostId();
-        commentPostId = commentItem.getPostId();
-        comments = commentItem.getComments();
-
-        if (!comments.isEmpty()) {
-            commentHold.setVisibility(View.VISIBLE);
-            for (Comment_ temp : comments) {
-                commentText = temp.getCommentText();
-                commentUserName = temp.getUserFirstName() + " " + temp.getUserLastName();
-                commentUserImage = temp.getUserPhoto();
-                commentImage = temp.getCommentImage();
-                commentTime = temp.getDateTime();
-            }
-
-            if (isNullOrEmpty(commentImage)) {
-                imagePostCommenting.setVisibility(View.GONE);
-            } else {
-                imagePostCommenting.setVisibility(View.VISIBLE);
-            }
-
-            tvCommentUserName.setText(commentUserName);
-            if(!isNullOrEmpty(commentText)){
-                tvCommentMessage.setVisibility(View.VISIBLE);
-                tvCommentMessage.setText(commentText);
-            }else {
-                tvCommentMessage.setVisibility(View.GONE);
-            }
-
-            tvCommentTime.setText(Utils.chatDateCompare(mContext, Long.valueOf(commentTime)));
-
-            String commentUserImageUrl = PROFILE_IMAGE + commentUserImage;
-            Glide.with(App.getAppContext())
-                    .load(commentUserImageUrl)
-                    .centerCrop()
-                    .dontAnimate()
-                    .into(imageCommentUser);
-
-        } else {
-            commentHold.setVisibility(View.GONE);
-        }
 
 
         tvCommentLike.setOnClickListener(new View.OnClickListener() {
@@ -652,12 +637,12 @@ public class VideoHolder extends RecyclerView.ViewHolder {
                 if(userPostId.equalsIgnoreCase(commentPostId)){
                     popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(false);
                     popupCommentMenu.getMenu().findItem(R.id.blockUser).setVisible(false);
-                    popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(true);
+                    popupCommentMenu.getMenu().findItem(R.id.editComment).setVisible(true);
                     popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(true);
                 }else {
                     popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(true);
                     popupCommentMenu.getMenu().findItem(R.id.blockUser).setVisible(true);
-                    popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(false);
+                    popupCommentMenu.getMenu().findItem(R.id.editComment).setVisible(false);
                     popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(false);
                 }
 
@@ -696,6 +681,60 @@ public class VideoHolder extends RecyclerView.ViewHolder {
             }
         });
 
+        imagePostComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AppCompatActivity activity = (AppCompatActivity) v.getContext();
+                //  mContext.startActivity(new Intent(mContext, CommentPost.class));
+//                FullBottomSheetDialogFragment postPermissions = new FullBottomSheetDialogFragment();
+//                postPermissions.show(activity.getSupportFragmentManager(), "PostPermission");
+                if (networkOk) {
+
+                    Call<CommentItem> call = commentService.getAllPostComments(deviceId, profileId, token, "false", limit, offset, "DESC", item.getPostId(), userIds);
+                    sendAllCommentItemRequest(call);
+
+                    //    log("Running code");
+                    delayLoadComment(mProgressBar);
+                } else {
+                    Utils.showNetworkDialog(activity.getSupportFragmentManager());
+
+
+                }
+
+            }
+        });
+
+
+
+    }
+
+    private void sendAllCommentItemRequest(Call<CommentItem> call) {
+
+        call.enqueue(new Callback<CommentItem>() {
+
+            @Override
+            public void onResponse(Call<CommentItem> mCall, Response<CommentItem> response) {
+
+
+                if(response.body()!=null){
+                    CommentItem commentItem = response.body();
+                    Intent intent = new Intent(mContext, CommentPost.class);
+                    intent.putExtra(COMMENT_KEY, (Parcelable) commentItem);
+                    intent.putExtra(ITEM_KEY, (Parcelable) item);
+
+                    mContext.startActivity(intent);
+
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call<CommentItem> call, Throwable t) {
+                Log.d("MESSAGE: ", t.getMessage());
+
+            }
+        });
 
     }
 

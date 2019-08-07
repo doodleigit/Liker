@@ -6,6 +6,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.graphics.Color;
+import android.os.Parcelable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -27,6 +28,7 @@ import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import com.chaos.view.PinView;
+import com.doodle.App;
 import com.doodle.Authentication.model.Error;
 import com.doodle.Authentication.model.ForgotPassword;
 import com.doodle.Authentication.model.LoginUser;
@@ -35,6 +37,7 @@ import com.doodle.Authentication.model.UserInfo;
 import com.doodle.Authentication.view.fragment.ResendEmail;
 import com.doodle.Authentication.viewmodel.LoginViewModel;
 import com.doodle.Home.view.activity.Home;
+import com.doodle.Post.adapter.MimAdapter;
 import com.doodle.R;
 import com.doodle.utils.ClearableEditText;
 import com.doodle.Authentication.service.AuthService;
@@ -42,6 +45,7 @@ import com.doodle.utils.NetworkHelper;
 import com.doodle.utils.PrefManager;
 import com.doodle.utils.Utils;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
+import com.google.gson.Gson;
 import com.onesignal.OneSignal;
 
 import org.json.JSONException;
@@ -79,7 +83,7 @@ public class Welcome extends AppCompatActivity implements View.OnClickListener, 
     private PrefManager manager;
     String otp;
     String mDeviceId;
-
+    public static final String USER_INFO_ITEM_KEY = "user_info_item_key";
     private CircularProgressView progressView;
 
 
@@ -673,13 +677,21 @@ public class Welcome extends AppCompatActivity implements View.OnClickListener, 
                     manager.setToken(mToken);
                     showSnackbar("login success!");
                     UserInfo userInfo = loginUser.getUserInfo();
+                    Gson gson = new Gson();
+                    String json = gson.toJson(userInfo);
+                    manager.setUserInfo(json);
                     String profileName = userInfo.getFirstName() + " " + userInfo.getLastName();
                     String photo = userInfo.getPhoto();
+                    App.setProfilePhoto(photo);
                     String profileId = userInfo.getUserId();
                     manager.setProfileName(profileName);
                     manager.setProfileImage(POST_IMAGES + photo);
                     manager.setProfileId(profileId);
                     //   startActivity(new Intent(Welcome.this, Liker.class));
+//                    Intent intent=new Intent(Welcome.this,Home.class);
+//                    intent.putExtra(USER_INFO_ITEM_KEY, (Parcelable) userInfo);
+//                    startActivity(intent);
+
                     startActivity(new Intent(Welcome.this, Home.class));
                 } else {
                     String msg = "Username and password miss match";

@@ -45,9 +45,24 @@ public class App extends Application {
     private static Category mCategory;
     private static Subcatg mSubcatg;
     private static String mSocketId;
+    private static int commentCount;
+    private static String profilePhoto;
 
+    public static String getProfilePhoto() {
+        return profilePhoto;
+    }
 
+    public static void setProfilePhoto(String profilePhoto) {
+        App.profilePhoto = profilePhoto;
+    }
 
+    public static int getCommentCount() {
+        return commentCount;
+    }
+
+    public static void setCommentCount(int commentCount) {
+        App.commentCount = commentCount;
+    }
 
     private HttpProxyCacheServer proxy;
 

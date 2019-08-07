@@ -232,8 +232,8 @@ public class FollowingPost extends Fragment {
                 CommentItem commentItem = response.body();
                 comments = commentItem.getComments();
                 Log.d("commentItem", commentItem.toString());
-                if (postItemList != null && comments != null) {
-                    adapter.addPagingData(postItemList,comments);
+                if (postItemList != null ) {
+                    adapter.addPagingData(postItemList);
                    // adapter.addPagingCommentData(comments);
                     offset += 5;
                     progressView.setVisibility(View.GONE);
@@ -326,7 +326,7 @@ public class FollowingPost extends Fragment {
                 comments = commentItem.getComments();
                 Log.d("commentItem", commentItem.toString());
                 if (postItemList != null && comments != null) {
-                    adapter = new BreakingPostAdapter(getActivity(), postItemList,comments);
+                    adapter = new BreakingPostAdapter(getActivity(), postItemList);
 
                     new Handler().postDelayed(new Runnable() {
                         @Override

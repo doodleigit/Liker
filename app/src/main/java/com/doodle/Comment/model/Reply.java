@@ -79,10 +79,10 @@ public class Reply implements Serializable, Parcelable
     private String commentImage;
     @SerializedName("comment_text_index")
     @Expose
-    private List<CommentTextIndex_> commentTextIndex = new ArrayList<CommentTextIndex_>();
+    private List<CommentTextIndex> commentTextIndex = new ArrayList<CommentTextIndex>();
     @SerializedName("link_data")
     @Expose
-    private LinkData_ linkData;
+    private LinkData linkData;
     public final static Creator<Reply> CREATOR = new Creator<Reply>() {
 
 
@@ -123,8 +123,8 @@ public class Reply implements Serializable, Parcelable
         this.deactivated = ((String) in.readValue((String.class.getClassLoader())));
         this.commentText = ((String) in.readValue((String.class.getClassLoader())));
         this.commentImage = ((String) in.readValue((String.class.getClassLoader())));
-        in.readList(this.commentTextIndex, (CommentTextIndex_.class.getClassLoader()));
-        this.linkData = ((LinkData_) in.readValue((LinkData_.class.getClassLoader())));
+        in.readList(this.commentTextIndex, (CommentTextIndex.class.getClassLoader()));
+        this.linkData = ((LinkData) in.readValue((LinkData_.class.getClassLoader())));
     }
 
     public Reply() {
@@ -298,19 +298,19 @@ public class Reply implements Serializable, Parcelable
         this.commentImage = commentImage;
     }
 
-    public List<CommentTextIndex_> getCommentTextIndex() {
+    public List<CommentTextIndex> getCommentTextIndex() {
         return commentTextIndex;
     }
 
-    public void setCommentTextIndex(List<CommentTextIndex_> commentTextIndex) {
+    public void setCommentTextIndex(List<CommentTextIndex> commentTextIndex) {
         this.commentTextIndex = commentTextIndex;
     }
 
-    public LinkData_ getLinkData() {
+    public LinkData getLinkData() {
         return linkData;
     }
 
-    public void setLinkData(LinkData_ linkData) {
+    public void setLinkData(LinkData linkData) {
         this.linkData = linkData;
     }
 

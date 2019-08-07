@@ -7,6 +7,8 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Parcelable;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.view.menu.MenuPopupHelper;
 import android.support.v7.widget.PopupMenu;
@@ -17,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +28,9 @@ import com.bumptech.glide.Glide;
 import com.doodle.App;
 import com.doodle.Comment.model.Comment_;
 import com.doodle.Comment.model.LinkData;
+import com.doodle.Comment.model.Reply;
+import com.doodle.Comment.view.activity.ReplyPost;
+import com.doodle.Home.model.PostItem;
 import com.doodle.Home.service.HomeService;
 import com.doodle.R;
 import com.doodle.utils.AppConstants;
@@ -37,11 +43,19 @@ import com.squareup.picasso.Target;
 import com.vanniktech.emoji.EmojiTextView;
 
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
+import static com.doodle.utils.AppConstants.LINK_IMAGES;
 import static com.doodle.utils.AppConstants.PROFILE_IMAGE;
+import static com.doodle.utils.Utils.delayLoadComment;
 import static com.doodle.utils.Utils.getDomainName;
+import static com.doodle.utils.Utils.isEmpty;
 import static com.doodle.utils.Utils.isNullOrEmpty;
 import static java.lang.Integer.parseInt;
 
@@ -81,10 +95,16 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
     //SHOW ALL COMMENTS
     private CommentService commentService;
     int limit = 10;
-    int offset = 1;
+    int offset = 0;
     boolean networkOk;
-    CircularProgressView progressView;
 
+
+    //ReplyAll
+    private ProgressBar mProgressBar;
+    public static final String REPLY_ITEM_KEY = "reply_item_key";
+    public static final String COMMENT_ITEM_KEY = "comment_item_key";
+    public static final String POST_ITEM_KEY = "post_item_key";
+    public PostItem postItem;
 
     public CommentYoutubeHolder(View itemView, Context context) {
         super(itemView);
@@ -139,8 +159,10 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
         //All comment post
         commentService = CommentService.mRetrofit.create(CommentService.class);
         networkOk = NetworkHelper.hasNetworkAccess(mContext);
-        progressView = (CircularProgressView) itemView.findViewById(R.id.progress_view);
 
+
+        //ReplyAll
+         mProgressBar=itemView.findViewById(R.id.ProgressBar);
     }
 
 
@@ -163,9 +185,10 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
     int goldStar;
     int silverStar;
 
-    public void setItem(Comment_ commentItem) {
+    public void setItem(Comment_ commentItem, PostItem postItem) {
 
         this.commentItem = commentItem;
+        this.postItem = postItem;
         //  userPostId = item.getPostId();
         commentPostId = commentItem.getPostId();
 
@@ -188,38 +211,44 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
         tvCommentTime.setText(Utils.chatDateCompare(mContext, Long.valueOf(commentTime)));
 
         LinkData linkItem = commentItem.getLinkData();
-        String imageName=linkItem.getImageName();
-        String linkFullUrl=linkItem.getLinkFullUrl();
-        String linkTitle=linkItem.getLinkTitle();
-        tvCommentMessage.setText(linkFullUrl);
-        Linkify.addLinks(tvCommentMessage, Linkify.ALL);
-        //set user name in blue color and remove underline from the textview
-        Utils.stripUnderlines(tvCommentMessage);
-        try {
-            String domainName = getDomainName(linkFullUrl);
-            tvLinkHost.setText(domainName);
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
-        tvDescription.setText(linkTitle);
-        String linkImage = AppConstants.YOUTUBE_IMAGE_PATH + imageName;
-        Glide.with(App.getAppContext())
-                .load(linkImage)
-                .centerCrop()
-                .dontAnimate()
-                .into(imagePostCommenting);
+        if(!isEmpty(linkItem)){
+            String imageName=linkItem.getImageName();
+            String linkFullUrl=linkItem.getLinkFullUrl();
+            String linkTitle=linkItem.getLinkTitle();
+            tvCommentMessage.setText(linkFullUrl);
+            Linkify.addLinks(tvCommentMessage, Linkify.ALL);
+            //set user name in blue color and remove underline from the textview
+            Utils.stripUnderlines(tvCommentMessage);
+            try {
+                if(!isNullOrEmpty(linkFullUrl)){
+                    String domainName = getDomainName(linkFullUrl);
+                    tvLinkHost.setText(domainName);
+                }
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            tvDescription.setText(linkTitle);
+         //   String linkImage = AppConstants.YOUTUBE_IMAGE_PATH + imageName;
+            String linkImage = LINK_IMAGES + imageName;
+            Glide.with(App.getAppContext())
+                    .load(linkImage)
+                    .centerCrop()
+                    .dontAnimate()
+                    .into(imagePostCommenting);
 
 
-        youtubeHold.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            youtubeHold.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
 
                     Intent browserIntents = new Intent(Intent.ACTION_VIEW, Uri.parse(linkFullUrl));
                     browserIntents.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     App.getAppContext().startActivity(browserIntents);
-            }
-        });
-        Log.d("linkData", linkItem.getLinkFullUrl());
+                }
+            });
+        }
+
 
 
 
@@ -396,19 +425,18 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
 
                 popupCommentMenu = new PopupMenu(mContext, v);
                 popupCommentMenu.getMenuInflater().inflate(R.menu.post_comment_menu, popupCommentMenu.getMenu());
-
-             /*   if(userPostId.equalsIgnoreCase(commentPostId)){
+                String commentUserId = commentItem.getUserId();
+                if(userIds.equalsIgnoreCase(commentUserId)){
                     popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(false);
                     popupCommentMenu.getMenu().findItem(R.id.blockUser).setVisible(false);
-                    popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(true);
+                    popupCommentMenu.getMenu().findItem(R.id.editComment).setVisible(true);
                     popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(true);
                 }else {
                     popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(true);
                     popupCommentMenu.getMenu().findItem(R.id.blockUser).setVisible(true);
-                    popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(false);
+                    popupCommentMenu.getMenu().findItem(R.id.editComment).setVisible(false);
                     popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(false);
                 }
-*/
 
 //                popup.show();
                 MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popupCommentMenu.getMenu(), v);
@@ -444,6 +472,59 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
             }
         });
 
+        tvCommentReply.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AppCompatActivity activity = (AppCompatActivity) v.getContext();
+
+                if (networkOk) {
+
+                    Call<List<Reply>> call = commentService.getPostCommentReplyList(deviceId, profileId, token, commentItem.getId(), "false", limit, offset, commentItem.getPostId(), userIds);
+                    sendAllCommentReplyListRequest(call);
+                    delayLoadComment(mProgressBar);
+                } else {
+                    Utils.showNetworkDialog(activity.getSupportFragmentManager());
+
+
+                }
+
+            }
+        });
+
+    }
+
+    private void sendAllCommentReplyListRequest(Call<List<Reply>> call) {
+
+        call.enqueue(new Callback<List<Reply>>() {
+
+            @Override
+            public void onResponse(Call<List<Reply>> mCall, Response<List<Reply>> response) {
+
+
+                if(response.body()!=null){
+                    List<Reply> replyItem = response.body();
+                    Log.d("replyItem ",replyItem.toString());
+
+                    Intent intent = new Intent(mContext, ReplyPost.class);
+                    intent.putExtra(COMMENT_ITEM_KEY, (Parcelable) commentItem);
+                    intent.putExtra(POST_ITEM_KEY, (Parcelable) postItem);
+                    intent.putParcelableArrayListExtra(REPLY_ITEM_KEY, (ArrayList<? extends Parcelable>) replyItem);
+                    mContext.startActivity(intent);
+
+                }else {
+                    Intent intent = new Intent(mContext, ReplyPost.class);
+                    mContext.startActivity(intent);
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call<List<Reply>> call, Throwable t) {
+                Log.d("MESSAGE: ", t.getMessage());
+
+            }
+        });
     }
 
 
