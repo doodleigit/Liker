@@ -6,8 +6,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.doodle.Profile.model.Star;
 import com.doodle.R;
 
 import java.util.ArrayList;
@@ -15,9 +17,9 @@ import java.util.ArrayList;
 public class StarAdapter extends RecyclerView.Adapter<StarAdapter.ViewHolder> {
 
     private Context context;
-    private ArrayList<String> arrayList;
+    private ArrayList<Star> arrayList;
 
-    public StarAdapter(Context context, ArrayList<String> arrayList) {
+    public StarAdapter(Context context, ArrayList<Star> arrayList) {
         this.context = context;
         this.arrayList = arrayList;
     }
@@ -32,23 +34,24 @@ public class StarAdapter extends RecyclerView.Adapter<StarAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
-
+        viewHolder.tvName.setText(arrayList.get(i).getCategoryName());
     }
 
     @Override
     public int getItemCount() {
-//        return arrayList.size();
-        return 7;
+        return arrayList.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView tvName;
+        ImageView ivStar;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             tvName = itemView.findViewById(R.id.name);
+            ivStar = itemView.findViewById(R.id.star);
         }
     }
 

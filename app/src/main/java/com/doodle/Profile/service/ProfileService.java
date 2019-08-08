@@ -4,6 +4,7 @@ import com.doodle.Profile.model.AlbumPhoto;
 import com.doodle.Profile.model.AllFriend;
 import com.doodle.Profile.model.PhotoAlbum;
 import com.doodle.Profile.model.RecentPhoto;
+import com.doodle.Profile.model.Star;
 import com.doodle.utils.AppConstants;
 
 import java.util.ArrayList;
@@ -246,6 +247,169 @@ public interface ProfileService {
             @Field("link") String link,
             @Field("type") String type,
             @Field("permission_type") String permission_type
+    );
+
+    @POST(AppConstants.UPDATE_EDUCATION)
+    @FormUrlEncoded
+    Call<String> updateEducation(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String user_id,
+            @Field("institute_name") String institute_name,
+            @Field("institute_type") String institute_type,
+            @Field("degree_name") String degree_name,
+            @Field("field_study_name") String field_study_name,
+            @Field("website_url") String website_url,
+            @Field("location_name") String location_name,
+            @Field("permission_type") String permission_type,
+            @Field("grade") String grade,
+            @Field("start_year") String start_year,
+            @Field("end_year") String end_year,
+            @Field("description") String description,
+            @Field("location_actual_name") String location_actual_name,
+            @Field("location_country_name") String location_country_name,
+            @Field("location_latitude") String location_latitude,
+            @Field("location_longitude") String location_longitude
+    );
+
+    @POST(AppConstants.UPDATE_EXPERIENCE)
+    @FormUrlEncoded
+    Call<String> updateExperience(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String user_id,
+            @Field("designation_name") String designation_name,
+            @Field("company_name") String company_name,
+            @Field("website_url") String website_url,
+            @Field("from_date") String from_date,
+            @Field("to_date") String to_date,
+            @Field("currently_worked") boolean currently_worked,
+            @Field("permission_type") String permission_type,
+            @Field("description") String description,
+            @Field("location_name") String location_name,
+            @Field("location_actual_name") String location_actual_name,
+            @Field("location_country_name") String location_country_name,
+            @Field("location_latitude") String location_latitude,
+            @Field("location_longitude") String location_longitude
+    );
+
+    @POST(AppConstants.UPDATE_AWARDS)
+    @FormUrlEncoded
+    Call<String> updateAwards(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String user_id,
+            @Field("institute_name") String institute_name,
+            @Field("institute_type") String institute_type,
+            @Field("website_url") String website_url,
+            @Field("awards_name") String awards_name,
+            @Field("date") String date,
+            @Field("permission_type") String permission_type,
+            @Field("description") String description,
+            @Field("location_name") String location_name,
+            @Field("location_actual_name") String location_actual_name,
+            @Field("location_country_name") String location_country_name,
+            @Field("location_latitude") String location_latitude,
+            @Field("location_longitude") String location_longitude
+    );
+
+    @POST(AppConstants.UPDATE_CERTIFICATE)
+    @FormUrlEncoded
+    Call<String> updateCertificate(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String user_id,
+            @Field("institute_name") String institute_name,
+            @Field("institute_type") String institute_type,
+            @Field("website_url") String website_url,
+            @Field("certification_name") String certification_name,
+            @Field("license_number") String license_number,
+            @Field("certification_url") String certification_url,
+            @Field("from_date") String from_date,
+            @Field("is_expired") boolean is_expired,
+            @Field("to_date") String to_date,
+            @Field("permission_type") String permission_type,
+            @Field("media") String media,
+            @Field("location_name") String location_name,
+            @Field("location_actual_name") String location_actual_name,
+            @Field("location_country_name") String location_country_name,
+            @Field("location_latitude") String location_latitude,
+            @Field("location_longitude") String location_longitude
+    );
+
+    @POST(AppConstants.UPDATE_LINK)
+    @FormUrlEncoded
+    Call<String> updateLink(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String user_id,
+            @Field("link") String link,
+            @Field("type") String type,
+            @Field("permission_type") String permission_type
+    );
+
+    @POST(AppConstants.REMOVE_EDUCATION)
+    @FormUrlEncoded
+    Call<String> removeEducation(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String user_id,
+            @Field("education_id") String education_id
+    );
+
+    @POST(AppConstants.REMOVE_EXPERIENCE)
+    @FormUrlEncoded
+    Call<String> removeExperience(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String user_id,
+            @Field("experience_id") String experience_id
+    );
+
+    @POST(AppConstants.REMOVE_AWARDS)
+    @FormUrlEncoded
+    Call<String> removeAwards(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String user_id,
+            @Field("awards_id") String awards_id
+    );
+
+    @POST(AppConstants.REMOVE_CERTIFICATION)
+    @FormUrlEncoded
+    Call<String> removeCertification(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String user_id,
+            @Field("certification_id") String certification_id
+    );
+
+    @POST(AppConstants.REMOVE_LINKS)
+    @FormUrlEncoded
+    Call<String> removeSocialLinks(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String user_id,
+            @Field("link") String link
+    );
+
+    @POST(AppConstants.STAR_LIST)
+    @FormUrlEncoded
+    Call<ArrayList<Star>> getStarList(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("profile_username") String profile_username
     );
 
 }

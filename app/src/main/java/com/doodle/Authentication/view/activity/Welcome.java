@@ -681,12 +681,14 @@ public class Welcome extends AppCompatActivity implements View.OnClickListener, 
                     String json = gson.toJson(userInfo);
                     manager.setUserInfo(json);
                     String profileName = userInfo.getFirstName() + " " + userInfo.getLastName();
+                    String userName = userInfo.getUserName();
                     String photo = userInfo.getPhoto();
                     App.setProfilePhoto(photo);
                     String profileId = userInfo.getUserId();
                     manager.setProfileName(profileName);
                     manager.setProfileImage(POST_IMAGES + photo);
                     manager.setProfileId(profileId);
+                    manager.setUserName(userName);
                     //   startActivity(new Intent(Welcome.this, Liker.class));
 //                    Intent intent=new Intent(Welcome.this,Home.class);
 //                    intent.putExtra(USER_INFO_ITEM_KEY, (Parcelable) userInfo);

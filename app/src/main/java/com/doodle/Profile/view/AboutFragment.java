@@ -1,6 +1,9 @@
 package com.doodle.Profile.view;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -74,8 +77,11 @@ public class AboutFragment extends Fragment {
 
     private LinearLayout birthDayLayout, birthYearLayout, emailLayout, phoneLayout, addressLayout;
     private TextView tvFullName, tvGender, tvBirthDay, tvBirthYear, tvAddress, tvCity, tvCountry;
-    private ImageView ivAddEducation, ivAddExperience, ivAddAwards, ivAddCertificate, ivAddSocialLinks;
+    private ImageView ivEditUserInfo, ivAddEducation, ivAddExperience, ivAddAwards, ivAddCertificate, ivAddSocialLinks;
     private RecyclerView emailRecyclerView, phoneRecyclerView, storyRecyclerView, educationRecyclerView, experienceRecyclerView, awardsRecyclerView, certificationRecyclerView, socialRecyclerView;
+
+    private AlertDialog.Builder alertDialog;
+    private ProgressDialog progressDialog;
 
     private ProfileService profileService;
     private PrefManager manager;
@@ -142,6 +148,11 @@ public class AboutFragment extends Fragment {
         certificationAdapter = new CertificationAdapter(getActivity(), certifications);
         socialAdapter = new SocialAdapter(getActivity(), links);
 
+        alertDialog = new AlertDialog.Builder(getActivity());
+        progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage(getString(R.string.loading));
+        progressDialog.show();
+
         birthDayLayout = view.findViewById(R.id.birth_day_layout);
         birthYearLayout = view.findViewById(R.id.birth_year_layout);
         emailLayout = view.findViewById(R.id.email_layout);
@@ -154,6 +165,7 @@ public class AboutFragment extends Fragment {
         tvAddress = view.findViewById(R.id.address);
         tvCity = view.findViewById(R.id.city);
         tvCountry = view.findViewById(R.id.country);
+        ivEditUserInfo = view.findViewById(R.id.edit_user_info);
         ivAddEducation = view.findViewById(R.id.add_education);
         ivAddExperience = view.findViewById(R.id.add_experience);
         ivAddAwards = view.findViewById(R.id.add_awards);
@@ -195,34 +207,40 @@ public class AboutFragment extends Fragment {
     }
 
     private void initialAllClickListener() {
+        ivEditUserInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                editUserInfo();
+            }
+        });
         ivAddEducation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                addEducation(false, "");
+                addEducation(false, "", null);
             }
         });
         ivAddExperience.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                addExperience(false, "");
+                addExperience(false, "", null);
             }
         });
         ivAddAwards.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                addAwards(false, "");
+                addAwards(false, "", null);
             }
         });
         ivAddCertificate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                addCertification(false, "");
+                addCertification(false, "", null);
             }
         });
         ivAddSocialLinks.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                addSocialSites(false, "");
+                addSocialSites(false, "", null);
             }
         });
 
@@ -279,7 +297,54 @@ public class AboutFragment extends Fragment {
     boolean currentlyWorked, isExpired;
     List<String> privacyList;
 
-    private void addEducation(boolean isUpdate, String educationId) {
+    private void editUserInfo() {
+        Dialog dialog = new Dialog(getActivity(), R.style.Theme_Dialog);
+        dialog.setContentView(R.layout.edit_user_info_layout);
+
+        EditText etFirstName, etLastName, etHeadline, etAddress, etNewEmail, etNewPhone;
+        Spinner genderSpinner, birthYearSpinner, birthMonthSpinner, birthDaySpinner, emailPrivacySpinner, phonePrivacySpinner, livesCountrySpinner, livesStateSpinner, homeCountrySpinner,
+                homeStateSpinner;
+        RecyclerView emailRecyclerView, phoneRecyclerView;
+        Button btnCancel, btnEmailSave, btnPhoneCancel, btnPhoneSave, btnLivesCancel, btnLivesSave, btnHomeStateCancel, btnHomeStateSave;
+        FloatingActionButton fabDone;
+
+        etFirstName = dialog.findViewById(R.id.first_name);
+        etLastName = dialog.findViewById(R.id.last_name);
+        etHeadline = dialog.findViewById(R.id.headline);
+        etAddress = dialog.findViewById(R.id.address);
+        etNewEmail = dialog.findViewById(R.id.new_email);
+        etNewPhone = dialog.findViewById(R.id.new_phone);
+
+        genderSpinner = dialog.findViewById(R.id.gender_spinner);
+        birthYearSpinner = dialog.findViewById(R.id.birth_year_spinner);
+        birthMonthSpinner = dialog.findViewById(R.id.birth_month_spinner);
+        birthDaySpinner = dialog.findViewById(R.id.birth_day_spinner);
+        emailPrivacySpinner = dialog.findViewById(R.id.email_privacy_spinner);
+        phonePrivacySpinner = dialog.findViewById(R.id.phone_privacy_spinner);
+        livesCountrySpinner = dialog.findViewById(R.id.lives_country_spinner);
+        livesStateSpinner = dialog.findViewById(R.id.lives_state_spinner);
+        homeCountrySpinner = dialog.findViewById(R.id.home_country_spinner);
+        homeStateSpinner = dialog.findViewById(R.id.home_state_spinner);
+
+        emailRecyclerView = dialog.findViewById(R.id.email_recycler_view);
+        emailRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        phoneRecyclerView = dialog.findViewById(R.id.phone_recycler_view);
+        phoneRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        btnCancel = dialog.findViewById(R.id.cancel);
+        btnEmailSave = dialog.findViewById(R.id.email_save);
+        btnPhoneCancel = dialog.findViewById(R.id.phone_cancel);
+        btnPhoneSave = dialog.findViewById(R.id.phone_save);
+        btnLivesCancel = dialog.findViewById(R.id.lives_cancel);
+        btnLivesSave = dialog.findViewById(R.id.lives_save);
+        btnHomeStateCancel = dialog.findViewById(R.id.home_state_cancel);
+        btnHomeStateSave = dialog.findViewById(R.id.home_state_save);
+        fabDone = dialog.findViewById(R.id.done);
+
+        dialog.show();
+    }
+
+    private void addEducation(boolean isUpdate, String educationId, Education education) {
         Dialog dialog = new Dialog(getActivity(), R.style.Theme_Dialog);
         dialog.setContentView(R.layout.add_education_layout);
 
@@ -309,11 +374,13 @@ public class AboutFragment extends Fragment {
         }
 
         Toolbar toolbar = dialog.findViewById(R.id.toolbar);
+        Button btnRemove;
         EditText etInstituteName, etSearchPlace, etSiteAddress, etDegree, etStudyMajor, etGrade, etSummary;
         Spinner instituteSpinner, fromYearSpinner, toYearSpinner, privacySpinner;
         FloatingActionButton fabDone;
         RecyclerView institutionNameRecyclerView, searchPlaceRecyclerView;
 
+        btnRemove = dialog.findViewById(R.id.remove);
         etInstituteName = dialog.findViewById(R.id.institute_name);
         etSearchPlace = dialog.findViewById(R.id.search_place);
         etSiteAddress = dialog.findViewById(R.id.site_address);
@@ -381,10 +448,47 @@ public class AboutFragment extends Fragment {
         institutionNameRecyclerView.setAdapter(instituteSuggestionAdapter);
         searchPlaceRecyclerView.setAdapter(placeSuggestionAdapter);
 
+        if (isUpdate) {
+            btnRemove.setVisibility(View.VISIBLE);
+            instituteType = education.getInstituteType();
+            startYear = education.getStartYear();
+            endYear = education.getEndYear();
+            permissionType = education.getPermissionType();
+            instituteSpinner.setSelection(Integer.valueOf(education.getInstituteType()));
+            etInstituteName.setText(education.getInstituteName());
+            etSearchPlace.setText(education.getLocationName());
+            etSiteAddress.setText(education.getWebsiteUrl());
+            etDegree.setText(education.getDegreeName());
+            etGrade.setText(education.getGrade());
+            for (int i = 0; i < years.size(); i++) {
+                if (education.getStartYear().equals(String.valueOf(years.get(i)))) {
+                    fromYearSpinner.setSelection(i);
+                }
+            }
+            for (int i = 0; i < years.size(); i++) {
+                if (education.getEndYear().equals(String.valueOf(years.get(i)))) {
+                    toYearSpinner.setSelection(i);
+                }
+            }
+            etSummary.setText(education.getDescription());
+            privacySpinner.setSelection(Integer.valueOf(education.getPermissionType()));
+        } else {
+            btnRemove.setVisibility(View.GONE);
+        }
+
         toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dialog.dismiss();
+            }
+        });
+
+        btnRemove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String message = getString(R.string.are_you_sure) + " " + "education";
+                Call<String> call = profileService.removeEducation(deviceId, token, userIds, userIds, educationId);
+                showAlert(message, call, dialog);
             }
         });
 
@@ -495,7 +599,7 @@ public class AboutFragment extends Fragment {
         dialog.show();
     }
 
-    private void addExperience(boolean isUpdate, String experienceId) {
+    private void addExperience(boolean isUpdate, String experienceId, Experience experience) {
         Dialog dialog = new Dialog(getActivity(), R.style.Theme_Dialog);
         dialog.setContentView(R.layout.add_experience_layout);
 
@@ -530,12 +634,14 @@ public class AboutFragment extends Fragment {
         }
 
         Toolbar toolbar = dialog.findViewById(R.id.toolbar);
+        Button btnRemove;
         EditText etDesignation, etCompanyName, etSiteAddress, etSearchPlace, etSummary;
         Spinner fromYearSpinner, fromMonthSpinner, toYearSpinner, toMonthSpinner, privacySpinner;
         FloatingActionButton fabDone;
         CheckBox currentlyWorkingCheck;
         RecyclerView designationRecyclerView, companyNameRecyclerView, searchPlaceRecyclerView;
 
+        btnRemove = dialog.findViewById(R.id.remove);
         etDesignation = dialog.findViewById(R.id.designation);
         etCompanyName = dialog.findViewById(R.id.company_name);
         etSiteAddress = dialog.findViewById(R.id.site_address);
@@ -623,10 +729,53 @@ public class AboutFragment extends Fragment {
         searchPlaceRecyclerView.setAdapter(placeSuggestionAdapter);
         companyNameRecyclerView.setAdapter(companyNameSuggestionAdapter);
 
+        if (isUpdate) {
+            btnRemove.setVisibility(View.VISIBLE);
+            permissionType = experience.getPermissionType();
+            etDesignation.setText(experience.getDescription());
+            etCompanyName.setText(experience.getCompanyName());
+            etSiteAddress.setText(experience.getWebsiteUrl());
+            etSearchPlace.setText(experience.getLocationName());
+            etSummary.setText(experience.getDescription());
+            currentlyWorkingCheck.setChecked(experience.getCurrentlyWorked());
+            privacySpinner.setSelection(Integer.valueOf(experience.getPermissionType()));
+            for (int i = 0; i < years.size(); i++) {
+                if (experience.getFromYear().equals(String.valueOf(years.get(i)))) {
+                    fromYearSpinner.setSelection(i);
+                }
+            }
+            for (int i = 0; i < years.size(); i++) {
+                if (experience.getToYear().equals(String.valueOf(years.get(i)))) {
+                    toYearSpinner.setSelection(i);
+                }
+            }
+            for (int i = 0; i < years.size(); i++) {
+                if (experience.getFromMonth().equals(String.valueOf(months.get(i)))) {
+                    fromMonthSpinner.setSelection(i);
+                }
+            }
+            for (int i = 0; i < years.size(); i++) {
+                if (experience.getToMonth().equals(String.valueOf(months.get(i)))) {
+                    toMonthSpinner.setSelection(i);
+                }
+            }
+        } else {
+            btnRemove.setVisibility(View.GONE);
+        }
+
         toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dialog.dismiss();
+            }
+        });
+
+        btnRemove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String message = getString(R.string.are_you_sure) + " " + "experience";
+                Call<String> call = profileService.removeExperience(deviceId, token, userIds, userIds, experienceId);
+                showAlert(message, call, dialog);
             }
         });
 
@@ -788,7 +937,7 @@ public class AboutFragment extends Fragment {
         dialog.show();
     }
 
-    private void addAwards(boolean isUpdate, String awardsId) {
+    private void addAwards(boolean isUpdate, String awardsId, Awards awards) {
         Dialog dialog = new Dialog(getActivity(), R.style.Theme_Dialog);
         dialog.setContentView(R.layout.add_awards_layout);
 
@@ -819,6 +968,7 @@ public class AboutFragment extends Fragment {
         }
 
         Toolbar toolbar = dialog.findViewById(R.id.toolbar);
+        Button btnRemove = dialog.findViewById(R.id.remove);
         EditText etAwardsName, etInstituteName, etSiteAddress, etSearchPlace, etSummary;
         Spinner yearSpinner, monthSpinner, privacySpinner;
         FloatingActionButton fabDone;
@@ -906,10 +1056,43 @@ public class AboutFragment extends Fragment {
         searchPlaceRecyclerView.setAdapter(placeSuggestionAdapter);
         instituteNameRecyclerView.setAdapter(instituteNameSuggestionAdapter);
 
+        if (isUpdate) {
+            btnRemove.setVisibility(View.VISIBLE);
+            permissionType = awards.getPermissionType();
+            etAwardsName.setText(awards.getAwardName());
+            etInstituteName.setText(awards.getInstituteName());
+            etSiteAddress.setText(awards.getWebsiteUrl());
+            etSearchPlace.setText(awards.getLocationName());
+            etSummary.setText(awards.getDescription());
+            privacySpinner.setSelection(Integer.valueOf(awards.getPermissionType()));
+            //Need to work
+            for (int i = 0; i < years.size(); i++) {
+                if (awards.getYear().equals(String.valueOf(years.get(i)))) {
+                    yearSpinner.setSelection(i);
+                }
+            }
+            for (int i = 0; i < years.size(); i++) {
+                if (awards.getMonth().equals(String.valueOf(months.get(i)))) {
+                    monthSpinner.setSelection(i);
+                }
+            }
+        } else {
+            btnRemove.setVisibility(View.GONE);
+        }
+
         toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dialog.dismiss();
+            }
+        });
+
+        btnRemove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String message = getString(R.string.are_you_sure) + " " + "awards";
+                Call<String> call = profileService.removeAwards(deviceId, token, userIds, userIds, awardsId);
+                showAlert(message, call, dialog);
             }
         });
 
@@ -1028,7 +1211,7 @@ public class AboutFragment extends Fragment {
         dialog.show();
     }
 
-    private void addCertification(boolean isUpdate, String certificateId) {
+    private void addCertification(boolean isUpdate, String certificateId, Certification certification) {
         Dialog dialog = new Dialog(getActivity(), R.style.Theme_Dialog);
         dialog.setContentView(R.layout.add_certifications_layout);
 
@@ -1058,6 +1241,7 @@ public class AboutFragment extends Fragment {
         }
 
         Toolbar toolbar = dialog.findViewById(R.id.toolbar);
+        Button btnRemove;
         TextView tvFileName;
         EditText etCertificateName, etInstituteName, etSiteAddress, etSearchPlace, etCertificateNumber, etCertificateUrl;
         Spinner fromYearSpinner, toYearSpinner, privacySpinner;
@@ -1066,6 +1250,7 @@ public class AboutFragment extends Fragment {
         Button upload;
         RecyclerView certificateNameRecyclerView, instituteNameRecyclerView, searchPlaceRecyclerView;
 
+        btnRemove = dialog.findViewById(R.id.remove);
         tvFileName = dialog.findViewById(R.id.file_name);
         etCertificateName = dialog.findViewById(R.id.certificate_name);
         etInstituteName = dialog.findViewById(R.id.institute_name);
@@ -1151,10 +1336,46 @@ public class AboutFragment extends Fragment {
         searchPlaceRecyclerView.setAdapter(placeSuggestionAdapter);
         instituteNameRecyclerView.setAdapter(instituteNameSuggestionAdapter);
 
+        if (isUpdate) {
+            btnRemove.setVisibility(View.VISIBLE);
+            permissionType = certification.getPermissionType();
+
+            etCertificateName.setText(certification.getCertificationName());
+            etInstituteName.setText(certification.getInstituteName());
+            etSiteAddress.setText(certification.getWebsiteUrl());
+            etSearchPlace.setText(certification.getLocationName());
+            etCertificateNumber.setText(certification.getLicenseNumber());
+            etCertificateUrl.setText(certification.getCertificationUrl());
+            notExpireCheck.setChecked(certification.getIsExpired());
+            privacySpinner.setSelection(Integer.valueOf(certification.getPermissionType()));
+            //Need to work
+            for (int i = 0; i < years.size(); i++) {
+                if (certification.getFromYear().equals(String.valueOf(years.get(i)))) {
+                    fromYearSpinner.setSelection(i);
+                }
+            }
+            for (int i = 0; i < years.size(); i++) {
+                if (certification.getToYear().equals(String.valueOf(years.get(i)))) {
+                    toYearSpinner.setSelection(i);
+                }
+            }
+        } else {
+            btnRemove.setVisibility(View.GONE);
+        }
+
         toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dialog.dismiss();
+            }
+        });
+
+        btnRemove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String message = getString(R.string.are_you_sure) + " " + "certification";
+                Call<String> call = profileService.removeCertification(deviceId, token, userIds, userIds, certificateId);
+                showAlert(message, call, dialog);
             }
         });
 
@@ -1292,7 +1513,7 @@ public class AboutFragment extends Fragment {
         dialog.show();
     }
 
-    private void addSocialSites(boolean isUpdate, String socialSiteId) {
+    private void addSocialSites(boolean isUpdate, String socialSiteId, Links links) {
         Dialog dialog = new Dialog(getActivity(), R.style.Theme_Dialog);
         dialog.setContentView(R.layout.add_social_links_layout);
 
@@ -1303,12 +1524,13 @@ public class AboutFragment extends Fragment {
         List<String> urlTypes = Arrays.asList(getResources().getStringArray(R.array.url_type_list));
 
         Toolbar toolbar = dialog.findViewById(R.id.toolbar);
+        Button btnRemove;
         EditText etSiteAddress;
         Spinner urlTypeSpinner, privacySpinner;
         FloatingActionButton fabDone;
 
         etSiteAddress = dialog.findViewById(R.id.site_address);
-
+        btnRemove = dialog.findViewById(R.id.remove);
         urlTypeSpinner = dialog.findViewById(R.id.url_type_spinner);
         privacySpinner = dialog.findViewById(R.id.privacy_spinner);
 
@@ -1322,10 +1544,29 @@ public class AboutFragment extends Fragment {
         urlTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         urlTypeSpinner.setAdapter(urlTypeAdapter);
 
+        if (isUpdate) {
+            btnRemove.setVisibility(View.VISIBLE);
+            permissionType = links.getPermissionType();
+            etSiteAddress.setText(links.getLink());
+            urlTypeSpinner.setSelection(Integer.valueOf(links.getType()));
+            privacySpinner.setSelection(Integer.valueOf(links.getPermissionType()));
+        } else {
+            btnRemove.setVisibility(View.GONE);
+        }
+
         toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dialog.dismiss();
+            }
+        });
+
+        btnRemove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String message = getString(R.string.are_you_sure) + " " + "link";
+                Call<String> call = profileService.removeSocialLinks(deviceId, token, userIds, userIds, socialSiteId);
+                showAlert(message, call, dialog);
             }
         });
 
@@ -1491,6 +1732,32 @@ public class AboutFragment extends Fragment {
         });
     }
 
+    private void removeRequest(Call<String> call, Dialog dialog) {
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                String jsonResponse = response.body();
+                try {
+                    JSONObject obj = new JSONObject(jsonResponse);
+                    boolean status = obj.getBoolean("status");
+                    if (status) {
+                        getData();
+                        dialog.dismiss();
+                    } else {
+                        Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
     private void sendProfileInfoRequest(Call<String> call) {
         call.enqueue(new Callback<String>() {
 
@@ -1499,11 +1766,13 @@ public class AboutFragment extends Fragment {
                 String jsonResponse = response.body();
                 clearData();
                 getDataFromJson(jsonResponse);
+                progressDialog.hide();
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
                 Log.d("MESSAGE: ", t.getMessage());
+                progressDialog.hide();
             }
         });
     }
@@ -1701,6 +1970,21 @@ public class AboutFragment extends Fragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    private void showAlert(String message, Call<String> call, Dialog dialog) {
+        alertDialog.setMessage(message)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface d, int which) {
+                        removeRequest(call, dialog);
+                    }
+                })
+
+                // A null listener allows the button to dismiss the dialog and take no further action.
+                .setNegativeButton(android.R.string.no, null)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+
     }
 
 }

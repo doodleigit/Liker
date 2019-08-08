@@ -62,7 +62,7 @@ public class ProfileActivity extends AppCompatActivity {
     LinearLayout searchLayout;
     private RelativeLayout coverImageLayout, profileImageLayout;
     private ImageView ivCoverImage, ivProfileImage, ivChangeCoverImage, ivChangeProfileImage;
-    private TextView tvUserName;
+    private TextView tvUserName, tvTotalInfoCount;
 
     private ProfileService profileService;
     private ProgressDialog progressDialog;
@@ -93,7 +93,7 @@ public class ProfileActivity extends AppCompatActivity {
         profileId = manager.getProfileId();
         token = manager.getToken();
         fullName = manager.getProfileName();
-        profileImage = AppConstants.PROFILE_IMAGE + manager.getProfileImage();
+        profileImage = manager.getProfileImage();
 
         toolbar = findViewById(R.id.toolbar);
         searchLayout = findViewById(R.id.search_layout);
@@ -104,6 +104,7 @@ public class ProfileActivity extends AppCompatActivity {
         ivChangeCoverImage = findViewById(R.id.change_cover_image);
         ivChangeProfileImage = findViewById(R.id.change_profile_image);
         tvUserName = findViewById(R.id.user_name);
+        tvTotalInfoCount = findViewById(R.id.total_info_count);
         tabLayout = findViewById(R.id.tabs);
 //        viewPager = findViewById(R.id.viewpager);
 
@@ -145,6 +146,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void setData() {
         tvUserName.setText(fullName);
+
         Glide.with(App.getAppContext())
                 .load(profileImage)
                 .placeholder(R.drawable.profile)

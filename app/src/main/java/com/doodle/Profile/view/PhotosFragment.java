@@ -1,6 +1,7 @@
 package com.doodle.Profile.view;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -37,6 +38,8 @@ public class PhotosFragment extends Fragment {
     View view;
     private RecyclerView albumRecyclerView, photoRecyclerView;
 
+    private ProgressDialog progressDialog;
+
     private PhotoAlbumClickListener photoAlbumClickListener;
     private ProfileService profileService;
     private PrefManager manager;
@@ -60,6 +63,10 @@ public class PhotosFragment extends Fragment {
     }
 
     private void initialComponent() {
+        progressDialog = new ProgressDialog(getContext());
+        progressDialog.setMessage(getString(R.string.loading));
+        progressDialog.show();
+
         profileService = ProfileService.mRetrofit.create(ProfileService.class);
         manager = new PrefManager(getContext());
         photoAlbums = new ArrayList<>();
@@ -138,13 +145,13 @@ public class PhotosFragment extends Fragment {
                     photoAlbums.addAll(arrayList);
                     albumAdapter.notifyDataSetChanged();
                 }
-//                progressDialog.hide();
+                progressDialog.hide();
             }
 
             @Override
             public void onFailure(Call<ArrayList<PhotoAlbum>> call, Throwable t) {
                 Log.d("MESSAGE: ", t.getMessage());
-//                progressDialog.hide();
+                progressDialog.hide();
             }
         });
 
@@ -162,13 +169,13 @@ public class PhotosFragment extends Fragment {
                     recentPhotos.addAll(arrayList);
                     photoAdapter.notifyDataSetChanged();
                 }
-//                progressDialog.hide();
+                progressDialog.hide();
             }
 
             @Override
             public void onFailure(Call<ArrayList<RecentPhoto>> call, Throwable t) {
                 Log.d("MESSAGE: ", t.getMessage());
-//                progressDialog.hide();
+                progressDialog.hide();
             }
         });
 

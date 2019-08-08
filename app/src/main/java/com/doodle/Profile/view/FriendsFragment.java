@@ -1,5 +1,6 @@
 package com.doodle.Profile.view;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -30,6 +31,8 @@ public class FriendsFragment extends Fragment {
     View view;
     private RecyclerView recyclerView;
 
+    private ProgressDialog progressDialog;
+
     private ProfileService profileService;
     private PrefManager manager;
     private FriendsAdapter friendsAdapter;
@@ -50,6 +53,10 @@ public class FriendsFragment extends Fragment {
     }
 
     private void initialComponent() {
+        progressDialog = new ProgressDialog(getContext());
+        progressDialog.setMessage(getString(R.string.loading));
+        progressDialog.show();
+
         profileService = ProfileService.mRetrofit.create(ProfileService.class);
         manager = new PrefManager(getContext());
         friends = new ArrayList<>();
@@ -84,13 +91,13 @@ public class FriendsFragment extends Fragment {
                     friendsAdapter.notifyDataSetChanged();
                     offset += 10;
                 }
-//                progressDialog.hide();
+                progressDialog.hide();
             }
 
             @Override
             public void onFailure(Call<AllFriend> call, Throwable t) {
                 Log.d("MESSAGE: ", t.getMessage());
-//                progressDialog.hide();
+                progressDialog.hide();
             }
         });
 

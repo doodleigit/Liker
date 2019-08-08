@@ -24,6 +24,7 @@ public class PrefManager {
     private static final String DEVICE_ID = "device_id";
     private static final String OAUTH_TOKEN = "oauth_token";
     private static final String FB_FIRST_NAME = "first_name";
+    private static final String USER_NAME = "user_name";
     private static final String PROFILE_NAME = "profile_name";
     private static final String PROFILE_IMAGE = "profile_image";
     private static final String TWITTER_FIRST_NAME = "first_name";
@@ -195,6 +196,11 @@ public class PrefManager {
         editor.apply();
     }
 
+    public void setUserName(String userName) {
+        editor.putString(USER_NAME, userName);
+        editor.apply();
+    }
+
     public void setProfileImage(String profileImage) {
         editor.putString(PROFILE_IMAGE, profileImage);
         editor.apply();
@@ -274,6 +280,11 @@ public class PrefManager {
     public String getProfileName() {
 
         return pref.getString(PROFILE_NAME, "");
+    }
+
+    public String getUserName() {
+
+        return pref.getString(USER_NAME, "");
     }
 
     public String getProfileId() {

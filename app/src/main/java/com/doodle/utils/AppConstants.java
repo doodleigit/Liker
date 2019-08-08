@@ -63,8 +63,8 @@ public class AppConstants {
     public static final String MIM_IMAGE = BASE_URL_MEDIA + "assets/nimg/";
     public static final String Link_IMAGE_PATH = BASE_URL_MEDIA + "uploads/link_images/";
     public static final String YOUTUBE_IMAGE_PATH = BASE_URL_MEDIA + "uploads/youtube/main_img/";
-   //https://www.cdn-liker.com/stg-static/uploads/post_images/5d2dafdfe9487.jpg
-   //https://www.cdn-liker.com/stg-static/uploads/post_videos/thumb/1ovh2hg2jy5qwenx.png
+    //https://www.cdn-liker.com/stg-static/uploads/post_images/5d2dafdfe9487.jpg
+    //https://www.cdn-liker.com/stg-static/uploads/post_videos/thumb/1ovh2hg2jy5qwenx.png
 
     //ADVANCE SEARCH
 
@@ -85,7 +85,7 @@ public class AppConstants {
     public static boolean IN_CHAT_MODE = false;
 
 
-   // http://192.168.0.77:8040/sites/likeropt/isDuplicateFile
+    // http://192.168.0.77:8040/sites/likeropt/isDuplicateFile
 
     //FEED
 
@@ -123,9 +123,21 @@ public class AppConstants {
     public static final String GET_AWARDS_SUGGESTION = "get_award_suggestions";
     public static final String GET_CERTIFICATE_SUGGESTION = "get_certification_suggestions";
     public static final String INSERT_EDUCATION = "insert_education";
+    public static final String UPDATE_EDUCATION = "update_education";
     public static final String INSERT_EXPERIENCE = "insert_experience";
+    public static final String UPDATE_EXPERIENCE = "update_experience";
     public static final String INSERT_AWARDS = "insert_award";
+    public static final String UPDATE_AWARDS = "update_award";
     public static final String INSERT_CERTIFICATE = "insert_certification";
+    public static final String UPDATE_CERTIFICATE = "update_certification";
     public static final String INSERT_LINK = "link_add";
+    public static final String UPDATE_LINK = "link_update";
+    public static final String REMOVE_EDUCATION = "remove_education";
+    public static final String REMOVE_EXPERIENCE = "remove_experience";
+    public static final String REMOVE_CERTIFICATION = "remove_certification";
+    public static final String REMOVE_AWARDS = "remove_awards";
+    public static final String REMOVE_LINKS = "remove_links";
+
+    public static final String STAR_LIST = "wallbadgelist";
 
 }
