@@ -284,7 +284,7 @@ public class ProfileActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == Crop.REQUEST_CROP && resultCode == RESULT_OK) {
-            uploadImage();
+//            uploadImage();
         }
         if (requestCode == REQUEST_TAKE_GALLERY_IMAGE) {
             if (resultCode == RESULT_OK) {

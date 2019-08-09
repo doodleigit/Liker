@@ -111,10 +111,11 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
 
     //EDIT COMMENT
     CommentListener commentListener;
-
+    Reply reply;
     public interface CommentListener {
 
         void onTitleClicked(Comment_ commentItem, int position);
+        void commentDelete(Comment_ commentItem, int position);
     }
     int position;
 
@@ -204,6 +205,7 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
         this.commentItem = commentItem;
         this.postItem = postItem;
         this.position = position;
+        this.reply = reply;
         //  userPostId = item.getPostId();
         commentPostId = commentItem.getPostId();
 
@@ -477,8 +479,7 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
                         }
 
                         if (id == R.id.deleteComment) {
-                            Toast.makeText(App.getAppContext(), "deleteComment : ", Toast.LENGTH_SHORT).show();
-                        }
+                            commentListener.commentDelete(commentItem,position);                        }
 
                         return true;
                     }

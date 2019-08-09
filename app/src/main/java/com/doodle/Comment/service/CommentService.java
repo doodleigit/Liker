@@ -192,4 +192,16 @@ user_id	26444*/
             @Field("post_id") String postId,
             @Field("user_id") String userIds
     );
+
+    @POST(AppConstants.DELETE_COMMENT_REPLY)
+    @FormUrlEncoded
+    Call<String> deleteCommentReply(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("commented_id") String commentId,
+            @Field("comment_reply_id") String commentReplyId,
+            @Field("post_id") String postId,
+            @Field("user_id") String userIds
+    );
 }

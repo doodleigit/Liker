@@ -99,6 +99,7 @@ public class AppConstants {
     public static final String EDIT_POST_COMMENT = "edit_postcomment";
     public static final String EDIT_COMMENT_REPLY = "edit_comment_reply";
     public static final String DELETE_POST_COMMENT = "delete_postcomment";
+    public static final String DELETE_COMMENT_REPLY = "delete_comment_reply";
 
     //Post share
     public static final String GET_POST_DETAILS = "get_postdetails";

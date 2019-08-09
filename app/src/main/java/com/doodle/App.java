@@ -47,6 +47,15 @@ public class App extends Application {
     private static String mSocketId;
     private static int commentCount;
     private static String profilePhoto;
+    private static boolean isFirstTimeShowReply;
+
+    public static boolean isIsFirstTimeShowReply() {
+        return isFirstTimeShowReply;
+    }
+
+    public static void setIsFirstTimeShowReply(boolean isFirstTimeShowReply) {
+        App.isFirstTimeShowReply = isFirstTimeShowReply;
+    }
 
     public static String getProfilePhoto() {
         return profilePhoto;

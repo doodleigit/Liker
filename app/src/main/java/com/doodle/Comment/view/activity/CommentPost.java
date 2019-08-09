@@ -55,6 +55,8 @@ import com.doodle.Comment.model.CommentItem;
 import com.doodle.Comment.model.CommentTextIndex;
 import com.doodle.Comment.model.Comment_;
 import com.doodle.Comment.model.LinkData;
+import com.doodle.Comment.model.Reply;
+import com.doodle.Comment.service.CommentImageHolder;
 import com.doodle.Comment.service.CommentLinkScriptHolder;
 import com.doodle.Comment.service.CommentService;
 import com.doodle.Comment.service.CommentTextHolder;
@@ -117,7 +119,8 @@ import static com.doodle.utils.Utils.isNullOrEmpty;
 public class CommentPost extends AppCompatActivity implements View.OnClickListener,
         CommentTextHolder.CommentListener,
         CommentLinkScriptHolder.CommentListener,
-        CommentYoutubeHolder.CommentListener {
+        CommentYoutubeHolder.CommentListener,
+        CommentImageHolder.CommentListener{
 
     private static final String TAG = "CommentPost";
     private List<Comment> commentList;
@@ -262,7 +265,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
         commentService = CommentService.mRetrofit.create(CommentService.class);
         webService = PostService.mRetrofit.create(PostService.class);
         //  Picasso.with(App.getInstance()).load(imageUrl).into(target);
-        adapter = new AllCommentAdapter(this, comment_list, postItem, this, this, this);
+        adapter = new AllCommentAdapter(this, comment_list, postItem, this, this, this,this);
         recyclerView.setAdapter(adapter);
         postId = postItem.getSharedPostId();
         userName.setText(String.format("%s %s", userInfo.getFirstName(), userInfo.getLastName()));
@@ -1037,21 +1040,24 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
 
     }
 
+
+Reply reply;
     @Override
     public void commentDelete(Comment_ commentItem, int position) {
         this.comment_Item = commentItem;
         this.position = position;
-//        if (networkOk) {
-//
-//            String commentId = commentItem.getId();
-//            String postId = commentItem.getPostId();
-//            Call<String> call = commentService.deletePostComment(deviceId, profileId, token, commentId, postId, userIds);
-//            sendDeleteCommentRequest(call);
-//            // delayLoadComment(mProgressBar);
-//        } else {
-//            Utils.showNetworkDialog(getSupportFragmentManager());
-//
-//        }
+
+        if (networkOk) {
+
+            String commentId = commentItem.getId();
+            String postId = commentItem.getPostId();
+            Call<String> call = commentService.deletePostComment(deviceId, profileId, token, commentId, postId, userIds);
+            sendDeleteCommentRequest(call);
+            // delayLoadComment(mProgressBar);
+        } else {
+            Utils.showNetworkDialog(getSupportFragmentManager());
+
+        }
     }
 
     private void sendDeleteCommentRequest(Call<String> call) {
@@ -1067,10 +1073,9 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
 
                             if (status) {
 
-                              //  comment_list.remove(comment_Item);
-                                adapter.deleteItem(position);
-                                adapter.notifyDataSetChanged();
-
+                                comment_list.remove(comment_Item);
+                               adapter.deleteItem(position);
+                              // adapter.notifyDataSetChanged();
 
                             }
 
