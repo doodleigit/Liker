@@ -8,12 +8,14 @@ import java.util.HashMap;
 public class AppConstants {
 
     //===============LOCAL SERVER==================
-//    public static final String BASE_URL = "http://192.168.0.99:8040/sites/likerapp/";
-//    public static final String BASE_URL_MEDIA = "http://192.168.0.99:8040/sites/likeropt/";
-//    public static final String SOCKET_WEB = "http://192.168.0.99:4001";
-//    public static final String SOCKET_MESSAGE = "http://192.168.0.99:4002";
-//    public static final String SOCKET_VIDEO = "http://192.168.0.99:4004";
-//    public static final String FACEBOOK_SHARE = "http://192.168.0.99:8040/sites/likerapp/public/posts/";
+//    public static final String BASE_URL = "http://192.168.0.77:8040/sites/likerapp/";
+//    public static final String BASE_URL_MEDIA = "http://192.168.0.77:8040/sites/likeropt/";
+//    public static final String BASE_URL_IMAGES = "http://192.168.0.77:8040/sites/likeropt/";
+//    public static final String LINK_IMAGES = "http://192.168.0.77:8040/sites/likeropt/uploads/link_images";
+//    public static final String SOCKET_WEB = "http://192.168.0.77:4001";
+//    public static final String SOCKET_MESSAGE = "http://192.168.0.77:4002";
+//    public static final String SOCKET_VIDEO = "http://192.168.0.77:4004";
+//    public static final String FACEBOOK_SHARE = "http://192.168.0.77:8040/sites/likerapp/public/posts/";
 //https://www.cdn-liker.com/stg-static/uploads/thumb/5d4025287ba0e.gif
 
     //==========================STG SERVER=====================
@@ -95,6 +97,8 @@ public class AppConstants {
     public static final String ADDED_COMMENTS = "added_comment";
     public static final String ADDED_COMMENT_REPLY = "add_comment_reply";
     public static final String EDIT_POST_COMMENT = "edit_postcomment";
+    public static final String EDIT_COMMENT_REPLY = "edit_comment_reply";
+    public static final String DELETE_POST_COMMENT = "delete_postcomment";
 
     //Post share
     public static final String GET_POST_DETAILS = "get_postdetails";
@@ -135,9 +139,12 @@ public class AppConstants {
     public static final String REMOVE_EDUCATION = "remove_education";
     public static final String REMOVE_EXPERIENCE = "remove_experience";
     public static final String REMOVE_CERTIFICATION = "remove_certification";
-    public static final String REMOVE_AWARDS = "remove_awards";
-    public static final String REMOVE_LINKS = "remove_links";
+    public static final String REMOVE_AWARDS = "remove_award";
+    public static final String REMOVE_LINKS = "link_remove";
 
     public static final String STAR_LIST = "wallbadgelist";
+    public static final String GET_USER_INFO_BY_USER_NAME = "getUserinfoByUserName";
+    public static final String UPLOAD_PROFILE_IMAGE = "updateProfilePicture";
+    public static final String UPLOAD_COVER_IMAGE = "add_cover_photo";
 
 }

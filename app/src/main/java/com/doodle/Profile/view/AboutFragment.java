@@ -376,6 +376,8 @@ public class AboutFragment extends Fragment {
         btnStorySave = dialog.findViewById(R.id.story_save);
         fabDone = dialog.findViewById(R.id.done);
 
+
+
         dialog.show();
     }
 
@@ -590,6 +592,16 @@ public class AboutFragment extends Fragment {
             }
         });
 
+        etInstituteName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (!b) {
+                    advanceSuggestions.clear();
+                    Objects.requireNonNull(institutionNameRecyclerView.getAdapter()).notifyDataSetChanged();
+                }
+            }
+        });
+
         instituteSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
@@ -793,16 +805,25 @@ public class AboutFragment extends Fragment {
                     toYearSpinner.setSelection(i);
                 }
             }
-            for (int i = 0; i < months.size(); i++) {
-                if (experience.getFromMonth().equals(String.valueOf(months.get(i)))) {
-                    fromMonthSpinner.setSelection(i);
+//            for (int i = 0; i < months.size(); i++) {
+////                if (experience.getFromMonth().equals(String.valueOf(months.get(i)))) {
+////                    fromMonthSpinner.setSelection(i);
+////                }
+////            }
+////            for (int i = 0; i < months.size(); i++) {
+////                if (experience.getToMonth().equals(String.valueOf(months.get(i)))) {
+////                    toMonthSpinner.setSelection(i);
+////                }
+////            }
+
+            try {
+                if (Integer.valueOf(experience.getFromMonth()) <= months.size()) {
+                    fromMonthSpinner.setSelection(Integer.valueOf(experience.getFromMonth()) - 1);
                 }
-            }
-            for (int i = 0; i < months.size(); i++) {
-                if (experience.getToMonth().equals(String.valueOf(months.get(i)))) {
-                    toMonthSpinner.setSelection(i);
+                if (Integer.valueOf(experience.getToMonth()) <= months.size()) {
+                    toMonthSpinner.setSelection(Integer.valueOf(experience.getToMonth()) - 1);
                 }
-            }
+            } catch (NumberFormatException ignored) { }
         } else {
             btnRemove.setVisibility(View.GONE);
         }
@@ -905,6 +926,16 @@ public class AboutFragment extends Fragment {
             }
         });
 
+        etDesignation.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (!b) {
+                    designations.clear();
+                    Objects.requireNonNull(designationRecyclerView.getAdapter()).notifyDataSetChanged();
+                }
+            }
+        });
+
         etCompanyName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -922,6 +953,16 @@ public class AboutFragment extends Fragment {
                     Call<String> call = profileService.getExperienceSuggestion(deviceId, token, userIds, "institute", etCompanyName.getText().toString());
                     getAdvanceSuggestion(call, advanceSuggestions, companyNameRecyclerView);
                 } else {
+                    advanceSuggestions.clear();
+                    companyNameRecyclerView.getAdapter().notifyDataSetChanged();
+                }
+            }
+        });
+
+        etCompanyName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (!b) {
                     advanceSuggestions.clear();
                     companyNameRecyclerView.getAdapter().notifyDataSetChanged();
                 }
@@ -1125,11 +1166,19 @@ public class AboutFragment extends Fragment {
                     yearSpinner.setSelection(i);
                 }
             }
-            for (int i = 0; i < months.size(); i++) {
-                if (awards.getMonth().equals(String.valueOf(months.get(i)))) {
-                    monthSpinner.setSelection(i);
+//            for (int i = 1; i < months.size(); i++) {
+//                if (awards.getMonth().equals(String.valueOf(months.get(i)))) {
+//                    monthSpinner.setSelection(i);
+//                }
+//            }
+
+            try {
+                if (Integer.valueOf(awards.getMonth()) <= months.size()) {
+                    monthSpinner.setSelection(Integer.valueOf(awards.getMonth()) - 1);
                 }
+            } catch (NumberFormatException ignored) {
             }
+
         } else {
             btnRemove.setVisibility(View.GONE);
         }
@@ -1210,6 +1259,16 @@ public class AboutFragment extends Fragment {
             }
         });
 
+        etAwardsName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (!b) {
+                    awardsNames.clear();
+                    Objects.requireNonNull(awardsNameRecyclerView.getAdapter()).notifyDataSetChanged();
+                }
+            }
+        });
+
         etInstituteName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -1229,6 +1288,16 @@ public class AboutFragment extends Fragment {
                 } else {
                     advanceSuggestions.clear();
                     instituteNameRecyclerView.getAdapter().notifyDataSetChanged();
+                }
+            }
+        });
+
+        etInstituteName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (!b) {
+                    advanceSuggestions.clear();
+                    Objects.requireNonNull(instituteNameRecyclerView.getAdapter()).notifyDataSetChanged();
                 }
             }
         });
@@ -1506,6 +1575,16 @@ public class AboutFragment extends Fragment {
             }
         });
 
+        etCertificateName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (!b) {
+                    certificateNames.clear();
+                    Objects.requireNonNull(certificateNameRecyclerView.getAdapter()).notifyDataSetChanged();
+                }
+            }
+        });
+
         etInstituteName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -1523,6 +1602,16 @@ public class AboutFragment extends Fragment {
                     Call<String> call = profileService.getCertificateSuggestion(deviceId, token, userIds, "institute", etInstituteName.getText().toString());
                     getAdvanceSuggestion(call, advanceSuggestions, instituteNameRecyclerView);
                 } else {
+                    advanceSuggestions.clear();
+                    instituteNameRecyclerView.getAdapter().notifyDataSetChanged();
+                }
+            }
+        });
+
+        etCertificateName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                if (!b) {
                     advanceSuggestions.clear();
                     instituteNameRecyclerView.getAdapter().notifyDataSetChanged();
                 }

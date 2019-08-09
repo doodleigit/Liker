@@ -96,22 +96,36 @@ public class CommentLinkScriptHolder extends RecyclerView.ViewHolder {
     //ReplyAllComment
     private ProgressBar mProgressBar;
     public static final String REPLY_ITEM_KEY = "reply_item_key";
+    public static final String REPLY_KEY = "reply_key";
     public static final String COMMENT_ITEM_KEY = "comment_item_key";
     public static final String POST_ITEM_KEY = "post_item_key";
     PostItem postItem;
+    Reply itemReply;
+    List<Reply> replyItem;
 
 
-    public CommentLinkScriptHolder(View itemView, Context context) {
+    //EDIT COMMENT
+    CommentListener listener;
+
+    public interface CommentListener {
+
+        void onTitleClicked(Comment_ commentItem, int position);
+    }
+
+    int position;
+
+    public CommentLinkScriptHolder(View itemView, Context context, final CommentListener listener) {
         super(itemView);
 
         mContext = context;
+        this.listener = listener;
         manager = new PrefManager(App.getAppContext());
         deviceId = manager.getDeviceId();
         profileId = manager.getProfileId();
         token = manager.getToken();
         userIds = manager.getProfileId();
-
-
+        itemReply = new Reply();
+        replyItem = new ArrayList<>();
         //tvPostContent = (ReadMoreTextView) itemView.findViewById(R.id.tvPostContent);
 
         star1 = itemView.findViewById(R.id.star1);
@@ -153,7 +167,7 @@ public class CommentLinkScriptHolder extends RecyclerView.ViewHolder {
         networkOk = NetworkHelper.hasNetworkAccess(mContext);
 
 
-        mProgressBar=itemView.findViewById(R.id.ProgressBar);
+        mProgressBar = itemView.findViewById(R.id.ProgressBar);
     }
 
 
@@ -176,9 +190,10 @@ public class CommentLinkScriptHolder extends RecyclerView.ViewHolder {
     int goldStar;
     int silverStar;
 
-    public void setItem(Comment_ commentItem, PostItem postItem) {
+    public void setItem(Comment_ commentItem, PostItem postItem, int position) {
 
         this.commentItem = commentItem;
+        this.position = position;
         this.postItem = postItem;
         //  userPostId = item.getPostId();
         commentPostId = commentItem.getPostId();
@@ -389,12 +404,12 @@ public class CommentLinkScriptHolder extends RecyclerView.ViewHolder {
                 popupCommentMenu.getMenuInflater().inflate(R.menu.post_comment_menu, popupCommentMenu.getMenu());
 
                 String commentUserId = commentItem.getUserId();
-                if(userIds.equalsIgnoreCase(commentUserId)){
+                if (userIds.equalsIgnoreCase(commentUserId)) {
                     popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(false);
                     popupCommentMenu.getMenu().findItem(R.id.blockUser).setVisible(false);
                     popupCommentMenu.getMenu().findItem(R.id.editComment).setVisible(true);
                     popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(true);
-                }else {
+                } else {
                     popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(true);
                     popupCommentMenu.getMenu().findItem(R.id.blockUser).setVisible(true);
                     popupCommentMenu.getMenu().findItem(R.id.editComment).setVisible(false);
@@ -420,8 +435,7 @@ public class CommentLinkScriptHolder extends RecyclerView.ViewHolder {
                             Toast.makeText(App.getAppContext(), "blockUser : ", Toast.LENGTH_SHORT).show();
                         }
                         if (id == R.id.editComment) {
-                            Toast.makeText(App.getAppContext(), "editComment : ", Toast.LENGTH_SHORT).show();
-
+                            listener.onTitleClicked(commentItem, position);
                         }
 
                         if (id == R.id.deleteComment) {
@@ -440,15 +454,25 @@ public class CommentLinkScriptHolder extends RecyclerView.ViewHolder {
             public void onClick(View v) {
                 AppCompatActivity activity = (AppCompatActivity) v.getContext();
 
-                if (networkOk) {
+                String commentReply = commentItem.getTotalReply();
+                if (Integer.parseInt(commentReply) > 0) {
+                    if (networkOk) {
 
-                    Call<List<Reply>> call = commentService.getPostCommentReplyList(deviceId, profileId, token, commentItem.getId(), "false", limit, offset, commentItem.getPostId(), userIds);
-                    sendAllCommentReplyListRequest(call);
-                    delayLoadComment(mProgressBar);
+                        Call<List<Reply>> call = commentService.getPostCommentReplyList(deviceId, profileId, token, commentItem.getId(), "false", limit, offset, commentItem.getPostId(), userIds);
+                        sendAllCommentReplyListRequest(call);
+                        delayLoadComment(mProgressBar);
+                    } else {
+                        Utils.showNetworkDialog(activity.getSupportFragmentManager());
+
+                    }
                 } else {
-                    Utils.showNetworkDialog(activity.getSupportFragmentManager());
+                    Intent intent = new Intent(mContext, ReplyPost.class);
+                    intent.putExtra(COMMENT_ITEM_KEY, (Parcelable) commentItem);
+                    intent.putExtra(POST_ITEM_KEY, (Parcelable) postItem);
+                    intent.putExtra(REPLY_ITEM_KEY, (Parcelable) itemReply);
+                    intent.putParcelableArrayListExtra(REPLY_KEY, (ArrayList<? extends Parcelable>) replyItem);
 
-
+                    mContext.startActivity(intent);
                 }
 
             }
@@ -464,17 +488,19 @@ public class CommentLinkScriptHolder extends RecyclerView.ViewHolder {
             public void onResponse(Call<List<Reply>> mCall, Response<List<Reply>> response) {
 
 
-                if(response.body()!=null){
-                    List<Reply> replyItem = response.body();
-                    Log.d("replyItem ",replyItem.toString());
+                if (response.body() != null) {
+                    replyItem = response.body();
+                    itemReply = replyItem.get(position);
+                    Log.d("replyItem ", replyItem.toString());
 
                     Intent intent = new Intent(mContext, ReplyPost.class);
                     intent.putExtra(COMMENT_ITEM_KEY, (Parcelable) commentItem);
                     intent.putExtra(POST_ITEM_KEY, (Parcelable) postItem);
-                    intent.putParcelableArrayListExtra(REPLY_ITEM_KEY, (ArrayList<? extends Parcelable>) replyItem);
+                    intent.putExtra(REPLY_ITEM_KEY, (Parcelable) itemReply);
+                    intent.putParcelableArrayListExtra(REPLY_KEY, (ArrayList<? extends Parcelable>) replyItem);
                     mContext.startActivity(intent);
 
-                }else {
+                } else {
                     Intent intent = new Intent(mContext, ReplyPost.class);
                     mContext.startActivity(intent);
                 }

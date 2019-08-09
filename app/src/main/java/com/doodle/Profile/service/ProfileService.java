@@ -5,6 +5,7 @@ import com.doodle.Profile.model.AllFriend;
 import com.doodle.Profile.model.PhotoAlbum;
 import com.doodle.Profile.model.RecentPhoto;
 import com.doodle.Profile.model.Star;
+import com.doodle.Profile.model.UserAllInfo;
 import com.doodle.utils.AppConstants;
 
 import java.util.ArrayList;
@@ -36,6 +37,37 @@ public interface ProfileService {
             @Header("User-Id") String userId,
             @Header("Security-Token") String token,
             @Field("user_id") String userIds
+    );
+
+    @POST(AppConstants.GET_USER_INFO_BY_USER_NAME)
+    @FormUrlEncoded
+    Call<UserAllInfo> getUserInfo(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("user_id") String userIds,
+            @Field("user_name") String userName,
+            @Field("get_followers") boolean getFollowers
+    );
+
+    @Multipart
+    @POST(AppConstants.UPLOAD_PROFILE_IMAGE)
+    Call<String> uploadProfileImage(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Part MultipartBody.Part file
+
+    );
+
+    @Multipart
+    @POST(AppConstants.UPLOAD_COVER_IMAGE)
+    Call<String> uploadCoverImage(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Part MultipartBody.Part file
+
     );
 
     @POST(AppConstants.FRIEND_LIST)
@@ -83,16 +115,6 @@ public interface ProfileService {
             @Field("user_id") String userIds,
             @Field("limit") int limit,
             @Field("offset") int offset
-    );
-
-    @Multipart
-    @POST(AppConstants.ADD_PHOTO)
-    Call<String> updateProfileImage(
-            @Header("Device-Id") String deviceId,
-            @Header("User-Id") String userId,
-            @Header("Security-Token") String token,
-            @Part MultipartBody.Part file
-
     );
 
     @POST(AppConstants.GET_PROFILE_INFO)

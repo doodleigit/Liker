@@ -1,8 +1,10 @@
 package com.doodle.Profile.adapter;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +15,7 @@ import com.doodle.App;
 import com.doodle.Profile.model.AlbumPhoto;
 import com.doodle.R;
 import com.doodle.utils.AppConstants;
+import com.github.chrisbanes.photoview.PhotoView;
 
 import java.util.ArrayList;
 
@@ -44,6 +47,13 @@ public class AlbumPhotoAdapter  extends RecyclerView.Adapter<AlbumPhotoAdapter.V
                 .centerCrop()
                 .dontAnimate()
                 .into(viewHolder.image);
+
+        viewHolder.image.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                viewFullImage(url);
+            }
+        });
     }
 
     @Override
@@ -60,6 +70,28 @@ public class AlbumPhotoAdapter  extends RecyclerView.Adapter<AlbumPhotoAdapter.V
 
             image = itemView.findViewById(R.id.image);
         }
+    }
+
+    private void viewFullImage(String url) {
+        Dialog dialog = new Dialog(context, R.style.Theme_Dialog);
+        dialog.setContentView(R.layout.image_full_view);
+
+        Toolbar toolbar = dialog.findViewById(R.id.toolbar);
+
+        PhotoView photoView = dialog.findViewById(R.id.photo_view);
+        Glide.with(App.getAppContext())
+                .load(url)
+                .dontAnimate()
+                .into(photoView);
+
+        toolbar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
     }
 
 }

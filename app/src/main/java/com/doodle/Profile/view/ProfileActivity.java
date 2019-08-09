@@ -31,6 +31,7 @@ import com.bumptech.glide.Glide;
 import com.doodle.App;
 import com.doodle.Post.service.PostService;
 import com.doodle.Profile.adapter.ViewPagerAdapter;
+import com.doodle.Profile.model.UserAllInfo;
 import com.doodle.Profile.service.ProfileService;
 import com.doodle.R;
 import com.doodle.Search.LikerSearch;
@@ -38,6 +39,9 @@ import com.doodle.utils.AppConstants;
 import com.doodle.utils.PrefManager;
 import com.doodle.utils.Utils;
 import com.soundcloud.android.crop.Crop;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -50,6 +54,8 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 import static android.widget.Toast.LENGTH_SHORT;
 import static android.widget.Toast.makeText;
@@ -68,22 +74,21 @@ public class ProfileActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
 
     private PrefManager manager;
+    private UserAllInfo userAllInfo;
     private Uri imageUri;
     private String profileUserId;
     private final int REQUEST_TAKE_CAMERA = 101;
     private final int REQUEST_TAKE_GALLERY_IMAGE = 102;
     private int uploadContentType = 0;
-    private String deviceId, profileId, token, fullName, profileImage, coverImage;
+    private String deviceId, profileId, token, userName, fullName, profileImage, coverImage, allCountInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         initialComponent();
-        setData();
-//        setupViewPager();
         setupTabIcons();
-
+        getData();
     }
 
     private void initialComponent() {
@@ -92,8 +97,7 @@ public class ProfileActivity extends AppCompatActivity {
         deviceId = manager.getDeviceId();
         profileId = manager.getProfileId();
         token = manager.getToken();
-        fullName = manager.getProfileName();
-        profileImage = manager.getProfileImage();
+        userName = manager.getUserName();
 
         toolbar = findViewById(R.id.toolbar);
         searchLayout = findViewById(R.id.search_layout);
@@ -110,7 +114,9 @@ public class ProfileActivity extends AppCompatActivity {
 
         profileService = ProfileService.mRetrofit.create(ProfileService.class);
         progressDialog = new ProgressDialog(this);
-        progressDialog.setMessage(getString(R.string.uploading));
+        progressDialog.setMessage(getString(R.string.loading));
+        progressDialog.setCancelable(false);
+        progressDialog.show();
 
         searchLayout.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -144,9 +150,23 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
-    private void setData() {
-        tvUserName.setText(fullName);
+    private void getData() {
+        Call<UserAllInfo> call = profileService.getUserInfo(deviceId, profileId, token, profileId, userName, true);
+        getUserInfo(call);
+    }
 
+    private void setData() {
+        fullName = userAllInfo.getFirstName() + " " + userAllInfo.getLastName();
+        profileImage = AppConstants.USER_UPLOADED_IMAGES + userAllInfo.getPhoto();
+        coverImage = AppConstants.USER_UPLOADED_IMAGES + userAllInfo.getCoverImage();
+        allCountInfo = userAllInfo.getTotalLikes() + " Likes " + userAllInfo.getTotalFollowers() + " Followers " + userAllInfo.getGoldStars() + " Stars";
+        tvUserName.setText(fullName);
+        tvTotalInfoCount.setText(allCountInfo);
+        loadProfileImage();
+        loadCoverImage();
+    }
+
+    private void loadProfileImage() {
         Glide.with(App.getAppContext())
                 .load(profileImage)
                 .placeholder(R.drawable.profile)
@@ -154,6 +174,14 @@ public class ProfileActivity extends AppCompatActivity {
                 .centerCrop()
                 .dontAnimate()
                 .into(ivProfileImage);
+    }
+
+    private void loadCoverImage() {
+        Glide.with(App.getAppContext())
+                .load(coverImage)
+                .centerCrop()
+                .dontAnimate()
+                .into(ivCoverImage);
     }
 
     private void initialFragment(Fragment fragment) {
@@ -226,8 +254,15 @@ public class ProfileActivity extends AppCompatActivity {
         File file = new File(path);
         RequestBody requestFile = RequestBody.create(MediaType.parse("image"), file);
         MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("picture", file.getName(), requestFile);
-        Call<String> mediaCall = profileService.updateProfileImage(deviceId, profileId, token, fileToUpload);
-//        sendImageRequest(mediaCall);
+        Call<String> mediaCall;
+        if (uploadContentType == 0) {
+            mediaCall = profileService.uploadProfileImage(deviceId, profileId, token, fileToUpload);
+        } else {
+            mediaCall = profileService.uploadCoverImage(deviceId, profileId, token, fileToUpload);
+        }
+        progressDialog.setMessage(getString(R.string.uploading));
+        progressDialog.show();
+        sendImageRequest(mediaCall);
     }
 
     @Override
@@ -248,7 +283,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == Crop.REQUEST_CROP && resultCode == RESULT_OK) {
+        if (requestCode == Crop.REQUEST_CROP) {
             uploadImage();
         }
         if (requestCode == REQUEST_TAKE_GALLERY_IMAGE) {
@@ -264,7 +299,7 @@ public class ProfileActivity extends AppCompatActivity {
         }
         if (requestCode == REQUEST_TAKE_CAMERA) {
             if (resultCode == RESULT_OK) {
-                cropImage(imageUri, imageUri);
+                cropImage(imageUri);
             } else {
                 Toast.makeText(this, "Cancel Camera Capture", Toast.LENGTH_SHORT).show();
             }
@@ -293,18 +328,20 @@ public class ProfileActivity extends AppCompatActivity {
                 ClipData.Item item = clipData.getItemAt(i);
                 uri = item.getUri();
             }
-            cropImage(uri, imageUri);
+            imageUri = uri;
+            cropImage(uri);
         } else {
             Uri uri = data.getData();
-            cropImage(uri, imageUri);
+            imageUri = uri;
+            cropImage(uri);
         }
     }
 
-    private void cropImage(Uri uri, Uri uriImage) {
+    private void cropImage(Uri uri) {
         if (uploadContentType == 0) {
-            Crop.of(uri, uriImage).asSquare().start(this);
+            Crop.of(uri, imageUri).asSquare().start(this);
         } else {
-            Crop.of(uri, uriImage).withAspect(5, 1).start(this);
+            Crop.of(uri, imageUri).withAspect(5, 1).start(this);
         }
     }
 
@@ -360,5 +397,58 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
     }
+
+    private void getUserInfo(Call<UserAllInfo> call) {
+        call.enqueue(new Callback<UserAllInfo>() {
+            @Override
+            public void onResponse(Call<UserAllInfo> call, Response<UserAllInfo> response) {
+                userAllInfo = response.body();
+                setData();
+                progressDialog.hide();
+            }
+
+            @Override
+            public void onFailure(Call<UserAllInfo> call, Throwable t) {
+                progressDialog.hide();
+            }
+        });
+    }
+
+       private void sendImageRequest(Call<String> call) {
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                try {
+                    JSONObject object = new JSONObject(response.body());
+                    boolean status = object.getBoolean("status");
+                    String message = object.getString("message");
+                    if (status) {
+                        String image = object.getString("image");
+                        if (uploadContentType == 0) {
+                            profileImage = image;
+                            loadProfileImage();
+                        } else {
+                            coverImage = image;
+                            loadCoverImage();
+                        }
+                        Toast.makeText(getApplicationContext(), message, LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Something went wrong.", LENGTH_SHORT).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                progressDialog.hide();
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Toast.makeText(getApplicationContext(), "Something went wrong.", LENGTH_SHORT).show();
+                progressDialog.hide();
+            }
+        });
+    }
+
+
 
 }

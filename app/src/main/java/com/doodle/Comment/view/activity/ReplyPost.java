@@ -38,6 +38,7 @@ import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -52,8 +53,10 @@ import com.doodle.Comment.model.Comment;
 import com.doodle.Comment.model.CommentItem;
 import com.doodle.Comment.model.Comment_;
 import com.doodle.Comment.model.Reply;
+import com.doodle.Comment.service.CommentLinkScriptHolder;
 import com.doodle.Comment.service.CommentService;
 import com.doodle.Comment.service.CommentTextHolder;
+import com.doodle.Comment.service.CommentYoutubeHolder;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.view.activity.PostShare;
 import com.doodle.Post.adapter.MentionUserAdapter;
@@ -96,6 +99,7 @@ import static android.widget.Toast.makeText;
 import static com.doodle.Comment.service.CommentTextHolder.COMMENT_ITEM_KEY;
 import static com.doodle.Comment.service.CommentTextHolder.POST_ITEM_KEY;
 import static com.doodle.Comment.service.CommentTextHolder.REPLY_ITEM_KEY;
+import static com.doodle.Comment.service.CommentTextHolder.REPLY_KEY;
 import static com.doodle.Home.service.TextHolder.ITEM_KEY;
 import static com.doodle.Post.view.activity.PostNew.isExternalStorageDocument;
 import static com.doodle.utils.MediaUtil.getDataColumn;
@@ -105,7 +109,10 @@ import static com.doodle.utils.MediaUtil.isMediaDocument;
 import static com.doodle.utils.Utils.getMD5EncryptedString;
 import static com.doodle.utils.Utils.isNullOrEmpty;
 
-public class ReplyPost extends AppCompatActivity implements View.OnClickListener, CommentTextHolder.ExcellentAdventureListener {
+public class ReplyPost extends AppCompatActivity implements View.OnClickListener,
+        CommentTextHolder.CommentListener,
+        CommentLinkScriptHolder.CommentListener,
+        CommentYoutubeHolder.CommentListener {
 
     private static final String TAG = "CommentPost";
     private List<Comment> commentList;
@@ -113,7 +120,6 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
     private RecyclerView recyclerView;
     private TextView userName;
     private Drawable mDrawable;
-    private ImageView imageSendComment;
     private EditText etComment;
 
     public CommentService commentService;
@@ -184,6 +190,12 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
     public static final String USER_ID_KEY = "user_id_key";
 
 
+    //Edit Comment
+    Comment_ comment_Item;
+    ImageView imageEditComment, imageSendComment;
+    private int position;
+    Reply replyItem;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -208,11 +220,16 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
         profileId = manager.getProfileId();
         token = manager.getToken();
         userIds = manager.getProfileId();
+        replyItem=new Reply();
 
         Gson gson = new Gson();
         String json = manager.getUserInfo();
         userInfo = gson.fromJson(json, UserInfo.class);
-        Log.d("userInfo", userInfo.toString());
+
+        imageSendComment = findViewById(R.id.imageSendComment);
+        imageEditComment = findViewById(R.id.imageEditComment);
+        imageSendComment.setOnClickListener(this);
+        imageEditComment.setOnClickListener(this);
 
         rootView = findViewById(R.id.main_activity_root_view);
         progressDialog = new ProgressDialog(this);
@@ -236,8 +253,8 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
 
         commentItem = getIntent().getExtras().getParcelable(COMMENT_ITEM_KEY);
         postItem = getIntent().getExtras().getParcelable(POST_ITEM_KEY);
-        Log.d("commentItem: ", commentItem.toString());
-        replyItems = getIntent().getExtras().getParcelableArrayList(REPLY_ITEM_KEY);
+        replyItems = getIntent().getExtras().getParcelableArrayList(REPLY_KEY);
+        replyItem = getIntent().getExtras().getParcelable(REPLY_ITEM_KEY);
 
 
         if (commentItem == null) {
@@ -273,7 +290,7 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
         commentService = CommentService.mRetrofit.create(CommentService.class);
         webService = PostService.mRetrofit.create(PostService.class);
         //  Picasso.with(App.getInstance()).load(imageUrl).into(target);
-        adapter = new AllCommentAdapter(this, comment_list, postItem,this);
+        adapter = new AllCommentAdapter(this, comment_list, postItem, this, this, this);
         recyclerView.setAdapter(adapter);
         postId = postItem.getSharedPostId();
         userName.setText(String.format("%s %s", userInfo.getFirstName(), userInfo.getLastName()));
@@ -649,6 +666,34 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
 
                 break;
 
+            case R.id.imageEditComment:
+                if (!isNullOrEmpty(mentionMessage)) {
+                    for (String temp : nameList) {
+                        name = temp;
+                    }
+                    if (commentText.contains(name)) {
+                        String text = commentText;
+                        String lastPlainText = text.substring((text.indexOf(name) + name.length()));
+                        mentionMessage += lastPlainText;
+                        commentText = mentionMessage;
+                    }
+                    hasMention = 1;
+                    commentType = 1;
+                }
+
+                if (!isNullOrEmpty(comment_Item.getCommentText())) {
+                    if (commentText.equalsIgnoreCase(comment_Item.getCommentText())) {
+                        etComment.getText().clear();
+                    } else {
+                        Call<Comment_> mCall = commentService.editCommentReply(deviceId, profileId, token, "1", "0", String.valueOf(replyItem.getId()), fileToUpload, "636", commentText, commentType, hasMention, true, linkUrl, mention, postId, userIds);
+                        sendCommentEditItemRequest(mCall);
+                        etComment.getText().clear();
+                    }
+                }
+
+
+                break;
+
             case R.id.imageEmoji:
                 emojiPopup.toggle();
                 break;
@@ -662,6 +707,55 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
                 }
                 break;
         }
+    }
+
+    private void sendCommentEditItemRequest(Call<Comment_> call) {
+
+        call.enqueue(new Callback<Comment_>() {
+
+            @Override
+            public void onResponse(Call<Comment_> call, Response<Comment_> response) {
+
+                Comment_ commentItems = response.body();
+                int insertId = commentItems.getInsertId();
+                Log.d("Data", commentItems.toString());
+                if (insertId > 0) {
+
+
+                    Comment_ commentItem = new Comment_();
+                    commentItem.setCommentImage(commentItems.getCommentImage());
+                    commentItem.setUserPhoto(userInfo.getPhoto());
+                    commentItem.setCommentType(String.valueOf(commentType));
+                    commentItem.setCommentText(commentItems.getCommentText());
+                    commentItem.setHasMention(String.valueOf(hasMention));
+                    commentItem.setCommentTextIndex(commentItems.getCommentTextIndex());
+                    commentItem.setLinkData(commentItems.getLinkData());
+                    commentItem.setUserId(profileId);
+                    commentItem.setUserFirstName(userInfo.getFirstName());
+                    commentItem.setUserLastName(userInfo.getLastName());
+                    commentItem.setUserGoldStars(userInfo.getGoldStars());
+                    commentItem.setUserSliverStars(userInfo.getSliverStars());
+                    long seconds = System.currentTimeMillis() / 1000;
+                    commentItem.setDateTime(String.valueOf(seconds));
+                    Log.d("comment: ", commentItem.toString());
+                    adapter.updateData(commentItem, position);
+                    progressDialog.dismiss();
+                    etComment.setText("");
+                    offset++;
+                    recyclerView.smoothScrollToPosition(0);
+                    // App.setCommentCount(1);
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call<Comment_> call, Throwable t) {
+                Log.d("MESSAGE: ", t.getMessage());
+
+            }
+        });
+
     }
 
 
@@ -892,40 +986,6 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
 
     private void sendCommentItemRequest(Call<Comment_> call) {
 
-
-  /*      call.enqueue(new Callback<String>() {
-
-
-            @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                Log.i("Response", response.body().toString());
-                //Toast.makeText()
-                if (response.isSuccessful()) {
-                    if (response.body() != null) {
-
-                        try {
-                            JSONObject object = new JSONObject(response.body());
-                            JSONObject successObject = object.getJSONObject("success");
-
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        Log.i("onSuccess", response.body().toString());
-                    } else {
-                        Log.i("onEmptyResponse", "Returned empty response");//Toast.makeText(getContext(),"Nothing returned",Toast.LENGTH_LONG).show();
-                    }
-                }
-
-            }
-
-            @Override
-            public void onFailure(Call<String> call, Throwable t) {
-                Log.d(TAG, t.getMessage());
-
-            }
-        });*/
-
         call.enqueue(new Callback<Comment_>() {
 
             @Override
@@ -979,11 +1039,28 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
     }
 
 
+    @Override
+    public void onTitleClicked(Comment_ commentItem, int position) {
+        this.comment_Item = commentItem;
+        this.position = position;
+        imageEditComment.setVisibility(View.VISIBLE);
+        imageSendComment.setVisibility(View.GONE);
+        etComment.setText(commentItem.getCommentText());
+        etComment.requestFocus();
+        etComment.postDelayed(new Runnable() {
+                                  @Override
+                                  public void run() {
+                                      InputMethodManager keyboard = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                                      keyboard.showSoftInput(etComment, 0);
+                                  }
+                              }
+                , 200);
+
+    }
 
     @Override
-    public void onTitleClicked( Comment_ commentItem) {
-        Log.d("item",commentItem.toString());
-        makeText(this, "TITLE", LENGTH_SHORT).show();
+    public void commentDelete(Comment_ commentItem, int position) {
+
     }
 
 
