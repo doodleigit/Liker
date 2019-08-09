@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.doodle.Profile.model.Links;
+import com.doodle.Profile.service.AboutComponentUpdateListener;
 import com.doodle.R;
 import com.doodle.utils.Utils;
 
@@ -21,10 +22,12 @@ public class SocialAdapter extends RecyclerView.Adapter<SocialAdapter.ViewHolder
 
     private Context context;
     private ArrayList<Links> arrayList;
+    private AboutComponentUpdateListener aboutComponentUpdateListener;
 
-    public SocialAdapter(Context context, ArrayList<Links> arrayList) {
+    public SocialAdapter(Context context, ArrayList<Links> arrayList, AboutComponentUpdateListener aboutComponentUpdateListener) {
         this.context = context;
         this.arrayList = arrayList;
+        this.aboutComponentUpdateListener = aboutComponentUpdateListener;
     }
 
     @NonNull
@@ -56,6 +59,13 @@ public class SocialAdapter extends RecyclerView.Adapter<SocialAdapter.ViewHolder
             public void onClick(View view) {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(finalInstituteSite));
                 context.startActivity(browserIntent);
+            }
+        });
+
+        viewHolder.ivEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                aboutComponentUpdateListener.onLinkUpdate(arrayList.get(i));
             }
         });
     }

@@ -594,6 +594,84 @@
 
                 </LinearLayout>
 
+                <TextView
+                    android:id="@+id/story_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Story Title"
+                    android:textColor="@color/colorBlack"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <EditText
+                        android:id="@+id/story_details"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="80dp"
+                        android:layout_marginTop="5dp"
+                        android:background="@drawable/rectangle_corner_round_five"
+                        android:hint=""
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp"
+                        android:textSize="14sp" />
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="5dp">
+
+                        <Button
+                            android:id="@+id/story_cancel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="35dp"
+                            android:layout_alignParentStart="true"
+                            android:background="@drawable/rectangle_corner_round_five"
+                            android:text="Cancel"
+                            android:textAllCaps="false"
+                            android:textSize="14sp" />
+
+                        <Spinner
+                            android:id="@+id/story_privacy_spinner"
+                            android:layout_width="wrap_content"
+                            android:layout_height="35dp"
+                            android:layout_marginEnd="10dp"
+                            android:layout_toStartOf="@+id/story_save"
+                            android:background="@drawable/rectangle_corner_round_five" />
+
+                        <Button
+                            android:id="@+id/story_save"
+                            android:layout_width="wrap_content"
+                            android:layout_height="35dp"
+                            android:layout_alignParentEnd="true"
+                            android:background="@drawable/rectangle_corner_round_six"
+                            android:text="Save"
+                            android:textAllCaps="false"
+                            android:textSize="14sp" />
+
+                    </RelativeLayout>
+
+                    <Spinner
+                        android:id="@+id/story_type_spinner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="35dp"
+                        android:layout_marginEnd="10dp"
+                        android:layout_marginTop="10dp"
+                        android:background="@drawable/rectangle_corner_round_five" />
+
+                    <android.support.v7.widget.RecyclerView
+                        android:id="@+id/story_recycler_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"/>
+
+                </LinearLayout>
+
             </LinearLayout>
 
         </android.support.v4.widget.NestedScrollView>

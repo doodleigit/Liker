@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.doodle.Profile.model.Awards;
+import com.doodle.Profile.service.AboutComponentUpdateListener;
 import com.doodle.R;
 import com.doodle.utils.Utils;
 
@@ -20,10 +21,12 @@ public class AwardsAdapter extends RecyclerView.Adapter<AwardsAdapter.ViewHolder
 
     private Context context;
     private ArrayList<Awards> arrayList;
+    private AboutComponentUpdateListener aboutComponentUpdateListener;
 
-    public AwardsAdapter(Context context, ArrayList<Awards> arrayList) {
+    public AwardsAdapter(Context context, ArrayList<Awards> arrayList, AboutComponentUpdateListener aboutComponentUpdateListener) {
         this.context = context;
         this.arrayList = arrayList;
+        this.aboutComponentUpdateListener = aboutComponentUpdateListener;
     }
 
 
@@ -46,6 +49,13 @@ public class AwardsAdapter extends RecyclerView.Adapter<AwardsAdapter.ViewHolder
         viewHolder.tvAwardsName.setText(awardsName);
         viewHolder.tvInstituteNameDuration.setText(instituteNameDuration);
         viewHolder.tvSummary.setText(summary);
+
+        viewHolder.ivEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                aboutComponentUpdateListener.onAwardsUpdate(arrayList.get(i));
+            }
+        });
     }
 
     @Override

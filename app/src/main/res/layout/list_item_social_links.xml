@@ -29,6 +29,6 @@
         android:layout_alignParentEnd="true"
         android:padding="10dp"
         android:src="@drawable/plus"
-        android:visibility="invisible"/>
+        android:visibility="visible"/>
 
 </RelativeLayout>

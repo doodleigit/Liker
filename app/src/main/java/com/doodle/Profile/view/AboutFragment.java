@@ -51,6 +51,7 @@ import com.doodle.Profile.model.Links;
 import com.doodle.Profile.model.Phone;
 import com.doodle.Profile.model.ProfileInfo;
 import com.doodle.Profile.model.Story;
+import com.doodle.Profile.service.AboutComponentUpdateListener;
 import com.doodle.Profile.service.ProfileService;
 import com.doodle.Profile.service.SuggestionClickListener;
 import com.doodle.R;
@@ -139,15 +140,6 @@ public class AboutFragment extends Fragment {
         token = manager.getToken();
         userIds = manager.getProfileId();
 
-        emailAdapter = new EmailAdapter(getActivity(), emails);
-        phoneAdapter = new PhoneAdapter(getActivity(), phones);
-        storyAdapter = new StoryAdapter(getActivity(), stories);
-        educationAdapter = new EducationAdapter(getActivity(), educations);
-        experienceAdapter = new ExperienceAdapter(getActivity(), experiences);
-        awardsAdapter = new AwardsAdapter(getActivity(), awards);
-        certificationAdapter = new CertificationAdapter(getActivity(), certifications);
-        socialAdapter = new SocialAdapter(getActivity(), links);
-
         alertDialog = new AlertDialog.Builder(getActivity());
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setMessage(getString(R.string.loading));
@@ -196,6 +188,42 @@ public class AboutFragment extends Fragment {
         socialRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         socialRecyclerView.setNestedScrollingEnabled(false);
 
+        AboutComponentUpdateListener aboutComponentUpdateListener = new AboutComponentUpdateListener() {
+            @Override
+            public void onEducationUpdate(Education education) {
+                addEducation(true, education.getId(), education);
+            }
+
+            @Override
+            public void onExperienceUpdate(Experience experience) {
+                addExperience(true, experience.getId(), experience);
+            }
+
+            @Override
+            public void onAwardsUpdate(Awards awards) {
+                addAwards(true, awards.getId(), awards);
+            }
+
+            @Override
+            public void onCertificationUpdate(Certification certification) {
+                addCertification(true, certification.getId(), certification);
+            }
+
+            @Override
+            public void onLinkUpdate(Links lnk) {
+                addSocialSites(true, lnk);
+            }
+        };
+
+        emailAdapter = new EmailAdapter(getActivity(), emails);
+        phoneAdapter = new PhoneAdapter(getActivity(), phones);
+        storyAdapter = new StoryAdapter(getActivity(), stories);
+        educationAdapter = new EducationAdapter(getActivity(), educations, aboutComponentUpdateListener);
+        experienceAdapter = new ExperienceAdapter(getActivity(), experiences, aboutComponentUpdateListener);
+        awardsAdapter = new AwardsAdapter(getActivity(), awards, aboutComponentUpdateListener);
+        certificationAdapter = new CertificationAdapter(getActivity(), certifications, aboutComponentUpdateListener);
+        socialAdapter = new SocialAdapter(getActivity(), links, aboutComponentUpdateListener);
+
         emailRecyclerView.setAdapter(emailAdapter);
         phoneRecyclerView.setAdapter(phoneAdapter);
         storyRecyclerView.setAdapter(storyAdapter);
@@ -240,7 +268,7 @@ public class AboutFragment extends Fragment {
         ivAddSocialLinks.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                addSocialSites(false, "", null);
+                addSocialSites(false, null);
             }
         });
 
@@ -291,7 +319,7 @@ public class AboutFragment extends Fragment {
         }
     }
 
-    String instituteName = "", instituteType = "", designationName = "", companyName = "", awardsName = "", certificationName = "", licenseNumber = "", certificationUrl = "", degreeName = "", link = "", type = "",
+    String instituteName = "", instituteType = "", designationName = "", companyName = "", awardsName = "", certificationName = "", licenseNumber = "", certificationUrl = "", degreeName = "", oldLink = "", link = "", type = "",
             fieldStudyName = "", websiteUrl = "", locationName = "", permissionType = "", grade = "", date = "", startYear = "", endYear = "", fromDate = "", toDate = "", description = "", media = "",
             locationActualName = "", locationCountryName = "", locationLatitude = "", locationLongitude = "";
     boolean currentlyWorked, isExpired;
@@ -301,19 +329,22 @@ public class AboutFragment extends Fragment {
         Dialog dialog = new Dialog(getActivity(), R.style.Theme_Dialog);
         dialog.setContentView(R.layout.edit_user_info_layout);
 
-        EditText etFirstName, etLastName, etHeadline, etAddress, etNewEmail, etNewPhone;
+        TextView tvStoryTitle;
+        EditText etFirstName, etLastName, etHeadline, etAddress, etNewEmail, etNewPhone, etStoryDetails;
         Spinner genderSpinner, birthYearSpinner, birthMonthSpinner, birthDaySpinner, emailPrivacySpinner, phonePrivacySpinner, livesCountrySpinner, livesStateSpinner, homeCountrySpinner,
-                homeStateSpinner;
-        RecyclerView emailRecyclerView, phoneRecyclerView;
-        Button btnCancel, btnEmailSave, btnPhoneCancel, btnPhoneSave, btnLivesCancel, btnLivesSave, btnHomeStateCancel, btnHomeStateSave;
+                homeStateSpinner, story_privacy_spinner, story_type_spinner;
+        RecyclerView emailRecyclerView, phoneRecyclerView, storyRecycleView;
+        Button btnCancel, btnEmailSave, btnPhoneCancel, btnPhoneSave, btnLivesCancel, btnLivesSave, btnHomeStateCancel, btnHomeStateSave, btnStoryCancel, btnStorySave;
         FloatingActionButton fabDone;
 
+        tvStoryTitle = dialog.findViewById(R.id.story_title);
         etFirstName = dialog.findViewById(R.id.first_name);
         etLastName = dialog.findViewById(R.id.last_name);
         etHeadline = dialog.findViewById(R.id.headline);
         etAddress = dialog.findViewById(R.id.address);
         etNewEmail = dialog.findViewById(R.id.new_email);
         etNewPhone = dialog.findViewById(R.id.new_phone);
+        etStoryDetails = dialog.findViewById(R.id.story_details);
 
         genderSpinner = dialog.findViewById(R.id.gender_spinner);
         birthYearSpinner = dialog.findViewById(R.id.birth_year_spinner);
@@ -330,6 +361,8 @@ public class AboutFragment extends Fragment {
         emailRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         phoneRecyclerView = dialog.findViewById(R.id.phone_recycler_view);
         phoneRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        storyRecycleView = dialog.findViewById(R.id.story_recycler_view);
+        storyRecycleView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         btnCancel = dialog.findViewById(R.id.cancel);
         btnEmailSave = dialog.findViewById(R.id.email_save);
@@ -339,6 +372,8 @@ public class AboutFragment extends Fragment {
         btnLivesSave = dialog.findViewById(R.id.lives_save);
         btnHomeStateCancel = dialog.findViewById(R.id.home_state_cancel);
         btnHomeStateSave = dialog.findViewById(R.id.home_state_save);
+        btnStoryCancel = dialog.findViewById(R.id.story_cancel);
+        btnStorySave = dialog.findViewById(R.id.story_save);
         fabDone = dialog.findViewById(R.id.done);
 
         dialog.show();
@@ -519,9 +554,16 @@ public class AboutFragment extends Fragment {
                 grade = etGrade.getText().toString();
                 description = etSummary.getText().toString();
 
-                Call<String> call = profileService.addEducation(deviceId, token, userIds, userIds, instituteName, instituteType, degreeName, fieldStudyName, websiteUrl, locationName, permissionType,
-                        grade, startYear, endYear, description, locationActualName, locationCountryName, locationLatitude, locationLongitude);
-                addEducationRequest(call, dialog);
+                if (isUpdate) {
+                    Call<String> call = profileService.updateEducation(deviceId, token, userIds, userIds, educationId, instituteName, instituteType, degreeName, fieldStudyName, websiteUrl, locationName, permissionType,
+                            grade, startYear, endYear, description, locationActualName, locationCountryName, locationLatitude, locationLongitude);
+                    addEducationRequest(call, dialog);
+                } else {
+                    Call<String> call = profileService.addEducation(deviceId, token, userIds, userIds, instituteName, instituteType, degreeName, fieldStudyName, websiteUrl, locationName, permissionType,
+                            grade, startYear, endYear, description, locationActualName, locationCountryName, locationLatitude, locationLongitude);
+                    addEducationRequest(call, dialog);
+                }
+
             }
         });
 
@@ -738,6 +780,8 @@ public class AboutFragment extends Fragment {
             etSearchPlace.setText(experience.getLocationName());
             etSummary.setText(experience.getDescription());
             currentlyWorkingCheck.setChecked(experience.getCurrentlyWorked());
+            toYearSpinner.setEnabled(experience.getCurrentlyWorked());
+            toMonthSpinner.setEnabled(experience.getCurrentlyWorked());
             privacySpinner.setSelection(Integer.valueOf(experience.getPermissionType()));
             for (int i = 0; i < years.size(); i++) {
                 if (experience.getFromYear().equals(String.valueOf(years.get(i)))) {
@@ -749,12 +793,12 @@ public class AboutFragment extends Fragment {
                     toYearSpinner.setSelection(i);
                 }
             }
-            for (int i = 0; i < years.size(); i++) {
+            for (int i = 0; i < months.size(); i++) {
                 if (experience.getFromMonth().equals(String.valueOf(months.get(i)))) {
                     fromMonthSpinner.setSelection(i);
                 }
             }
-            for (int i = 0; i < years.size(); i++) {
+            for (int i = 0; i < months.size(); i++) {
                 if (experience.getToMonth().equals(String.valueOf(months.get(i)))) {
                     toMonthSpinner.setSelection(i);
                 }
@@ -803,9 +847,15 @@ public class AboutFragment extends Fragment {
                 description = etSummary.getText().toString();
                 locationName = etSearchPlace.getText().toString();
 
-                Call<String> call = profileService.addExperience(deviceId, token, userIds, userIds, designationName, companyName, websiteUrl, fromDate, toDate, currentlyWorked, permissionType, description,
-                        locationName, locationActualName, locationCountryName, locationLatitude, locationLongitude);
-                addExperienceRequest(call, dialog);
+                if (isUpdate) {
+                    Call<String> call = profileService.updateExperience(deviceId, token, userIds, userIds, experienceId, designationName, companyName, websiteUrl, fromDate, toDate, currentlyWorked, permissionType, description,
+                            locationName, locationActualName, locationCountryName, locationLatitude, locationLongitude);
+                    addExperienceRequest(call, dialog);
+                } else {
+                    Call<String> call = profileService.addExperience(deviceId, token, userIds, userIds, designationName, companyName, websiteUrl, fromDate, toDate, currentlyWorked, permissionType, description,
+                            locationName, locationActualName, locationCountryName, locationLatitude, locationLongitude);
+                    addExperienceRequest(call, dialog);
+                }
 
             }
         });
@@ -817,12 +867,16 @@ public class AboutFragment extends Fragment {
                     toYearSpinner.setBackgroundResource(R.drawable.rectangle_corner_round_nine);
                     toMonthSpinner.setBackgroundResource(R.drawable.rectangle_corner_round_nine);
                     toYearSpinner.setClickable(false);
+                    toYearSpinner.setEnabled(false);
                     toMonthSpinner.setClickable(false);
+                    toMonthSpinner.setEnabled(false);
                 } else {
                     toYearSpinner.setBackgroundResource(R.drawable.rectangle_corner_round_five);
                     toMonthSpinner.setBackgroundResource(R.drawable.rectangle_corner_round_five);
                     toYearSpinner.setClickable(true);
+                    toYearSpinner.setEnabled(true);
                     toMonthSpinner.setClickable(true);
+                    toMonthSpinner.setEnabled(true);
                 }
                 currentlyWorked = b;
             }
@@ -1071,7 +1125,7 @@ public class AboutFragment extends Fragment {
                     yearSpinner.setSelection(i);
                 }
             }
-            for (int i = 0; i < years.size(); i++) {
+            for (int i = 0; i < months.size(); i++) {
                 if (awards.getMonth().equals(String.valueOf(months.get(i)))) {
                     monthSpinner.setSelection(i);
                 }
@@ -1120,9 +1174,16 @@ public class AboutFragment extends Fragment {
                 description = etSummary.getText().toString();
                 locationName = etSearchPlace.getText().toString();
 
-                Call<String> call = profileService.addAwards(deviceId, token, userIds, userIds, instituteName, instituteType, websiteUrl, awardsName, date, permissionType, description,
-                        locationName, locationActualName, locationCountryName, locationLatitude, locationLongitude);
-                addAwardsRequest(call, dialog);
+                if (isUpdate) {
+                    Call<String> call = profileService.updateAwards(deviceId, token, userIds, userIds, awardsId, instituteName, instituteType, websiteUrl, awardsName, date, permissionType, description,
+                            locationName, locationActualName, locationCountryName, locationLatitude, locationLongitude);
+                    addAwardsRequest(call, dialog);
+                } else {
+                    Call<String> call = profileService.addAwards(deviceId, token, userIds, userIds, instituteName, instituteType, websiteUrl, awardsName, date, permissionType, description,
+                            locationName, locationActualName, locationCountryName, locationLatitude, locationLongitude);
+                    addAwardsRequest(call, dialog);
+                }
+
             }
         });
 
@@ -1347,6 +1408,7 @@ public class AboutFragment extends Fragment {
             etCertificateNumber.setText(certification.getLicenseNumber());
             etCertificateUrl.setText(certification.getCertificationUrl());
             notExpireCheck.setChecked(certification.getIsExpired());
+            toYearSpinner.setEnabled(certification.getIsExpired());
             privacySpinner.setSelection(Integer.valueOf(certification.getPermissionType()));
             //Need to work
             for (int i = 0; i < years.size(); i++) {
@@ -1408,9 +1470,16 @@ public class AboutFragment extends Fragment {
                 fromDate = fromYear[0] + "-01-01";
                 toDate = toYear[0] + "-01-01";
 
-                Call<String> call = profileService.addCertificate(deviceId, token, userIds, userIds, instituteName, instituteType, websiteUrl, certificationName, licenseNumber, certificationUrl,
-                        fromDate, isExpired, toDate, permissionType, media, locationName, locationActualName, locationCountryName, locationLatitude, locationLongitude);
-                addAwardsRequest(call, dialog);
+                if (isUpdate) {
+                    Call<String> call = profileService.updateCertificate(deviceId, token, userIds, userIds, certificateId, instituteName, instituteType, websiteUrl, certificationName, licenseNumber, certificationUrl,
+                            fromDate, isExpired, toDate, permissionType, media, locationName, locationActualName, locationCountryName, locationLatitude, locationLongitude);
+                    addAwardsRequest(call, dialog);
+                } else {
+                    Call<String> call = profileService.addCertificate(deviceId, token, userIds, userIds, instituteName, instituteType, websiteUrl, certificationName, licenseNumber, certificationUrl,
+                            fromDate, isExpired, toDate, permissionType, media, locationName, locationActualName, locationCountryName, locationLatitude, locationLongitude);
+                    addAwardsRequest(call, dialog);
+                }
+
             }
         });
 
@@ -1466,9 +1535,11 @@ public class AboutFragment extends Fragment {
                 if (b) {
                     toYearSpinner.setBackgroundResource(R.drawable.rectangle_corner_round_nine);
                     toYearSpinner.setClickable(false);
+                    toYearSpinner.setEnabled(false);
                 } else {
                     toYearSpinner.setBackgroundResource(R.drawable.rectangle_corner_round_five);
                     toYearSpinner.setClickable(true);
+                    toYearSpinner.setEnabled(true);
                 }
                 isExpired = b;
             }
@@ -1513,10 +1584,11 @@ public class AboutFragment extends Fragment {
         dialog.show();
     }
 
-    private void addSocialSites(boolean isUpdate, String socialSiteId, Links links) {
+    private void addSocialSites(boolean isUpdate, Links links) {
         Dialog dialog = new Dialog(getActivity(), R.style.Theme_Dialog);
         dialog.setContentView(R.layout.add_social_links_layout);
 
+        oldLink = "";
         link = "";
         type = "";
         permissionType = "0";
@@ -1546,6 +1618,7 @@ public class AboutFragment extends Fragment {
 
         if (isUpdate) {
             btnRemove.setVisibility(View.VISIBLE);
+            oldLink = links.getLink();
             permissionType = links.getPermissionType();
             etSiteAddress.setText(links.getLink());
             urlTypeSpinner.setSelection(Integer.valueOf(links.getType()));
@@ -1565,7 +1638,7 @@ public class AboutFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 String message = getString(R.string.are_you_sure) + " " + "link";
-                Call<String> call = profileService.removeSocialLinks(deviceId, token, userIds, userIds, socialSiteId);
+                Call<String> call = profileService.removeSocialLinks(deviceId, token, userIds, userIds, etSiteAddress.getText().toString());
                 showAlert(message, call, dialog);
             }
         });
@@ -1575,8 +1648,13 @@ public class AboutFragment extends Fragment {
             public void onClick(View view) {
                 link = etSiteAddress.getText().toString();
 
-                Call<String> call = profileService.addLink(deviceId, token, userIds, userIds, link, type, permissionType);
-                addAwardsRequest(call, dialog);
+                if (isUpdate) {
+                    Call<String> call = profileService.updateLink(deviceId, token, userIds, userIds, oldLink, link, type, permissionType);
+                    addAwardsRequest(call, dialog);
+                } else {
+                    Call<String> call = profileService.addLink(deviceId, token, userIds, userIds, link, type, permissionType);
+                    addAwardsRequest(call, dialog);
+                }
             }
         });
 
@@ -1736,19 +1814,21 @@ public class AboutFragment extends Fragment {
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                String jsonResponse = response.body();
-                try {
-                    JSONObject obj = new JSONObject(jsonResponse);
-                    boolean status = obj.getBoolean("status");
-                    if (status) {
-                        getData();
-                        dialog.dismiss();
-                    } else {
-                        Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+//                String jsonResponse = response.body();
+//                try {
+//                    JSONObject obj = new JSONObject(jsonResponse);
+//                    boolean status = obj.getBoolean("status");
+//                    if (status) {
+//                        getData();
+//                        dialog.dismiss();
+//                    } else {
+//                        Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+//                    }
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+                getData();
+                dialog.dismiss();
             }
 
             @Override

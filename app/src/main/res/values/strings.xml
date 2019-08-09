@@ -69,6 +69,12 @@
         <item>Sparkling Water</item>
     </string-array>
 
+    <string-array name="gender_list">
+        <item>Select</item>
+        <item>Male</item>
+        <item>Female</item>
+    </string-array>
+
     <string-array name="privacy_list">
         <item>Public</item>
         <item>Only Me</item>
@@ -109,6 +115,17 @@
         <item>Pinterest</item>
         <item>Google Plus</item>
         <item>YouTube</item>
+    </string-array>
+
+    <string-array name="story_type_list">
+        <item>About You</item>
+        <item>Early life</item>
+        <item>Family</item>
+        <item>Career</item>
+        <item>Background</item>
+        <item>Childhood</item>
+        <item>Personal life</item>
+        <item>intro</item>
     </string-array>
 
     <string name="grant">permission granted</string>

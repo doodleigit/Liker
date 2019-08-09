@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.doodle.Profile.model.Education;
+import com.doodle.Profile.service.AboutComponentUpdateListener;
 import com.doodle.R;
 
 import java.util.ArrayList;
@@ -20,10 +21,12 @@ public class EducationAdapter extends RecyclerView.Adapter<EducationAdapter.View
 
     private Context context;
     private ArrayList<Education> arrayList;
+    private AboutComponentUpdateListener aboutComponentUpdateListener;
 
-    public EducationAdapter(Context context, ArrayList<Education> arrayList) {
+    public EducationAdapter(Context context, ArrayList<Education> arrayList, AboutComponentUpdateListener aboutComponentUpdateListener) {
         this.context = context;
         this.arrayList = arrayList;
+        this.aboutComponentUpdateListener = aboutComponentUpdateListener;
     }
 
 
@@ -65,6 +68,13 @@ public class EducationAdapter extends RecyclerView.Adapter<EducationAdapter.View
             public void onClick(View view) {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(finalInstituteSite));
                 context.startActivity(browserIntent);
+            }
+        });
+
+        viewHolder.ivEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                aboutComponentUpdateListener.onEducationUpdate(arrayList.get(i));
             }
         });
     }

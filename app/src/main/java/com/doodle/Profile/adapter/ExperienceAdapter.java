@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.doodle.Profile.model.Experience;
+import com.doodle.Profile.service.AboutComponentUpdateListener;
 import com.doodle.R;
 
 import java.util.ArrayList;
@@ -18,12 +19,13 @@ public class ExperienceAdapter extends RecyclerView.Adapter<ExperienceAdapter.Vi
 
     private Context context;
     private ArrayList<Experience> arrayList;
+    private AboutComponentUpdateListener aboutComponentUpdateListener;
 
-    public ExperienceAdapter(Context context, ArrayList<Experience> arrayList) {
+    public ExperienceAdapter(Context context, ArrayList<Experience> arrayList, AboutComponentUpdateListener aboutComponentUpdateListener) {
         this.context = context;
         this.arrayList = arrayList;
+        this.aboutComponentUpdateListener = aboutComponentUpdateListener;
     }
-
 
     @NonNull
     @Override
@@ -52,6 +54,13 @@ public class ExperienceAdapter extends RecyclerView.Adapter<ExperienceAdapter.Vi
         viewHolder.tvCompanyName.setText(companyName);
         viewHolder.tvDuration.setText(duration);
         viewHolder.tvSummary.setText(summary);
+
+        viewHolder.ivEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                aboutComponentUpdateListener.onExperienceUpdate(arrayList.get(i));
+            }
+        });
     }
 
     @Override

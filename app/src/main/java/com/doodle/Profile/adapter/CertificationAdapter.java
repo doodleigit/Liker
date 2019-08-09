@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.doodle.Profile.model.Certification;
+import com.doodle.Profile.service.AboutComponentUpdateListener;
 import com.doodle.R;
 import com.doodle.utils.Utils;
 
@@ -21,10 +22,12 @@ public class CertificationAdapter extends RecyclerView.Adapter<CertificationAdap
 
     private Context context;
     private ArrayList<Certification> arrayList;
+    private AboutComponentUpdateListener aboutComponentUpdateListener;
 
-    public CertificationAdapter(Context context, ArrayList<Certification> arrayList) {
+    public CertificationAdapter(Context context, ArrayList<Certification> arrayList, AboutComponentUpdateListener aboutComponentUpdateListener) {
         this.context = context;
         this.arrayList = arrayList;
+        this.aboutComponentUpdateListener = aboutComponentUpdateListener;
     }
 
 
@@ -64,6 +67,13 @@ public class CertificationAdapter extends RecyclerView.Adapter<CertificationAdap
             public void onClick(View view) {
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(finalInstituteSite));
                 context.startActivity(browserIntent);
+            }
+        });
+
+        viewHolder.ivEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                aboutComponentUpdateListener.onCertificationUpdate(arrayList.get(i));
             }
         });
     }
