@@ -283,7 +283,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == Crop.REQUEST_CROP) {
+        if (requestCode == Crop.REQUEST_CROP && resultCode == RESULT_OK) {
             uploadImage();
         }
         if (requestCode == REQUEST_TAKE_GALLERY_IMAGE) {
@@ -299,7 +299,7 @@ public class ProfileActivity extends AppCompatActivity {
         }
         if (requestCode == REQUEST_TAKE_CAMERA) {
             if (resultCode == RESULT_OK) {
-                cropImage(imageUri);
+                cropImage(imageUri, imageUri);
             } else {
                 Toast.makeText(this, "Cancel Camera Capture", Toast.LENGTH_SHORT).show();
             }
@@ -328,20 +328,18 @@ public class ProfileActivity extends AppCompatActivity {
                 ClipData.Item item = clipData.getItemAt(i);
                 uri = item.getUri();
             }
-            imageUri = uri;
-            cropImage(uri);
+            cropImage(uri, imageUri);
         } else {
             Uri uri = data.getData();
-            imageUri = uri;
-            cropImage(uri);
+            cropImage(uri, imageUri);
         }
     }
 
-    private void cropImage(Uri uri) {
+    private void cropImage(Uri uri, Uri uriImage) {
         if (uploadContentType == 0) {
-            Crop.of(uri, imageUri).asSquare().start(this);
+            Crop.of(uri, uriImage).asSquare().start(this);
         } else {
-            Crop.of(uri, imageUri).withAspect(5, 1).start(this);
+            Crop.of(uri, uriImage).withAspect(5, 1).start(this);
         }
     }
 
