@@ -87,6 +87,17 @@ public class Comment_ implements Serializable, Parcelable {
     @SerializedName("replies")
     @Expose
     private List<Reply> replies = new ArrayList<Reply>();
+
+    @SerializedName("mention_insert_data")
+    @Expose
+    private List<Integer> mentionInsertData = new ArrayList<Integer>();
+
+    @SerializedName("status")
+    @Expose
+    private boolean status;
+
+
+
     public final static Creator<Comment_> CREATOR = new Creator<Comment_>() {
 
 
@@ -129,6 +140,8 @@ public class Comment_ implements Serializable, Parcelable {
         this.linkData = ((LinkData) in.readValue((LinkData.class.getClassLoader())));
         this.likeUserStatus = ((boolean) in.readValue((boolean.class.getClassLoader())));
         in.readList(this.replies, (Reply.class.getClassLoader()));
+        in.readList(this.mentionInsertData, (java.lang.Integer.class.getClassLoader()));
+        this.status = ((boolean) in.readValue((boolean.class.getClassLoader())));
     }
 
     public Comment_() {
@@ -198,6 +211,20 @@ public class Comment_ implements Serializable, Parcelable {
         this.commentTextIndex = commentTextIndex;
     }
 
+    public List<Integer> getMentionInsertData() {
+        return mentionInsertData;
+    }
+
+    public void setMentionInsertData(List<Integer> mentionInsertData) {
+        this.mentionInsertData = mentionInsertData;
+    }
+    public boolean isStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
     public String getCommentImage() {
         return commentImage;
     }
@@ -352,6 +379,9 @@ public class Comment_ implements Serializable, Parcelable {
         dest.writeValue(linkData);
         dest.writeValue(likeUserStatus);
         dest.writeList(replies);
+        dest.writeList(mentionInsertData);
+        dest.writeValue(status);
+
     }
 
     public int describeContents() {

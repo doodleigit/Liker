@@ -34,15 +34,13 @@ public interface CommentService {
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(15, TimeUnit.SECONDS)
             .build();
-    Gson gson = new GsonBuilder()
-            .setLenient()
-            .create();
+
 
     Retrofit mRetrofit = new Retrofit.Builder()
             .baseUrl(AppConstants.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(ScalarsConverterFactory.create())
-            .addConverterFactory(GsonConverterFactory.create(gson))
+            .addConverterFactory(GsonConverterFactory.create())
             .build();
 
 
@@ -76,6 +74,8 @@ public interface CommentService {
             @Field("post_id") String postId,
             @Field("user_id") String userIds
     );
+
+
 
     /*comment_id	95101
 is_public	false
@@ -141,7 +141,7 @@ user_id	26444*/
     );
 
 
-  @Multipart
+    @Multipart
     @POST(AppConstants.EDIT_POST_COMMENT)
     Call<Comment_> editPostComment(
             @Header("Device-Id") String deviceId,
@@ -161,18 +161,35 @@ user_id	26444*/
             @Part("user_id") String userIds
     );
 
-/*POST https://www.stg.liker.com/edit_postcomment
-change_comment_text	1
-change_image	0
-comment_id	92596
-comment_image
-comment_text	text  edit
-comment_type	1
-has_mention	0
-is_change	true
-link_url
-mention
-post_id	32993
-user_id	26445
- */
+    @Multipart
+    @POST(AppConstants.EDIT_COMMENT_REPLY)
+    Call<Comment_> editCommentReply(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Part("change_comment_text") String changeCommentText,
+            @Part("change_image") String changeImage,
+            @Part("comment_id") String commentId,
+            @Part MultipartBody.Part file,
+            @Part("comment_reply_id") String commentReplyId,
+            @Part("comment_text") String commentText,
+            @Part("comment_type") int commentType,
+            @Part("has_mention") int hasMention,
+            @Part("is_change") boolean isChange,
+            @Part("link_url") String linkUrl,
+            @Part("mention") String mention,
+            @Part("post_id") String postId,
+            @Part("user_id") String userIds
+    );
+
+    @POST(AppConstants.DELETE_POST_COMMENT)
+    @FormUrlEncoded
+    Call<String> deletePostComment(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("commented_id") String commentId,
+            @Field("post_id") String postId,
+            @Field("user_id") String userIds
+    );
 }

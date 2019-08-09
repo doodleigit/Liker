@@ -36,13 +36,22 @@ public class AllCommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private int size = 0;
 
     private CallBack mCallBack;
-    private CommentTextHolder.ExcellentAdventureListener adventureListener;
+    private CommentLinkScriptHolder.CommentListener commentLinkListener;
+    private CommentTextHolder.CommentListener commentListener;
+    private CommentYoutubeHolder.CommentListener commentYoutubeListener;
 
-    public AllCommentAdapter(Context context, List<Comment_> comment_list, PostItem postItem,CommentTextHolder.ExcellentAdventureListener adventureListener) {
+    public AllCommentAdapter(Context context, List<Comment_> comment_list, PostItem postItem,
+                             CommentTextHolder.CommentListener commentListener,
+                             CommentLinkScriptHolder.CommentListener commentLinkListener,
+                             CommentYoutubeHolder.CommentListener commentYoutubeListener
+
+    ) {
         this.mContext = context;
         this.comment_list = comment_list;
         this.postItem = postItem;
-        this.adventureListener = adventureListener;
+        this.commentListener = commentListener;
+        this.commentLinkListener = commentLinkListener;
+        this.commentYoutubeListener = commentYoutubeListener;
         if (comment_list != null && !comment_list.isEmpty()) {
             size = comment_list.size();
         }
@@ -54,7 +63,7 @@ public class AllCommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         View view;
         if (viewType == VIEW_TYPE_TEXT) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_comment_text, parent, false);
-            return new CommentTextHolder(view, mContext,adventureListener);
+            return new CommentTextHolder(view, mContext, commentListener);
         }
 
 
@@ -66,13 +75,13 @@ public class AllCommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         if (viewType == VIEW_TYPE_TEXT_LINK_SCRIPT) {
 
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_comment_linkscript, parent, false);
-            return new CommentLinkScriptHolder(view, mContext);
+            return new CommentLinkScriptHolder(view, mContext, commentLinkListener);
         }
 
         if (viewType == VIEW_TYPE_TEXT_LINK_SCRIPT_YOUTUBE) {
 
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_comment_youtube, parent, false);
-            return new CommentYoutubeHolder(view, mContext);
+            return new CommentYoutubeHolder(view, mContext, commentYoutubeListener);
         }
 
         return null;
@@ -83,22 +92,22 @@ public class AllCommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         if (viewHolder instanceof CommentTextHolder) {
             CommentTextHolder vh = (CommentTextHolder) viewHolder;
-            vh.setItem(comment_list.get(position), postItem);
+            vh.setItem(comment_list.get(position), postItem, position);
         }
 
 
         if (viewHolder instanceof CommentLinkScriptHolder) {
             CommentLinkScriptHolder vh = (CommentLinkScriptHolder) viewHolder;
-            vh.setItem(comment_list.get(position),postItem);
+            vh.setItem(comment_list.get(position), postItem, position);
         }
         if (viewHolder instanceof CommentYoutubeHolder) {
             CommentYoutubeHolder vh = (CommentYoutubeHolder) viewHolder;
-            vh.setItem(comment_list.get(position),postItem);
+            vh.setItem(comment_list.get(position), postItem, position);
         }
         if (viewHolder instanceof CommentImageHolder) {
             CommentImageHolder vh = (CommentImageHolder) viewHolder;
 //            vh.setItem(postItems.get(position), comments.get(position));
-            vh.setItem(comment_list.get(position),postItem);
+            vh.setItem(comment_list.get(position), postItem);
         }
 
     }
@@ -109,10 +118,13 @@ public class AllCommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         return size;
     }
 
+
+
     @Override
     public int getItemViewType(int position) {
 
         String commentType = comment_list.get(position).getCommentType();
+
         int viewType = Integer.parseInt(commentType);
         switch (viewType) {
             case 1:
@@ -153,8 +165,8 @@ public class AllCommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     public void refreshData(Comment_ commentItem) {
 
-        if(comment_list.size()>0){
-            comment_list.add(0,commentItem);
+        if (comment_list.size() > 0) {
+            comment_list.add(0, commentItem);
             size = comment_list.size();
             notifyDataSetChanged();
         } else {
@@ -164,9 +176,32 @@ public class AllCommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
     }
 
+    public void updateData(Comment_ commentItem, int position) {
+
+        if (comment_list.size() > 0) {
+            comment_list.set(position, commentItem);
+            size = comment_list.size();
+            notifyItemChanged(position);
+        } else {
+            comment_list.set(position, commentItem);
+            size = comment_list.size();
+            notifyItemChanged(position);
+        }
+    }
+
     public interface CallBack {
         void myCommentCallBack();
 
     }
+
+    public void deleteItem(int position) {
+
+        comment_list.remove(position);
+        notifyItemRemoved(position);
+        notifyItemRangeChanged(position, comment_list.size());
+
+    }
+
+
 
 }
