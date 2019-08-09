@@ -107,10 +107,21 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
     Reply itemReply;
     List<Reply> replyItem;
 
-    public CommentImageHolder(View itemView, Context context) {
+    CommentListener listener;
+    String replyId = "";
+    Reply reply;
+    public interface CommentListener {
+
+        void onTitleClicked(Comment_ commentItem, int position);
+        void commentDelete(Comment_ commentItem, int position);
+    }
+
+
+    public CommentImageHolder(View itemView, Context context, final CommentListener listener) {
         super(itemView);
 
         mContext = context;
+        this.listener = listener;
         manager = new PrefManager(App.getAppContext());
         deviceId = manager.getDeviceId();
         profileId = manager.getProfileId();
@@ -182,11 +193,14 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
 
     int goldStar;
     int silverStar;
+    int position;
 
-    public void setItem(Comment_ commentItem, PostItem postItem) {
+    public void setItem(Comment_ commentItem, PostItem postItem, int position) {
 
         this.commentItem = commentItem;
         this.postItem = postItem;
+        this.position = position;
+
         //  userPostId = item.getPostId();
         commentPostId = commentItem.getPostId();
 
@@ -450,7 +464,7 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
                         }
 
                         if (id == R.id.deleteComment) {
-                            Toast.makeText(App.getAppContext(), "deleteComment : ", Toast.LENGTH_SHORT).show();
+                            listener.commentDelete(commentItem,position);
                         }
 
                         return true;

@@ -2,6 +2,7 @@ package com.doodle.Comment.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,11 +40,13 @@ public class AllCommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     private CommentLinkScriptHolder.CommentListener commentLinkListener;
     private CommentTextHolder.CommentListener commentListener;
     private CommentYoutubeHolder.CommentListener commentYoutubeListener;
+    private CommentImageHolder.CommentListener commentImageListener;
 
     public AllCommentAdapter(Context context, List<Comment_> comment_list, PostItem postItem,
                              CommentTextHolder.CommentListener commentListener,
                              CommentLinkScriptHolder.CommentListener commentLinkListener,
-                             CommentYoutubeHolder.CommentListener commentYoutubeListener
+                             CommentYoutubeHolder.CommentListener commentYoutubeListener,
+                             CommentImageHolder.CommentListener commentImageListener
 
     ) {
         this.mContext = context;
@@ -52,6 +55,7 @@ public class AllCommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         this.commentListener = commentListener;
         this.commentLinkListener = commentLinkListener;
         this.commentYoutubeListener = commentYoutubeListener;
+        this.commentImageListener = commentImageListener;
         if (comment_list != null && !comment_list.isEmpty()) {
             size = comment_list.size();
         }
@@ -70,7 +74,7 @@ public class AllCommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         if (viewType == VIEW_TYPE_TEXT_IMAGE) {
 
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_comment_image, parent, false);
-            return new CommentImageHolder(view, mContext);
+            return new CommentImageHolder(view, mContext,commentImageListener);
         }
         if (viewType == VIEW_TYPE_TEXT_LINK_SCRIPT) {
 
@@ -107,7 +111,7 @@ public class AllCommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         if (viewHolder instanceof CommentImageHolder) {
             CommentImageHolder vh = (CommentImageHolder) viewHolder;
 //            vh.setItem(postItems.get(position), comments.get(position));
-            vh.setItem(comment_list.get(position), postItem);
+            vh.setItem(comment_list.get(position), postItem,position);
         }
 
     }
@@ -119,9 +123,11 @@ public class AllCommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
 
-
     @Override
     public int getItemViewType(int position) {
+
+        Log.d("size",comment_list.size()+"");
+        Log.d("index",comment_list.indexOf(getItemCount())+"");
 
         String commentType = comment_list.get(position).getCommentType();
 
@@ -196,12 +202,13 @@ public class AllCommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     public void deleteItem(int position) {
 
-        comment_list.remove(position);
-        notifyItemRemoved(position);
-        notifyItemRangeChanged(position, comment_list.size());
+
+       // comment_list.remove(position);
+       // comment_list.remove(position);
+        size = comment_list.size();
+        notifyDataSetChanged();
 
     }
-
 
 
 }

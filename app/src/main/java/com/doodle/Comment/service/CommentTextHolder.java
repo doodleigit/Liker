@@ -133,10 +133,16 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
     //EDIT COMMENT
     CommentListener listener;
     String replyId = "";
+    Reply reply;
+
+
+    boolean isFirstTimeShowReply;
+
 
     public interface CommentListener {
 
         void onTitleClicked(Comment_ commentItem, int position);
+
         void commentDelete(Comment_ commentItem, int position);
     }
 
@@ -150,7 +156,7 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
         profileId = manager.getProfileId();
         token = manager.getToken();
         userIds = manager.getProfileId();
-        itemReply=new Reply();
+        itemReply = new Reply();
 
 
         //tvPostContent = (ReadMoreTextView) itemView.findViewById(R.id.tvPostContent);
@@ -227,7 +233,7 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
     int silverStar;
     int position;
 
-    public void setItem(Comment_ commentItem, PostItem postItem, int position) {
+    public void setItem(Comment_ commentItem, PostItem postItem,int position) {
 
         this.commentItem = commentItem;
         this.postItem = postItem;
@@ -294,6 +300,7 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
                 AppCompatActivity activity = (AppCompatActivity) v.getContext();
 
                 String commentReply = commentItem.getTotalReply();
+
                 if (Integer.parseInt(commentReply) > 0) {
                     if (networkOk) {
 
@@ -308,7 +315,7 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
                     Intent intent = new Intent(mContext, ReplyPost.class);
                     intent.putExtra(COMMENT_ITEM_KEY, (Parcelable) commentItem);
                     intent.putExtra(POST_ITEM_KEY, (Parcelable) postItem);
-                    intent.putExtra(REPLY_ITEM_KEY,   (Parcelable) itemReply);
+                    intent.putExtra(REPLY_ITEM_KEY, (Parcelable) itemReply);
                     intent.putParcelableArrayListExtra(REPLY_KEY, (ArrayList<? extends Parcelable>) replyItem);
 
                     mContext.startActivity(intent);
@@ -620,6 +627,7 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
                         }
                         if (id == R.id.editComment) {
 
+
                             listener.onTitleClicked(commentItem, position);
 
 
@@ -627,11 +635,9 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
 
                         if (id == R.id.deleteComment) {
 
-
-                            listener.commentDelete(commentItem,position);
-
-
-
+                            List<Reply> replyList = commentItem.getReplies();
+                            Reply reply = replyList.get(position);
+                            listener.commentDelete(commentItem, position);
 
 
                         }
@@ -646,7 +652,6 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
     }
 
 
-
     private void sendAllCommentReplyListRequest(Call<List<Reply>> call) {
 
         call.enqueue(new Callback<List<Reply>>() {
@@ -657,12 +662,12 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
 
                 if (response.body() != null) {
                     replyItem = response.body();
-                    itemReply=replyItem.get(position);
+                    itemReply = replyItem.get(position);
 
                     Intent intent = new Intent(mContext, ReplyPost.class);
                     intent.putExtra(COMMENT_ITEM_KEY, (Parcelable) commentItem);
                     intent.putExtra(POST_ITEM_KEY, (Parcelable) postItem);
-                    intent.putExtra(REPLY_ITEM_KEY,   (Parcelable) itemReply);
+                    intent.putExtra(REPLY_ITEM_KEY, (Parcelable) itemReply);
                     intent.putParcelableArrayListExtra(REPLY_KEY, (ArrayList<? extends Parcelable>) replyItem);
                     mContext.startActivity(intent);
 
@@ -678,8 +683,6 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
             }
         });
     }
-
-
 
 
 }

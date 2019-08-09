@@ -110,6 +110,7 @@ public class CommentLinkScriptHolder extends RecyclerView.ViewHolder {
     public interface CommentListener {
 
         void onTitleClicked(Comment_ commentItem, int position);
+
     }
 
     int position;
@@ -439,7 +440,9 @@ public class CommentLinkScriptHolder extends RecyclerView.ViewHolder {
                         }
 
                         if (id == R.id.deleteComment) {
-                            Toast.makeText(App.getAppContext(), "deleteComment : ", Toast.LENGTH_SHORT).show();
+
+
+
                         }
 
                         return true;

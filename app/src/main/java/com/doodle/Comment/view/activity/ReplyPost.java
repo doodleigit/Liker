@@ -53,6 +53,7 @@ import com.doodle.Comment.model.Comment;
 import com.doodle.Comment.model.CommentItem;
 import com.doodle.Comment.model.Comment_;
 import com.doodle.Comment.model.Reply;
+import com.doodle.Comment.service.CommentImageHolder;
 import com.doodle.Comment.service.CommentLinkScriptHolder;
 import com.doodle.Comment.service.CommentService;
 import com.doodle.Comment.service.CommentTextHolder;
@@ -112,7 +113,8 @@ import static com.doodle.utils.Utils.isNullOrEmpty;
 public class ReplyPost extends AppCompatActivity implements View.OnClickListener,
         CommentTextHolder.CommentListener,
         CommentLinkScriptHolder.CommentListener,
-        CommentYoutubeHolder.CommentListener {
+        CommentYoutubeHolder.CommentListener,
+        CommentImageHolder.CommentListener{
 
     private static final String TAG = "CommentPost";
     private List<Comment> commentList;
@@ -221,6 +223,7 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
         token = manager.getToken();
         userIds = manager.getProfileId();
         replyItem=new Reply();
+        comment_Item = new Comment_();
 
         Gson gson = new Gson();
         String json = manager.getUserInfo();
@@ -290,7 +293,7 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
         commentService = CommentService.mRetrofit.create(CommentService.class);
         webService = PostService.mRetrofit.create(PostService.class);
         //  Picasso.with(App.getInstance()).load(imageUrl).into(target);
-        adapter = new AllCommentAdapter(this, comment_list, postItem, this, this, this);
+        adapter = new AllCommentAdapter(this, comment_list, postItem, this, this, this,this);
         recyclerView.setAdapter(adapter);
         postId = postItem.getSharedPostId();
         userName.setText(String.format("%s %s", userInfo.getFirstName(), userInfo.getLastName()));
@@ -1061,6 +1064,59 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
     @Override
     public void commentDelete(Comment_ commentItem, int position) {
 
+
+        this.comment_Item = commentItem;
+        this.position = position;
+
+        if (networkOk) {
+
+            String commentId = comment_Item.getId();
+            String postId = comment_Item.getPostId();
+            Call<String> call = commentService.deleteCommentReply(deviceId, profileId, token,replyItem.getCommentId(), String.valueOf(replyItem.getId()), postId, userIds);
+            sendDeleteCommentRequest(call);
+            // delayLoadComment(mProgressBar);
+        } else {
+            Utils.showNetworkDialog(getSupportFragmentManager());
+
+        }
+
+    }
+
+    private void sendDeleteCommentRequest(Call<String> call) {
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        try {
+                            JSONObject object = new JSONObject(response.body());
+                            boolean status = object.getBoolean("status");
+
+                            if (status) {
+
+                                comment_list.remove(comment_Item);
+                                adapter.deleteItem(position);
+                                // adapter.notifyDataSetChanged();
+
+                            }
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    } else {
+
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
     }
 
 
