@@ -329,15 +329,47 @@ public class AboutFragment extends Fragment {
         Dialog dialog = new Dialog(getActivity(), R.style.Theme_Dialog);
         dialog.setContentView(R.layout.edit_user_info_layout);
 
-        TextView tvStoryTitle;
+        final String[] year = {""};
+        final String[] month = {""};
+        final String[] day = {""};
+        final String[] gender = {""};
+        final String[] yearPermission = {""};
+        final String[] dayMonthPermission = {""};
+        List<String> months = Arrays.asList(getResources().getStringArray(R.array.month_list));
+        ArrayList<String> years = new ArrayList<>();
+        ArrayList<String> days = new ArrayList<>();
+        years.add(getString(R.string.select_year));
+        days.add(getString(R.string.select_day));
+        int thisYear = Calendar.getInstance().get(Calendar.YEAR);
+        int totalDay = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+        for (int i = 1930; i <= thisYear; i++) {
+            years.add(Integer.toString(i));
+        }
+        for (int i = 1; i <= totalDay; i++) {
+            days.add(Integer.toString(i));
+        }
+
+        LinearLayout addEmailLayout, addPhoneLayout, addLivesInLayout, addHomeStateLayout, addStoryLayout;
+        TextView tvStoryTitle, tvAddEmail, tvAddPhone, tvAddLivesIn, tvAddHomeState;
         EditText etFirstName, etLastName, etHeadline, etAddress, etNewEmail, etNewPhone, etStoryDetails;
-        Spinner genderSpinner, birthYearSpinner, birthMonthSpinner, birthDaySpinner, emailPrivacySpinner, phonePrivacySpinner, livesCountrySpinner, livesStateSpinner, homeCountrySpinner,
-                homeStateSpinner, story_privacy_spinner, story_type_spinner;
+        Spinner genderSpinner, birthYearSpinner, birthMonthSpinner, birthDaySpinner, birthYearPrivacySpinner, birthDayPrivacySpinner, emailPrivacySpinner, phonePrivacySpinner, livesCountrySpinner, livesStateSpinner, homeCountrySpinner,
+                homeStateSpinner, storyPrivacySpinner, storyTypeSpinner, addStorySpinner;
         RecyclerView emailRecyclerView, phoneRecyclerView, storyRecycleView;
-        Button btnCancel, btnEmailSave, btnPhoneCancel, btnPhoneSave, btnLivesCancel, btnLivesSave, btnHomeStateCancel, btnHomeStateSave, btnStoryCancel, btnStorySave;
+        Button btnEmailCancel, btnEmailSave, btnPhoneCancel, btnPhoneSave, btnLivesCancel, btnLivesSave, btnHomeStateCancel, btnHomeStateSave, btnStoryCancel, btnStorySave;
         FloatingActionButton fabDone;
 
+        addEmailLayout = dialog.findViewById(R.id.add_email_layout);
+        addPhoneLayout = dialog.findViewById(R.id.add_phone_layout);
+        addLivesInLayout = dialog.findViewById(R.id.add_lives_in_layout);
+        addHomeStateLayout = dialog.findViewById(R.id.add_home_state_layout);
+        addStoryLayout = dialog.findViewById(R.id.add_story_layout);
+
         tvStoryTitle = dialog.findViewById(R.id.story_title);
+        tvAddEmail = dialog.findViewById(R.id.add_email);
+        tvAddPhone = dialog.findViewById(R.id.add_phone);
+        tvAddLivesIn = dialog.findViewById(R.id.add_lives_in);
+        tvAddHomeState = dialog.findViewById(R.id.add_home_state);
+
         etFirstName = dialog.findViewById(R.id.first_name);
         etLastName = dialog.findViewById(R.id.last_name);
         etHeadline = dialog.findViewById(R.id.headline);
@@ -350,12 +382,17 @@ public class AboutFragment extends Fragment {
         birthYearSpinner = dialog.findViewById(R.id.birth_year_spinner);
         birthMonthSpinner = dialog.findViewById(R.id.birth_month_spinner);
         birthDaySpinner = dialog.findViewById(R.id.birth_day_spinner);
+        birthYearPrivacySpinner = dialog.findViewById(R.id.birth_year_privacy_spinner);
+        birthDayPrivacySpinner = dialog.findViewById(R.id.birth_day_privacy_spinner);
         emailPrivacySpinner = dialog.findViewById(R.id.email_privacy_spinner);
         phonePrivacySpinner = dialog.findViewById(R.id.phone_privacy_spinner);
         livesCountrySpinner = dialog.findViewById(R.id.lives_country_spinner);
         livesStateSpinner = dialog.findViewById(R.id.lives_state_spinner);
         homeCountrySpinner = dialog.findViewById(R.id.home_country_spinner);
         homeStateSpinner = dialog.findViewById(R.id.home_state_spinner);
+        storyPrivacySpinner = dialog.findViewById(R.id.story_privacy_spinner);
+        storyTypeSpinner = dialog.findViewById(R.id.story_type_spinner);
+        addStorySpinner = dialog.findViewById(R.id.add_story_spinner);
 
         emailRecyclerView = dialog.findViewById(R.id.email_recycler_view);
         emailRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -364,7 +401,7 @@ public class AboutFragment extends Fragment {
         storyRecycleView = dialog.findViewById(R.id.story_recycler_view);
         storyRecycleView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        btnCancel = dialog.findViewById(R.id.cancel);
+        btnEmailCancel = dialog.findViewById(R.id.email_cancel);
         btnEmailSave = dialog.findViewById(R.id.email_save);
         btnPhoneCancel = dialog.findViewById(R.id.phone_cancel);
         btnPhoneSave = dialog.findViewById(R.id.phone_save);
@@ -376,7 +413,157 @@ public class AboutFragment extends Fragment {
         btnStorySave = dialog.findViewById(R.id.story_save);
         fabDone = dialog.findViewById(R.id.done);
 
+        etFirstName.setText(profileInfo.getFirstName());
+        etLastName.setText(profileInfo.getLastName());
+        etHeadline.setText(profileInfo.getHeadLine());
+        etAddress.setText(profileInfo.getAddress());
+        genderSpinner.setSelection(Integer.valueOf(profileInfo.getSex()));
+        birthYearSpinner.setSelection(Integer.valueOf(profileInfo.getBirthYear()));
+        birthMonthSpinner.setSelection(Integer.valueOf(profileInfo.getBirthMonth()));
+        birthDaySpinner.setSelection(Integer.valueOf(profileInfo.getBirthDate()));
+        birthYearPrivacySpinner.setSelection(Integer.valueOf(profileInfo.getYearPermission()));
+        birthDayPrivacySpinner.setSelection(Integer.valueOf(profileInfo.getDayMonthPermission()));
 
+        genderSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                gender[0] = String.valueOf(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        birthYearSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                year[0] = String.valueOf(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        birthMonthSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                month[0] = String.valueOf(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        birthDaySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                day[0] = String.valueOf(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        birthYearPrivacySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                yearPermission[0] = String.valueOf(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        birthDayPrivacySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                dayMonthPermission[0] = String.valueOf(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        tvAddEmail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addEmailLayout.setVisibility(View.VISIBLE);
+            }
+        });
+
+        btnEmailCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addEmailLayout.setVisibility(View.GONE);
+                etNewEmail.setText("");
+            }
+        });
+
+        tvAddPhone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addPhoneLayout.setVisibility(View.VISIBLE);
+            }
+        });
+
+        btnPhoneCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addPhoneLayout.setVisibility(View.GONE);
+                etNewPhone.setText("");
+            }
+        });
+
+        tvAddLivesIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addLivesInLayout.setVisibility(View.VISIBLE);
+            }
+        });
+
+        btnLivesCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addLivesInLayout.setVisibility(View.GONE);
+//                livesCountrySpinner.setSelection(0);
+//                livesStateSpinner.setSelection(0);
+            }
+        });
+
+        tvAddHomeState.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addHomeStateLayout.setVisibility(View.VISIBLE);
+            }
+        });
+
+        btnHomeStateCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addHomeStateLayout.setVisibility(View.GONE);
+//                homeCountrySpinner.setSelection(0);
+//                homeStateSpinner.setSelection(0);
+            }
+        });
+
+        fabDone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
 
         dialog.show();
     }
@@ -403,7 +590,7 @@ public class AboutFragment extends Fragment {
         ArrayList<AdvanceSuggestion> advanceSuggestions = new ArrayList<>();
         ArrayList<String> searchLocations = new ArrayList<>();
         List<String> instituteList = Arrays.asList(getResources().getStringArray(R.array.institute_list));
-        ArrayList<String> years = new ArrayList<String>();
+        ArrayList<String> years = new ArrayList<>();
         years.add(getString(R.string.select_year));
         int thisYear = Calendar.getInstance().get(Calendar.YEAR);
         for (int i = 1930; i <= thisYear; i++) {
@@ -823,7 +1010,8 @@ public class AboutFragment extends Fragment {
                 if (Integer.valueOf(experience.getToMonth()) <= months.size()) {
                     toMonthSpinner.setSelection(Integer.valueOf(experience.getToMonth()) - 1);
                 }
-            } catch (NumberFormatException ignored) { }
+            } catch (NumberFormatException ignored) {
+            }
         } else {
             btnRemove.setVisibility(View.GONE);
         }

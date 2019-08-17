@@ -95,7 +95,7 @@ import static com.doodle.Authentication.view.activity.Welcome.USER_INFO_ITEM_KEY
 import static com.doodle.Home.service.TextHolder.ITEM_KEY;
 import static com.doodle.utils.AppConstants.IN_CHAT_MODE;
 
-public class Home extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener{
+public class Home extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
@@ -105,11 +105,8 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
     private ProgressDialog progressDialog;
     private PrefManager manager;
     private String image_url;
-    private String token, deviceId, userId, socketId, mSocketId, selectedCategory = "";
+    private String token, deviceId, userId, selectedCategory = "";
     int categoryPosition = 0;
-    int limit = 5;
-    int offset = 0;
-    private boolean isApps = true;
     private Socket socket, mSocket;
     private HomeService webService;
     private static final String TAG = Home.class.getSimpleName();
@@ -129,6 +126,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
 
     public LoadCompleteListener loadCompleteListener;
     public UserInfo userInfo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -141,8 +139,6 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
 
 
         initialComponent();
-
-
 
 
         if (topContributorStatus != null) {
@@ -168,7 +164,6 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
         setData();
         setBroadcast();
         sendCategoryListRequest();
-
 
 
     }
@@ -205,7 +200,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
         imageProfile = findViewById(R.id.imageProfile);
         imageProfile.setOnClickListener(this);
         imageStarContributor = findViewById(R.id.imageStarContributor);
-// imageStarContributor.setOnClickListener(this);
+        imageStarContributor.setOnClickListener(this);
         profileImage = findViewById(R.id.profile_image);
         categorySpinner = findViewById(R.id.spinnerCategoryType);
         categorySpinner.setOnItemSelectedListener(this);
@@ -259,7 +254,6 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
                     hideProgressBar();
             }
         };
-
 
 
     }
@@ -914,9 +908,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
                 break;
 
             case R.id.imageStarContributor:
-//                startActivity(new Intent(this, PostNew.class));
-// imageStarContributor.setCircleBackgroundColor(getResources().getColor(R.color.colorWhite));
-// imageStarContributor.setImageResource(R.drawable.ic_star_border_blue_24dp);
+                startActivity(new Intent(this, StarContributorActivity.class));
                 break;
         }
     }

@@ -142,13 +142,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:weightSum="1">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="5dp"
-                        android:layout_weight="1"
+                        android:layout_weight="0.3"
                         android:orientation="vertical">
 
                         <TextView
@@ -174,7 +175,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
-                        android:layout_weight="1"
+                        android:layout_marginEnd="5dp"
+                        android:layout_weight="0.3"
                         android:orientation="vertical">
 
                         <TextView
@@ -196,19 +198,32 @@
 
                     </LinearLayout>
 
+                    <Spinner
+                        android:id="@+id/birth_year_privacy_spinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:layout_gravity="bottom"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_weight="0.4"
+                        android:background="@drawable/rectangle_corner_round_five"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp" />
+
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:weightSum="1">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="5dp"
-                        android:layout_weight="1"
+                        android:layout_weight="0.3"
                         android:orientation="vertical">
 
                         <TextView
@@ -234,7 +249,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
-                        android:layout_weight="1"
+                        android:layout_marginEnd="5dp"
+                        android:layout_weight="0.3"
                         android:orientation="vertical">
 
                         <TextView
@@ -255,6 +271,18 @@
                             android:paddingEnd="10dp" />
 
                     </LinearLayout>
+
+                    <Spinner
+                        android:id="@+id/birth_day_privacy_spinner"
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:layout_gravity="bottom"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginTop="5dp"
+                        android:layout_weight="0.4"
+                        android:background="@drawable/rectangle_corner_round_five"
+                        android:paddingStart="10dp"
+                        android:paddingEnd="10dp" />
 
                 </LinearLayout>
 
@@ -294,6 +322,7 @@
                     android:visibility="gone" />
 
                 <LinearLayout
+                    android:id="@+id/add_email_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
@@ -315,7 +344,7 @@
                         android:layout_marginTop="5dp">
 
                         <Button
-                            android:id="@+id/cancel"
+                            android:id="@+id/email_cancel"
                             android:layout_width="wrap_content"
                             android:layout_height="35dp"
                             android:layout_alignParentStart="true"
@@ -344,16 +373,18 @@
 
                     </RelativeLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginTop="5dp"
-                        android:text="Add new email"
-                        android:textColor="@color/colorPrimary"
-                        android:textSize="16sp" />
-
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/add_email"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="5dp"
+                    android:padding="5dp"
+                    android:text="Add new email"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="16sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -365,6 +396,7 @@
                     android:textStyle="bold" />
 
                 <LinearLayout
+                    android:id="@+id/add_phone_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
@@ -418,10 +450,12 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/add_phone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="5dp"
+                    android:padding="5dp"
                     android:text="Add new phone"
                     android:textColor="@color/colorPrimary"
                     android:textSize="16sp" />
@@ -435,13 +469,8 @@
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/phone_recycler_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:visibility="gone" />
-
                 <LinearLayout
+                    android:id="@+id/add_lives_in_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
@@ -503,10 +532,12 @@
                     </RelativeLayout>
 
                     <TextView
+                        android:id="@+id/add_lives_in"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginTop="5dp"
+                        android:padding="5dp"
                         android:text="Add lives in address"
                         android:textColor="@color/colorPrimary"
                         android:textSize="16sp" />
@@ -523,6 +554,7 @@
                     android:textStyle="bold" />
 
                 <LinearLayout
+                    android:id="@+id/add_home_state_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
@@ -583,40 +615,51 @@
 
                     </RelativeLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginTop="5dp"
-                        android:text="Add home state address"
-                        android:textColor="@color/colorPrimary"
-                        android:textSize="16sp" />
-
                 </LinearLayout>
 
                 <TextView
-                    android:id="@+id/story_title"
+                    android:id="@+id/add_home_state"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Story Title"
-                    android:textColor="@color/colorBlack"
-                    android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:layout_gravity="center"
+                    android:layout_marginTop="5dp"
+                    android:padding="5dp"
+                    android:text="Add home state address"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="16sp" />
+
+                <Spinner
+                    android:id="@+id/add_story_spinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="35dp"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="5dp"
+                    android:background="@drawable/rectangle_corner_round_five" />
 
                 <LinearLayout
+                    android:id="@+id/add_story_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/story_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Story Title"
+                        android:textColor="@color/colorBlack"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
 
                     <EditText
                         android:id="@+id/story_details"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:minHeight="80dp"
                         android:layout_marginTop="5dp"
                         android:background="@drawable/rectangle_corner_round_five"
                         android:hint=""
+                        android:minHeight="80dp"
                         android:paddingStart="10dp"
                         android:paddingEnd="10dp"
                         android:textSize="14sp" />
@@ -660,15 +703,15 @@
                         android:id="@+id/story_type_spinner"
                         android:layout_width="wrap_content"
                         android:layout_height="35dp"
-                        android:layout_marginEnd="10dp"
                         android:layout_marginTop="10dp"
+                        android:layout_marginEnd="10dp"
                         android:background="@drawable/rectangle_corner_round_five" />
 
                     <android.support.v7.widget.RecyclerView
                         android:id="@+id/story_recycler_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:visibility="gone"/>
+                        android:visibility="gone" />
 
                 </LinearLayout>
 

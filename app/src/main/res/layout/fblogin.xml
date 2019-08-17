@@ -5,9 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Authentication.view.activity.FBLogin">
+
     <include
         android:id="@+id/main_activiy_bar"
         layout="@layout/myappbar" />
+
     <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/profile_image"
         android:layout_width="96dp"
@@ -30,13 +32,13 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:visibility="gone"
         android:id="@+id/profile_email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/profile_name"
         android:gravity="center_horizontal"
-        android:hint="azad@gmail.com" />
+        android:hint="azad@gmail.com"
+        android:visibility="gone" />
 
     <com.facebook.login.widget.LoginButton
         android:id="@+id/login_button"
@@ -46,13 +48,14 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="30dp"
         android:layout_marginBottom="30dp" />
+
     <TextView
-        android:visibility="gone"
         android:id="@+id/tvDetails"
-        android:layout_below="@id/login_button"
-        android:hint="Details"
-        android:gravity="center_horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_below="@id/login_button"
+        android:gravity="center_horizontal"
+        android:hint="Details"
+        android:visibility="gone" />
 
 </RelativeLayout>

@@ -2,9 +2,11 @@ package com.doodle.Home.service;
 
 import com.doodle.Comment.model.CommentItem;
 import com.doodle.Home.model.PostItem;
+import com.doodle.Home.model.StarContributor;
 import com.doodle.Home.model.postshare.PostShareItem;
 import com.doodle.utils.AppConstants;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -114,6 +116,18 @@ public interface HomeService {
             @Header("User-Id") String userId,
             @Header("Security-Token") String token,
             @Field("user_id") String id
+    );
+
+    @POST(AppConstants.GET_USER_RANKINGS)
+    @FormUrlEncoded
+    Call<ArrayList<StarContributor>> getUserRanking(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("cat_id") String catId,
+            @Field("search_name") String searchName,
+            @Field("offset") int offset,
+            @Field("limit") int limit
     );
 
 }

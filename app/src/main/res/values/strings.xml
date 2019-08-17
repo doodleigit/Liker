@@ -200,6 +200,8 @@
     <string name="select_profile_picture">Select Profile Picture</string>
     <string name="capture_profile_picture">Capture Profile Picture</string>
     <string name="select_year">Select Year</string>
+    <string name="select_day">Select Day</string>
     <string name="are_you_sure">Are you sure you want to remove</string>
+    <string name="search_by_name">Search By Name</string>
 
 </resources>
