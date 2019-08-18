@@ -109,7 +109,7 @@ public class CommentLinkScriptHolder extends RecyclerView.ViewHolder {
 
     public interface CommentListener {
 
-        void onTitleClicked(Comment_ commentItem, int position);
+        void onTitleClicked(Comment_ commentItem, int position,Reply reply);
 
     }
 
@@ -436,7 +436,17 @@ public class CommentLinkScriptHolder extends RecyclerView.ViewHolder {
                             Toast.makeText(App.getAppContext(), "blockUser : ", Toast.LENGTH_SHORT).show();
                         }
                         if (id == R.id.editComment) {
-                            listener.onTitleClicked(commentItem, position);
+                            Reply replyItem=new Reply();
+                            List<Reply> replyList = commentItem.getReplies();
+                            if(replyList.size()==0){
+                                Reply reply = new Reply();
+                                reply.setId("1");
+                                reply.setCommentId("2");
+                                listener.onTitleClicked(commentItem, position,reply);
+                            }else {
+                                replyItem = replyList.get(0);
+                                listener.onTitleClicked(commentItem, position,replyItem);
+                            }
                         }
 
                         if (id == R.id.deleteComment) {

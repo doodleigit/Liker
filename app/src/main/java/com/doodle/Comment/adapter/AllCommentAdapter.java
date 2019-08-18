@@ -205,8 +205,11 @@ public class AllCommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
        // comment_list.remove(position);
        // comment_list.remove(position);
+
+     //   comment_list.remove(position);
         size = comment_list.size();
-        notifyDataSetChanged();
+     //   notifyItemRemoved(position);
+       notifyDataSetChanged();
 
     }
 

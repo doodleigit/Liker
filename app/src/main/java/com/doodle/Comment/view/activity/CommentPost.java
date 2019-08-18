@@ -38,7 +38,6 @@ import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.EditText;
@@ -52,23 +51,23 @@ import com.doodle.Authentication.model.UserInfo;
 import com.doodle.Comment.adapter.AllCommentAdapter;
 import com.doodle.Comment.model.Comment;
 import com.doodle.Comment.model.CommentItem;
-import com.doodle.Comment.model.CommentTextIndex;
 import com.doodle.Comment.model.Comment_;
-import com.doodle.Comment.model.LinkData;
 import com.doodle.Comment.model.Reply;
 import com.doodle.Comment.service.CommentImageHolder;
 import com.doodle.Comment.service.CommentLinkScriptHolder;
 import com.doodle.Comment.service.CommentService;
 import com.doodle.Comment.service.CommentTextHolder;
 import com.doodle.Comment.service.CommentYoutubeHolder;
+import com.doodle.Comment.view.fragment.ReportLikerMessageSheet;
+import com.doodle.Comment.view.fragment.ReportPersonMessageSheet;
+import com.doodle.Comment.view.fragment.ReportReasonSheet;
+import com.doodle.Comment.view.fragment.ReportSendCategorySheet;
 import com.doodle.Home.model.PostItem;
-import com.doodle.Home.view.activity.Home;
 import com.doodle.Post.adapter.MentionUserAdapter;
 import com.doodle.Post.model.MentionUser;
 import com.doodle.Post.model.PostImage;
 import com.doodle.Post.service.PostService;
-import com.doodle.Post.view.activity.PostNew;
-import com.doodle.Post.view.fragment.ContributorStatus;
+import com.doodle.Post.view.fragment.PostPermission;
 import com.doodle.R;
 import com.doodle.utils.NetworkHelper;
 import com.doodle.utils.PageTransformer;
@@ -80,7 +79,6 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.vanniktech.emoji.EmojiPopup;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -102,9 +100,6 @@ import retrofit2.Response;
 
 import static android.widget.Toast.LENGTH_SHORT;
 import static android.widget.Toast.makeText;
-import static com.doodle.Comment.service.CommentTextHolder.COMMENT_ITEM_KEY;
-import static com.doodle.Comment.service.CommentTextHolder.POST_ITEM_KEY;
-import static com.doodle.Comment.service.CommentTextHolder.REPLY_ITEM_KEY;
 import static com.doodle.Home.service.TextHolder.COMMENT_KEY;
 import static com.doodle.Home.service.TextHolder.ITEM_KEY;
 import static com.doodle.Post.view.activity.PostNew.isExternalStorageDocument;
@@ -112,7 +107,6 @@ import static com.doodle.utils.MediaUtil.getDataColumn;
 import static com.doodle.utils.MediaUtil.isDownloadsDocument;
 import static com.doodle.utils.MediaUtil.isGooglePhotosUri;
 import static com.doodle.utils.MediaUtil.isMediaDocument;
-import static com.doodle.utils.Utils.delayLoadComment;
 import static com.doodle.utils.Utils.getMD5EncryptedString;
 import static com.doodle.utils.Utils.isNullOrEmpty;
 
@@ -120,7 +114,11 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
         CommentTextHolder.CommentListener,
         CommentLinkScriptHolder.CommentListener,
         CommentYoutubeHolder.CommentListener,
-        CommentImageHolder.CommentListener{
+        CommentImageHolder.CommentListener,
+        ReportReasonSheet.BottomSheetListener,
+        ReportSendCategorySheet.BottomSheetListener,
+        ReportPersonMessageSheet.BottomSheetListener,
+        ReportLikerMessageSheet.BottomSheetListener{
 
     private static final String TAG = "CommentPost";
     private List<Comment> commentList;
@@ -196,6 +194,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
 
     //Edit Comment
     Comment_ comment_Item;
+    Reply reply;
     ImageView imageEditComment, imageSendComment;
     private int position;
 
@@ -231,6 +230,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
         commentList = new ArrayList<Comment>();
         comment_list = new ArrayList<Comment_>();
         comment_Item = new Comment_();
+        reply = new Reply();
         recyclerView = findViewById(R.id.recyclerView);
         rvSearchMention = findViewById(R.id.rvSearchMention);
         layoutManager = new LinearLayoutManager(this);
@@ -265,7 +265,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
         commentService = CommentService.mRetrofit.create(CommentService.class);
         webService = PostService.mRetrofit.create(PostService.class);
         //  Picasso.with(App.getInstance()).load(imageUrl).into(target);
-        adapter = new AllCommentAdapter(this, comment_list, postItem, this, this, this,this);
+        adapter = new AllCommentAdapter(this, comment_list, postItem, this, this, this, this);
         recyclerView.setAdapter(adapter);
         postId = postItem.getSharedPostId();
         userName.setText(String.format("%s %s", userInfo.getFirstName(), userInfo.getLastName()));
@@ -980,11 +980,13 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
                 if (insertId > 0) {
 
                     Comment_ commentItem = new Comment_();
+                    commentItem.setId(String.valueOf(commentItems.getInsertId()));
                     commentItem.setCommentImage(commentItems.getCommentImage());
                     commentItem.setUserPhoto(userInfo.getPhoto());
                     commentItem.setCommentType(String.valueOf(commentType));
                     commentItem.setCommentText(commentItems.getCommentText());
                     commentItem.setHasMention(String.valueOf(hasMention));
+                    commentItem.setPostId(postId);
                     //  commentItem.getLinkData().setLinkFullUrl(linkUrl);
 
                     //  commentItem.getLinkData().setLinkFullUrl(linkUrl);
@@ -1021,8 +1023,9 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
 
 
     @Override
-    public void onTitleClicked(Comment_ commentItem, int position) {
+    public void onTitleClicked(Comment_ commentItem, int position, Reply reply) {
         this.comment_Item = commentItem;
+        this.reply = reply;
         this.position = position;
         imageEditComment.setVisibility(View.VISIBLE);
         imageSendComment.setVisibility(View.GONE);
@@ -1041,10 +1044,10 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
     }
 
 
-Reply reply;
     @Override
-    public void commentDelete(Comment_ commentItem, int position) {
+    public void commentDelete(Comment_ commentItem, int position, Reply reply) {
         this.comment_Item = commentItem;
+        this.reply = reply;
         this.position = position;
 
         if (networkOk) {
@@ -1074,8 +1077,8 @@ Reply reply;
                             if (status) {
 
                                 comment_list.remove(comment_Item);
-                               adapter.deleteItem(position);
-                              // adapter.notifyDataSetChanged();
+                                adapter.deleteItem(position);
+                                // adapter.notifyDataSetChanged();
 
                             }
 
@@ -1097,4 +1100,44 @@ Reply reply;
         });
     }
 
+    @Override
+    public void onButtonClicked(int image, String text) {
+        makeText(CommentPost.this, "report", LENGTH_SHORT).show();
+
+        String message = text;
+        ReportSendCategorySheet reportSendCategorySheet = ReportSendCategorySheet.newInstance(message);
+        reportSendCategorySheet.show(getSupportFragmentManager(), "ReportSendCategorySheet");
+    }
+
+    @Override
+    public void onFollowClicked(int image, String text) {
+        String message = text;
+
+        ReportPersonMessageSheet reportPersonMessageSheet = ReportPersonMessageSheet.newInstance(message);
+        reportPersonMessageSheet.show(getSupportFragmentManager(), "ReportPersonMessageSheet");
+    }
+
+    @Override
+    public void onReportLikerClicked(int image, String text) {
+        String message = text;
+        ReportLikerMessageSheet reportLikerMessageSheet = ReportLikerMessageSheet.newInstance(message);
+        reportLikerMessageSheet.show(getSupportFragmentManager(), "ReportLikerMessageSheet");
+    }
+
+    @Override
+    public void onPersonLikerClicked(int image, String text) {
+        String message = text;
+        ReportPersonMessageSheet reportPersonMessageSheet = ReportPersonMessageSheet.newInstance(message);
+        reportPersonMessageSheet.show(getSupportFragmentManager(), "ReportPersonMessageSheet");
+    }
+
+    @Override
+    public void onReportPersonMessageClicked(int image, String text) {
+
+    }
+
+    @Override
+    public void onReportLikerMessageClicked(int image, String text) {
+
+    }
 }

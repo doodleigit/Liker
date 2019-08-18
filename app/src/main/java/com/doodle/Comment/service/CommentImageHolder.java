@@ -112,8 +112,8 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
     Reply reply;
     public interface CommentListener {
 
-        void onTitleClicked(Comment_ commentItem, int position);
-        void commentDelete(Comment_ commentItem, int position);
+        void onTitleClicked(Comment_ commentItem, int position,Reply reply);
+        void commentDelete(Comment_ commentItem, int position,Reply reply);
     }
 
 
@@ -459,12 +459,37 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
                             Toast.makeText(App.getAppContext(), "blockUser : ", Toast.LENGTH_SHORT).show();
                         }
                         if (id == R.id.editComment) {
-                            Toast.makeText(App.getAppContext(), "editComment : ", Toast.LENGTH_SHORT).show();
+
+                            Reply replyItem=new Reply();
+                            List<Reply> replyList = commentItem.getReplies();
+                            if(replyList.size()==0){
+                                Reply reply = new Reply();
+                                reply.setId("1");
+                                reply.setCommentId("2");
+                                listener.onTitleClicked(commentItem, position,reply);
+                            }else {
+                                replyItem = replyList.get(0);
+                                listener.onTitleClicked(commentItem, position,replyItem);
+                            }
 
                         }
 
                         if (id == R.id.deleteComment) {
-                            listener.commentDelete(commentItem,position);
+
+                            Reply replyItem=new Reply();
+                            List<Reply> replyList = commentItem.getReplies();
+                            if(replyList.size()==0){
+                                Reply reply = new Reply();
+                                reply.setId("1");
+                                reply.setCommentId("2");
+                                listener.commentDelete(commentItem, position,reply);
+                            }else{
+                                replyItem = replyList.get(0);
+                                listener.commentDelete(commentItem, position,replyItem);
+                            }
+
+
+
                         }
 
                         return true;
