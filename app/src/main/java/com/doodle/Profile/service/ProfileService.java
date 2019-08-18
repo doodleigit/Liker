@@ -2,6 +2,7 @@ package com.doodle.Profile.service;
 
 import com.doodle.Profile.model.AlbumPhoto;
 import com.doodle.Profile.model.AllFriend;
+import com.doodle.Profile.model.PhoneCountry;
 import com.doodle.Profile.model.PhotoAlbum;
 import com.doodle.Profile.model.RecentPhoto;
 import com.doodle.Profile.model.Star;
@@ -437,6 +438,74 @@ public interface ProfileService {
             @Header("Security-Token") String token,
             @Header("User-Id") String userId,
             @Field("profile_username") String profile_username
+    );
+
+    @POST(AppConstants.EMAIL_ADD)
+    @FormUrlEncoded
+    Call<String> addEmail(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String id,
+            @Field("email") String email,
+            @Field("permission_type") String permissionType
+    );
+
+    @POST(AppConstants.PHONE_ADD)
+    @FormUrlEncoded
+    Call<String> addPhone(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String id,
+            @Field("phone_number") String phoneNumber,
+            @Field("type") String type,
+            @Field("permission_type") String permissionType,
+            @Field("country_id") String countryId
+    );
+
+    @POST(AppConstants.SET_STORY)
+    @FormUrlEncoded
+    Call<String> setStory(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String id,
+            @Field("type") String type,
+            @Field("permission_type") String permissionType,
+            @Field("description") String description
+    );
+
+    @POST(AppConstants.SET_LIVE_PLACE)
+    @FormUrlEncoded
+    Call<String> setLivePlace(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String id,
+            @Field("country_id") String countryId,
+            @Field("city_id") String cityId,
+            @Field("type") String type,
+            @Field("permission_type") String permissionType
+    );
+
+    @POST(AppConstants.GET_CITY_LIST)
+    @FormUrlEncoded
+    Call<ArrayList<Star>> getCityList(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String id,
+            @Field("country_id") String countryId
+    );
+
+    @POST(AppConstants.GET_COUNTRY_PHONE_CODES)
+    @FormUrlEncoded
+    Call<ArrayList<PhoneCountry>> getCountryPhoneCodes(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String id
     );
 
 }

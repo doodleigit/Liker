@@ -401,16 +401,31 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <EditText
-                        android:id="@+id/new_phone"
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="30dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginTop="5dp"
-                        android:background="@drawable/rectangle_corner_round_five"
-                        android:hint="New Phone"
-                        android:paddingStart="10dp"
-                        android:paddingEnd="10dp"
-                        android:textSize="14sp" />
+                        android:gravity="start|center"
+                        android:orientation="horizontal">
+
+                        <Spinner
+                            android:id="@+id/phone_country_spinner"
+                            android:layout_width="wrap_content"
+                            android:layout_height="30dp"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/rectangle_corner_round_five" />
+
+                        <EditText
+                            android:id="@+id/new_phone"
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp"
+                            android:background="@drawable/rectangle_corner_round_five"
+                            android:hint="New Phone"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -426,6 +441,14 @@
                             android:text="Cancel"
                             android:textAllCaps="false"
                             android:textSize="14sp" />
+
+                        <Spinner
+                            android:id="@+id/phone_type_spinner"
+                            android:layout_width="wrap_content"
+                            android:layout_height="35dp"
+                            android:layout_marginEnd="10dp"
+                            android:layout_toStartOf="@+id/phone_privacy_spinner"
+                            android:background="@drawable/rectangle_corner_round_five" />
 
                         <Spinner
                             android:id="@+id/phone_privacy_spinner"
@@ -469,10 +492,35 @@
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
+                <RelativeLayout
+                    android:id="@+id/lives_in_address_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="5dp">
+
+                    <TextView
+                        android:id="@+id/lives_in_address"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Dhaka, Bangladesh"
+                        android:textColor="@color/colorBlack"
+                        android:textSize="14sp" />
+
+                    <ImageView
+                        android:id="@+id/lives_in_edit"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/plus"
+                        android:layout_alignParentEnd="true"/>
+
+                </RelativeLayout>
+
                 <LinearLayout
                     android:id="@+id/add_lives_in_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
                     android:orientation="vertical">
 
                     <LinearLayout
@@ -553,10 +601,35 @@
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
+                <RelativeLayout
+                    android:id="@+id/home_state_address_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="5dp">
+
+                    <TextView
+                        android:id="@+id/home_state_address"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Dhaka, Bangladesh"
+                        android:textColor="@color/colorBlack"
+                        android:textSize="14sp" />
+
+                    <ImageView
+                        android:id="@+id/home_state_edit"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/plus"
+                        android:layout_alignParentEnd="true"/>
+
+                </RelativeLayout>
+
                 <LinearLayout
                     android:id="@+id/add_home_state_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
                     android:orientation="vertical">
 
                     <LinearLayout
@@ -634,7 +707,23 @@
                     android:layout_height="35dp"
                     android:layout_gravity="center"
                     android:layout_marginTop="5dp"
-                    android:background="@drawable/rectangle_corner_round_five" />
+                    android:background="@drawable/rectangle_corner_round_five"
+                    android:visibility="invisible"/>
+
+                <TextView
+                    android:id="@+id/add_story"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="5dp"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:background="@drawable/rectangle_corner_round_five"
+                    android:text="Add Story"
+                    android:textSize="14sp"
+                    android:textColor="@color/colorBlack"/>
 
                 <LinearLayout
                     android:id="@+id/add_story_layout"
@@ -698,14 +787,6 @@
                             android:textSize="14sp" />
 
                     </RelativeLayout>
-
-                    <Spinner
-                        android:id="@+id/story_type_spinner"
-                        android:layout_width="wrap_content"
-                        android:layout_height="35dp"
-                        android:layout_marginTop="10dp"
-                        android:layout_marginEnd="10dp"
-                        android:background="@drawable/rectangle_corner_round_five" />
 
                     <android.support.v7.widget.RecyclerView
                         android:id="@+id/story_recycler_view"

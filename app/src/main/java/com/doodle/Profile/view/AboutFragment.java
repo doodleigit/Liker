@@ -26,6 +26,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,6 +50,7 @@ import com.doodle.Profile.model.Experience;
 import com.doodle.Profile.model.AdvanceSuggestion;
 import com.doodle.Profile.model.Links;
 import com.doodle.Profile.model.Phone;
+import com.doodle.Profile.model.PhoneCountry;
 import com.doodle.Profile.model.ProfileInfo;
 import com.doodle.Profile.model.Story;
 import com.doodle.Profile.service.AboutComponentUpdateListener;
@@ -97,6 +99,7 @@ public class AboutFragment extends Fragment {
     private ArrayList<Awards> awards;
     private ArrayList<Certification> certifications;
     private ArrayList<Links> links;
+    private ArrayList<PhoneCountry> phoneCountries;
 
     private String deviceId, profileId, token, userIds;
 
@@ -134,6 +137,7 @@ public class AboutFragment extends Fragment {
         awards = new ArrayList<>();
         certifications = new ArrayList<>();
         links = new ArrayList<>();
+        phoneCountries = new ArrayList<>();
 
         deviceId = manager.getDeviceId();
         profileId = manager.getProfileId();
@@ -238,7 +242,7 @@ public class AboutFragment extends Fragment {
         ivEditUserInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                editUserInfo();
+//                editUserInfo();
             }
         });
         ivAddEducation.setOnClickListener(new View.OnClickListener() {
@@ -287,6 +291,7 @@ public class AboutFragment extends Fragment {
     private void getData() {
         Call<String> call = profileService.getProfileInfo(deviceId, token, userIds, profileId, userIds);
         sendProfileInfoRequest(call);
+        sendPhoneCountryListRequest();
     }
 
     private void clearData() {
@@ -319,6 +324,9 @@ public class AboutFragment extends Fragment {
         }
     }
 
+    String numberType = "", storyType = "", phoneNumberPrivacyType = "", emailPrivacyType = "", storyPrivacyType = "";
+    Phone phone;
+
     String instituteName = "", instituteType = "", designationName = "", companyName = "", awardsName = "", certificationName = "", licenseNumber = "", certificationUrl = "", degreeName = "", oldLink = "", link = "", type = "",
             fieldStudyName = "", websiteUrl = "", locationName = "", permissionType = "", grade = "", date = "", startYear = "", endYear = "", fromDate = "", toDate = "", description = "", media = "",
             locationActualName = "", locationCountryName = "", locationLatitude = "", locationLongitude = "";
@@ -335,6 +343,10 @@ public class AboutFragment extends Fragment {
         final String[] gender = {""};
         final String[] yearPermission = {""};
         final String[] dayMonthPermission = {""};
+        List<String> phoneTypes = Arrays.asList(getResources().getStringArray(R.array.phone_type_list));
+        List<String> storyTypes = Arrays.asList(getResources().getStringArray(R.array.story_type_list));
+        List<String> types = new ArrayList<>();
+        List<String> genders = Arrays.asList(getResources().getStringArray(R.array.gender_list));
         List<String> months = Arrays.asList(getResources().getStringArray(R.array.month_list));
         ArrayList<String> years = new ArrayList<>();
         ArrayList<String> days = new ArrayList<>();
@@ -350,10 +362,12 @@ public class AboutFragment extends Fragment {
         }
 
         LinearLayout addEmailLayout, addPhoneLayout, addLivesInLayout, addHomeStateLayout, addStoryLayout;
-        TextView tvStoryTitle, tvAddEmail, tvAddPhone, tvAddLivesIn, tvAddHomeState;
+        RelativeLayout livesInAddressLayout, homeStateAddressLayout;
+        TextView tvStoryTitle, tvAddEmail, tvAddPhone, tvAddLivesIn, tvAddHomeState, tvAddStory, tvLivesInAddress, tvHomeStateAddress;
+        ImageView ivLivesInEdit, ivHomeStateEdit;
         EditText etFirstName, etLastName, etHeadline, etAddress, etNewEmail, etNewPhone, etStoryDetails;
-        Spinner genderSpinner, birthYearSpinner, birthMonthSpinner, birthDaySpinner, birthYearPrivacySpinner, birthDayPrivacySpinner, emailPrivacySpinner, phonePrivacySpinner, livesCountrySpinner, livesStateSpinner, homeCountrySpinner,
-                homeStateSpinner, storyPrivacySpinner, storyTypeSpinner, addStorySpinner;
+        Spinner genderSpinner, birthYearSpinner, birthMonthSpinner, birthDaySpinner, birthYearPrivacySpinner, birthDayPrivacySpinner, emailPrivacySpinner, phoneCountrySpinner, phonePrivacySpinner, phoneTypeSpinner, livesCountrySpinner, livesStateSpinner, homeCountrySpinner,
+                homeStateSpinner, storyPrivacySpinner, addStorySpinner;
         RecyclerView emailRecyclerView, phoneRecyclerView, storyRecycleView;
         Button btnEmailCancel, btnEmailSave, btnPhoneCancel, btnPhoneSave, btnLivesCancel, btnLivesSave, btnHomeStateCancel, btnHomeStateSave, btnStoryCancel, btnStorySave;
         FloatingActionButton fabDone;
@@ -364,11 +378,20 @@ public class AboutFragment extends Fragment {
         addHomeStateLayout = dialog.findViewById(R.id.add_home_state_layout);
         addStoryLayout = dialog.findViewById(R.id.add_story_layout);
 
+        livesInAddressLayout = dialog.findViewById(R.id.lives_in_address_layout);
+        homeStateAddressLayout = dialog.findViewById(R.id.home_state_address_layout);
+
         tvStoryTitle = dialog.findViewById(R.id.story_title);
         tvAddEmail = dialog.findViewById(R.id.add_email);
         tvAddPhone = dialog.findViewById(R.id.add_phone);
         tvAddLivesIn = dialog.findViewById(R.id.add_lives_in);
         tvAddHomeState = dialog.findViewById(R.id.add_home_state);
+        tvAddStory = dialog.findViewById(R.id.add_story);
+        tvLivesInAddress = dialog.findViewById(R.id.lives_in_address);
+        tvHomeStateAddress = dialog.findViewById(R.id.home_state_address);
+
+        ivLivesInEdit = dialog.findViewById(R.id.lives_in_edit);
+        ivHomeStateEdit = dialog.findViewById(R.id.home_state_edit);
 
         etFirstName = dialog.findViewById(R.id.first_name);
         etLastName = dialog.findViewById(R.id.last_name);
@@ -385,13 +408,14 @@ public class AboutFragment extends Fragment {
         birthYearPrivacySpinner = dialog.findViewById(R.id.birth_year_privacy_spinner);
         birthDayPrivacySpinner = dialog.findViewById(R.id.birth_day_privacy_spinner);
         emailPrivacySpinner = dialog.findViewById(R.id.email_privacy_spinner);
+        phoneCountrySpinner = dialog.findViewById(R.id.phone_country_spinner);
         phonePrivacySpinner = dialog.findViewById(R.id.phone_privacy_spinner);
+        phoneTypeSpinner = dialog.findViewById(R.id.phone_type_spinner);
         livesCountrySpinner = dialog.findViewById(R.id.lives_country_spinner);
         livesStateSpinner = dialog.findViewById(R.id.lives_state_spinner);
         homeCountrySpinner = dialog.findViewById(R.id.home_country_spinner);
         homeStateSpinner = dialog.findViewById(R.id.home_state_spinner);
         storyPrivacySpinner = dialog.findViewById(R.id.story_privacy_spinner);
-        storyTypeSpinner = dialog.findViewById(R.id.story_type_spinner);
         addStorySpinner = dialog.findViewById(R.id.add_story_spinner);
 
         emailRecyclerView = dialog.findViewById(R.id.email_recycler_view);
@@ -412,6 +436,41 @@ public class AboutFragment extends Fragment {
         btnStoryCancel = dialog.findViewById(R.id.story_cancel);
         btnStorySave = dialog.findViewById(R.id.story_save);
         fabDone = dialog.findViewById(R.id.done);
+
+        ArrayList<String> phoneCountryCodes = new ArrayList<>();
+        for (PhoneCountry phoneCountry : phoneCountries) {
+            phoneCountryCodes.add(phoneCountry.getCountryIsoCode2() + "(" + phoneCountry.getCountryPhoneCode() + ")");
+        }
+        ArrayAdapter<String> phoneCountryAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, phoneCountryCodes);
+        phoneCountryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        phoneCountrySpinner.setAdapter(phoneCountryAdapter);
+
+        ArrayAdapter<String> phoneTypesAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, phoneTypes);
+        phoneTypesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        phoneTypeSpinner.setAdapter(phoneTypesAdapter);
+
+        ArrayAdapter<String> genderAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, genders);
+        genderAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        genderSpinner.setAdapter(genderAdapter);
+
+        ArrayAdapter<String> birthYearAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, years);
+        birthYearAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        birthYearSpinner.setAdapter(birthYearAdapter);
+
+        ArrayAdapter<String> birthMonthAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, months);
+        birthMonthAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        birthMonthSpinner.setAdapter(birthMonthAdapter);
+
+        ArrayAdapter<String> birthDayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, days);
+        birthDayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        birthDaySpinner.setAdapter(birthDayAdapter);
+
+        ArrayAdapter<String> privacyAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, privacyList);
+        privacyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        birthYearPrivacySpinner.setAdapter(privacyAdapter);
+        birthDayPrivacySpinner.setAdapter(privacyAdapter);
+        emailPrivacySpinner.setAdapter(privacyAdapter);
+        phonePrivacySpinner.setAdapter(privacyAdapter);
 
         etFirstName.setText(profileInfo.getFirstName());
         etLastName.setText(profileInfo.getLastName());
@@ -511,6 +570,14 @@ public class AboutFragment extends Fragment {
             }
         });
 
+        btnEmailSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String emailAddress = etNewEmail.getText().toString();
+                addEmailRequest(emailAddress, emailPrivacyType);
+            }
+        });
+
         tvAddPhone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -523,13 +590,23 @@ public class AboutFragment extends Fragment {
             public void onClick(View view) {
                 addPhoneLayout.setVisibility(View.GONE);
                 etNewPhone.setText("");
+                phoneCountrySpinner.setSelection(0);
             }
         });
 
-        tvAddLivesIn.setOnClickListener(new View.OnClickListener() {
+        btnPhoneSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String phoneNumber = etNewPhone.getText().toString();
+                addPhoneRequest(phoneNumber, numberType, phoneNumberPrivacyType, phone);
+            }
+        });
+
+        ivLivesInEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 addLivesInLayout.setVisibility(View.VISIBLE);
+                livesInAddressLayout.setVisibility(View.GONE);
             }
         });
 
@@ -537,15 +614,24 @@ public class AboutFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 addLivesInLayout.setVisibility(View.GONE);
+                livesInAddressLayout.setVisibility(View.VISIBLE);
 //                livesCountrySpinner.setSelection(0);
 //                livesStateSpinner.setSelection(0);
             }
         });
 
-        tvAddHomeState.setOnClickListener(new View.OnClickListener() {
+        btnLivesSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        ivHomeStateEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 addHomeStateLayout.setVisibility(View.VISIBLE);
+                homeStateAddressLayout.setVisibility(View.GONE);
             }
         });
 
@@ -553,8 +639,128 @@ public class AboutFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 addHomeStateLayout.setVisibility(View.GONE);
+                homeStateAddressLayout.setVisibility(View.VISIBLE);
 //                homeCountrySpinner.setSelection(0);
 //                homeStateSpinner.setSelection(0);
+            }
+        });
+
+        btnHomeStateSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        tvAddStory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                for (int i = 0; i < storyTypes.size(); i++) {
+                    for (Story story : profileInfo.getStories()) {
+                        if (!story.getType().equals(String.valueOf(i + 1))) {
+                            types.add(storyTypes.get(i));
+                        }
+                    }
+                }
+                ArrayAdapter<String> storyTypeAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, types);
+                storyTypeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                addStorySpinner.setAdapter(storyTypeAdapter);
+                addStorySpinner.performClick();
+            }
+        });
+
+        btnStoryCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                addStoryLayout.setVisibility(View.GONE);
+                etStoryDetails.setText("");
+            }
+        });
+
+        btnStorySave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String description = etStoryDetails.getText().toString();
+                setStoryRequest(storyType, storyPrivacyType, description);
+            }
+        });
+
+        phoneCountrySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                phone = new Phone("", phoneCountries.get(position).getCountryId(), "", "",
+                        "1", phoneCountries.get(position).getCountryName(), phoneCountries.get(position).getCountryIsoCode2(), phoneCountries.get(position).getCountryPhoneCode());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        phoneTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                numberType = String.valueOf(position + 1);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        emailPrivacySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                emailPrivacyType = String.valueOf(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        phonePrivacySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                phoneNumberPrivacyType = String.valueOf(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        storyPrivacySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                storyPrivacyType = String.valueOf(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        addStorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                for (int i = 0; i < storyTypes.size(); i++) {
+                    if (storyTypes.get(i).equals(types.get(position))) {
+                        storyType = String.valueOf(i + 1);
+                    }
+                }
+                tvStoryTitle.setText(storyTypes.get(position));
+                addStoryLayout.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
             }
         });
 
@@ -2087,6 +2293,69 @@ public class AboutFragment extends Fragment {
         });
     }
 
+    private void addEmailRequest(String emailAddress, String emailPrivacyType) {
+        Call<String> call = profileService.addEmail(deviceId, token, userIds, userIds, emailAddress, emailPrivacyType);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                profileInfo.getEmails().add(new Email(emailAddress, "2", emailPrivacyType, "0"));
+                emailAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void addPhoneRequest(String phoneNumber, String numberType, String phoneNumberPrivacyType, Phone phone) {
+        Call<String> call = profileService.addPhone(deviceId, token, userIds, userIds, phoneNumber, numberType, phoneNumberPrivacyType, phone.getCountryId());
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                profileInfo.getPhones().add(new Phone(phoneNumber, phone.getCountryId(), numberType, phoneNumberPrivacyType, "1", phone.getCountryName(), phone.getCountryIsoCode2(), phone.getCountryPhoneCode()));
+                phoneAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void setStoryRequest(String storyType, String storyPrivacyType, String description) {
+        Call<String> call = profileService.setStory(deviceId, token, userIds, userIds, storyType, storyPrivacyType, description);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                profileInfo.getStories().add(new Story(description, storyType, storyPrivacyType));
+                storyAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void setLivePlaceRequest(String type, String privacyType, String countryId, String cityId) {
+        Call<String> call = profileService.setLivePlace(deviceId, token, userIds, userIds, countryId, cityId, type, privacyType);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
     private void removeRequest(Call<String> call, Dialog dialog) {
         call.enqueue(new Callback<String>() {
             @Override
@@ -2128,6 +2397,33 @@ public class AboutFragment extends Fragment {
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
+                Log.d("MESSAGE: ", t.getMessage());
+                progressDialog.hide();
+            }
+        });
+    }
+
+    private void sendPhoneCountryListRequest() {
+        progressDialog.show();
+        PhoneCountry phoneCountry = new PhoneCountry();
+        phoneCountry.setCountryId("");
+        phoneCountry.setCountryName("Select");
+        phoneCountry.setCountryIsoCode2("");
+        phoneCountry.setCountryPhoneCode("");
+        phoneCountries.add(phoneCountry);
+        Call<ArrayList<PhoneCountry>> call = profileService.getCountryPhoneCodes(deviceId, token, userIds, userIds);
+        call.enqueue(new Callback<ArrayList<PhoneCountry>>() {
+
+            @Override
+            public void onResponse(Call<ArrayList<PhoneCountry>> call, Response<ArrayList<PhoneCountry>> response) {
+                if (response.body() != null) {
+                    phoneCountries.addAll(response.body());
+                }
+                progressDialog.hide();
+            }
+
+            @Override
+            public void onFailure(Call<ArrayList<PhoneCountry>> call, Throwable t) {
                 Log.d("MESSAGE: ", t.getMessage());
                 progressDialog.hide();
             }

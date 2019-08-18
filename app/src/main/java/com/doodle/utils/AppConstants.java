@@ -1,10 +1,5 @@
 package com.doodle.utils;
 
-import android.widget.Button;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-
 public class AppConstants {
 
     //===============LOCAL SERVER==================
@@ -148,5 +143,11 @@ public class AppConstants {
     public static final String GET_USER_INFO_BY_USER_NAME = "getUserinfoByUserName";
     public static final String UPLOAD_PROFILE_IMAGE = "updateProfilePicture";
     public static final String UPLOAD_COVER_IMAGE = "add_cover_photo";
+    public static final String EMAIL_ADD = "email_add";
+    public static final String PHONE_ADD = "phone_add";
+    public static final String SET_STORY = "set_story";
+    public static final String SET_LIVE_PLACE = "set_live_place";
+    public static final String GET_CITY_LIST = "get_city_list";
+    public static final String GET_COUNTRY_PHONE_CODES = "get_country_phone_codes";
 
 }

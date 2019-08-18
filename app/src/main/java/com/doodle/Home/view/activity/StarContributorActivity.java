@@ -2,7 +2,6 @@ package com.doodle.Home.view.activity;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,23 +17,19 @@ import android.widget.TextView;
 
 import com.doodle.Home.adapter.StarContributorSubCategoryAdapter;
 import com.doodle.Home.adapter.StarContributorsAdapter;
-import com.doodle.Home.adapter.SubCategoryAdapter;
-import com.doodle.Home.model.CommonCategory;
 import com.doodle.Home.model.PostFilterItem;
 import com.doodle.Home.model.PostFilterSubCategory;
 import com.doodle.Home.model.StarContributor;
-import com.doodle.Home.service.FilterClickListener;
 import com.doodle.Home.service.HomeService;
 import com.doodle.Home.service.StarContributorCategoryListener;
 import com.doodle.R;
-import com.doodle.utils.AppConstants;
 import com.doodle.utils.PrefManager;
-import com.doodle.utils.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import retrofit2.Call;
@@ -46,7 +41,7 @@ public class StarContributorActivity extends AppCompatActivity {
     Toolbar toolbar;
     RecyclerView recyclerView;
     SearchView searchView;
-    TextView tvFilterItem;
+    TextView tvFilterItem, tvAlertText;
     ProgressBar progressBar;
     private ProgressDialog progressDialog;
     private LinearLayoutManager layoutManager;
@@ -61,7 +56,6 @@ public class StarContributorActivity extends AppCompatActivity {
     private int totalItems;
     private int scrollOutItems;
     private int currentItems;
-
 
     private ArrayList<PostFilterSubCategory> subCategories;
     private ArrayList<StarContributor> starContributors;
@@ -83,6 +77,7 @@ public class StarContributorActivity extends AppCompatActivity {
         recyclerView.setNestedScrollingEnabled(false);
         searchView = findViewById(R.id.search_view);
         tvFilterItem = findViewById(R.id.filterItem);
+        tvAlertText = findViewById(R.id.alertText);
         progressBar = findViewById(R.id.progress_bar);
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage(getString(R.string.loading));
@@ -154,6 +149,10 @@ public class StarContributorActivity extends AppCompatActivity {
                 }
             }
         });
+
+
+
+
     }
 
     private void showFilterDialog() {
@@ -200,17 +199,31 @@ public class StarContributorActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<ArrayList<StarContributor>> call, Response<ArrayList<StarContributor>> response) {
                 ArrayList<StarContributor> arrayList = response.body();
+                starContributors.clear();
                 if (arrayList != null) {
-                    starContributors.clear();
                     starContributors.addAll(arrayList);
-                    starContributorsAdapter.notifyDataSetChanged();
                     offset += limit;
                 }
+                starContributorsAdapter.notifyDataSetChanged();
+
+                if (starContributors.size() == 0) {
+                    tvAlertText.setVisibility(View.VISIBLE);
+                } else {
+                    tvAlertText.setVisibility(View.GONE);
+                }
+
                 progressDialog.hide();
             }
 
             @Override
             public void onFailure(Call<ArrayList<StarContributor>> call, Throwable t) {
+                starContributors.clear();
+                starContributorsAdapter.notifyDataSetChanged();
+                if (starContributors.size() == 0) {
+                    tvAlertText.setVisibility(View.VISIBLE);
+                } else {
+                    tvAlertText.setVisibility(View.GONE);
+                }
                 progressDialog.hide();
             }
         });
