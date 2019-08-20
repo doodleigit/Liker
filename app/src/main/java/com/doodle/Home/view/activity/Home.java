@@ -69,6 +69,7 @@ import com.doodle.Post.view.activity.PostNew;
 import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.R;
 import com.doodle.Search.LikerSearch;
+import com.doodle.Setting.view.SettingActivity;
 import com.doodle.utils.AppConstants;
 import com.doodle.utils.PrefManager;
 import com.doodle.utils.ScreenOnOffBroadcast;
@@ -869,6 +870,20 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
                 finish();
                 return true;
 
+            case R.id.action_how_to_use_liker:
+                Intent intent = new Intent(this, SettingActivity.class);
+                intent.putExtra("type", getString(R.string.how_to_use_liker));
+                intent.putExtra("link", getString(R.string.how_to_use_liker_link));
+                startActivity(intent);
+                return true;
+
+            case R.id.action_find_friends:
+                Intent findFriendsIntent = new Intent(this, SettingActivity.class);
+                findFriendsIntent.putExtra("type", getString(R.string.find_friends));
+                findFriendsIntent.putExtra("link", getString(R.string.find_friends_link));
+                startActivity(findFriendsIntent);
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -1011,6 +1026,5 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
     public void onNothingSelected(AdapterView<?> adapterView) {
 
     }
-
 
 }

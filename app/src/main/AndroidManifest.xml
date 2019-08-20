@@ -22,6 +22,9 @@
         android:vmSafeMode="true"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
+            android:name=".Setting.view.SettingActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".Home.view.activity.StarContributorActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name="com.soundcloud.android.crop.CropImageActivity" />

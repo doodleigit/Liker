@@ -44,9 +44,17 @@
                             android:layout_height="40dp"
                             android:layout_alignParentEnd="true"
                             android:padding="10dp"
-                            android:src="@drawable/plus" />
+                            android:src="@drawable/edit_blue" />
 
                     </RelativeLayout>
+
+                    <TextView
+                        android:id="@+id/intro"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:text="Male"
+                        android:textSize="14sp" />
 
                     <TextView
                         android:layout_width="wrap_content"

@@ -46,7 +46,8 @@
                 android:padding="5dp"
                 android:text="Edit"
                 android:textColor="@color/text_selected"
-                android:textSize="14sp"/>
+                android:textSize="14sp"
+                android:visibility="gone"/>
 
         </LinearLayout>
 

@@ -81,6 +81,22 @@
         <item>Friends</item>
     </string-array>
 
+    <integer-array name="privacy_list_drawable">
+        <item>@drawable/public_</item>
+        <item>@drawable/only_me</item>
+        <item>@drawable/friends</item>
+    </integer-array>
+
+    <string-array name="privacy_list_two">
+        <item>Everyone</item>
+        <item>Nobody</item>
+    </string-array>
+
+    <integer-array name="privacy_list_two_drawable">
+        <item>@drawable/public_</item>
+        <item>@drawable/friends</item>
+    </integer-array>
+
     <string-array name="institute_list">
         <item>Select</item>
         <item>High School</item>
@@ -209,5 +225,51 @@
     <string name="select_day">Select Day</string>
     <string name="are_you_sure">Are you sure you want to remove</string>
     <string name="search_by_name">Search By Name</string>
+
+    <string name="who_can_send_you_friend_requests">Who can send you friend requests:</string>
+    <string name="who_can_post_on_your_wall">Who can post on your wall:</string>
+    <string name="who_can_see_your_friend_list">Who can see your friend list:</string>
+    <string name="who_can_see_your_photos">Who can see your photos:</string>
+    <string name="who_can_send_you_message">Who can send you message:</string>
+    <string name="block_users">Block Users:</string>
+    <string name="reset">Reset</string>
+    <string name="deactivate">Deactivate</string>
+    <string name="cancel">Cancel</string>
+    <string name="change">Change</string>
+    <string name="change_all">Change All</string>
+    <string name="save">Save</string>
+    <string name="save_all">Save All</string>
+    <string name="find_user">Find User</string>
+    <string name="user_or_email">User or Email</string>
+    <string name="notifications_on_off_list">Notifications On Off List</string>
+    <string name="notification_name">Notification Name</string>
+    <string name="push">Push</string>
+    <string name="email">Email</string>
+    <string name="browser">Browser</string>
+    <string name="selected_categories">Selected Categories</string>
+    <string name="please_select_any_category">Please select any category that you would like to declare yourself a contributor to (we will track your likes and add you to the rankings)</string>
+    <string name="you_can_still_post_on_deactivation">You can still post on deactivation (though it doesn’t go anywhere) Post(s) shows once you’ve activate your account again.</string>
+    <string name="security_setting">Security Settings</string>
+    <string name="password_setting">Password Settings</string>
+    <string name="email_setting">Email Settings</string>
+    <string name="security_question_">Security Question:</string>
+    <string name="answer_">Answer:</string>
+    <string name="security_answer">Security Answer</string>
+    <string name="add_new_email">Add New Email</string>
+    <string name="old_password_">Old Password:</string>
+    <string name="new_password_">New Password:</string>
+    <string name="retype_new_password_">Retype New Password:</string>
+    <string name="active_deactive_your_account">Activate / Deactivate your account</string>
+    <string name="terms_of_service">Terms of Service</string>
+    <string name="privacy">Privacy</string>
+    <string name="contact">Contact</string>
+    <string name="how_to_use_liker">How to use liker</string>
+    <string name="how_to_use_liker_link">https://www.m.liker.com/how-liker-works</string>
+    <string name="find_friends">Find Friends</string>
+    <string name="find_friends_link">https://www.m.liker.com/settings/find-friends</string>
+    <string name="account_setting">Account Setting</string>
+    <string name="contributor_setting">Contributor Setting</string>
+    <string name="notification_setting">Notification Setting</string>
+    <string name="privacy_and_security">Privacy and Security</string>
 
 </resources>

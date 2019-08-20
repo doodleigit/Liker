@@ -28,7 +28,7 @@
         android:layout_centerInParent="true"
         android:layout_alignParentEnd="true"
         android:padding="10dp"
-        android:src="@drawable/plus"
+        android:src="@drawable/edit_blue"
         android:visibility="visible"/>
 
 </RelativeLayout>

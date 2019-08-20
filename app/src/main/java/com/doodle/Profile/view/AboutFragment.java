@@ -31,6 +31,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.doodle.Profile.adapter.AddEmailAdapter;
+import com.doodle.Profile.adapter.AddPhoneAdapter;
+import com.doodle.Profile.adapter.AddStoryAdapter;
 import com.doodle.Profile.adapter.AwardsAdapter;
 import com.doodle.Profile.adapter.CertificationAdapter;
 import com.doodle.Profile.adapter.EducationAdapter;
@@ -43,6 +46,9 @@ import com.doodle.Profile.adapter.StoryAdapter;
 import com.doodle.Profile.adapter.SuggestionAdapter;
 import com.doodle.Profile.model.Awards;
 import com.doodle.Profile.model.Certification;
+import com.doodle.Profile.model.Cities;
+import com.doodle.Profile.model.City;
+import com.doodle.Profile.model.Country;
 import com.doodle.Profile.model.CountryInfo;
 import com.doodle.Profile.model.Education;
 import com.doodle.Profile.model.Email;
@@ -54,7 +60,10 @@ import com.doodle.Profile.model.PhoneCountry;
 import com.doodle.Profile.model.ProfileInfo;
 import com.doodle.Profile.model.Story;
 import com.doodle.Profile.service.AboutComponentUpdateListener;
+import com.doodle.Profile.service.EmailModificationListener;
+import com.doodle.Profile.service.PhoneModificationListener;
 import com.doodle.Profile.service.ProfileService;
+import com.doodle.Profile.service.StoryModificationListener;
 import com.doodle.Profile.service.SuggestionClickListener;
 import com.doodle.R;
 import com.doodle.utils.PrefManager;
@@ -79,7 +88,7 @@ public class AboutFragment extends Fragment {
     View view;
 
     private LinearLayout birthDayLayout, birthYearLayout, emailLayout, phoneLayout, addressLayout;
-    private TextView tvFullName, tvGender, tvBirthDay, tvBirthYear, tvAddress, tvCity, tvCountry;
+    private TextView tvFullName, tvIntro, tvGender, tvBirthDay, tvBirthYear, tvAddress, tvCity, tvCountry;
     private ImageView ivEditUserInfo, ivAddEducation, ivAddExperience, ivAddAwards, ivAddCertificate, ivAddSocialLinks;
     private RecyclerView emailRecyclerView, phoneRecyclerView, storyRecyclerView, educationRecyclerView, experienceRecyclerView, awardsRecyclerView, certificationRecyclerView, socialRecyclerView;
 
@@ -129,6 +138,7 @@ public class AboutFragment extends Fragment {
         manager = new PrefManager(getContext());
 
         privacyList = Arrays.asList(getResources().getStringArray(R.array.privacy_list));
+        countries = new ArrayList<>();
         emails = new ArrayList<>();
         phones = new ArrayList<>();
         stories = new ArrayList<>();
@@ -155,6 +165,7 @@ public class AboutFragment extends Fragment {
         phoneLayout = view.findViewById(R.id.phone_layout);
         addressLayout = view.findViewById(R.id.address_layout);
         tvFullName = view.findViewById(R.id.user_name);
+        tvIntro = view.findViewById(R.id.intro);
         tvGender = view.findViewById(R.id.gender);
         tvBirthDay = view.findViewById(R.id.birth_day);
         tvBirthYear = view.findViewById(R.id.birth_year);
@@ -242,7 +253,7 @@ public class AboutFragment extends Fragment {
         ivEditUserInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                editUserInfo();
+                editUserInfo();
             }
         });
         ivAddEducation.setOnClickListener(new View.OnClickListener() {
@@ -280,6 +291,13 @@ public class AboutFragment extends Fragment {
 
     private void setData() {
         tvFullName.setText(profileInfo.getFirstName() + " " + profileInfo.getLastName());
+//        if (!profileInfo.getIntro().equals("")) {
+//            tvIntro.setText(profileInfo.getIntro());
+//            tvIntro.setVisibility(View.VISIBLE);
+//        } else {
+//            tvIntro.setVisibility(View.GONE);
+//        }
+        tvIntro.setVisibility(View.GONE);
         tvGender.setText(profileInfo.getSex().equals("1") ? "Male" : "Female");
         tvBirthDay.setText(profileInfo.getBirthDate() + " " + Utils.getMonth(profileInfo.getBirthMonth()));
         tvBirthYear.setText(profileInfo.getBirthYear());
@@ -341,6 +359,14 @@ public class AboutFragment extends Fragment {
         final String[] month = {""};
         final String[] day = {""};
         final String[] gender = {""};
+        final String[] livesCountryId = {""};
+        final String[] livesCountryName = {""};
+        final String[] homeCountryId = {""};
+        final String[] homeCountryName = {""};
+        final String[] livesCityId = {""};
+        final String[] livesCityName = {""};
+        final String[] homeCityId = {""};
+        final String[] homeCityName = {""};
         final String[] yearPermission = {""};
         final String[] dayMonthPermission = {""};
         List<String> phoneTypes = Arrays.asList(getResources().getStringArray(R.array.phone_type_list));
@@ -350,6 +376,11 @@ public class AboutFragment extends Fragment {
         List<String> months = Arrays.asList(getResources().getStringArray(R.array.month_list));
         ArrayList<String> years = new ArrayList<>();
         ArrayList<String> days = new ArrayList<>();
+        ArrayList<String> countryList = new ArrayList<>();
+        ArrayList<City> livesCityList = new ArrayList<>();
+        ArrayList<City> homeCityList = new ArrayList<>();
+        ArrayList<String> livesCityNameList = new ArrayList<>();
+        ArrayList<String> homeCityNameList = new ArrayList<>();
         years.add(getString(R.string.select_year));
         days.add(getString(R.string.select_day));
         int thisYear = Calendar.getInstance().get(Calendar.YEAR);
@@ -360,10 +391,14 @@ public class AboutFragment extends Fragment {
         for (int i = 1; i <= totalDay; i++) {
             days.add(Integer.toString(i));
         }
+        for (CountryInfo countryInfo : countries) {
+            countryList.add(countryInfo.getCountryName());
+        }
 
+        Toolbar toolbar = dialog.findViewById(R.id.toolbar);
         LinearLayout addEmailLayout, addPhoneLayout, addLivesInLayout, addHomeStateLayout, addStoryLayout;
         RelativeLayout livesInAddressLayout, homeStateAddressLayout;
-        TextView tvStoryTitle, tvAddEmail, tvAddPhone, tvAddLivesIn, tvAddHomeState, tvAddStory, tvLivesInAddress, tvHomeStateAddress;
+        TextView tvStoryTitle, tvAddEmail, tvAddPhone, tvAddStory, tvLivesInAddress, tvHomeStateAddress;
         ImageView ivLivesInEdit, ivHomeStateEdit;
         EditText etFirstName, etLastName, etHeadline, etAddress, etNewEmail, etNewPhone, etStoryDetails;
         Spinner genderSpinner, birthYearSpinner, birthMonthSpinner, birthDaySpinner, birthYearPrivacySpinner, birthDayPrivacySpinner, emailPrivacySpinner, phoneCountrySpinner, phonePrivacySpinner, phoneTypeSpinner, livesCountrySpinner, livesStateSpinner, homeCountrySpinner,
@@ -384,8 +419,6 @@ public class AboutFragment extends Fragment {
         tvStoryTitle = dialog.findViewById(R.id.story_title);
         tvAddEmail = dialog.findViewById(R.id.add_email);
         tvAddPhone = dialog.findViewById(R.id.add_phone);
-        tvAddLivesIn = dialog.findViewById(R.id.add_lives_in);
-        tvAddHomeState = dialog.findViewById(R.id.add_home_state);
         tvAddStory = dialog.findViewById(R.id.add_story);
         tvLivesInAddress = dialog.findViewById(R.id.lives_in_address);
         tvHomeStateAddress = dialog.findViewById(R.id.home_state_address);
@@ -439,7 +472,12 @@ public class AboutFragment extends Fragment {
 
         ArrayList<String> phoneCountryCodes = new ArrayList<>();
         for (PhoneCountry phoneCountry : phoneCountries) {
-            phoneCountryCodes.add(phoneCountry.getCountryIsoCode2() + "(" + phoneCountry.getCountryPhoneCode() + ")");
+            if (phoneCountry.getCountryName().equals("Select")) {
+                phoneCountryCodes.add(phoneCountry.getCountryName());
+            } else {
+                phoneCountryCodes.add(phoneCountry.getCountryIsoCode2() + "(" + phoneCountry.getCountryPhoneCode() + ")");
+            }
+
         }
         ArrayAdapter<String> phoneCountryAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, phoneCountryCodes);
         phoneCountryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -465,6 +503,11 @@ public class AboutFragment extends Fragment {
         birthDayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         birthDaySpinner.setAdapter(birthDayAdapter);
 
+        ArrayAdapter<String> countryListAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, countryList);
+        countryListAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        livesCountrySpinner.setAdapter(countryListAdapter);
+        homeCountrySpinner.setAdapter(countryListAdapter);
+
         ArrayAdapter<String> privacyAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, privacyList);
         privacyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         birthYearPrivacySpinner.setAdapter(privacyAdapter);
@@ -472,14 +515,69 @@ public class AboutFragment extends Fragment {
         emailPrivacySpinner.setAdapter(privacyAdapter);
         phonePrivacySpinner.setAdapter(privacyAdapter);
 
+        EmailModificationListener emailModificationListener = new EmailModificationListener() {
+            @Override
+            public void onEmailRemove(Email email, int position) {
+                Call<String> call = profileService.removeEmail(deviceId, token, userIds, userIds, email.getEmail());
+                removeEmail(call, position, emailRecyclerView);
+            }
+        };
+
+        PhoneModificationListener phoneModificationListener = new PhoneModificationListener() {
+            @Override
+            public void onPhoneEdit(Phone phone) {
+
+            }
+
+            @Override
+            public void onPhoneRemove(Phone phone, int position) {
+                Call<String> call = profileService.removePhone(deviceId, token, userIds, userIds, phone.getPhoneNumber());
+                removePhone(call, position, phoneRecyclerView);
+            }
+        };
+
+        StoryModificationListener storyModificationListener = new StoryModificationListener() {
+            @Override
+            public void onStoryEdit(Story story) {
+
+            }
+        };
+
+        AddEmailAdapter addEmailAdapter = new AddEmailAdapter(getActivity(), profileInfo.getEmails(), emailModificationListener);
+        emailRecyclerView.setAdapter(addEmailAdapter);
+
+        AddPhoneAdapter addPhoneAdapter = new AddPhoneAdapter(getActivity(), profileInfo.getPhones(), phoneModificationListener);
+        phoneRecyclerView.setAdapter(addPhoneAdapter);
+
+        AddStoryAdapter addStoryAdapter = new AddStoryAdapter(getActivity(), profileInfo.getStories(), storyModificationListener);
+        storyRecycleView.setAdapter(addStoryAdapter);
+
         etFirstName.setText(profileInfo.getFirstName());
         etLastName.setText(profileInfo.getLastName());
         etHeadline.setText(profileInfo.getHeadLine());
         etAddress.setText(profileInfo.getAddress());
+        if (!profileInfo.getCurrentCityCity().equals("")) {
+            tvLivesInAddress.setText(profileInfo.getCurrentCityCity() + ", " + profileInfo.getCurrentCityCountry());
+        } else {
+            tvLivesInAddress.setText("Not Yet");
+        }
         genderSpinner.setSelection(Integer.valueOf(profileInfo.getSex()));
-        birthYearSpinner.setSelection(Integer.valueOf(profileInfo.getBirthYear()));
+
+        for (int i = 0; i < years.size(); i++) {
+            if (years.get(i).equals(profileInfo.getBirthYear())) {
+                birthYearSpinner.setSelection(i);
+                break;
+            }
+        }
+
+        for (int i = 0; i < days.size(); i++) {
+            if (days.get(i).equals(profileInfo.getBirthDate())) {
+                birthDaySpinner.setSelection(i);
+                break;
+            }
+        }
+
         birthMonthSpinner.setSelection(Integer.valueOf(profileInfo.getBirthMonth()));
-        birthDaySpinner.setSelection(Integer.valueOf(profileInfo.getBirthDate()));
         birthYearPrivacySpinner.setSelection(Integer.valueOf(profileInfo.getYearPermission()));
         birthDayPrivacySpinner.setSelection(Integer.valueOf(profileInfo.getDayMonthPermission()));
 
@@ -498,7 +596,7 @@ public class AboutFragment extends Fragment {
         birthYearSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                year[0] = String.valueOf(position);
+                year[0] = years.get(position);
             }
 
             @Override
@@ -555,6 +653,60 @@ public class AboutFragment extends Fragment {
             }
         });
 
+        livesCountrySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                livesCountryId[0] = countries.get(i).getCountryId();
+                livesCountryName[0] = countries.get(i).getCountryName();
+                sendCityListRequest(livesCountryId[0], livesCityList, livesCityNameList, livesStateSpinner);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        homeCountrySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                homeCountryId[0] = countries.get(i).getCountryId();
+                homeCountryName[0] = countries.get(i).getCountryName();
+                sendCityListRequest(homeCountryId[0], homeCityList, homeCityNameList, homeStateSpinner);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        livesStateSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                livesCityId[0] = livesCityList.get(i).getId();
+                livesCityName[0] = livesCityList.get(i).getName();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        homeStateSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                homeCityId[0] = homeCityList.get(i).getId();
+                homeCityName[0] = homeCityList.get(i).getName();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
         tvAddEmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -574,7 +726,7 @@ public class AboutFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 String emailAddress = etNewEmail.getText().toString();
-                addEmailRequest(emailAddress, emailPrivacyType);
+                addEmailRequest(emailAddress, emailPrivacyType, addEmailAdapter, etNewEmail, addEmailLayout);
             }
         });
 
@@ -598,7 +750,7 @@ public class AboutFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 String phoneNumber = etNewPhone.getText().toString();
-                addPhoneRequest(phoneNumber, numberType, phoneNumberPrivacyType, phone);
+                addPhoneRequest(phoneNumber, numberType, phoneNumberPrivacyType, phone, addPhoneAdapter, etNewPhone, phoneCountrySpinner, addPhoneLayout);
             }
         });
 
@@ -623,7 +775,8 @@ public class AboutFragment extends Fragment {
         btnLivesSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                setLivePlaceRequest("1", "1", livesCountryId[0], livesCountryName[0], livesCityId[0], livesCityName[0], addLivesInLayout, livesInAddressLayout,
+                        tvLivesInAddress);
             }
         });
 
@@ -648,13 +801,15 @@ public class AboutFragment extends Fragment {
         btnHomeStateSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                setLivePlaceRequest("2", "1", homeCountryId[0], homeCountryName[0], homeCityId[0], homeCityName[0], addHomeStateLayout, homeStateAddressLayout,
+                        tvHomeStateAddress);
             }
         });
 
         tvAddStory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                types.clear();
                 for (int i = 0; i < storyTypes.size(); i++) {
                     for (Story story : profileInfo.getStories()) {
                         if (!story.getType().equals(String.valueOf(i + 1))) {
@@ -681,7 +836,7 @@ public class AboutFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 String description = etStoryDetails.getText().toString();
-                setStoryRequest(storyType, storyPrivacyType, description);
+                setStoryRequest(storyType, storyPrivacyType, description, addStoryAdapter, etStoryDetails, addStoryLayout);
             }
         });
 
@@ -754,7 +909,7 @@ public class AboutFragment extends Fragment {
                         storyType = String.valueOf(i + 1);
                     }
                 }
-                tvStoryTitle.setText(storyTypes.get(position));
+                tvStoryTitle.setText(storyTypes.get(position + 1));
                 addStoryLayout.setVisibility(View.VISIBLE);
             }
 
@@ -767,7 +922,38 @@ public class AboutFragment extends Fragment {
         fabDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+//                user_id: 26444
+//                first_name: June
+//                last_name: Ramirez
+//                headline: Hello Hi Bye Bye
+//                sex: 1
+//                address: dhaka
+//                location_name:
+//                year: 1990
+//                month: 01
+//                date: 14
+//                year_permission: 0
+//                day_month_permission: 0
+//                location_actual_name:
+//                location_latitude:
+//                location_longitude:
+//                location_country_name:
+                String firstName, lastName, headline, address;
+                firstName = etFirstName.getText().toString();
+                lastName = etLastName.getText().toString();
+                headline = etHeadline.getText().toString();
+                address = etAddress.getText().toString();
 
+                Call<String> call = profileService.setIntro(deviceId, token, userIds, userIds, firstName, lastName, headline, gender[0], address, "", year[0], month[0], day[0], yearPermission[0],
+                        dayMonthPermission[0], "", "", "", "");
+                sendSetIntroRequest(call, dialog);
+            }
+        });
+
+        toolbar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
             }
         });
 
@@ -2293,13 +2479,16 @@ public class AboutFragment extends Fragment {
         });
     }
 
-    private void addEmailRequest(String emailAddress, String emailPrivacyType) {
+    private void addEmailRequest(String emailAddress, String emailPrivacyType, AddEmailAdapter addEmailAdapter, EditText etNewEmail, LinearLayout addEmailLayout) {
         Call<String> call = profileService.addEmail(deviceId, token, userIds, userIds, emailAddress, emailPrivacyType);
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 profileInfo.getEmails().add(new Email(emailAddress, "2", emailPrivacyType, "0"));
                 emailAdapter.notifyDataSetChanged();
+                addEmailAdapter.notifyDataSetChanged();
+                etNewEmail.setText("");
+                addEmailLayout.setVisibility(View.GONE);
             }
 
             @Override
@@ -2309,13 +2498,17 @@ public class AboutFragment extends Fragment {
         });
     }
 
-    private void addPhoneRequest(String phoneNumber, String numberType, String phoneNumberPrivacyType, Phone phone) {
+    private void addPhoneRequest(String phoneNumber, String numberType, String phoneNumberPrivacyType, Phone phone, AddPhoneAdapter addPhoneAdapter, EditText etNewPhone, Spinner phoneCountry, LinearLayout addPhoneLayout) {
         Call<String> call = profileService.addPhone(deviceId, token, userIds, userIds, phoneNumber, numberType, phoneNumberPrivacyType, phone.getCountryId());
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 profileInfo.getPhones().add(new Phone(phoneNumber, phone.getCountryId(), numberType, phoneNumberPrivacyType, "1", phone.getCountryName(), phone.getCountryIsoCode2(), phone.getCountryPhoneCode()));
                 phoneAdapter.notifyDataSetChanged();
+                addPhoneAdapter.notifyDataSetChanged();
+                etNewPhone.setText("");
+                phoneCountry.setSelection(0);
+                addPhoneLayout.setVisibility(View.GONE);
             }
 
             @Override
@@ -2325,13 +2518,16 @@ public class AboutFragment extends Fragment {
         });
     }
 
-    private void setStoryRequest(String storyType, String storyPrivacyType, String description) {
+    private void setStoryRequest(String storyType, String storyPrivacyType, String description, AddStoryAdapter addStoryAdapter, EditText etNewStory, LinearLayout addStoryLayout) {
         Call<String> call = profileService.setStory(deviceId, token, userIds, userIds, storyType, storyPrivacyType, description);
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 profileInfo.getStories().add(new Story(description, storyType, storyPrivacyType));
                 storyAdapter.notifyDataSetChanged();
+                addStoryAdapter.notifyDataSetChanged();
+                etNewStory.setText("");
+                addStoryLayout.setVisibility(View.GONE);
             }
 
             @Override
@@ -2341,16 +2537,27 @@ public class AboutFragment extends Fragment {
         });
     }
 
-    private void setLivePlaceRequest(String type, String privacyType, String countryId, String cityId) {
+    private void setLivePlaceRequest(String type, String privacyType, String countryId, String countryName, String cityId, String cityName, LinearLayout addLivesInLayout, RelativeLayout livesInAddressLayout,
+                                     TextView tvLivesIn) {
+        progressDialog.show();
         Call<String> call = profileService.setLivePlace(deviceId, token, userIds, userIds, countryId, cityId, type, privacyType);
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-
+                profileInfo.setCurrentCityCity(cityName);
+                profileInfo.setCurrentCityCityId(cityId);
+                profileInfo.setCurrentCityCountry(countryName);
+                profileInfo.setCurrentCityCountryId(countryId);
+                profileInfo.setCurrentCityId("");
+                progressDialog.hide();
+                tvLivesIn.setText(cityName + ", " + countryName);
+                addLivesInLayout.setVisibility(View.GONE);
+                livesInAddressLayout.setVisibility(View.VISIBLE);
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
+                progressDialog.hide();
                 Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
             }
         });
@@ -2384,6 +2591,30 @@ public class AboutFragment extends Fragment {
         });
     }
 
+    private void sendSetIntroRequest(Call<String> call, Dialog dialog) {
+        progressDialog.show();
+        call.enqueue(new Callback<String>() {
+
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                progressDialog.hide();
+                dialog.dismiss();
+                getActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .detach(AboutFragment.this)
+                        .attach(AboutFragment.this)
+                        .commit();
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.d("MESSAGE: ", t.getMessage());
+                Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                progressDialog.hide();
+            }
+        });
+    }
+
     private void sendProfileInfoRequest(Call<String> call) {
         call.enqueue(new Callback<String>() {
 
@@ -2392,7 +2623,7 @@ public class AboutFragment extends Fragment {
                 String jsonResponse = response.body();
                 clearData();
                 getDataFromJson(jsonResponse);
-                progressDialog.hide();
+                sendCountryListRequest();
             }
 
             @Override
@@ -2402,6 +2633,130 @@ public class AboutFragment extends Fragment {
             }
         });
     }
+
+    private void removeEmail(Call<String> call, int position, RecyclerView recyclerView) {
+        call.enqueue(new Callback<String>() {
+
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                String jsonResponse = response.body();
+                try {
+                    JSONObject obj = new JSONObject(jsonResponse);
+                    boolean status = obj.getBoolean("status");
+                    if (status) {
+                        profileInfo.getEmails().remove(position);
+                        emailAdapter.notifyDataSetChanged();
+                        recyclerView.getAdapter().notifyDataSetChanged();
+                    } else {
+                        Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.d("MESSAGE: ", t.getMessage());
+                progressDialog.hide();
+            }
+        });
+    }
+
+    private void removePhone(Call<String> call, int position, RecyclerView recyclerView) {
+        call.enqueue(new Callback<String>() {
+
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                String jsonResponse = response.body();
+                try {
+                    JSONObject obj = new JSONObject(jsonResponse);
+                    boolean status = obj.getBoolean("status");
+                    if (status) {
+                        profileInfo.getPhones().remove(position);
+                        phoneAdapter.notifyDataSetChanged();
+                        recyclerView.getAdapter().notifyDataSetChanged();
+                    } else {
+                        Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.d("MESSAGE: ", t.getMessage());
+                progressDialog.hide();
+            }
+        });
+    }
+
+    private void sendCountryListRequest() {
+        progressDialog.show();
+        CountryInfo countryInfo = new CountryInfo();
+        countryInfo.setCountryId("");
+        countryInfo.setCountryName("Select Country");
+        countryInfo.setCountryIsoCode2("");
+        countryInfo.setCountryIsoCode3("");
+        countryInfo.setCountryPhoneCode("");
+        countryInfo.setCountryAddressFormat("");
+        countryInfo.setCountryPostcodeRequired("");
+        countryInfo.setCountryStatus("");
+        countries.add(countryInfo);
+        Call<Country> call = profileService.getCountryList(deviceId, token, userIds, userIds);
+        call.enqueue(new Callback<Country>() {
+
+            @Override
+            public void onResponse(Call<Country> call, Response<Country> response) {
+                Country country = response.body();
+                if (country != null) {
+                    countries.addAll(country.getCountry());
+                }
+                progressDialog.hide();
+            }
+
+            @Override
+            public void onFailure(Call<Country> call, Throwable t) {
+                Log.d("MESSAGE: ", t.getMessage());
+                progressDialog.hide();
+            }
+        });
+    }
+
+    private void sendCityListRequest(String countryId, ArrayList<City> cityList, ArrayList<String> cityNameList, Spinner spinner) {
+        cityNameList.clear();
+        cityList.clear();
+        City city = new City();
+        city.setCountryId("");
+        city.setId("");
+        city.setName("Select City");
+        city.setInactive("");
+        cityList.add(city);
+        Call<Cities> call = profileService.getCityList(deviceId, token, userIds, userIds, countryId);
+        call.enqueue(new Callback<Cities>() {
+
+            @Override
+            public void onResponse(Call<Cities> call, Response<Cities> response) {
+                Cities cities = response.body();
+                if (cities.getData() != null) {
+                    cityList.addAll(cities.getData());
+                }
+                for (City c : cityList) {
+                    cityNameList.add(c.getName());
+                }
+                ArrayAdapter<String> cityListAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, cityNameList);
+                cityListAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinner.setAdapter(cityListAdapter);
+            }
+
+            @Override
+            public void onFailure(Call<Cities> call, Throwable t) {
+                Log.d("MESSAGE: ", t.getMessage());
+            }
+        });
+    }
+
 
     private void sendPhoneCountryListRequest() {
         progressDialog.show();

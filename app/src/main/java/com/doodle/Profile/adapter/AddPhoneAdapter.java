@@ -9,18 +9,26 @@ import android.view.ViewGroup;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.doodle.Profile.model.Phone;
+import com.doodle.Profile.service.PhoneModificationListener;
 import com.doodle.R;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class AddPhoneAdapter extends RecyclerView.Adapter<AddPhoneAdapter.ViewHolder> {
 
     private Context context;
-    private ArrayList<String> arrayList;
+    private ArrayList<Phone> arrayList;
+    private List<String> numberTypes;
+    private PhoneModificationListener phoneModificationListener;
 
-    public AddPhoneAdapter(Context context, ArrayList<String> arrayList) {
+    public AddPhoneAdapter(Context context, ArrayList<Phone> arrayList, PhoneModificationListener phoneModificationListener) {
         this.context = context;
         this.arrayList = arrayList;
+        this.numberTypes = Arrays.asList(context.getResources().getStringArray(R.array.phone_type_list));
+        this.phoneModificationListener = phoneModificationListener;
     }
 
     @NonNull
@@ -33,7 +41,22 @@ public class AddPhoneAdapter extends RecyclerView.Adapter<AddPhoneAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
+        viewHolder.tvPhoneNumber.setText(arrayList.get(i).getPhoneNumber());
+        viewHolder.tvNumberType.setText(numberTypes.get(Integer.valueOf(arrayList.get(i).getType()) - 1));
 
+        viewHolder.tvEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                phoneModificationListener.onPhoneEdit(arrayList.get(i));
+            }
+        });
+
+        viewHolder.tvRemove.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                phoneModificationListener.onPhoneRemove(arrayList.get(i), i);
+            }
+        });
     }
 
     @Override

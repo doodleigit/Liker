@@ -56,7 +56,8 @@
             android:padding="5dp"
             android:text="Resend Verification"
             android:textSize="12sp"
-            android:textColor="@color/colorPrimary"/>
+            android:textColor="@color/colorPrimary"
+            android:visibility="invisible"/>
 
         <Spinner
             android:id="@+id/email_privacy_spinner"

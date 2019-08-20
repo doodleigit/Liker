@@ -53,7 +53,8 @@
                 android:paddingStart="15dp"
                 android:paddingTop="15dp"
                 android:paddingEnd="15dp"
-                android:paddingBottom="60dp">
+                android:paddingBottom="60dp"
+                android:focusableInTouchMode="true">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -149,7 +150,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="5dp"
-                        android:layout_weight="0.3"
+                        android:layout_weight="0.33"
                         android:orientation="vertical">
 
                         <TextView
@@ -176,7 +177,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:layout_marginEnd="5dp"
-                        android:layout_weight="0.3"
+                        android:layout_weight="0.33"
                         android:orientation="vertical">
 
                         <TextView
@@ -198,17 +199,34 @@
 
                     </LinearLayout>
 
-                    <Spinner
-                        android:id="@+id/birth_year_privacy_spinner"
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="30dp"
-                        android:layout_gravity="bottom"
+                        android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
-                        android:layout_marginTop="5dp"
-                        android:layout_weight="0.4"
-                        android:background="@drawable/rectangle_corner_round_five"
-                        android:paddingStart="10dp"
-                        android:paddingEnd="10dp" />
+                        android:layout_marginEnd="5dp"
+                        android:layout_weight="0.34"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text=""
+                            android:textColor="@color/colorBlack"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <Spinner
+                            android:id="@+id/birth_year_privacy_spinner"
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp"
+                            android:layout_gravity="bottom"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginTop="5dp"
+                            android:background="@drawable/rectangle_corner_round_five"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
@@ -223,7 +241,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="5dp"
-                        android:layout_weight="0.3"
+                        android:layout_weight="0.33"
                         android:orientation="vertical">
 
                         <TextView
@@ -250,7 +268,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:layout_marginEnd="5dp"
-                        android:layout_weight="0.3"
+                        android:layout_weight="0.33"
                         android:orientation="vertical">
 
                         <TextView
@@ -272,17 +290,34 @@
 
                     </LinearLayout>
 
-                    <Spinner
-                        android:id="@+id/birth_day_privacy_spinner"
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="30dp"
-                        android:layout_gravity="bottom"
+                        android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
-                        android:layout_marginTop="5dp"
-                        android:layout_weight="0.4"
-                        android:background="@drawable/rectangle_corner_round_five"
-                        android:paddingStart="10dp"
-                        android:paddingEnd="10dp" />
+                        android:layout_marginEnd="5dp"
+                        android:layout_weight="0.34"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text=""
+                            android:textColor="@color/colorBlack"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <Spinner
+                            android:id="@+id/birth_day_privacy_spinner"
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp"
+                            android:layout_gravity="bottom"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginTop="5dp"
+                            android:background="@drawable/rectangle_corner_round_five"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp" />
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
@@ -319,13 +354,14 @@
                     android:id="@+id/email_recycler_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="gone" />
+                    android:visibility="visible" />
 
                 <LinearLayout
                     android:id="@+id/add_email_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
                     <EditText
                         android:id="@+id/new_email"
@@ -333,6 +369,7 @@
                         android:layout_height="30dp"
                         android:layout_marginTop="5dp"
                         android:background="@drawable/rectangle_corner_round_five"
+                        android:inputType="textEmailAddress"
                         android:hint="New Email"
                         android:paddingStart="10dp"
                         android:paddingEnd="10dp"
@@ -395,11 +432,18 @@
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/phone_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible" />
+
                 <LinearLayout
                     android:id="@+id/add_phone_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -479,6 +523,7 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="5dp"
                     android:padding="5dp"
+                    android:inputType="number"
                     android:text="Add new phone"
                     android:textColor="@color/colorPrimary"
                     android:textSize="16sp" />
@@ -503,7 +548,7 @@
                         android:id="@+id/lives_in_address"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Dhaka, Bangladesh"
+                        android:text="Not Yet"
                         android:textColor="@color/colorBlack"
                         android:textSize="14sp" />
 
@@ -511,7 +556,7 @@
                         android:id="@+id/lives_in_edit"
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:src="@drawable/plus"
+                        android:src="@drawable/edit_blue"
                         android:layout_alignParentEnd="true"/>
 
                 </RelativeLayout>
@@ -521,7 +566,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -579,17 +625,6 @@
 
                     </RelativeLayout>
 
-                    <TextView
-                        android:id="@+id/add_lives_in"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginTop="5dp"
-                        android:padding="5dp"
-                        android:text="Add lives in address"
-                        android:textColor="@color/colorPrimary"
-                        android:textSize="16sp" />
-
                 </LinearLayout>
 
                 <TextView
@@ -612,7 +647,7 @@
                         android:id="@+id/home_state_address"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Dhaka, Bangladesh"
+                        android:text="Not Yet"
                         android:textColor="@color/colorBlack"
                         android:textSize="14sp" />
 
@@ -620,7 +655,7 @@
                         android:id="@+id/home_state_edit"
                         android:layout_width="20dp"
                         android:layout_height="20dp"
-                        android:src="@drawable/plus"
+                        android:src="@drawable/edit_blue"
                         android:layout_alignParentEnd="true"/>
 
                 </RelativeLayout>
@@ -630,7 +665,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -690,17 +726,6 @@
 
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/add_home_state"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="5dp"
-                    android:padding="5dp"
-                    android:text="Add home state address"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="16sp" />
-
                 <Spinner
                     android:id="@+id/add_story_spinner"
                     android:layout_width="wrap_content"
@@ -708,7 +733,7 @@
                     android:layout_gravity="center"
                     android:layout_marginTop="5dp"
                     android:background="@drawable/rectangle_corner_round_five"
-                    android:visibility="invisible"/>
+                    android:visibility="visible"/>
 
                 <TextView
                     android:id="@+id/add_story"
@@ -729,7 +754,8 @@
                     android:id="@+id/add_story_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
                     <TextView
                         android:id="@+id/story_title"
@@ -788,13 +814,13 @@
 
                     </RelativeLayout>
 
-                    <android.support.v7.widget.RecyclerView
-                        android:id="@+id/story_recycler_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:visibility="gone" />
-
                 </LinearLayout>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/story_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible" />
 
             </LinearLayout>
 

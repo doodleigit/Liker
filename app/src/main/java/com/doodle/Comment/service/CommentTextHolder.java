@@ -28,35 +28,25 @@ import android.widget.Toast;
 import com.borjabravo.readmoretextview.ReadMoreTextView;
 import com.bumptech.glide.Glide;
 import com.doodle.App;
-import com.doodle.Comment.adapter.AllCommentAdapter;
-import com.doodle.Comment.model.CommentItem;
 import com.doodle.Comment.model.CommentTextIndex;
 import com.doodle.Comment.model.Comment_;
 import com.doodle.Comment.model.Reply;
-import com.doodle.Comment.view.activity.CommentPost;
+import com.doodle.Comment.model.ReportReason;
 import com.doodle.Comment.view.activity.ReplyPost;
-import com.doodle.Home.model.PostFilterItem;
-import com.doodle.Home.model.PostFilterSubCategory;
+import com.doodle.Comment.view.fragment.ReportReasonSheet;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.service.HomeService;
-import com.doodle.Home.view.activity.Home;
 import com.doodle.R;
 import com.doodle.utils.AppConstants;
 import com.doodle.utils.NetworkHelper;
 import com.doodle.utils.PrefManager;
 import com.doodle.utils.Utils;
-import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.vanniktech.emoji.EmojiTextView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
@@ -70,12 +60,11 @@ import static com.doodle.utils.Utils.extractMentionText;
 import static com.doodle.utils.Utils.extractMentionUser;
 import static com.doodle.utils.Utils.extractUrls;
 import static com.doodle.utils.Utils.getSpannableStringBuilder;
-import static com.doodle.utils.Utils.isEmpty;
 import static com.doodle.utils.Utils.isNullOrEmpty;
 import static java.lang.Integer.getInteger;
 import static java.lang.Integer.parseInt;
 
-public class CommentTextHolder extends RecyclerView.ViewHolder {
+public class CommentTextHolder extends RecyclerView.ViewHolder  {
 
 
     public CircleImageView imagePostUser;
@@ -139,11 +128,13 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
     boolean isFirstTimeShowReply;
 
 
+
+
     public interface CommentListener {
 
-        void onTitleClicked(Comment_ commentItem, int position);
+        void onTitleClicked(Comment_ commentItem, int position,Reply reply);
 
-        void commentDelete(Comment_ commentItem, int position);
+        void commentDelete(Comment_ commentItem, int position,Reply reply);
     }
 
     public CommentTextHolder(View itemView, Context context, final CommentListener listener) {
@@ -301,25 +292,35 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
 
                 String commentReply = commentItem.getTotalReply();
 
-                if (Integer.parseInt(commentReply) > 0) {
-                    if (networkOk) {
+                if(!isNullOrEmpty(commentReply)){
+                    if (Integer.parseInt(commentReply) > 0) {
+                        if (networkOk) {
 
-                        Call<List<Reply>> call = commentService.getPostCommentReplyList(deviceId, profileId, token, commentItem.getId(), "false", limit, offset, commentItem.getPostId(), userIds);
-                        sendAllCommentReplyListRequest(call);
-                        delayLoadComment(mProgressBar);
-                    } else {
-                        Utils.showNetworkDialog(activity.getSupportFragmentManager());
+                            Call<List<Reply>> call = commentService.getPostCommentReplyList(deviceId, profileId, token, commentItem.getId(), "false", limit, offset, commentItem.getPostId(), userIds);
+                            sendAllCommentReplyListRequest(call);
+                            delayLoadComment(mProgressBar);
+                        } else {
+                            Utils.showNetworkDialog(activity.getSupportFragmentManager());
 
+                        }
+                    } else if(Integer.parseInt(commentReply) == 0) {
+                        Intent intent = new Intent(mContext, ReplyPost.class);
+                        intent.putExtra(COMMENT_ITEM_KEY, (Parcelable) commentItem);
+                        intent.putExtra(POST_ITEM_KEY, (Parcelable) postItem);
+                        intent.putExtra(REPLY_ITEM_KEY, (Parcelable) itemReply);
+                        intent.putParcelableArrayListExtra(REPLY_KEY, (ArrayList<? extends Parcelable>) replyItem);
+
+                        mContext.startActivity(intent);
                     }
-                } else {
+                }else {
                     Intent intent = new Intent(mContext, ReplyPost.class);
                     intent.putExtra(COMMENT_ITEM_KEY, (Parcelable) commentItem);
                     intent.putExtra(POST_ITEM_KEY, (Parcelable) postItem);
                     intent.putExtra(REPLY_ITEM_KEY, (Parcelable) itemReply);
                     intent.putParcelableArrayListExtra(REPLY_KEY, (ArrayList<? extends Parcelable>) replyItem);
-
                     mContext.startActivity(intent);
                 }
+
 
 
             }
@@ -619,7 +620,20 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
 
                         if (id == R.id.reportComment) {
 
-                            Toast.makeText(App.getAppContext(), "reportComment : ", Toast.LENGTH_SHORT).show();
+                            AppCompatActivity activity = (AppCompatActivity) v.getContext();
+
+//                    AppCompatActivity activity = (AppCompatActivity) v.getContext();
+                    ReportReasonSheet reportReasonSheet = ReportReasonSheet.newInstance("message");
+                    reportReasonSheet.show(activity.getSupportFragmentManager(), "ReportReasonSheet");
+//                            if (networkOk) {
+//
+//                                Call<ReportReason> call = commentService.getReportReason(deviceId, profileId, token, commentItem.getUserId(),  "2", userIds);
+//                                sendReportReason(call);
+//                              //  delayLoadComment(mProgressBar);
+//                            } else {
+//                                Utils.showNetworkDialog(activity.getSupportFragmentManager());
+//
+//                            }
                         }
 
                         if (id == R.id.blockUser) {
@@ -627,17 +641,38 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
                         }
                         if (id == R.id.editComment) {
 
+                            Reply replyItem=new Reply();
+                            List<Reply> replyList = commentItem.getReplies();
+                            if(replyList.size()==0){
+                                Reply reply = new Reply();
+                                reply.setId("1");
+                                reply.setCommentId("2");
+                                listener.onTitleClicked(commentItem, position,reply);
+                            }else {
+                                replyItem = replyList.get(0);
+                                listener.onTitleClicked(commentItem, position,replyItem);
+                            }
 
-                            listener.onTitleClicked(commentItem, position);
 
 
+
+                          //  Utils.showNetworkDialog(activity.getSupportFragmentManager());
                         }
 
                         if (id == R.id.deleteComment) {
 
+                            Reply replyItem=new Reply();
                             List<Reply> replyList = commentItem.getReplies();
-                            Reply reply = replyList.get(position);
-                            listener.commentDelete(commentItem, position);
+                            if(replyList.size()==0){
+                               Reply reply = new Reply();
+                               reply.setId("1");
+                               reply.setCommentId("2");
+                                listener.commentDelete(commentItem, position,reply);
+                            }else{
+                                replyItem = replyList.get(0);
+                                listener.commentDelete(commentItem, position,replyItem);
+                            }
+
 
 
                         }
@@ -645,6 +680,35 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
                         return true;
                     }
                 });
+
+            }
+        });
+
+    }
+
+    private void sendReportReason(Call<ReportReason> call) {
+
+        call.enqueue(new Callback<ReportReason>() {
+
+            @Override
+            public void onResponse(Call<ReportReason> mCall, Response<ReportReason> response) {
+
+
+                if (response.body() != null) {
+                ReportReason    replyItem = response.body();
+                   Log.d("replyItem: ",replyItem.toString());
+//                    AppCompatActivity activity = (AppCompatActivity) v.getContext();
+//                    ReportReasonSheet reportReasonSheet = ReportReasonSheet.newInstance("message");
+//                    reportReasonSheet.show(activity.getSupportFragmentManager(), "ReportReasonSheet");
+
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call<ReportReason> call, Throwable t) {
+                Log.d("MESSAGE: ", t.getMessage());
 
             }
         });
@@ -664,12 +728,15 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
                     replyItem = response.body();
                     itemReply = replyItem.get(position);
 
-                    Intent intent = new Intent(mContext, ReplyPost.class);
-                    intent.putExtra(COMMENT_ITEM_KEY, (Parcelable) commentItem);
-                    intent.putExtra(POST_ITEM_KEY, (Parcelable) postItem);
-                    intent.putExtra(REPLY_ITEM_KEY, (Parcelable) itemReply);
-                    intent.putParcelableArrayListExtra(REPLY_KEY, (ArrayList<? extends Parcelable>) replyItem);
-                    mContext.startActivity(intent);
+                    if(replyItem.size()>0){
+                        Intent intent = new Intent(mContext, ReplyPost.class);
+                        intent.putExtra(COMMENT_ITEM_KEY, (Parcelable) commentItem);
+                        intent.putExtra(POST_ITEM_KEY, (Parcelable) postItem);
+                        intent.putExtra(REPLY_ITEM_KEY, (Parcelable) itemReply);
+                        intent.putParcelableArrayListExtra(REPLY_KEY, (ArrayList<? extends Parcelable>) replyItem);
+                        mContext.startActivity(intent);
+                    }
+
 
                 }
 

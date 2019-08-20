@@ -2,14 +2,15 @@
 package com.doodle.Profile.model;
 
 import java.io.Serializable;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.Parcelable.Creator;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class PhoneCountry implements Serializable, Parcelable
-{
+public class PhoneCountry implements Serializable, Parcelable {
 
     @SerializedName("country_id")
     @Expose
@@ -27,7 +28,7 @@ public class PhoneCountry implements Serializable, Parcelable
 
 
         @SuppressWarnings({
-            "unchecked"
+                "unchecked"
         })
         public PhoneCountry createFromParcel(Parcel in) {
             return new PhoneCountry(in);
@@ -37,8 +38,7 @@ public class PhoneCountry implements Serializable, Parcelable
             return (new PhoneCountry[size]);
         }
 
-    }
-    ;
+    };
     private final static long serialVersionUID = -2930766865839362223L;
 
     protected PhoneCountry(Parcel in) {
@@ -91,7 +91,7 @@ public class PhoneCountry implements Serializable, Parcelable
     }
 
     public int describeContents() {
-        return  0;
+        return 0;
     }
 
 }

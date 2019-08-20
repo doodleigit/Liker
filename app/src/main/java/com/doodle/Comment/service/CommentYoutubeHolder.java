@@ -114,8 +114,8 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
     Reply reply;
     public interface CommentListener {
 
-        void onTitleClicked(Comment_ commentItem, int position);
-        void commentDelete(Comment_ commentItem, int position);
+        void onTitleClicked(Comment_ commentItem, int position,Reply reply);
+        void commentDelete(Comment_ commentItem, int position,Reply reply);
     }
     int position;
 
@@ -474,12 +474,38 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
                             Toast.makeText(App.getAppContext(), "blockUser : ", Toast.LENGTH_SHORT).show();
                         }
                         if (id == R.id.editComment) {
-                            commentListener.onTitleClicked(commentItem, position);
+
+                            Reply replyItem=new Reply();
+                            List<Reply> replyList = commentItem.getReplies();
+                            if(replyList.size()==0){
+                                Reply reply = new Reply();
+                                reply.setId("1");
+                                reply.setCommentId("2");
+                                commentListener.onTitleClicked(commentItem, position,reply);
+                            }else {
+                                replyItem = replyList.get(0);
+                                commentListener.onTitleClicked(commentItem, position,replyItem);
+                            }
 
                         }
 
                         if (id == R.id.deleteComment) {
-                            commentListener.commentDelete(commentItem,position);                        }
+
+                            Reply replyItem=new Reply();
+                            List<Reply> replyList = commentItem.getReplies();
+                            if(replyList.size()==0){
+                                Reply reply = new Reply();
+                                reply.setId("1");
+                                reply.setCommentId("2");
+                                commentListener.commentDelete(commentItem, position,reply);
+                            }else{
+                                replyItem = replyList.get(0);
+                                commentListener.commentDelete(commentItem, position,replyItem);
+                            }
+
+
+
+                        }
 
                         return true;
                     }

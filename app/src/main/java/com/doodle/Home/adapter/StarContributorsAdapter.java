@@ -7,11 +7,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.doodle.App;
 import com.doodle.Home.model.StarContributor;
+import com.doodle.Home.service.StarContributorPaginationListener;
 import com.doodle.R;
 import com.doodle.utils.AppConstants;
 

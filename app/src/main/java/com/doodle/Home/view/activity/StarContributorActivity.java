@@ -3,6 +3,7 @@ package com.doodle.Home.view.activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.support.annotation.NonNull;
+import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -10,8 +11,10 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.AbsListView;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.SearchView;
 import android.widget.TextView;
 
@@ -22,8 +25,10 @@ import com.doodle.Home.model.PostFilterSubCategory;
 import com.doodle.Home.model.StarContributor;
 import com.doodle.Home.service.HomeService;
 import com.doodle.Home.service.StarContributorCategoryListener;
+import com.doodle.Home.service.StarContributorPaginationListener;
 import com.doodle.R;
 import com.doodle.utils.PrefManager;
+import com.doodle.utils.TouchDetectableScrollView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,6 +45,7 @@ public class StarContributorActivity extends AppCompatActivity {
 
     Toolbar toolbar;
     RecyclerView recyclerView;
+    NestedScrollView scrollView;
     SearchView searchView;
     TextView tvFilterItem, tvAlertText;
     ProgressBar progressBar;
@@ -52,7 +58,7 @@ public class StarContributorActivity extends AppCompatActivity {
 
     private String token, deviceId, userId, selectedCategory = "", selectedCategoryName = "", searchKey = "";
     private int limit = 20, offset = 0;
-    private boolean isScrolling;
+    private boolean isScrolling = true;
     private int totalItems;
     private int scrollOutItems;
     private int currentItems;
@@ -75,6 +81,7 @@ public class StarContributorActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setNestedScrollingEnabled(false);
+        scrollView = findViewById(R.id.scrollView);
         searchView = findViewById(R.id.search_view);
         tvFilterItem = findViewById(R.id.filterItem);
         tvAlertText = findViewById(R.id.alertText);
@@ -127,31 +134,43 @@ public class StarContributorActivity extends AppCompatActivity {
             }
         });
 
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+//                super.onScrollStateChanged(recyclerView, newState);
+//                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+//                    isScrolling = true;
+//                }
+//            }
+//
+//            @Override
+//            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+//                super.onScrolled(recyclerView, dx, dy);
+//                currentItems = layoutManager.getChildCount();
+//                scrollOutItems = layoutManager.findFirstVisibleItemPosition();
+//                totalItems = layoutManager.getItemCount();
+//
+//                if (isScrolling && (currentItems + scrollOutItems == totalItems)) {
+//                    isScrolling = false;
+////                    sendUserRankingPaginationRequest();
+//                }
+//            }
+//        });
+//
+        scrollView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
             @Override
-            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
-                    isScrolling = true;
-                }
-            }
+            public void onScrollChanged() {
+                View view = (View) scrollView.getChildAt(scrollView.getChildCount() - 1);
 
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                currentItems = layoutManager.getChildCount();
-                scrollOutItems = layoutManager.findFirstVisibleItemPosition();
-                totalItems = layoutManager.getItemCount();
+                int diff = (view.getBottom() - (scrollView.getHeight() + scrollView
+                        .getScrollY()));
 
-                if (isScrolling && (currentItems + scrollOutItems == totalItems)) {
-                    isScrolling = false;
-                    sendUserRankingPaginationRequest();
+                if (diff == 0) {
+                    if (isScrolling)
+                        sendUserRankingPaginationRequest();
                 }
             }
         });
-
-
-
 
     }
 
@@ -230,6 +249,7 @@ public class StarContributorActivity extends AppCompatActivity {
     }
 
     private void sendUserRankingPaginationRequest() {
+        isScrolling = false;
         progressBar.setVisibility(View.VISIBLE);
         Call<ArrayList<StarContributor>> call = webService.getUserRanking(deviceId, userId, token, selectedCategory, searchKey, offset, limit);
         call.enqueue(new Callback<ArrayList<StarContributor>>() {
@@ -243,12 +263,14 @@ public class StarContributorActivity extends AppCompatActivity {
                 }
                 progressDialog.hide();
                 progressBar.setVisibility(View.GONE);
+                isScrolling = true;
             }
 
             @Override
             public void onFailure(Call<ArrayList<StarContributor>> call, Throwable t) {
                 progressDialog.hide();
                 progressBar.setVisibility(View.GONE);
+                isScrolling = true;
             }
         });
     }

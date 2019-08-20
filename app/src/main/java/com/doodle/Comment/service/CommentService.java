@@ -4,6 +4,7 @@ import com.doodle.Comment.model.CommentItem;
 import com.doodle.Comment.model.CommentTextIndex_;
 import com.doodle.Comment.model.Comment_;
 import com.doodle.Comment.model.Reply;
+import com.doodle.Comment.model.ReportReason;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.postshare.PostShareItem;
 import com.doodle.utils.AppConstants;
@@ -72,6 +73,18 @@ public interface CommentService {
             @Field("limit") int limit,
             @Field("offset") int offset,
             @Field("post_id") String postId,
+            @Field("user_id") String userIds
+    );
+
+
+    @POST(AppConstants.GET_REPORT_REASON)
+    @FormUrlEncoded
+    Call<ReportReason> getReportReason(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("blocked_user_id") String blockedUserId,
+            @Field("report_type") String reportType,
             @Field("user_id") String userIds
     );
 
@@ -199,7 +212,7 @@ user_id	26444*/
             @Header("Device-Id") String deviceId,
             @Header("User-Id") String userId,
             @Header("Security-Token") String token,
-            @Field("commented_id") String commentId,
+            @Field("comment_id") String commentId,
             @Field("comment_reply_id") String commentReplyId,
             @Field("post_id") String postId,
             @Field("user_id") String userIds
