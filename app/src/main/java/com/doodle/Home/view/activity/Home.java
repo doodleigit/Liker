@@ -870,6 +870,34 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
                 finish();
                 return true;
 
+            case R.id.action_account_setting:
+                Intent accountIntent = new Intent(this, SettingActivity.class);
+                accountIntent.putExtra("type", "account");
+                accountIntent.putExtra("link", getString(R.string.how_to_use_liker_link));
+                startActivity(accountIntent);
+                return true;
+
+            case R.id.action_privacy_security:
+                Intent privacyIntent = new Intent(this, SettingActivity.class);
+                privacyIntent.putExtra("type", "privacy");
+                privacyIntent.putExtra("link", getString(R.string.how_to_use_liker_link));
+                startActivity(privacyIntent);
+                return true;
+
+            case R.id.action_notification_settings:
+                Intent notificationIntent = new Intent(this, SettingActivity.class);
+                notificationIntent.putExtra("type", "notification");
+                notificationIntent.putExtra("link", getString(R.string.how_to_use_liker_link));
+                startActivity(notificationIntent);
+                return true;
+
+            case R.id.action_contributor_settings:
+                Intent contributorIntent = new Intent(this, SettingActivity.class);
+                contributorIntent.putExtra("type", "contributor");
+                contributorIntent.putExtra("link", getString(R.string.how_to_use_liker_link));
+                startActivity(contributorIntent);
+                return true;
+
             case R.id.action_how_to_use_liker:
                 Intent intent = new Intent(this, SettingActivity.class);
                 intent.putExtra("type", getString(R.string.how_to_use_liker));

@@ -232,6 +232,7 @@
     <string name="who_can_see_your_photos">Who can see your photos:</string>
     <string name="who_can_send_you_message">Who can send you message:</string>
     <string name="block_users">Block Users:</string>
+    <string name="block">Block</string>
     <string name="reset">Reset</string>
     <string name="deactivate">Deactivate</string>
     <string name="cancel">Cancel</string>
@@ -271,5 +272,6 @@
     <string name="contributor_setting">Contributor Setting</string>
     <string name="notification_setting">Notification Setting</string>
     <string name="privacy_and_security">Privacy and Security</string>
+    <string name="please_input">Please input atleast two character</string>
 
 </resources>

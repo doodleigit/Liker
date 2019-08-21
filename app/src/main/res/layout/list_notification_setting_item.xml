@@ -15,6 +15,7 @@
         android:weightSum="4">
 
         <TextView
+            android:id="@+id/privacy_type_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -31,6 +32,7 @@
             android:gravity="center">
 
             <TextView
+                android:id="@+id/push_privacy_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="off"
@@ -38,6 +40,7 @@
                 android:textSize="12sp" />
 
             <CheckBox
+                android:id="@+id/push_privacy_check_box"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="gone"/>
@@ -52,6 +55,7 @@
             android:gravity="center">
 
             <TextView
+                android:id="@+id/email_privacy_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="off"
@@ -59,6 +63,7 @@
                 android:textSize="12sp" />
 
             <CheckBox
+                android:id="@+id/email_privacy_check_box"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="gone"/>
@@ -73,6 +78,7 @@
             android:gravity="center">
 
             <TextView
+                android:id="@+id/browser_privacy_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="off"
@@ -80,6 +86,7 @@
                 android:textSize="12sp" />
 
             <CheckBox
+                android:id="@+id/browser_privacy_check_box"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="gone"/>
@@ -99,22 +106,26 @@
         android:visibility="visible">
 
         <ImageView
+            android:id="@+id/edit"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:src="@drawable/edit_blue"
             android:visibility="visible"/>
 
         <ImageView
+            android:id="@+id/save"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginEnd="5dp"
-            android:src="@drawable/edit_blue"
+            android:src="@drawable/ok"
             android:visibility="gone" />
 
         <ImageView
+            android:id="@+id/cancel"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:src="@drawable/edit_blue"
+            android:padding="5dp"
+            android:src="@drawable/close"
             android:visibility="gone"/>
 
     </LinearLayout>

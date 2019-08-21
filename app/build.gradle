@@ -142,6 +142,7 @@ dependencies {
     implementation 'com.theartofdev.edmodo:android-image-cropper:2.7.0'
 
     implementation 'com.github.chrisbanes:PhotoView:2.1.4'
+    implementation 'com.google.android:flexbox:1.0.0'
 
 
 }

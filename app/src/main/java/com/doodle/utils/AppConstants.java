@@ -154,4 +154,15 @@ public class AppConstants {
     public static final String EMAIL_REMOVE = "email_remove";
     public static final String PHONE_REMOVE = "phone_remove";
 
+    public static final String PRIVACY_VIEW = "privacy_view";
+    public static final String PRIVACY_UPDATE_PERMISSION = "privacy_update_permission";
+    public static final String BLOCKED_USER = "blocked_user";
+    public static final String GET_ON_OFFS_BY_USER_ID = "get_on_offs_by_user_id";
+    public static final String EMAIL_NOTIFICATION = "email_notification";
+    public static final String CONTRIBUTOR_VIEW = "contributor_view";
+    public static final String GET_CONTRIBUTOR_CATEGORY = "get_contributor_categories";
+    public static final String SET_CONTRIBUTOR_CATEGORY = "set_contributor_category";
+    public static final String ACCOUNT_VIEW = "account_view";
+    public static final String GET_EMAILS = "get_emails";
+
 }
