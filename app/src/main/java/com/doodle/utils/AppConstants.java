@@ -101,6 +101,9 @@ public class AppConstants {
     public static final String DELETE_POST_COMMENT = "delete_postcomment";
     public static final String DELETE_COMMENT_REPLY = "delete_comment_reply";
     public static final String GET_REPORT_REASON = "get_report_reason";
+    public static final String REPORT_USER = "reportUser";
+    public static final String UN_FOLLOW = "unfollow";
+    public static final String BLOCKED_USER = "blocked_user";
 
     //Post share
     public static final String GET_POST_DETAILS = "get_postdetails";

@@ -344,7 +344,11 @@ public class FollowingPost extends Fragment {
                     progressView.setVisibility(View.GONE);
                     progressView.stopAnimation();
                 }
-                ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(2);
+                try {
+                    ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(2);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
             }
 

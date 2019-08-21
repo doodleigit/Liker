@@ -38,11 +38,14 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.danikula.videocache.HttpProxyCacheServer;
 import com.doodle.App;
+import com.doodle.Comment.model.Reason;
+import com.doodle.Comment.model.ReportReason;
 import com.doodle.Comment.view.activity.CommentPost;
 import com.doodle.Comment.model.Comment;
 import com.doodle.Comment.model.CommentItem;
 import com.doodle.Comment.model.Comment_;
 import com.doodle.Comment.service.CommentService;
+import com.doodle.Comment.view.fragment.ReportReasonSheet;
 import com.doodle.Home.model.PostFooter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.postshare.PostShareItem;
@@ -79,8 +82,10 @@ import static com.doodle.utils.AppConstants.FACEBOOK_SHARE;
 import static com.doodle.utils.AppConstants.PROFILE_IMAGE;
 import static com.doodle.utils.Utils.containsIllegalCharacters;
 import static com.doodle.utils.Utils.delayLoadComment;
+import static com.doodle.utils.Utils.dismissDialog;
 import static com.doodle.utils.Utils.getSpannableStringBuilder;
 import static com.doodle.utils.Utils.isNullOrEmpty;
+import static com.doodle.utils.Utils.showBlockUser;
 import static com.facebook.FacebookSdk.getApplicationContext;
 import static java.lang.Integer.parseInt;
 
@@ -132,7 +137,7 @@ public class VideoHolder extends RecyclerView.ViewHolder {
     ProgressBar mProgressBar;
     LinearLayout commentBox;
     public static final String COMMENT_KEY = "comment_item_key";
-
+    AppCompatActivity activity;
     public VideoHolder(View itemView, Context context) {
         super(itemView);
 
@@ -586,8 +591,32 @@ public class VideoHolder extends RecyclerView.ViewHolder {
             @Override
             public void onClick(View v) {
 
+
+                String postUserId = item.getPostUserid();
                 popupMenu = new PopupMenu(mContext, v);
                 popupMenu.getMenuInflater().inflate(R.menu.post_permission_menu, popupMenu.getMenu());
+
+
+                if (userIds.equalsIgnoreCase(postUserId)) {
+                    popupMenu.getMenu().findItem(R.id.blockedUser).setVisible(false);
+                    popupMenu.getMenu().findItem(R.id.reportedPost).setVisible(false);
+                    popupMenu.getMenu().findItem(R.id.publics).setVisible(true);
+                    popupMenu.getMenu().findItem(R.id.friends).setVisible(true);
+                    popupMenu.getMenu().findItem(R.id.onlyMe).setVisible(true);
+                    popupMenu.getMenu().findItem(R.id.edit).setVisible(true);
+                    popupMenu.getMenu().findItem(R.id.delete).setVisible(true);
+                    popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(true);
+                } else {
+                    popupMenu.getMenu().findItem(R.id.blockedUser).setVisible(true);
+                    popupMenu.getMenu().findItem(R.id.reportedPost).setVisible(true);
+                    popupMenu.getMenu().findItem(R.id.publics).setVisible(false);
+                    popupMenu.getMenu().findItem(R.id.friends).setVisible(false);
+                    popupMenu.getMenu().findItem(R.id.onlyMe).setVisible(false);
+                    popupMenu.getMenu().findItem(R.id.edit).setVisible(false);
+                    popupMenu.getMenu().findItem(R.id.delete).setVisible(false);
+                    popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(true);
+                }
+
 
 //                popup.show();
                 MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popupMenu.getMenu(), v);
@@ -599,6 +628,25 @@ public class VideoHolder extends RecyclerView.ViewHolder {
                     public boolean onMenuItemClick(MenuItem menuItem) {
                         int id = menuItem.getItemId();
 
+                        if (id == R.id.blockedUser) {
+                            if (!((Activity) mContext).isFinishing()) {
+                                App.setItem(item);
+                                showBlockUser(v);
+                            }else {
+                                dismissDialog();
+                            }
+
+                        }
+                        if (id == R.id.reportedPost) {
+                            App.setItem(item);
+                            activity = (AppCompatActivity) v.getContext();
+                            if (networkOk) {
+                                Call<ReportReason> call = commentService.getReportReason(deviceId, profileId, token, item.getPostUserid(), "2", userIds);
+                                sendReportReason(call);
+                            } else {
+                                Utils.showNetworkDialog(activity.getSupportFragmentManager());
+                            }
+                        }
                         if (id == R.id.publics) {
                             Toast.makeText(App.getAppContext(), "publics : ", Toast.LENGTH_SHORT).show();
                         }
@@ -706,6 +754,36 @@ public class VideoHolder extends RecyclerView.ViewHolder {
 
 
 
+    }
+
+    private void sendReportReason(Call<ReportReason> call) {
+        call.enqueue(new Callback<ReportReason>() {
+
+            @Override
+            public void onResponse(Call<ReportReason> mCall, Response<ReportReason> response) {
+
+
+                if (response.body() != null) {
+                    ReportReason reportReason = response.body();
+                    boolean isFollowed=reportReason.isFollowed();
+                    App.setIsFollow(isFollowed);
+                    List<Reason> reasonList=reportReason.getReason();
+                    PostItem item=new PostItem();
+                    CommentItem commentItems=new CommentItem();
+                    ReportReasonSheet reportReasonSheet = ReportReasonSheet.newInstance(reasonList);
+                    reportReasonSheet.show(activity.getSupportFragmentManager(), "ReportReasonSheet");
+
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call<ReportReason> call, Throwable t) {
+                Log.d("MESSAGE: ", t.getMessage());
+
+            }
+        });
     }
 
     private void sendAllCommentItemRequest(Call<CommentItem> call) {

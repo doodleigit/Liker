@@ -201,5 +201,6 @@
     <string name="capture_profile_picture">Capture Profile Picture</string>
     <string name="select_year">Select Year</string>
     <string name="are_you_sure">Are you sure you want to remove</string>
+    <string name="report_post">Report Post</string>
 
 </resources>

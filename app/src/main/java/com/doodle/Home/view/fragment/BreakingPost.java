@@ -347,7 +347,11 @@ public class BreakingPost extends Fragment {
                     progressView.setVisibility(View.GONE);
                     progressView.stopAnimation();
                 }
-                ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(1);
+                try {
+                    ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(1);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
             }
 

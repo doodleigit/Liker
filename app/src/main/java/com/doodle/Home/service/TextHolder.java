@@ -12,6 +12,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Parcelable;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.view.menu.MenuPopupHelper;
@@ -37,11 +38,15 @@ import com.borjabravo.readmoretextview.ReadMoreTextView;
 import com.bumptech.glide.Glide;
 import com.doodle.App;
 import com.doodle.Comment.adapter.AllCommentAdapter;
+import com.doodle.Comment.model.Reason;
+import com.doodle.Comment.model.ReportReason;
 import com.doodle.Comment.view.activity.CommentPost;
 import com.doodle.Comment.model.Comment;
 import com.doodle.Comment.model.CommentItem;
 import com.doodle.Comment.model.Comment_;
 import com.doodle.Comment.service.CommentService;
+import com.doodle.Comment.view.fragment.BlockUserDialog;
+import com.doodle.Comment.view.fragment.ReportReasonSheet;
 import com.doodle.Home.model.PostFooter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.PostTextIndex;
@@ -84,11 +89,13 @@ import static com.doodle.Authentication.service.MyService.TAG;
 import static com.doodle.utils.AppConstants.FACEBOOK_SHARE;
 import static com.doodle.utils.Utils.containsIllegalCharacters;
 import static com.doodle.utils.Utils.delayLoadComment;
+import static com.doodle.utils.Utils.dismissDialog;
 import static com.doodle.utils.Utils.displayProgressBar;
 import static com.doodle.utils.Utils.extractMentionText;
 import static com.doodle.utils.Utils.extractUrls;
 import static com.doodle.utils.Utils.getSpannableStringBuilder;
 import static com.doodle.utils.Utils.isNullOrEmpty;
+import static com.doodle.utils.Utils.showBlockUser;
 import static java.lang.Integer.parseInt;
 
 public class TextHolder extends RecyclerView.ViewHolder {
@@ -123,9 +130,9 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
 
     //Comment
-    Comment commentItem;
+
     private List<Comment_> comments = new ArrayList<Comment_>();
-    private String commentPostId;
+    private String commentPostId, postId;
     RelativeLayout commentHold;
     private String commentText, commentUserName, commentUserImage, commentImage, commentTime;
     public EmojiTextView tvCommentMessage;
@@ -144,7 +151,10 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
     public ImageView imagePostComment;
     public static final String COMMENT_KEY = "comment_item_key";
+    public static final String COMMENT_CHILD_KEY = "comment_child_key";
     private ProgressBar mProgressBar;
+
+    public static final String REASON_KEY = "reason_key";
 
 
     public TextHolder(View itemView, Context context) {
@@ -236,6 +246,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
     };
 
     String text;
+    AppCompatActivity activity;
 
     public void setItem(final PostItem item) {
         this.item = item;
@@ -673,8 +684,32 @@ public class TextHolder extends RecyclerView.ViewHolder {
             @Override
             public void onClick(View v) {
 
+
+                String postUserId = item.getPostUserid();
                 popupMenu = new PopupMenu(mContext, v);
                 popupMenu.getMenuInflater().inflate(R.menu.post_permission_menu, popupMenu.getMenu());
+
+
+                if (userIds.equalsIgnoreCase(postUserId)) {
+                    popupMenu.getMenu().findItem(R.id.blockedUser).setVisible(false);
+                    popupMenu.getMenu().findItem(R.id.reportedPost).setVisible(false);
+                    popupMenu.getMenu().findItem(R.id.publics).setVisible(true);
+                    popupMenu.getMenu().findItem(R.id.friends).setVisible(true);
+                    popupMenu.getMenu().findItem(R.id.onlyMe).setVisible(true);
+                    popupMenu.getMenu().findItem(R.id.edit).setVisible(true);
+                    popupMenu.getMenu().findItem(R.id.delete).setVisible(true);
+                    popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(true);
+                } else {
+                    popupMenu.getMenu().findItem(R.id.blockedUser).setVisible(true);
+                    popupMenu.getMenu().findItem(R.id.reportedPost).setVisible(true);
+                    popupMenu.getMenu().findItem(R.id.publics).setVisible(false);
+                    popupMenu.getMenu().findItem(R.id.friends).setVisible(false);
+                    popupMenu.getMenu().findItem(R.id.onlyMe).setVisible(false);
+                    popupMenu.getMenu().findItem(R.id.edit).setVisible(false);
+                    popupMenu.getMenu().findItem(R.id.delete).setVisible(false);
+                    popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(true);
+                }
+
 
 //                popup.show();
                 MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popupMenu.getMenu(), v);
@@ -686,6 +721,25 @@ public class TextHolder extends RecyclerView.ViewHolder {
                     public boolean onMenuItemClick(MenuItem menuItem) {
                         int id = menuItem.getItemId();
 
+                        if (id == R.id.blockedUser) {
+                            if (!((Activity) mContext).isFinishing()) {
+                                App.setItem(item);
+                                showBlockUser(v);
+                            }else {
+                                dismissDialog();
+                            }
+                        }
+
+                        if (id == R.id.reportedPost) {
+                            App.setItem(item);
+                            activity = (AppCompatActivity) v.getContext();
+                            if (networkOk) {
+                                Call<ReportReason> call = commentService.getReportReason(deviceId, profileId, token, item.getPostUserid(), "2", userIds);
+                                sendReportReason(call);
+                            } else {
+                                Utils.showNetworkDialog(activity.getSupportFragmentManager());
+                            }
+                        }
                         if (id == R.id.publics) {
                             Toast.makeText(App.getAppContext(), "publics : ", Toast.LENGTH_SHORT).show();
                         }
@@ -713,7 +767,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
             }
         });
-        imageCommentSettings.setOnClickListener(new View.OnClickListener() {
+       /* imageCommentSettings.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("RestrictedApi")
             @Override
             public void onClick(View v) {
@@ -767,10 +821,40 @@ public class TextHolder extends RecyclerView.ViewHolder {
                 });
 
             }
-        });
+        });*/
 
     }
 
+
+    private void sendReportReason(Call<ReportReason> call) {
+        call.enqueue(new Callback<ReportReason>() {
+
+            @Override
+            public void onResponse(Call<ReportReason> mCall, Response<ReportReason> response) {
+
+
+                if (response.body() != null) {
+                    ReportReason reportReason = response.body();
+                    boolean isFollowed = reportReason.isFollowed();
+                    App.setIsFollow(isFollowed);
+                    List<Reason> reasonList = reportReason.getReason();
+                    PostItem item = new PostItem();
+                    CommentItem commentItems = new CommentItem();
+                    ReportReasonSheet reportReasonSheet = ReportReasonSheet.newInstance(reasonList);
+                    reportReasonSheet.show(activity.getSupportFragmentManager(), "ReportReasonSheet");
+
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call<ReportReason> call, Throwable t) {
+                Log.d("MESSAGE: ", t.getMessage());
+
+            }
+        });
+    }
 
 
     private void sendAllCommentItemRequest(Call<CommentItem> call) {
@@ -783,9 +867,13 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
                 if (response.body() != null) {
                     CommentItem commentItem = response.body();
+                    ReportReason reportReason = new ReportReason();
+                    Comment_ comment_Item = new Comment_();
                     Intent intent = new Intent(mContext, CommentPost.class);
                     intent.putExtra(COMMENT_KEY, (Parcelable) commentItem);
                     intent.putExtra(ITEM_KEY, (Parcelable) item);
+                    //intent.putExtra(COMMENT_CHILD_KEY, (Parcelable) comment_Item);
+                    //  intent.putExtra(REASON_KEY, (Parcelable) reportReason);
                     mContext.startActivity(intent);
 
                 }
@@ -853,6 +941,15 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
 
         return text;
+    }
+
+
+    private void showSimpleDialog() {
+        BlockUserDialog blockUserDialog = new BlockUserDialog();
+        // TODO: Use setCancelable() to make the dialog non-cancelable
+        blockUserDialog.setCancelable(false);
+        blockUserDialog.show(activity.getSupportFragmentManager(), "BlockUserDialog");
+//        blockUserDialog.show(activity.getSupportFragmentManager(), "BlockUserDialog");
     }
 
 

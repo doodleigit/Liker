@@ -17,9 +17,11 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -58,6 +60,12 @@ import com.doodle.Comment.service.CommentLinkScriptHolder;
 import com.doodle.Comment.service.CommentService;
 import com.doodle.Comment.service.CommentTextHolder;
 import com.doodle.Comment.service.CommentYoutubeHolder;
+import com.doodle.Comment.view.fragment.BlockUserDialog;
+import com.doodle.Comment.view.fragment.FollowSheet;
+import com.doodle.Comment.view.fragment.ReportLikerMessageSheet;
+import com.doodle.Comment.view.fragment.ReportPersonMessageSheet;
+import com.doodle.Comment.view.fragment.ReportReasonSheet;
+import com.doodle.Comment.view.fragment.ReportSendCategorySheet;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.view.activity.PostShare;
 import com.doodle.Post.adapter.MentionUserAdapter;
@@ -99,7 +107,6 @@ import static android.widget.Toast.LENGTH_SHORT;
 import static android.widget.Toast.makeText;
 import static com.doodle.Comment.service.CommentTextHolder.COMMENT_ITEM_KEY;
 import static com.doodle.Comment.service.CommentTextHolder.POST_ITEM_KEY;
-import static com.doodle.Comment.service.CommentTextHolder.REPLY_ITEM_KEY;
 import static com.doodle.Comment.service.CommentTextHolder.REPLY_KEY;
 import static com.doodle.Home.service.TextHolder.ITEM_KEY;
 import static com.doodle.Post.view.activity.PostNew.isExternalStorageDocument;
@@ -114,7 +121,14 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
         CommentTextHolder.CommentListener,
         CommentLinkScriptHolder.CommentListener,
         CommentYoutubeHolder.CommentListener,
-        CommentImageHolder.CommentListener {
+        CommentImageHolder.CommentListener,
+        ReportReasonSheet.BottomSheetListener,
+        ReportSendCategorySheet.BottomSheetListener,
+        ReportPersonMessageSheet.BottomSheetListener,
+        ReportLikerMessageSheet.BottomSheetListener,
+        FollowSheet.BottomSheetListener,
+        BlockUserDialog.BlockListener
+{
 
     private static final String TAG = "CommentPost";
     private List<Comment> commentList;
@@ -193,12 +207,14 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
 
 
     //Edit Comment
-    Comment_ comment_Item;
+    Comment_ comment_Item,commentChild;
     Reply reply;
     ImageView imageEditComment, imageSendComment;
     private int position;
-    Reply replyItem;
+
     String commentId;
+    private boolean isFriend;
+    private String blockUserId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -224,9 +240,11 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
         profileId = manager.getProfileId();
         token = manager.getToken();
         userIds = manager.getProfileId();
-        replyItem = new Reply();
+
         comment_Item = new Comment_();
+        commentChild = new Comment_();
         reply = new Reply();
+        postItem=new PostItem();
 
         Gson gson = new Gson();
         String json = manager.getUserInfo();
@@ -260,7 +278,7 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
         commentItem = getIntent().getExtras().getParcelable(COMMENT_ITEM_KEY);
         postItem = getIntent().getExtras().getParcelable(POST_ITEM_KEY);
         replyItems = getIntent().getExtras().getParcelableArrayList(REPLY_KEY);
-        replyItem = getIntent().getExtras().getParcelable(REPLY_ITEM_KEY);
+
 
 
         if (commentItem == null) {
@@ -296,14 +314,14 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
             mComment.setHasMention(String.valueOf(temp.getHasMention()));
             mComment.setCommentTextIndex(temp.getCommentTextIndex());
             mComment.setLinkData(temp.getLinkData());
-            mComment.setId(temp.getCommentId());
+            mComment.setId(temp.getId());
           //  mComment.setReplies(replyItems);
             mComment.setPostId(postId);
-            mComment.setUserId(profileId);
-            mComment.setUserFirstName(userInfo.getFirstName());
-            mComment.setUserLastName(userInfo.getLastName());
-            mComment.setUserGoldStars(userInfo.getGoldStars());
-            mComment.setUserSliverStars(userInfo.getSliverStars());
+            mComment.setUserId(temp.getUserId());
+            mComment.setUserFirstName(temp.getFirstName());
+            mComment.setUserLastName(temp.getLastName());
+            mComment.setUserGoldStars(temp.getUserGoldStars());
+            mComment.setUserSliverStars(temp.getUserSliverStars());
             mComment.setDateTime(String.valueOf(temp.getDateTime()));
             comment_list.add(mComment);
         }
@@ -1160,11 +1178,153 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
         });
     }
 
+    @Override
+    public void onUnfollowClicked(int image, String text) {
+        
+    }
+
+    @Override
+    public void onReportLikerMessageClicked(int image, String text) {
+
+    }
+
+    @Override
+    public void onReportPersonMessageClicked(int image, String text) {
+
+    }
+
+    String reportId;
+
+    @Override
+    public void onButtonClicked(int image, String text) {
+        reportId = text;
+        commentChild=App.getCommentItem();
+        boolean isFollow=App.isIsFollow();
+        ReportSendCategorySheet reportSendCategorySheet = ReportSendCategorySheet.newInstance(reportId,commentChild,isFollow);
+        reportSendCategorySheet.show(getSupportFragmentManager(), "ReportSendCategorySheet");
+    }
+
+    @Override
+    public void onFollowClicked(int image, String text) {
+        String message = text;
+        FollowSheet followSheet = FollowSheet.newInstance(reportId,commentChild);
+        followSheet.show(getSupportFragmentManager(), "FollowSheet");
+    }
+
+    @Override
+    public void onReportLikerClicked(int image, String text) {
+        String message = text;
+        commentChild=App.getCommentItem();
+        ReportLikerMessageSheet reportLikerMessageSheet = ReportLikerMessageSheet.newInstance(reportId,commentChild);
+        reportLikerMessageSheet.show(getSupportFragmentManager(), "ReportLikerMessageSheet");
+    }
+
+    @Override
+    public void onPersonLikerClicked(int image, String text) {
+        String message = text;
+        commentChild=App.getCommentItem();
+        ReportPersonMessageSheet reportPersonMessageSheet = ReportPersonMessageSheet.newInstance(reportId,commentChild);
+        reportPersonMessageSheet.show(getSupportFragmentManager(), "ReportPersonMessageSheet");
+    }
+
+    @Override
+    public void onBlockResult(DialogFragment dlg) {
+        commentChild = App.getCommentItem();
+        blockUserId = commentChild.getUserId();
+        if (networkOk) {
+            Call<String> call = commentService.blockedUser(deviceId, profileId, token, blockUserId, userIds);
+            sendBlockUserRequest(call);
+        } else {
+            Utils.showNetworkDialog(getSupportFragmentManager());
+        }
+    }
+
+    @Override
+    public void onCancelResult(DialogFragment dlg) {
+
+    }
+
 
     public interface CallBack {
         void yourMethodName();
 
     }
+    private void sendBlockUserRequest(Call<String> call) {
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        try {
+                            JSONObject object = new JSONObject(response.body());
+                            boolean status = object.getBoolean("status");
+
+                            if (status) {
+
+                                App.setIsBockReply(true);
+                                App.setIsBockComment(true);
+                                Call<List<Reply>> blockCall = commentService.getPostCommentReplyList(deviceId, profileId, token, commentItem.getId(), "false", limit, offset, commentItem.getPostId(), userIds);
+                                sendAllCommentReplyListRequest(blockCall);
+                                //    log("Running code");
+                                //  delayLoadComment(mProgressBar);
 
 
+                            }
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    } else {
+
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.d("message", t.getMessage());
+            }
+        });
+    }
+
+
+
+    private void sendAllCommentReplyListRequest(Call<List<Reply>> blockCall) {
+
+        blockCall.enqueue(new Callback<List<Reply>>() {
+
+            @Override
+            public void onResponse(Call<List<Reply>> mCall, Response<List<Reply>> response) {
+
+
+                if (response.body() != null) {
+                   List<Reply> replyItem = response.body();
+                    Intent intent = new Intent(ReplyPost.this, ReplyPost.class);
+                    intent.putExtra(COMMENT_ITEM_KEY, (Parcelable) commentItem);
+                    intent.putExtra(POST_ITEM_KEY, (Parcelable) postItem);
+                    intent.putParcelableArrayListExtra(REPLY_KEY, (ArrayList<? extends Parcelable>) replyItem);
+                    startActivity(intent);
+                    finish();
+
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call<List<Reply>> call, Throwable t) {
+                Log.d("MESSAGE: ", t.getMessage());
+
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Utils.dismissDialog();
+    }
 }

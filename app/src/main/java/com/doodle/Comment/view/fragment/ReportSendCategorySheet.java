@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,23 +16,38 @@ import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.doodle.App;
+import com.doodle.Comment.model.Comment_;
+import com.doodle.Home.model.PostItem;
 import com.doodle.R;
 import com.doodle.utils.PrefManager;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.doodle.utils.Utils.isEmpty;
 import static com.facebook.FacebookSdk.getApplicationContext;
 
 public class ReportSendCategorySheet extends BottomSheetDialogFragment implements View.OnClickListener {
     private BottomSheetListener mListener;
     public static final String MESSAGE_key = "message_key";
+    public static final String COMMENT_key = "comment_key";
+    public static final String IS_FOLLOW_key = "is_follow_key";
     private PrefManager manager;
     private BottomSheetBehavior mBehavior;
+    private String reportId;
+    private String reportPersonName;
+    private boolean isFollow;
+    private Comment_ commentItem;
+    List<String> reportCategoryList = new ArrayList<>();
+    private String categoryName;
 
-    public static ReportSendCategorySheet newInstance(String message) {
+    public static ReportSendCategorySheet newInstance(String message, Comment_ comment_Item, boolean isFollow) {
 
         Bundle args = new Bundle();
         //args.putString(ExampleBottomSheetDialog.MESSAGE_key, resend);
-//        args.putParcelable(ResendEmail.MESSAGE_key, message);
+        args.putParcelable(ReportSendCategorySheet.COMMENT_key, comment_Item);
         args.putString(ReportSendCategorySheet.MESSAGE_key, message);
+        args.putBoolean(ReportSendCategorySheet.IS_FOLLOW_key, isFollow);
 
         ReportSendCategorySheet fragment = new ReportSendCategorySheet();
         fragment.setArguments(args);
@@ -43,8 +59,6 @@ public class ReportSendCategorySheet extends BottomSheetDialogFragment implement
         super.onSaveInstanceState(outState);
     }
 
-    private String message;
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -52,18 +66,21 @@ public class ReportSendCategorySheet extends BottomSheetDialogFragment implement
         manager = new PrefManager(App.getAppContext());
         setStyle(BottomSheetDialogFragment.STYLE_NORMAL, R.style.SheetDialog);
         // setStyle(BottomSheetDialogFragment.STYLE_NORMAL, R.style.CustomBottomSheetStyle);
+        commentItem = new Comment_();
         Bundle argument = getArguments();
         if (argument != null) {
-            message = argument.getString(MESSAGE_key);
+            reportId = argument.getString(MESSAGE_key);
+            isFollow = argument.getBoolean(IS_FOLLOW_key);
+            commentItem = argument.getParcelable(COMMENT_key);
+          //  Toast.makeText(getActivity(), "comment_key: " + commentItem.getUserFirstName() + "isFriend: " + isFriend, Toast.LENGTH_SHORT).show();
 
         }
     }
 
 
-
     private RadioGroup radioGroupSendCategory;
     private RadioButton radioMessagePerson, radioUnfollowPerson, radioReportLiker;
-
+    private String reoprtUser, unFollowUser, reportLiker;
 
     @Nullable
     @Override
@@ -76,34 +93,45 @@ public class ReportSendCategorySheet extends BottomSheetDialogFragment implement
 
         radioGroupSendCategory = (RadioGroup) root.findViewById(R.id.radioGroupSendCategory);
 
-        radioGroupSendCategory.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        if(!isEmpty(commentItem)){
+            reportPersonName = commentItem.getUserFirstName() + " " + commentItem.getUserLastName();
+        }else {
+            PostItem item=new PostItem();
+            item=App.getItem();
+            reportPersonName = item.getUserFirstName() + " " + item.getUserLastName();
+        }
 
+        reoprtUser = "Send a message to " + reportPersonName;
+        unFollowUser = "Unfollow " + reportPersonName;
+        reportLiker = "Report to Liker";
+        if (isFollow) {
+            reportCategoryList.add(reoprtUser);
+            reportCategoryList.add(unFollowUser);
+            reportCategoryList.add(reportLiker);
+        } else {
+            reportCategoryList.add(reoprtUser);
+            reportCategoryList.add(reportLiker);
+        }
+
+
+        for (int i = 0; i < reportCategoryList.size(); i++) {
+            RadioButton radioButton = new RadioButton(getActivity());
+            radioButton.setText(reportCategoryList.get(i));
+            radioButton.setId(i);
+            radioGroupSendCategory.addView(radioButton);
+        }
+
+        //set listener to radio button group
+        radioGroupSendCategory.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                // find which radio button is selected
-                switch (checkedId) {
-                    case R.id.radioMessagePerson:
-
-                        Toast.makeText(getApplicationContext(), "choice: radioNudity", Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.radioUnfollowPerson:
-                        Toast.makeText(getApplicationContext(), "choice: radioUnfollowPerson", Toast.LENGTH_SHORT).show();
-                        break;
-                    case R.id.radioReportLiker:
-                        Toast.makeText(getApplicationContext(), "choice: radioReportLiker", Toast.LENGTH_SHORT).show();
-                        break;
-
-
-                }
-
+                int checkedRadioButtonId = radioGroupSendCategory.getCheckedRadioButtonId();
+                RadioButton radioBtn = (RadioButton) root.findViewById(checkedRadioButtonId);
+                //  reasonId=String.valueOf(checkedRadioButtonId);
+                categoryName = radioBtn.getText().toString();
+             //   Toast.makeText(getActivity(), categoryName, Toast.LENGTH_SHORT).show();
             }
-
         });
-
-        radioMessagePerson = (RadioButton) root.findViewById(R.id.radioMessagePerson);
-        radioUnfollowPerson = (RadioButton) root.findViewById(R.id.radioUnfollowPerson);
-        radioReportLiker = (RadioButton) root.findViewById(R.id.radioReportLiker);
-
 
 
         return root;
@@ -118,16 +146,17 @@ public class ReportSendCategorySheet extends BottomSheetDialogFragment implement
         switch (id) {
             case R.id.btnCategoryContinue:
 
-                if (selectedId == radioMessagePerson.getId()) {
-                    mListener.onPersonLikerClicked(R.drawable.ic_public_black_12dp, "Public");
+                if (reoprtUser.equalsIgnoreCase(categoryName)) {
+                    mListener.onPersonLikerClicked(R.drawable.ic_public_black_12dp, categoryName);
                     dismiss();
-                } else if (selectedId == radioUnfollowPerson.getId()) {
-                    mListener.onFollowClicked(R.drawable.ic_public_black_12dp, "Public");
+                } else if (unFollowUser.equalsIgnoreCase(categoryName)) {
+                    mListener.onFollowClicked(R.drawable.ic_public_black_12dp, categoryName);
                     dismiss();
-                } else if (selectedId == radioReportLiker.getId()) {
-                    mListener.onReportLikerClicked(R.drawable.ic_public_black_12dp, "Public");
+                } else if (reportLiker.equalsIgnoreCase(categoryName)) {
+                    mListener.onReportLikerClicked(R.drawable.ic_public_black_12dp, categoryName);
                     dismiss();
                 }
+
 
 
                 break;
@@ -141,7 +170,9 @@ public class ReportSendCategorySheet extends BottomSheetDialogFragment implement
 
     public interface BottomSheetListener {
         void onFollowClicked(int image, String text);
+
         void onReportLikerClicked(int image, String text);
+
         void onPersonLikerClicked(int image, String text);
     }
 

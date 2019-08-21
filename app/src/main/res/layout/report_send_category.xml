@@ -67,7 +67,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <RadioButton
+           <!-- <RadioButton
                 android:id="@+id/radioMessagePerson"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -83,7 +83,7 @@
                 android:id="@+id/radioReportLiker"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Report to Liker" />
+                android:text="Report to Liker" />-->
 
 
         </RadioGroup>

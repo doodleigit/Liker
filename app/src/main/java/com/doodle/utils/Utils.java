@@ -18,7 +18,9 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.os.Handler;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -44,6 +46,7 @@ import android.widget.Toast;
 import com.borjabravo.readmoretextview.ReadMoreTextView;
 import com.doodle.Authentication.service.MyService;
 import com.doodle.Comment.model.Comment_;
+import com.doodle.Comment.view.fragment.BlockUserDialog;
 import com.doodle.Home.adapter.PostAdapter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.PostTextIndex;
@@ -151,6 +154,25 @@ public class Utils {
         network.show(manager, "NetworkDialogFragment");
     }
 
+   public static void showBlockUser(View v) {
+        AppCompatActivity activity = (AppCompatActivity) v.getContext();
+        BlockUserDialog blockUserDialog = new BlockUserDialog();
+        // TODO: Use setCancelable() to make the dialog non-cancelable
+        blockUserDialog.setCancelable(false);
+        blockUserDialog.show(activity.getSupportFragmentManager(), "BlockUserDialog");
+    }
+
+    public  static void closeBlockUser(View view){
+        BlockUserDialog blockUserDialog = new BlockUserDialog();
+        // TODO: Use setCancelable() to make the dialog non-cancelable
+        blockUserDialog.setCancelable(false);
+
+    }
+    public static void dismissDialog(){
+        BlockUserDialog prev = new BlockUserDialog();
+        prev.setCancelable(true);
+
+    }
     public static void stripUnderlines(EmojiTextView tvPostEmojiContent) {
 
         Spannable s = new SpannableString(tvPostEmojiContent.getText());
@@ -845,5 +867,9 @@ public class Utils {
         } else {
             view.setVisibility(View.INVISIBLE);
         }
+    }
+
+    public static boolean isNullOrWhiteSpace(String value) {
+        return value == null || value.trim().isEmpty();
     }
 }

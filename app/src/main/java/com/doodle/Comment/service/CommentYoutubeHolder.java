@@ -1,6 +1,7 @@
 package com.doodle.Comment.service;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -28,8 +29,11 @@ import com.bumptech.glide.Glide;
 import com.doodle.App;
 import com.doodle.Comment.model.Comment_;
 import com.doodle.Comment.model.LinkData;
+import com.doodle.Comment.model.Reason;
 import com.doodle.Comment.model.Reply;
+import com.doodle.Comment.model.ReportReason;
 import com.doodle.Comment.view.activity.ReplyPost;
+import com.doodle.Comment.view.fragment.ReportReasonSheet;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.service.HomeService;
 import com.doodle.R;
@@ -54,9 +58,11 @@ import retrofit2.Response;
 import static com.doodle.utils.AppConstants.LINK_IMAGES;
 import static com.doodle.utils.AppConstants.PROFILE_IMAGE;
 import static com.doodle.utils.Utils.delayLoadComment;
+import static com.doodle.utils.Utils.dismissDialog;
 import static com.doodle.utils.Utils.getDomainName;
 import static com.doodle.utils.Utils.isEmpty;
 import static com.doodle.utils.Utils.isNullOrEmpty;
+import static com.doodle.utils.Utils.showBlockUser;
 import static java.lang.Integer.parseInt;
 
 public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
@@ -101,7 +107,7 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
 
     //ReplyAll
     private ProgressBar mProgressBar;
-    public static final String REPLY_ITEM_KEY = "reply_item_key";
+
     public static final String REPLY_KEY = "reply_key";
     public static final String COMMENT_ITEM_KEY = "comment_item_key";
     public static final String POST_ITEM_KEY = "post_item_key";
@@ -199,7 +205,7 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
 
     int goldStar;
     int silverStar;
-
+    AppCompatActivity activity;
     public void setItem(Comment_ commentItem, PostItem postItem,int position) {
 
         this.commentItem = commentItem;
@@ -467,11 +473,22 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
 
                         if (id == R.id.reportComment) {
 
-                            Toast.makeText(App.getAppContext(), "reportComment : ", Toast.LENGTH_SHORT).show();
-                        }
+                            App.setCommentItem(commentItem);
+                            activity = (AppCompatActivity) v.getContext();
+                            if (networkOk) {
+                                Call<ReportReason> call = commentService.getReportReason(deviceId, profileId, token, commentItem.getUserId(), "2", userIds);
+                                sendReportReason(call);
+                            } else {
+                                Utils.showNetworkDialog(activity.getSupportFragmentManager());
+                            }                        }
 
                         if (id == R.id.blockUser) {
-                            Toast.makeText(App.getAppContext(), "blockUser : ", Toast.LENGTH_SHORT).show();
+                            if (!((Activity) mContext).isFinishing()) {
+                                App.setCommentItem(commentItem);
+                                showBlockUser(v);
+                            }else {
+                                dismissDialog();
+                            }
                         }
                         if (id == R.id.editComment) {
 
@@ -514,6 +531,10 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
             }
         });
 
+        if (!isNullOrEmpty(commentItem.getTotalReply()) && Integer.parseInt(commentItem.getTotalReply()) > 0) {
+            tvCommentReply.setText(String.format("%s Reply", commentItem.getTotalReply()));
+        }
+
         tvCommentReply.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -534,11 +555,39 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
                     Intent intent = new Intent(mContext, ReplyPost.class);
                     intent.putExtra(COMMENT_ITEM_KEY, (Parcelable) commentItem);
                     intent.putExtra(POST_ITEM_KEY, (Parcelable) postItem);
-                    intent.putExtra(REPLY_ITEM_KEY,   (Parcelable) itemReply);
+
                     intent.putParcelableArrayListExtra(REPLY_KEY, (ArrayList<? extends Parcelable>) replyItem);
 
                     mContext.startActivity(intent);
                 }
+            }
+        });
+
+    }
+
+    private void sendReportReason(Call<ReportReason> call) {
+
+        call.enqueue(new Callback<ReportReason>() {
+
+            @Override
+            public void onResponse(Call<ReportReason> mCall, Response<ReportReason> response) {
+
+
+                if (response.body() != null) {
+                    ReportReason reportReason = response.body();
+                    boolean isFollowed=reportReason.isFollowed();
+                    App.setIsFollow(isFollowed);
+                    List<Reason> reasonList=reportReason.getReason();
+                    ReportReasonSheet reportReasonSheet = ReportReasonSheet.newInstance(reasonList);
+                    reportReasonSheet.show(activity.getSupportFragmentManager(), "ReportReasonSheet");
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<ReportReason> call, Throwable t) {
+                Log.d("MESSAGE: ", t.getMessage());
+
             }
         });
 
@@ -554,13 +603,10 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
 
                 if(response.body()!=null){
                     replyItem = response.body();
-                    itemReply=replyItem.get(position);
-                    Log.d("replyItem ",replyItem.toString());
 
                     Intent intent = new Intent(mContext, ReplyPost.class);
                     intent.putExtra(COMMENT_ITEM_KEY, (Parcelable) commentItem);
                     intent.putExtra(POST_ITEM_KEY, (Parcelable) postItem);
-                    intent.putExtra(REPLY_ITEM_KEY,   (Parcelable) itemReply);
                     intent.putParcelableArrayListExtra(REPLY_KEY, (ArrayList<? extends Parcelable>) replyItem);                    mContext.startActivity(intent);
 
                 }else {

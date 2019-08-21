@@ -20,6 +20,19 @@ public class ReportReason implements Serializable, Parcelable
     @SerializedName("is_friends")
     @Expose
     private boolean isFriends;
+
+    @SerializedName("is_followed")
+    @Expose
+    private boolean isFollowed;
+
+    public boolean isFollowed() {
+        return isFollowed;
+    }
+
+    public void setFollowed(boolean followed) {
+        isFollowed = followed;
+    }
+
     public final static Creator<ReportReason> CREATOR = new Creator<ReportReason>() {
 
 
@@ -41,6 +54,7 @@ public class ReportReason implements Serializable, Parcelable
     protected ReportReason(Parcel in) {
         in.readList(this.reason, (Reason.class.getClassLoader()));
         this.isFriends = ((boolean) in.readValue((boolean.class.getClassLoader())));
+        this.isFollowed = ((boolean) in.readValue((boolean.class.getClassLoader())));
     }
 
     public ReportReason() {
@@ -65,6 +79,7 @@ public class ReportReason implements Serializable, Parcelable
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeList(reason);
         dest.writeValue(isFriends);
+        dest.writeValue(isFollowed);
     }
 
     public int describeContents() {
