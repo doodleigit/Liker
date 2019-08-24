@@ -142,9 +142,18 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
     private boolean notificationStatus;
 
 
-    public TextMimHolder(View itemView,Context context) {
+    //Delete post
+    public PostItemListener listener;
+    public interface PostItemListener {
+        void deletePost(PostItem postItem, int position);
+
+    }
+
+
+    public TextMimHolder(View itemView, Context context, PostItemListener mimListener) {
         super(itemView);
         mContext=context;
+        this.listener=mimListener;
         callbackManager = CallbackManager.Factory.create();
         shareDialog = new ShareDialog((Activity) context);
         manager = new PrefManager(App.getAppContext());
@@ -212,8 +221,10 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
     }
 
     AppCompatActivity activity;
-    public void setItem(PostItem item) {
+    int position;
+    public void setItem(PostItem item, int position) {
         this.item = item;
+        this.position = position;
         userPostId = item.getPostId();
 
         String postPermission = item.getPermission();
@@ -692,7 +703,8 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                             Toast.makeText(App.getAppContext(), "edit : ", Toast.LENGTH_SHORT).show();
                         }
                         if (id == R.id.delete) {
-                            Toast.makeText(App.getAppContext(), "delete : ", Toast.LENGTH_SHORT).show();
+
+                                listener.deletePost(item,position);
                         }
                         if (id == R.id.turnOffNotification) {
                             activity = (AppCompatActivity) v.getContext();

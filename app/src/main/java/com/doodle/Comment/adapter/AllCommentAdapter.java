@@ -13,12 +13,6 @@ import com.doodle.Comment.service.CommentLinkScriptHolder;
 import com.doodle.Comment.service.CommentTextHolder;
 import com.doodle.Comment.service.CommentYoutubeHolder;
 import com.doodle.Home.model.PostItem;
-import com.doodle.Home.service.ImageHolder;
-import com.doodle.Home.service.LinkScriptHolder;
-import com.doodle.Home.service.LinkScriptYoutubeHolder;
-import com.doodle.Home.service.TextHolder;
-import com.doodle.Home.service.TextMimHolder;
-import com.doodle.Home.service.VideoHolder;
 import com.doodle.R;
 
 import java.util.List;
@@ -36,7 +30,7 @@ public class AllCommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     PostItem postItem;
     private int size = 0;
 
-    private CallBack mCallBack;
+
     private CommentLinkScriptHolder.CommentListener commentLinkListener;
     private CommentTextHolder.CommentListener commentListener;
     private CommentYoutubeHolder.CommentListener commentYoutubeListener;
