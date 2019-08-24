@@ -2,14 +2,15 @@
 package com.doodle.Setting.model;
 
 import java.io.Serializable;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.Parcelable.Creator;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Email implements Serializable, Parcelable
-{
+public class Email implements Serializable, Parcelable {
 
     @SerializedName("email")
     @Expose
@@ -27,7 +28,7 @@ public class Email implements Serializable, Parcelable
 
 
         @SuppressWarnings({
-            "unchecked"
+                "unchecked"
         })
         public Email createFromParcel(Parcel in) {
             return new Email(in);
@@ -37,8 +38,7 @@ public class Email implements Serializable, Parcelable
             return (new Email[size]);
         }
 
-    }
-    ;
+    };
     private final static long serialVersionUID = -5123783708540407044L;
 
     protected Email(Parcel in) {
@@ -48,7 +48,11 @@ public class Email implements Serializable, Parcelable
         this.isVerified = ((String) in.readValue((String.class.getClassLoader())));
     }
 
-    public Email() {
+    public Email(String email, String type, String permissionType, String isVerified) {
+        this.email = email;
+        this.type = type;
+        this.permissionType = permissionType;
+        this.isVerified = isVerified;
     }
 
     public String getEmail() {
@@ -91,7 +95,7 @@ public class Email implements Serializable, Parcelable
     }
 
     public int describeContents() {
-        return  0;
+        return 0;
     }
 
 }

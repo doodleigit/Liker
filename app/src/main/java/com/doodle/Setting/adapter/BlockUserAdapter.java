@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.doodle.R;
 import com.doodle.Setting.model.BlockUser;
+import com.doodle.Setting.service.UserBlockClickListener;
 
 import java.util.ArrayList;
 
@@ -18,10 +19,12 @@ public class BlockUserAdapter extends RecyclerView.Adapter<BlockUserAdapter.View
 
     private Context context;
     private ArrayList<BlockUser> arrayList;
+    private UserBlockClickListener userBlockClickListener;
 
-    public BlockUserAdapter(Context context, ArrayList<BlockUser> arrayList) {
+    public BlockUserAdapter(Context context, ArrayList<BlockUser> arrayList, UserBlockClickListener userBlockClickListener) {
         this.context = context;
         this.arrayList = arrayList;
+        this.userBlockClickListener = userBlockClickListener;
     }
 
     @NonNull
@@ -39,7 +42,7 @@ public class BlockUserAdapter extends RecyclerView.Adapter<BlockUserAdapter.View
         viewHolder.ivRemove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                userBlockClickListener.onUnBlockClick(arrayList.get(i), i);
             }
         });
 

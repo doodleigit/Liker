@@ -157,12 +157,20 @@ public class AppConstants {
     public static final String PRIVACY_VIEW = "privacy_view";
     public static final String PRIVACY_UPDATE_PERMISSION = "privacy_update_permission";
     public static final String BLOCKED_USER = "blocked_user";
+    public static final String UNBLOCKED_USER = "unblocked_user";
     public static final String GET_ON_OFFS_BY_USER_ID = "get_on_offs_by_user_id";
-    public static final String EMAIL_NOTIFICATION = "email_notification";
+    public static final String NOTIFICATION_ON_OFF = "notifications_on_off";
     public static final String CONTRIBUTOR_VIEW = "contributor_view";
     public static final String GET_CONTRIBUTOR_CATEGORY = "get_contributor_categories";
     public static final String SET_CONTRIBUTOR_CATEGORY = "set_contributor_category";
     public static final String ACCOUNT_VIEW = "account_view";
     public static final String GET_EMAILS = "get_emails";
+    public static final String UPDATE_PASSWORD = "account_update_password";
+    public static final String DEACTIVATED_ACCOUNT = "deactivate_account";
+    public static final String EMAIL_VERIFICATION_SEND = "email_verification_send";
+    public static final String UPDATE_SECURITY_QUESTION = "account_update_security_question";
+    public static final String PEOPLE_YOU_MAY_KNOW = "people_may_know";
+    public static final String GET_SOCIAL_FRIENDS = "get_social_friends";
+    public static final String GET_SOCIAL_LINKS = "get_social_links";
 
 }

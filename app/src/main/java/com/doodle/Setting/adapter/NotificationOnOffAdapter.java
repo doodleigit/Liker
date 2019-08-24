@@ -70,7 +70,7 @@ public class NotificationOnOffAdapter extends RecyclerView.Adapter<NotificationO
             viewHolder.ivSave.setVisibility(View.VISIBLE);
             viewHolder.ivCancel.setVisibility(View.VISIBLE);
 
-            viewHolder.tvPrivacyTypeName.setVisibility(View.GONE);
+            viewHolder.tvPushPrivacyStatus.setVisibility(View.GONE);
             viewHolder.tvEmailPrivacyStatus.setVisibility(View.GONE);
             viewHolder.tvBrowserPrivacyStatus.setVisibility(View.GONE);
             viewHolder.cbPushPrivacyCheckBox.setVisibility(View.VISIBLE);
@@ -81,7 +81,7 @@ public class NotificationOnOffAdapter extends RecyclerView.Adapter<NotificationO
             viewHolder.ivSave.setVisibility(View.GONE);
             viewHolder.ivCancel.setVisibility(View.GONE);
 
-            viewHolder.tvPrivacyTypeName.setVisibility(View.VISIBLE);
+            viewHolder.tvPushPrivacyStatus.setVisibility(View.VISIBLE);
             viewHolder.tvEmailPrivacyStatus.setVisibility(View.VISIBLE);
             viewHolder.tvBrowserPrivacyStatus.setVisibility(View.VISIBLE);
             viewHolder.cbPushPrivacyCheckBox.setVisibility(View.GONE);
@@ -96,7 +96,7 @@ public class NotificationOnOffAdapter extends RecyclerView.Adapter<NotificationO
                 viewHolder.ivSave.setVisibility(View.VISIBLE);
                 viewHolder.ivCancel.setVisibility(View.VISIBLE);
 
-                viewHolder.tvPrivacyTypeName.setVisibility(View.GONE);
+                viewHolder.tvPushPrivacyStatus.setVisibility(View.GONE);
                 viewHolder.tvEmailPrivacyStatus.setVisibility(View.GONE);
                 viewHolder.tvBrowserPrivacyStatus.setVisibility(View.GONE);
                 viewHolder.cbPushPrivacyCheckBox.setVisibility(View.VISIBLE);
@@ -112,7 +112,7 @@ public class NotificationOnOffAdapter extends RecyclerView.Adapter<NotificationO
                 viewHolder.ivSave.setVisibility(View.GONE);
                 viewHolder.ivCancel.setVisibility(View.GONE);
 
-                viewHolder.tvPrivacyTypeName.setVisibility(View.VISIBLE);
+                viewHolder.tvPushPrivacyStatus.setVisibility(View.VISIBLE);
                 viewHolder.tvEmailPrivacyStatus.setVisibility(View.VISIBLE);
                 viewHolder.tvBrowserPrivacyStatus.setVisibility(View.VISIBLE);
                 viewHolder.cbPushPrivacyCheckBox.setVisibility(View.GONE);
@@ -161,9 +161,9 @@ public class NotificationOnOffAdapter extends RecyclerView.Adapter<NotificationO
         String initialKey = key.replace("_" , " ");
         String[] wordArray = initialKey.split(" ");
         for (String s : wordArray) {
-            title.append(Character.toUpperCase(s.charAt(0))).append(s.substring(1));
+            title.append(Character.toUpperCase(s.charAt(0))).append(s.substring(1)).append(" ");
         }
-        return title.toString();
+        return title.toString().trim();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
@@ -189,6 +189,7 @@ public class NotificationOnOffAdapter extends RecyclerView.Adapter<NotificationO
     }
 
     private void sendNotificationOnOffRequest(String singleStatus, ArrayList<String> onOffs, int position, int pushStatus, int emailStatus, int browserStatus) {
+        progressDialog.setMessage(context.getString(R.string.updating));
         progressDialog.show();
         Call<String> call = settingService.setNotificationOnOff(deviceId, userId, token, userId, singleStatus, onOffs);
         call.enqueue(new Callback<String>() {
@@ -207,6 +208,8 @@ public class NotificationOnOffAdapter extends RecyclerView.Adapter<NotificationO
                         Toast.makeText(context, "Something went wrong", Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
+                    e.printStackTrace();
+                } catch (NumberFormatException e) {
                     e.printStackTrace();
                 }
                 progressDialog.hide();

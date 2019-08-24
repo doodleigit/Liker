@@ -29,6 +29,7 @@ import com.doodle.R;
 import com.doodle.Setting.adapter.BlockUserAdapter;
 import com.doodle.Setting.adapter.CustomPrivacySpinnerAdapter;
 import com.doodle.Setting.adapter.UserForBlockAdapter;
+import com.doodle.Setting.model.BlockUser;
 import com.doodle.Setting.model.Friend;
 import com.doodle.Setting.model.Permissions;
 import com.doodle.Setting.model.PrivacyInfo;
@@ -67,6 +68,7 @@ public class PrivacyAndSecurityFragment extends Fragment {
     private PrefManager manager;
     private PrivacyInfo privacyInfo;
     private ArrayList<PrivacyType> privacyTwoTypes, privacyThreeTypes;
+    private ArrayList<BlockUser> blockUsers;
     private ArrayList<Friend> friends;
     private String deviceId, token, userId;
     private boolean isFirstTime = true;
@@ -99,6 +101,7 @@ public class PrivacyAndSecurityFragment extends Fragment {
         privacyInfo.setPermissions(new Permissions());
         privacyTwoTypes = new ArrayList<>();
         privacyThreeTypes = new ArrayList<>();
+        blockUsers = new ArrayList<>();
         friends = new ArrayList<>();
 
         privacyTwoTypes.add(new PrivacyType("Public", R.drawable.public_));
@@ -145,11 +148,16 @@ public class PrivacyAndSecurityFragment extends Fragment {
         UserBlockClickListener userBlockClickListener = new UserBlockClickListener() {
             @Override
             public void onBlockClick(Friend friend, int position) {
-                setBlockedUserRequest(friend.getUserId(), position);
+                setBlockedUserRequest(friend, position);
+            }
+
+            @Override
+            public void onUnBlockClick(BlockUser blockUser, int position) {
+                setUnBlockedUserRequest(blockUser.getUserId(), position);
             }
         };
 
-        blockUserAdapter = new BlockUserAdapter(getActivity(), privacyInfo.getBlockUsers());
+        blockUserAdapter = new BlockUserAdapter(getActivity(), blockUsers, userBlockClickListener);
         userForBlockAdapter = new UserForBlockAdapter(getActivity(), friends, userBlockClickListener);
 
         recyclerView.setAdapter(blockUserAdapter);
@@ -218,6 +226,8 @@ public class PrivacyAndSecurityFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 etFindUserEmail.setText("");
+                friends.clear();
+                userForBlockAdapter.notifyDataSetChanged();
                 blockChangeLayout.setVisibility(View.VISIBLE);
                 findUserLayout.setVisibility(View.GONE);
                 btnBlockCancel.setVisibility(View.GONE);
@@ -355,18 +365,22 @@ public class PrivacyAndSecurityFragment extends Fragment {
     }
 
     private void sendPrivacyAndSecuritySettingRequest() {
+        progressDialog.show();
         Call<PrivacyInfo> call = settingService.getPrivacyAndSecuritySetting(deviceId, userId, token, userId);
         call.enqueue(new Callback<PrivacyInfo>() {
             @Override
             public void onResponse(Call<PrivacyInfo> call, Response<PrivacyInfo> response) {
                 privacyInfo = response.body();
                 if (privacyInfo != null) {
+                    blockUsers.addAll(privacyInfo.getBlockUsers());
                     setData();
                 }
+                progressDialog.hide();
             }
 
             @Override
             public void onFailure(Call<PrivacyInfo> call, Throwable t) {
+                progressDialog.hide();
                 Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
             }
         });
@@ -403,6 +417,7 @@ public class PrivacyAndSecurityFragment extends Fragment {
     }
 
     private void sendFindUserRequest(String searchKey) {
+        progressDialog.show();
         Call<ArrayList<Friend>> call = settingService.getSearchUser(deviceId, userId, token, searchKey);
         call.enqueue(new Callback<ArrayList<Friend>>() {
             @Override
@@ -413,23 +428,55 @@ public class PrivacyAndSecurityFragment extends Fragment {
                     friends.addAll(arrayList);
                 }
                 userForBlockAdapter.notifyDataSetChanged();
+                progressDialog.hide();
             }
 
             @Override
             public void onFailure(Call<ArrayList<Friend>> call, Throwable t) {
-
+                progressDialog.hide();
             }
         });
     }
 
-    private void setBlockedUserRequest(String blockUserId, int position) {
+    private void setBlockedUserRequest(Friend friend, int position) {
         progressDialog.show();
-        Call<String> call = settingService.setBlockedUser(deviceId, userId, token, userId, blockUserId);
+        Call<String> call = settingService.setBlockedUser(deviceId, userId, token, userId, friend.getUserId());
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
+                BlockUser blockUser = new BlockUser();
+                blockUser.setUserId(friend.getUserId());
+                blockUser.setFirstName(friend.getFirstName());
+                blockUser.setLastName(friend.getLastName());
+                blockUser.setUserName(friend.getUserName());
+                blockUser.setTotalLikes(friend.getTotalLikes());
+                blockUser.setGoldStars(friend.getGoldStars());
+                blockUser.setSliverStars(friend.getSliverStars());
+                blockUser.setPhoto(friend.getPhoto());
+
+                blockUsers.add(blockUser);
                 friends.remove(position);
+                blockUserAdapter.notifyDataSetChanged();
                 userForBlockAdapter.notifyDataSetChanged();
+                progressDialog.hide();
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                progressDialog.hide();
+                Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void setUnBlockedUserRequest(String blockedId, int position) {
+        progressDialog.show();
+        Call<String> call = settingService.setUnBlockedUser(deviceId, userId, token, userId, blockedId);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                blockUsers.remove(position);
+                blockUserAdapter.notifyDataSetChanged();
                 progressDialog.hide();
             }
 

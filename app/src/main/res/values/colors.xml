@@ -44,4 +44,7 @@
     <color name="soft_grey_choose">#aaaaaa</color>
     <color name="aa">#ff007de3</color>
 
+    <color name="light_green">#DFF0D8</color>
+    <color name="deep_green">#558955</color>
+
 </resources>

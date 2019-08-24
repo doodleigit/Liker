@@ -125,7 +125,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:visibility="gone">
+                            android:visibility="visible">
 
                             <LinearLayout
                                 android:layout_width="match_parent"
@@ -341,7 +341,20 @@
                     <android.support.v7.widget.RecyclerView
                         android:id="@+id/email_recycler_view"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:visibility="visible"/>
+
+                    <TextView
+                        android:id="@+id/email_verification_message"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:padding="10dp"
+                        android:background="@color/light_green"
+                        android:text="@string/a_verification_email_has_been_resent_to_your_email"
+                        android:textColor="@color/deep_green"
+                        android:textSize="14sp"
+                        android:visibility="gone"/>
 
                     <TextView
                         android:id="@+id/add_new_email"
@@ -352,6 +365,64 @@
                         android:text="@string/add_new_email"
                         android:textColor="@color/colorPrimary"
                         android:textSize="14sp" />
+
+                    <LinearLayout
+                        android:id="@+id/add_email_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_margin="10dp"
+                        android:visibility="gone">
+
+                        <EditText
+                            android:id="@+id/new_email"
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp"
+                            android:layout_marginTop="5dp"
+                            android:background="@drawable/rectangle_corner_round_five"
+                            android:inputType="textEmailAddress"
+                            android:hint="New Email"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"
+                            android:textSize="14sp" />
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp">
+
+                            <Button
+                                android:id="@+id/email_cancel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="35dp"
+                                android:layout_alignParentStart="true"
+                                android:background="@drawable/rectangle_corner_round_five"
+                                android:text="Cancel"
+                                android:textAllCaps="false"
+                                android:textSize="14sp" />
+
+                            <Spinner
+                                android:id="@+id/email_privacy_spinner"
+                                android:layout_width="wrap_content"
+                                android:layout_height="35dp"
+                                android:layout_marginEnd="10dp"
+                                android:layout_toStartOf="@+id/email_save"
+                                android:background="@drawable/rectangle_corner_round_five" />
+
+                            <Button
+                                android:id="@+id/email_save"
+                                android:layout_width="wrap_content"
+                                android:layout_height="35dp"
+                                android:layout_alignParentEnd="true"
+                                android:background="@drawable/rectangle_corner_round_seven"
+                                android:text="Save"
+                                android:textAllCaps="false"
+                                android:textSize="14sp"
+                                android:textColor="@color/colorWhite"/>
+
+                        </RelativeLayout>
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
@@ -456,6 +527,7 @@
                                 android:layout_weight="2"
                                 android:background="@color/colorWhite"
                                 android:padding="10dp"
+                                android:inputType="textPassword"
                                 android:textSize="14sp" />
 
                         </LinearLayout>
@@ -489,6 +561,7 @@
                                 android:layout_weight="2"
                                 android:background="@color/colorWhite"
                                 android:padding="10dp"
+                                android:inputType="textPassword"
                                 android:textSize="14sp" />
 
                         </LinearLayout>
@@ -522,6 +595,7 @@
                                 android:layout_weight="2"
                                 android:background="@color/colorWhite"
                                 android:padding="10dp"
+                                android:inputType="textPassword"
                                 android:textSize="14sp" />
 
                         </LinearLayout>

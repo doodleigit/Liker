@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -27,6 +28,9 @@ import com.doodle.Setting.model.SubCategory;
 import com.doodle.Setting.service.ContributionAddListener;
 import com.doodle.Setting.service.SettingService;
 import com.doodle.utils.PrefManager;
+import com.google.android.flexbox.FlexDirection;
+import com.google.android.flexbox.FlexboxLayoutManager;
+import com.google.android.flexbox.JustifyContent;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -35,10 +39,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.facebook.FacebookSdk.getApplicationContext;
+
 public class ContributorSettingFragment extends Fragment {
 
     View view;
-    LinearLayout mainLayout;
+    private Toolbar toolbar;
+    private LinearLayout mainLayout;
     private EditText etAddCategory;
     private RecyclerView categoryRecyclerView, selectedRecyclerView;
 
@@ -79,6 +86,7 @@ public class ContributorSettingFragment extends Fragment {
         token = manager.getToken();
         userId = manager.getProfileId();
 
+        toolbar = view.findViewById(R.id.toolbar);
         mainLayout = view.findViewById(R.id.main_layout);
         etAddCategory = view.findViewById(R.id.add_category);
 
@@ -86,7 +94,17 @@ public class ContributorSettingFragment extends Fragment {
         categoryRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         categoryRecyclerView.setNestedScrollingEnabled(false);
         selectedRecyclerView = view.findViewById(R.id.selected_recycler_view);
-        selectedRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL));
+
+        // Create the FlexboxLayoutMananger, only flexbox library version 0.3.0 or higher support.
+        FlexboxLayoutManager flexboxLayoutManager = new FlexboxLayoutManager(getContext());
+        // Set flex direction.
+        flexboxLayoutManager.setFlexDirection(FlexDirection.ROW);
+        // Set JustifyContent.
+        flexboxLayoutManager.setJustifyContent(JustifyContent.SPACE_AROUND);
+        selectedRecyclerView.setLayoutManager(flexboxLayoutManager);
+
+
+//        selectedRecyclerView.setLayoutManager(new StaggeredGridLayoutManager(3, StaggeredGridLayoutManager.VERTICAL));
         selectedRecyclerView.setNestedScrollingEnabled(false);
 
         ContributionAddListener contributionAddListener = new ContributionAddListener() {
@@ -117,32 +135,6 @@ public class ContributorSettingFragment extends Fragment {
         contributorCategoryAdapter = new ContributorCategoryAdapter(getActivity(), categories, contributionAddListener, progressDialog, settingService, deviceId, token, userId);
         categoryRecyclerView.setAdapter(contributorCategoryAdapter);
 
-//        etAddCategory.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                String key = etAddCategory.getText().toString();
-//                categories.clear();
-//                if (key.isEmpty()) {
-//                    categories.addAll(allCategories);
-//                } else {
-//                    for (Category category : allCategories) {
-//                        if (category.getInfo().getName().contains(key)) {
-//                            ArrayList<SubCategory> arrayList = new ArrayList<>();
-//                            for (SubCategory subCategory : category.getSubCategories()) {
-//                                if (subCategory.getName().contains(key)) {
-//                                    arrayList.add(subCategory);
-//                                }
-//                            }
-//                            category.getSubCategories().clear();
-//                            category.getSubCategories().addAll(arrayList);
-//                            categories.add(category);
-//                        }
-//                    }
-//                }
-//                contributorCategoryAdapter.notifyDataSetChanged();
-//            }
-//        });
-
         etAddCategory.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -157,16 +149,21 @@ public class ContributorSettingFragment extends Fragment {
                     categories.addAll(allCategories);
                 } else {
                     for (Category category : allCategories) {
-                        if (category.getInfo().getName().contains(key)) {
-                            ArrayList<SubCategory> arrayList = new ArrayList<>();
-                            for (SubCategory subCategory : category.getSubCategories()) {
-                                if (subCategory.getName().contains(key)) {
-                                    arrayList.add(subCategory);
-                                }
+                        ArrayList<SubCategory> arrayList = new ArrayList<>();
+                        for (SubCategory subCategory : category.getSubCategories()) {
+                            if (subCategory.getName().toLowerCase().contains(key.toLowerCase())) {
+                                arrayList.add(subCategory);
                             }
-                            category.getSubCategories().clear();
-                            category.getSubCategories().addAll(arrayList);
+                        }
+                        category.getSubCategories().clear();
+                        category.getSubCategories().addAll(arrayList);
+
+                        if (category.getInfo().getName().toLowerCase().equals(key.toLowerCase())) {
                             categories.add(category);
+                        } else {
+                            if (arrayList.size() != 0) {
+                                categories.add(category);
+                            }
                         }
                     }
                 }
@@ -185,7 +182,55 @@ public class ContributorSettingFragment extends Fragment {
                 if (!b) {
                     categories.clear();
                     contributorCategoryAdapter.notifyDataSetChanged();
+                } else {
+                    String key = etAddCategory.getText().toString();
+                    categories.clear();
+                    if (key.isEmpty()) {
+                        categories.addAll(allCategories);
+                    } else {
+                        for (Category category : allCategories) {
+                            ArrayList<SubCategory> arrayList = new ArrayList<>();
+                            for (SubCategory subCategory : category.getSubCategories()) {
+                                if (subCategory.getName().contains(key)) {
+                                    arrayList.add(subCategory);
+                                }
+                            }
+                            category.getSubCategories().clear();
+                            category.getSubCategories().addAll(arrayList);
+
+                            if (category.getInfo().getName().equals(key)) {
+                                categories.add(category);
+                            } else {
+                                if (arrayList.size() != 0) {
+                                    categories.add(category);
+                                }
+                            }
+                        }
+
+
+//                        for (Category category : allCategories) {
+//                            if (category.getInfo().getName().contains(key)) {
+//                                ArrayList<SubCategory> arrayList = new ArrayList<>();
+//                                for (SubCategory subCategory : category.getSubCategories()) {
+//                                    if (subCategory.getName().contains(key)) {
+//                                        arrayList.add(subCategory);
+//                                    }
+//                                }
+//                                category.getSubCategories().clear();
+//                                category.getSubCategories().addAll(arrayList);
+//                                categories.add(category);
+//                            }
+//                        }
+                    }
+                    contributorCategoryAdapter.notifyDataSetChanged();
                 }
+            }
+        });
+
+        toolbar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getActivity().onBackPressed();
             }
         });
 
@@ -199,6 +244,9 @@ public class ContributorSettingFragment extends Fragment {
                 Contribution contribution = response.body();
                 if (contribution != null) {
                     allCategories.addAll(contribution.getCategories());
+                    if (allCategories.size() > 0) {
+                        allCategories.remove(0);
+                    }
                 }
             }
 
@@ -210,6 +258,7 @@ public class ContributorSettingFragment extends Fragment {
     }
 
     private void getContributorCategory() {
+        progressDialog.show();
         Call<ContributionItem> call = settingService.getContributorView(deviceId, userId, token, userId);
         call.enqueue(new Callback<ContributionItem>() {
             @Override
@@ -219,11 +268,12 @@ public class ContributorSettingFragment extends Fragment {
                     addedCategories.addAll(contributionItem.getCategories());
                     contributionAddedItemAdapter.notifyDataSetChanged();
                 }
+                progressDialog.hide();
             }
 
             @Override
             public void onFailure(Call<ContributionItem> call, Throwable t) {
-
+                progressDialog.hide();
             }
         });
     }

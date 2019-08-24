@@ -180,7 +180,7 @@
     <string name="notifications">Notifications</string>
     <string name="friend_requests">Friend Requests</string>
     <string name="star_contributors">Star Contributors</string>
-    <string name="loading">Loading</string>
+    <string name="loading">Loading…</string>
     <string name="likes">Likes</string>
     <string name="stars">Stars</string>
     <string name="search_messages">Search Messages</string>
@@ -273,5 +273,25 @@
     <string name="notification_setting">Notification Setting</string>
     <string name="privacy_and_security">Privacy and Security</string>
     <string name="please_input">Please input atleast two character</string>
+    <string name="password_length_is_less_than_8">password length is less than 8</string>
+    <string name="new_password_confirm_password_does_not_match">New password and confirm password does not match !</string>
+    <string name="password_has_been_updated">Password has been updated</string>
+    <string name="security_question_has_been_updated">Security Question has been updated</string>
+    <string name="account_has_been_deactivated">Account has been deactivated</string>
+    <string name="something_went_wrong">Something went wrong</string>
+    <string name="are_you_sure_you_want_to_deactivated_your_account">Are you sure you want to deactivated your account ?</string>
+    <string name="a_verification_email_has_been_resent_to_your_email">A verification email has been resent to your email </string>
+    <string name="if_you_need_help_please_contact_with_liker_support">If you need help please contact with Liker Support .</string>
+    <string name="unverified">Unverified</string>
+    <string name="primary">Primary</string>
+    <string name="normal">Normal</string>
+    <string name="updating">Updating…</string>
+    <string name="your_email_address_is_not_valid">Your email address is not valid</string>
+    <string name="send_facebook_invitation">Send Facebook Invitation</string>
+    <string name="send_twitter_invitation">Send Twitter Invitation</string>
+    <string name="send_linkedin_invitation">Send Linkedin Invitation</string>
+    <string name="there_is_no_facebook_friends">There are no facebook friends.</string>
+    <string name="there_is_no_twitter_friends">There are no twitter friends.</string>
+    <string name="there_is_no_likedin_friends">There are no linkedin friends.</string>
 
 </resources>

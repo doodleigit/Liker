@@ -5,8 +5,12 @@ import com.doodle.Setting.model.AllEmail;
 import com.doodle.Setting.model.Contribution;
 import com.doodle.Setting.model.ContributionItem;
 import com.doodle.Setting.model.Friend;
+import com.doodle.Setting.model.PeopleMayKnow;
 import com.doodle.Setting.model.PrivacyInfo;
 import com.doodle.Setting.model.PrivacyOnOff;
+import com.doodle.Setting.model.Social;
+import com.doodle.Setting.model.SocialFriend;
+import com.doodle.Setting.model.SocialLink;
 import com.doodle.utils.AppConstants;
 
 import java.util.ArrayList;
@@ -67,6 +71,16 @@ public interface SettingService {
             @Field("block_user_id") String blockUserId
     );
 
+    @POST(AppConstants.UNBLOCKED_USER)
+    @FormUrlEncoded
+    Call<String> setUnBlockedUser(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("user_id") String id,
+            @Field("blocked_id") String blockedId
+    );
+
     @POST(AppConstants.GET_ON_OFFS_BY_USER_ID)
     @FormUrlEncoded
     Call<PrivacyOnOff> getPrivacyOnOff(
@@ -76,7 +90,7 @@ public interface SettingService {
             @Field("user_id") String id
     );
 
-    @POST(AppConstants.EMAIL_NOTIFICATION)
+    @POST(AppConstants.NOTIFICATION_ON_OFF)
     @FormUrlEncoded
     Call<String> setNotificationOnOff(
             @Header("Device-Id") String deviceId,
@@ -133,6 +147,102 @@ public interface SettingService {
             @Header("User-Id") String userId,
             @Header("Security-Token") String token,
             @Field("user_id") String id
+    );
+
+    @POST(AppConstants.EMAIL_ADD)
+    @FormUrlEncoded
+    Call<String> addEmail(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String id,
+            @Field("email") String email,
+            @Field("permission_type") String permissionType
+    );
+
+    @POST(AppConstants.EMAIL_REMOVE)
+    @FormUrlEncoded
+    Call<String> removeEmail(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String id,
+            @Field("email") String email
+    );
+
+    @POST(AppConstants.UPDATE_PASSWORD)
+    @FormUrlEncoded
+    Call<String> updatePassword(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String id,
+            @Field("old_password") String oldPassword,
+            @Field("new_password") String newPassword,
+            @Field("new_password_confirm") String newPasswordConfirm
+    );
+
+    @POST(AppConstants.DEACTIVATED_ACCOUNT)
+    @FormUrlEncoded
+    Call<String> deactivatedAccount(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String id
+    );
+
+    @POST(AppConstants.EMAIL_VERIFICATION_SEND)
+    @FormUrlEncoded
+    Call<String> emailVerificationSend(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String id,
+            @Field("email") String email
+    );
+
+    @POST(AppConstants.UPDATE_SECURITY_QUESTION)
+    @FormUrlEncoded
+    Call<String> updateSecurityQuestion(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String id,
+            @Field("question_id") String questionId,
+            @Field("answer") String answer
+    );
+
+    @POST(AppConstants.PEOPLE_YOU_MAY_KNOW)
+    @FormUrlEncoded
+    Call<ArrayList<PeopleMayKnow>> peopleYouMayKnow(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String userIds,
+            @Field("suggested_ids") String suggested_ids,
+            @Field("limit") int limit,
+            @Field("offset") int offset
+    );
+
+    @POST(AppConstants.GET_SOCIAL_FRIENDS)
+    @FormUrlEncoded
+    Call<Social> getSocialFriends(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String userIds,
+            @Field("social_type") String socialType,
+            @Field("limit") int limit,
+            @Field("offset") int offset
+    );
+
+    @POST(AppConstants.GET_SOCIAL_LINKS)
+    @FormUrlEncoded
+    Call<SocialLink> getSocialLinks(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String userIds
     );
 
 }

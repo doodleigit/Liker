@@ -25,6 +25,9 @@ public class SettingActivity extends AppCompatActivity {
             case "account":
                 initialFragment(new AccountSettingFragment());
                 break;
+            case "findFriends":
+                initialFragment(new FindFriendsFragment());
+                break;
             case "privacy":
                 initialFragment(new PrivacyAndSecurityFragment());
                 break;

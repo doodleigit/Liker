@@ -877,6 +877,13 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
                 startActivity(accountIntent);
                 return true;
 
+            case R.id.action_find_friends:
+                Intent findFriendsIntent = new Intent(this, SettingActivity.class);
+                findFriendsIntent.putExtra("type", "findFriends");
+                findFriendsIntent.putExtra("link", getString(R.string.how_to_use_liker_link));
+                startActivity(findFriendsIntent);
+                return true;
+
             case R.id.action_privacy_security:
                 Intent privacyIntent = new Intent(this, SettingActivity.class);
                 privacyIntent.putExtra("type", "privacy");
@@ -903,13 +910,6 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
                 intent.putExtra("type", getString(R.string.how_to_use_liker));
                 intent.putExtra("link", getString(R.string.how_to_use_liker_link));
                 startActivity(intent);
-                return true;
-
-            case R.id.action_find_friends:
-                Intent findFriendsIntent = new Intent(this, SettingActivity.class);
-                findFriendsIntent.putExtra("type", getString(R.string.find_friends));
-                findFriendsIntent.putExtra("link", getString(R.string.find_friends_link));
-                startActivity(findFriendsIntent);
                 return true;
 
             default:

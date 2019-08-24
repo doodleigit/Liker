@@ -16,8 +16,11 @@ import android.widget.LinearLayout;
 import com.doodle.R;
 import com.doodle.Setting.adapter.NotificationOnOffAdapter;
 import com.doodle.Setting.model.PrivacyOnOff;
+import com.doodle.Setting.model.Status;
 import com.doodle.Setting.service.SettingService;
 import com.doodle.utils.PrefManager;
+
+import java.util.ArrayList;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -34,7 +37,7 @@ public class NotificationSettingFragment extends Fragment {
     private NotificationOnOffAdapter notificationOnOffAdapter;
     private SettingService settingService;
     private PrefManager manager;
-    private PrivacyOnOff privacyOnOff;
+    private ArrayList<Status> statuses;
     private String deviceId, token, userId;
 
     @Nullable
@@ -50,12 +53,12 @@ public class NotificationSettingFragment extends Fragment {
 
     private void initialComponent() {
         progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setMessage("Updating...");
+        progressDialog.setMessage(getString(R.string.loading));
         progressDialog.setCancelable(false);
 
         settingService = SettingService.mRetrofit.create(SettingService.class);
         manager = new PrefManager(getContext());
-        privacyOnOff = new PrivacyOnOff();
+        statuses = new ArrayList<>();
         deviceId = manager.getDeviceId();
         token = manager.getToken();
         userId = manager.getProfileId();
@@ -70,7 +73,7 @@ public class NotificationSettingFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        notificationOnOffAdapter = new NotificationOnOffAdapter(getActivity(), privacyOnOff.getStatuses(), progressDialog, settingService, deviceId, token, userId, false);
+        notificationOnOffAdapter = new NotificationOnOffAdapter(getActivity(), statuses, progressDialog, settingService, deviceId, token, userId, false);
         recyclerView.setAdapter(notificationOnOffAdapter);
 
         toolbar.setOnClickListener(new View.OnClickListener() {
@@ -98,19 +101,22 @@ public class NotificationSettingFragment extends Fragment {
     }
 
     private void sendPrivacyOnOffInfoRequest() {
+        progressDialog.show();
         Call<PrivacyOnOff> call = settingService.getPrivacyOnOff(deviceId, userId, token, userId);
         call.enqueue(new Callback<PrivacyOnOff>() {
             @Override
             public void onResponse(Call<PrivacyOnOff> call, Response<PrivacyOnOff> response) {
-                privacyOnOff = response.body();
+                PrivacyOnOff privacyOnOff = response.body();
                 if (privacyOnOff != null) {
+                    statuses.addAll(privacyOnOff.getStatuses());
                     notificationOnOffAdapter.notifyDataSetChanged();
                 }
+                progressDialog.hide();
             }
 
             @Override
             public void onFailure(Call<PrivacyOnOff> call, Throwable t) {
-
+                progressDialog.hide();
             }
         });
 
