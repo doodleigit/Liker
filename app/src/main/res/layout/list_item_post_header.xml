@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/containerHeader"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -44,11 +45,12 @@
                     />
 
                 <ImageView
+                    android:id="@+id/imagePostPermission"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginLeft="5dp"
-                    android:src="@drawable/ic_public_black_24dp" />
+                    tools:src="@drawable/ic_public_black_24dp" />
 
                 <com.doodle.utils.SingleLineTextView
                     android:id="@+id/tvPostTime"

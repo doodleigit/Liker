@@ -1,13 +1,9 @@
 package com.doodle.utils;
 
-import android.widget.Button;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-
 public class AppConstants {
 
     //===============LOCAL SERVER==================
+
     public static final String BASE_URL = "http://192.168.0.77:8040/sites/likerapp/";
     public static final String BASE_URL_MEDIA = "http://192.168.0.77:8040/sites/likeropt/";
     public static final String BASE_URL_IMAGES = "http://192.168.0.77:8040/sites/likeropt/";
@@ -16,9 +12,9 @@ public class AppConstants {
     public static final String SOCKET_MESSAGE = "http://192.168.0.77:4002";
     public static final String SOCKET_VIDEO = "http://192.168.0.77:4004";
     public static final String FACEBOOK_SHARE = "http://192.168.0.77:8040/sites/likerapp/public/posts/";
-//https://www.cdn-liker.com/stg-static/uploads/thumb/5d4025287ba0e.gif
 
     //==========================STG SERVER=====================
+
 //    public static final String BASE_URL = "https://www.stg.liker.com/";
 //    public static final String BASE_URL_MEDIA = "https://www.cdn-liker.com/stg-static/";
 //    public static final String BASE_URL_IMAGES = "https://www.cdn-liker.com/";
@@ -27,8 +23,7 @@ public class AppConstants {
 //    public static final String SOCKET_VIDEO = "https://node.liker.com:7807";
 //    public static final String FACEBOOK_SHARE = "https://www.stg.liker.com/public/posts/";
 //    public static final String LINK_IMAGES = "https://www.cdn-liker.com/uploads/link_images/";
-//https://www.cdn-liker.com/uploads/post_images/06df79c0c2cfd0b0f5991dff11d9beea.jpg
-    //https://www.cdn-liker.com/uploads/link_images/
+
     //=======================LIVE SERVER=============================
     //    public static final String BASE_URL = "https://www.liker.com/";
     //    public static final String BASE_URL_MEDIA = "https://www.cdn-liker.com/";
@@ -110,7 +105,11 @@ public class AppConstants {
     public static final String ADD_SHARED_POST = "addSharedpost";
     public static final String SEND_BROWSER_NOTIFICATION = "send_browser_notification";
     public static final String GET_FILTER_CATEGORIES = "get_categories";
-
+    public static final String GET_USER_RANKINGS = "getUserRankings";
+    public static final String POST_PERMISSION = "post_permission";
+    public static final String POST_NOTIFICATION_TURN_OFF = "post_notification_turn_off";
+    public static final String POST_NOTIFICATION_TURN_ON = "post_notification_turn_on";
+    public static final String POST_DELETE = "post_delete";
 
     public static final String NEW_MESSAGE_BROADCAST = "new_message_broadcast";
     public static final String NEW_MESSAGE_BROADCAST_FROM_HOME = "new_message_broadcast_from_home";
@@ -151,5 +150,24 @@ public class AppConstants {
     public static final String GET_USER_INFO_BY_USER_NAME = "getUserinfoByUserName";
     public static final String UPLOAD_PROFILE_IMAGE = "updateProfilePicture";
     public static final String UPLOAD_COVER_IMAGE = "add_cover_photo";
+    public static final String EMAIL_ADD = "email_add";
+    public static final String PHONE_ADD = "phone_add";
+    public static final String SET_STORY = "set_story";
+    public static final String SET_LIVE_PLACE = "set_live_place";
+    public static final String GET_CITY_LIST = "get_city_list";
+    public static final String GET_COUNTRY_PHONE_CODES = "get_country_phone_codes";
+    public static final String SET_INTRO = "set_intro";
+    public static final String EMAIL_REMOVE = "email_remove";
+    public static final String PHONE_REMOVE = "phone_remove";
+
+    public static final String PRIVACY_VIEW = "privacy_view";
+    public static final String PRIVACY_UPDATE_PERMISSION = "privacy_update_permission";
+    public static final String GET_ON_OFFS_BY_USER_ID = "get_on_offs_by_user_id";
+    public static final String EMAIL_NOTIFICATION = "email_notification";
+    public static final String CONTRIBUTOR_VIEW = "contributor_view";
+    public static final String GET_CONTRIBUTOR_CATEGORY = "get_contributor_categories";
+    public static final String SET_CONTRIBUTOR_CATEGORY = "set_contributor_category";
+    public static final String ACCOUNT_VIEW = "account_view";
+    public static final String GET_EMAILS = "get_emails";
 
 }

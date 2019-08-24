@@ -68,6 +68,9 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.vanniktech.emoji.EmojiTextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -83,6 +86,7 @@ import static com.doodle.utils.Utils.delayLoadComment;
 import static com.doodle.utils.Utils.dismissDialog;
 import static com.doodle.utils.Utils.getSpannableStringBuilder;
 import static com.doodle.utils.Utils.isNullOrEmpty;
+import static com.doodle.utils.Utils.sendNotificationRequest;
 import static com.doodle.utils.Utils.showBlockUser;
 import static java.lang.Integer.parseInt;
 
@@ -108,7 +112,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
     private Context mContext;
     CallbackManager callbackManager;
     ShareDialog shareDialog;
-
+    public ImageView imagePostPermission;
     //Comment
     Comment commentItem;
     private List<Comment_> comments = new ArrayList<Comment_>();
@@ -133,6 +137,9 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
     public ImageView imagePostComment;
     LinearLayout commentBox;
     public static final String COMMENT_KEY = "comment_item_key";
+    private boolean notificationOff;
+    private String postPermissions;
+    private boolean notificationStatus;
 
 
     public TextMimHolder(View itemView,Context context) {
@@ -178,6 +185,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
         star16 = itemView.findViewById(R.id.star16);
         imagePostShare = itemView.findViewById(R.id.imagePostShare);
         imagePermission = itemView.findViewById(R.id.imagePermission);
+        imagePostPermission = itemView.findViewById(R.id.imagePostPermission);
 
 
 
@@ -206,10 +214,21 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
     AppCompatActivity activity;
     public void setItem(PostItem item) {
         this.item = item;
-
-
         userPostId = item.getPostId();
 
+        String postPermission = item.getPermission();
+
+        switch (postPermission) {
+            case "0":
+                imagePostPermission.setBackgroundResource(R.drawable.ic_public_black_24dp);
+                break;
+            case "1":
+                imagePostPermission.setBackgroundResource(R.drawable.ic_only_me_12dp);
+                break;
+            case "2":
+                imagePostPermission.setBackgroundResource(R.drawable.ic_friends_12dp);
+                break;
+        }
 
         tvCommentLike.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -561,7 +580,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
             @Override
             public void onClick(View v) {
 
-
+                boolean isNotificationOff = item.isIsNotificationOff();
                 String postUserId = item.getPostUserid();
                 popupMenu = new PopupMenu(mContext, v);
                 popupMenu.getMenuInflater().inflate(R.menu.post_permission_menu, popupMenu.getMenu());
@@ -575,7 +594,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                     popupMenu.getMenu().findItem(R.id.onlyMe).setVisible(true);
                     popupMenu.getMenu().findItem(R.id.edit).setVisible(true);
                     popupMenu.getMenu().findItem(R.id.delete).setVisible(true);
-                    popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(true);
+                   // popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(true);
                 } else {
                     popupMenu.getMenu().findItem(R.id.blockedUser).setVisible(true);
                     popupMenu.getMenu().findItem(R.id.reportedPost).setVisible(true);
@@ -584,8 +603,29 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                     popupMenu.getMenu().findItem(R.id.onlyMe).setVisible(false);
                     popupMenu.getMenu().findItem(R.id.edit).setVisible(false);
                     popupMenu.getMenu().findItem(R.id.delete).setVisible(false);
-                    popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(true);
+                   // popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(true);
                 }
+
+                if (App.isNotificationStatus()) {
+
+                    if (notificationOff) {
+                        popupMenu.getMenu().add(1, R.id.turnOffNotification, 1, "Turn on notifications").setIcon(R.drawable.ic_notifications_black_24dp);
+                    } else {
+                        popupMenu.getMenu().add(1, R.id.turnOffNotification, 1, "Turn off notifications").setIcon(R.drawable.ic_notifications_off_black_24dp);
+
+                    }
+
+
+                } else {
+                    if (isNotificationOff) {
+                        popupMenu.getMenu().add(1, R.id.turnOffNotification, 1, "Turn on notifications").setIcon(R.drawable.ic_notifications_black_24dp);
+
+                    } else {
+                        popupMenu.getMenu().add(1, R.id.turnOffNotification, 1, "Turn off notifications").setIcon(R.drawable.ic_notifications_off_black_24dp);
+
+                    }
+                }
+
 
 
 //                popup.show();
@@ -597,7 +637,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                     @Override
                     public boolean onMenuItemClick(MenuItem menuItem) {
                         int id = menuItem.getItemId();
-
+                        postPermissions = menuItem.getTitle().toString();
                         if (id == R.id.blockedUser) {
                             if (!((Activity) mContext).isFinishing()) {
                                 App.setItem(item);
@@ -617,14 +657,34 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                             }
                         }
                         if (id == R.id.publics) {
-                            Toast.makeText(App.getAppContext(), "publics : ", Toast.LENGTH_SHORT).show();
-                        }
 
+                            activity = (AppCompatActivity) v.getContext();
+                            if (networkOk) {
+                                Call<String> call = webService.postPermission(deviceId, profileId, token, "0", item.getPostId());
+                                sendPostPermissionRequest(call);
+                            } else {
+                                Utils.showNetworkDialog(activity.getSupportFragmentManager());
+                            }
+
+
+                        }
                         if (id == R.id.friends) {
-                            Toast.makeText(App.getAppContext(), "friends : ", Toast.LENGTH_SHORT).show();
+                            activity = (AppCompatActivity) v.getContext();
+                            if (networkOk) {
+                                Call<String> call = webService.postPermission(deviceId, profileId, token, "2", item.getPostId());
+                                sendPostPermissionRequest(call);
+                            } else {
+                                Utils.showNetworkDialog(activity.getSupportFragmentManager());
+                            }
                         }
                         if (id == R.id.onlyMe) {
-                            Toast.makeText(App.getAppContext(), "onlyMe : ", Toast.LENGTH_SHORT).show();
+                            activity = (AppCompatActivity) v.getContext();
+                            if (networkOk) {
+                                Call<String> call = webService.postPermission(deviceId, profileId, token, "1", item.getPostId());
+                                sendPostPermissionRequest(call);
+                            } else {
+                                Utils.showNetworkDialog(activity.getSupportFragmentManager());
+                            }
 
                         }
 
@@ -635,8 +695,29 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                             Toast.makeText(App.getAppContext(), "delete : ", Toast.LENGTH_SHORT).show();
                         }
                         if (id == R.id.turnOffNotification) {
-                            Toast.makeText(App.getAppContext(), "turnOffNotification : ", Toast.LENGTH_SHORT).show();
-                        }
+                            activity = (AppCompatActivity) v.getContext();
+
+                            switch (postPermissions) {
+                                case "Turn off notifications":
+                                    notificationOff = true;
+                                    if (networkOk) {
+                                        Call<String> call = webService.postNotificationTurnOff(deviceId, profileId, token, userIds, item.getPostId());
+                                        sendNotificationRequest(call);
+                                    } else {
+                                        Utils.showNetworkDialog(activity.getSupportFragmentManager());
+                                    }
+                                    break;
+                                case "Turn on notifications":
+                                    notificationOff = false;
+                                    if (networkOk) {
+                                        Call<String> call = webService.postNotificationTurnOn(deviceId, profileId, token, userIds, item.getPostId());
+                                        sendNotificationRequest(call);
+                                    } else {
+                                        Utils.showNetworkDialog(activity.getSupportFragmentManager());
+                                    }
+                                    break;
+
+                            }                        }
                         return true;
                     }
                 });
@@ -717,6 +798,48 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
 
 
                 }
+
+            }
+        });
+    }
+
+    private void sendPostPermissionRequest(Call<String> call) {
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        try {
+                            JSONObject object = new JSONObject(response.body());
+                            boolean status = object.getBoolean("status");
+                            if (status) {
+                                switch (postPermissions) {
+                                    case "Public":
+                                        imagePostPermission.setBackgroundResource(R.drawable.ic_public_black_24dp);
+                                        break;
+                                    case "Friends":
+                                        imagePostPermission.setBackgroundResource(R.drawable.ic_friends_12dp);
+                                        break;
+                                    case "Only Me":
+                                        imagePostPermission.setBackgroundResource(R.drawable.ic_only_me_12dp);
+                                        break;
+
+                                }
+
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Log.i("onSuccess", response.body().toString());
+                    } else {
+                        Log.i("onEmptyResponse", "Returned empty response");
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
 
             }
         });

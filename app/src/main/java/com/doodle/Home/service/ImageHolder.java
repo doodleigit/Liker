@@ -57,6 +57,9 @@ import com.facebook.share.widget.ShareDialog;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.vanniktech.emoji.EmojiTextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -72,6 +75,7 @@ import static com.doodle.utils.Utils.delayLoadComment;
 import static com.doodle.utils.Utils.dismissDialog;
 import static com.doodle.utils.Utils.getSpannableStringBuilder;
 import static com.doodle.utils.Utils.isNullOrEmpty;
+import static com.doodle.utils.Utils.sendNotificationRequest;
 import static com.doodle.utils.Utils.showBlockUser;
 import static java.lang.Integer.parseInt;
 
@@ -83,6 +87,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
     public ImageView star1, star2, star3, star4, star5, star6, star7, star8,
             star9, star10, star11, star12, star13, star14, star15, star16;
     public ImageView imageMedia;
+    public ImageView imagePostPermission;
     public LinearLayout postBodyLayer;
     PostItem item;
 
@@ -119,6 +124,8 @@ public class ImageHolder extends RecyclerView.ViewHolder {
     public ImageView imagePostComment;
     LinearLayout commentBox;
     public static final String COMMENT_KEY = "comment_item_key";
+    private String postPermissions;
+    private boolean notificationOff;
 
 
     public ImageHolder(View itemView,Context context) {
@@ -168,6 +175,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
         star16 = itemView.findViewById(R.id.star16);
 
         imageMedia = itemView.findViewById(R.id.imageMedia);
+        imagePostPermission = itemView.findViewById(R.id.imagePostPermission);
 
         //Comment
         tvCommentMessage = itemView.findViewById(R.id.tvCommentMessage);
@@ -198,7 +206,19 @@ public class ImageHolder extends RecyclerView.ViewHolder {
 
         userPostId = item.getPostId();
 
+        String postPermission = item.getPermission();
 
+        switch (postPermission) {
+            case "0":
+                imagePostPermission.setBackgroundResource(R.drawable.ic_public_black_24dp);
+                break;
+            case "1":
+                imagePostPermission.setBackgroundResource(R.drawable.ic_only_me_12dp);
+                break;
+            case "2":
+                imagePostPermission.setBackgroundResource(R.drawable.ic_friends_12dp);
+                break;
+        }
 
         tvCommentLike.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -512,9 +532,9 @@ public class ImageHolder extends RecyclerView.ViewHolder {
 
 
                 String postUserId = item.getPostUserid();
+                boolean isNotificationOff = item.isIsNotificationOff();
                 popupMenu = new PopupMenu(mContext, v);
                 popupMenu.getMenuInflater().inflate(R.menu.post_permission_menu, popupMenu.getMenu());
-
 
                 if (userIds.equalsIgnoreCase(postUserId)) {
                     popupMenu.getMenu().findItem(R.id.blockedUser).setVisible(false);
@@ -537,6 +557,27 @@ public class ImageHolder extends RecyclerView.ViewHolder {
                 }
 
 
+
+                if (App.isNotificationStatus()) {
+
+                    if (notificationOff) {
+                        popupMenu.getMenu().add(1, R.id.turnOffNotification, 1, "Turn on notifications").setIcon(R.drawable.ic_notifications_black_24dp);
+                    } else {
+                        popupMenu.getMenu().add(1, R.id.turnOffNotification, 1, "Turn off notifications").setIcon(R.drawable.ic_notifications_off_black_24dp);
+
+                    }
+
+
+                } else {
+                    if (isNotificationOff) {
+                        popupMenu.getMenu().add(1, R.id.turnOffNotification, 1, "Turn on notifications").setIcon(R.drawable.ic_notifications_black_24dp);
+
+                    } else {
+                        popupMenu.getMenu().add(1, R.id.turnOffNotification, 1, "Turn off notifications").setIcon(R.drawable.ic_notifications_off_black_24dp);
+
+                    }
+                }
+
 //                popup.show();
                 MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popupMenu.getMenu(), v);
                 menuHelper.setForceShowIcon(true);
@@ -546,7 +587,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
                     @Override
                     public boolean onMenuItemClick(MenuItem menuItem) {
                         int id = menuItem.getItemId();
-
+                        postPermissions = menuItem.getTitle().toString();
                         if (id == R.id.blockedUser) {
                             if (!((Activity) mContext).isFinishing()) {
                                 App.setItem(item);
@@ -566,14 +607,34 @@ public class ImageHolder extends RecyclerView.ViewHolder {
                             }
                         }
                         if (id == R.id.publics) {
-                            Toast.makeText(App.getAppContext(), "publics : ", Toast.LENGTH_SHORT).show();
-                        }
 
+                            activity = (AppCompatActivity) v.getContext();
+                            if (networkOk) {
+                                Call<String> call = webService.postPermission(deviceId, profileId, token, "0", item.getPostId());
+                                sendPostPermissionRequest(call);
+                            } else {
+                                Utils.showNetworkDialog(activity.getSupportFragmentManager());
+                            }
+
+
+                        }
                         if (id == R.id.friends) {
-                            Toast.makeText(App.getAppContext(), "friends : ", Toast.LENGTH_SHORT).show();
+                            activity = (AppCompatActivity) v.getContext();
+                            if (networkOk) {
+                                Call<String> call = webService.postPermission(deviceId, profileId, token, "2", item.getPostId());
+                                sendPostPermissionRequest(call);
+                            } else {
+                                Utils.showNetworkDialog(activity.getSupportFragmentManager());
+                            }
                         }
                         if (id == R.id.onlyMe) {
-                            Toast.makeText(App.getAppContext(), "onlyMe : ", Toast.LENGTH_SHORT).show();
+                            activity = (AppCompatActivity) v.getContext();
+                            if (networkOk) {
+                                Call<String> call = webService.postPermission(deviceId, profileId, token, "1", item.getPostId());
+                                sendPostPermissionRequest(call);
+                            } else {
+                                Utils.showNetworkDialog(activity.getSupportFragmentManager());
+                            }
 
                         }
 
@@ -584,7 +645,29 @@ public class ImageHolder extends RecyclerView.ViewHolder {
                             Toast.makeText(App.getAppContext(), "delete : ", Toast.LENGTH_SHORT).show();
                         }
                         if (id == R.id.turnOffNotification) {
-                            Toast.makeText(App.getAppContext(), "turnOffNotification : ", Toast.LENGTH_SHORT).show();
+                            activity = (AppCompatActivity) v.getContext();
+
+                            switch (postPermissions) {
+                                case "Turn off notifications":
+                                    notificationOff = true;
+                                    if (networkOk) {
+                                        Call<String> call = webService.postNotificationTurnOff(deviceId, profileId, token, userIds, item.getPostId());
+                                        sendNotificationRequest(call);
+                                    } else {
+                                        Utils.showNetworkDialog(activity.getSupportFragmentManager());
+                                    }
+                                    break;
+                                case "Turn on notifications":
+                                    notificationOff = false;
+                                    if (networkOk) {
+                                        Call<String> call = webService.postNotificationTurnOn(deviceId, profileId, token, userIds, item.getPostId());
+                                        sendNotificationRequest(call);
+                                    } else {
+                                        Utils.showNetworkDialog(activity.getSupportFragmentManager());
+                                    }
+                                    break;
+
+                            }
                         }
                         return true;
                     }
@@ -665,6 +748,48 @@ public class ImageHolder extends RecyclerView.ViewHolder {
 
 
                 }
+
+            }
+        });
+    }
+
+    private void sendPostPermissionRequest(Call<String> call) {
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        try {
+                            JSONObject object = new JSONObject(response.body());
+                            boolean status = object.getBoolean("status");
+                            if (status) {
+                                switch (postPermissions) {
+                                    case "Public":
+                                        imagePostPermission.setBackgroundResource(R.drawable.ic_public_black_24dp);
+                                        break;
+                                    case "Friends":
+                                        imagePostPermission.setBackgroundResource(R.drawable.ic_friends_12dp);
+                                        break;
+                                    case "Only Me":
+                                        imagePostPermission.setBackgroundResource(R.drawable.ic_only_me_12dp);
+                                        break;
+
+                                }
+
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Log.i("onSuccess", response.body().toString());
+                    } else {
+                        Log.i("onEmptyResponse", "Returned empty response");
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
 
             }
         });

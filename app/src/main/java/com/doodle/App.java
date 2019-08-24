@@ -55,6 +55,24 @@ public class App extends Application {
     private static boolean isFollow;
     private static boolean isBockComment;
     private static boolean isBockReply;
+    private static boolean notificationStatus;
+    private static int position;
+
+    public static int getPosition() {
+        return position;
+    }
+
+    public static void setPosition(int position) {
+        App.position = position;
+    }
+
+    public static boolean isNotificationStatus() {
+        return notificationStatus;
+    }
+
+    public static void setNotificationStatus(boolean notificationStatus) {
+        App.notificationStatus = notificationStatus;
+    }
 
     public static boolean isIsBockReply() {
         return isBockReply;

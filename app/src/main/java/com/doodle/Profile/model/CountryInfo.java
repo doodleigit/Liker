@@ -47,6 +47,8 @@ public class CountryInfo implements Parcelable
         countryStatus = in.readString();
     }
 
+    public CountryInfo() {}
+
     public static final Creator<CountryInfo> CREATOR = new Creator<CountryInfo>() {
         @Override
         public CountryInfo createFromParcel(Parcel in) {

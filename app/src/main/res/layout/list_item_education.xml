@@ -46,7 +46,7 @@
                 android:layout_height="40dp"
                 android:layout_alignParentEnd="true"
                 android:padding="10dp"
-                android:src="@drawable/plus"
+                android:src="@drawable/edit_blue"
                 android:visibility="visible"/>
 
         </RelativeLayout>

@@ -11,10 +11,11 @@ import android.util.Log;
 import com.doodle.App;
 import com.doodle.Comment.model.Comment_;
 import com.doodle.Home.model.PostItem;
+import com.doodle.Home.view.fragment.BreakingPost;
 
 import static com.doodle.utils.Utils.isEmpty;
 
-public class BlockUserDialog extends DialogFragment {
+public class BlockUserDialog extends DialogFragment  {
     private final String TAG = "AUC_SIMPLE";
 
     private BlockListener mHost;
@@ -25,7 +26,6 @@ public class BlockUserDialog extends DialogFragment {
         public void onBlockResult(DialogFragment dlg);
 
         public void onCancelResult(DialogFragment dlg);
-
     }
 
 

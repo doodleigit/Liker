@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/story_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start|center"
+                android:text="Intro"
+                android:textColor="@color/colorBlack"
+                android:textSize="14sp"
+                android:textStyle="bold"/>
+
+            <Spinner
+                android:id="@+id/story_privacy_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/rectangle_corner_round_five"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/change"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_centerInParent="true"
+            android:layout_alignParentEnd="true"
+            android:padding="5dp"
+            android:text="Change"
+            android:textSize="12sp"
+            android:textColor="@color/colorPrimary"
+            android:visibility="gone"/>
+
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/colorBorderBackground"/>
+
+    <TextView
+        android:id="@+id/story"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:text="The page you requested was not found.The page you requested was not found. The page you requested was not found. The page you re"
+        android:textSize="14sp"/>
+
+</LinearLayout>

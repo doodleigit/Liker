@@ -37,11 +37,11 @@ public class EmailAdapter extends RecyclerView.Adapter<EmailAdapter.ViewHolder> 
         viewHolder.tvEmail.setText(arrayList.get(i).getEmail());
 
         if (arrayList.get(i).getPermissionType().equals("1")) {
-            viewHolder.tvPermissionIcon.setImageResource(R.drawable.plus);
+            viewHolder.tvPermissionIcon.setImageResource(R.drawable.only_me);
         } else if (arrayList.get(i).getPermissionType().equals("2")) {
-            viewHolder.tvPermissionIcon.setImageResource(R.drawable.plus);
+            viewHolder.tvPermissionIcon.setImageResource(R.drawable.friends);
         } else {
-            viewHolder.tvPermissionIcon.setImageResource(R.drawable.plus);
+            viewHolder.tvPermissionIcon.setImageResource(R.drawable.public_);
         }
     }
 

@@ -53,7 +53,8 @@
                 android:paddingStart="15dp"
                 android:paddingTop="15dp"
                 android:paddingEnd="15dp"
-                android:paddingBottom="60dp">
+                android:paddingBottom="60dp"
+                android:focusableInTouchMode="true">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -142,13 +143,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:weightSum="1">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="5dp"
-                        android:layout_weight="1"
+                        android:layout_weight="0.33"
                         android:orientation="vertical">
 
                         <TextView
@@ -174,7 +176,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
-                        android:layout_weight="1"
+                        android:layout_marginEnd="5dp"
+                        android:layout_weight="0.33"
                         android:orientation="vertical">
 
                         <TextView
@@ -196,19 +199,49 @@
 
                     </LinearLayout>
 
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_weight="0.34"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text=""
+                            android:textColor="@color/colorBlack"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <Spinner
+                            android:id="@+id/birth_year_privacy_spinner"
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp"
+                            android:layout_gravity="bottom"
+                            android:layout_marginStart="5dp"
+                            android:layout_marginTop="5dp"
+                            android:background="@drawable/rectangle_corner_round_five"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp" />
+
+                    </LinearLayout>
+
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:weightSum="1">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginEnd="5dp"
-                        android:layout_weight="1"
+                        android:layout_weight="0.33"
                         android:orientation="vertical">
 
                         <TextView
@@ -234,7 +267,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
-                        android:layout_weight="1"
+                        android:layout_marginEnd="5dp"
+                        android:layout_weight="0.33"
                         android:orientation="vertical">
 
                         <TextView
@@ -249,6 +283,35 @@
                             android:id="@+id/birth_day_spinner"
                             android:layout_width="match_parent"
                             android:layout_height="30dp"
+                            android:layout_marginTop="5dp"
+                            android:background="@drawable/rectangle_corner_round_five"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginEnd="5dp"
+                        android:layout_weight="0.34"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text=""
+                            android:textColor="@color/colorBlack"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <Spinner
+                            android:id="@+id/birth_day_privacy_spinner"
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp"
+                            android:layout_gravity="bottom"
+                            android:layout_marginStart="5dp"
                             android:layout_marginTop="5dp"
                             android:background="@drawable/rectangle_corner_round_five"
                             android:paddingStart="10dp"
@@ -291,12 +354,14 @@
                     android:id="@+id/email_recycler_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="gone" />
+                    android:visibility="visible" />
 
                 <LinearLayout
+                    android:id="@+id/add_email_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
                     <EditText
                         android:id="@+id/new_email"
@@ -304,6 +369,7 @@
                         android:layout_height="30dp"
                         android:layout_marginTop="5dp"
                         android:background="@drawable/rectangle_corner_round_five"
+                        android:inputType="textEmailAddress"
                         android:hint="New Email"
                         android:paddingStart="10dp"
                         android:paddingEnd="10dp"
@@ -315,7 +381,7 @@
                         android:layout_marginTop="5dp">
 
                         <Button
-                            android:id="@+id/cancel"
+                            android:id="@+id/email_cancel"
                             android:layout_width="wrap_content"
                             android:layout_height="35dp"
                             android:layout_alignParentStart="true"
@@ -344,16 +410,18 @@
 
                     </RelativeLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginTop="5dp"
-                        android:text="Add new email"
-                        android:textColor="@color/colorPrimary"
-                        android:textSize="16sp" />
-
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/add_email"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="5dp"
+                    android:padding="5dp"
+                    android:text="Add new email"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="16sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -364,21 +432,44 @@
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
-                <LinearLayout
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/phone_recycler_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:visibility="visible" />
 
-                    <EditText
-                        android:id="@+id/new_phone"
+                <LinearLayout
+                    android:id="@+id/add_phone_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="30dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginTop="5dp"
-                        android:background="@drawable/rectangle_corner_round_five"
-                        android:hint="New Phone"
-                        android:paddingStart="10dp"
-                        android:paddingEnd="10dp"
-                        android:textSize="14sp" />
+                        android:gravity="start|center"
+                        android:orientation="horizontal">
+
+                        <Spinner
+                            android:id="@+id/phone_country_spinner"
+                            android:layout_width="wrap_content"
+                            android:layout_height="30dp"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/rectangle_corner_round_five" />
+
+                        <EditText
+                            android:id="@+id/new_phone"
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp"
+                            android:background="@drawable/rectangle_corner_round_five"
+                            android:hint="New Phone"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"
+                            android:textSize="14sp" />
+
+                    </LinearLayout>
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -394,6 +485,14 @@
                             android:text="Cancel"
                             android:textAllCaps="false"
                             android:textSize="14sp" />
+
+                        <Spinner
+                            android:id="@+id/phone_type_spinner"
+                            android:layout_width="wrap_content"
+                            android:layout_height="35dp"
+                            android:layout_marginEnd="10dp"
+                            android:layout_toStartOf="@+id/phone_privacy_spinner"
+                            android:background="@drawable/rectangle_corner_round_five" />
 
                         <Spinner
                             android:id="@+id/phone_privacy_spinner"
@@ -418,10 +517,13 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/add_phone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginTop="5dp"
+                    android:padding="5dp"
+                    android:inputType="number"
                     android:text="Add new phone"
                     android:textColor="@color/colorPrimary"
                     android:textSize="16sp" />
@@ -435,16 +537,37 @@
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/phone_recycler_view"
+                <RelativeLayout
+                    android:id="@+id/lives_in_address_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="gone" />
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="5dp">
+
+                    <TextView
+                        android:id="@+id/lives_in_address"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Not Yet"
+                        android:textColor="@color/colorBlack"
+                        android:textSize="14sp" />
+
+                    <ImageView
+                        android:id="@+id/lives_in_edit"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/edit_blue"
+                        android:layout_alignParentEnd="true"/>
+
+                </RelativeLayout>
 
                 <LinearLayout
+                    android:id="@+id/add_lives_in_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:layout_marginTop="5dp"
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -502,15 +625,6 @@
 
                     </RelativeLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginTop="5dp"
-                        android:text="Add lives in address"
-                        android:textColor="@color/colorPrimary"
-                        android:textSize="16sp" />
-
                 </LinearLayout>
 
                 <TextView
@@ -522,10 +636,37 @@
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
-                <LinearLayout
+                <RelativeLayout
+                    android:id="@+id/home_state_address_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="5dp">
+
+                    <TextView
+                        android:id="@+id/home_state_address"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Not Yet"
+                        android:textColor="@color/colorBlack"
+                        android:textSize="14sp" />
+
+                    <ImageView
+                        android:id="@+id/home_state_edit"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/edit_blue"
+                        android:layout_alignParentEnd="true"/>
+
+                </RelativeLayout>
+
+                <LinearLayout
+                    android:id="@+id/add_home_state_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -583,40 +724,57 @@
 
                     </RelativeLayout>
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginTop="5dp"
-                        android:text="Add home state address"
-                        android:textColor="@color/colorPrimary"
-                        android:textSize="16sp" />
-
                 </LinearLayout>
 
+                <Spinner
+                    android:id="@+id/add_story_spinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="35dp"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="5dp"
+                    android:background="@drawable/rectangle_corner_round_five"
+                    android:visibility="visible"/>
+
                 <TextView
-                    android:id="@+id/story_title"
+                    android:id="@+id/add_story"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:text="Story Title"
-                    android:textColor="@color/colorBlack"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="5dp"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:background="@drawable/rectangle_corner_round_five"
+                    android:text="Add Story"
                     android:textSize="14sp"
-                    android:textStyle="bold" />
+                    android:textColor="@color/colorBlack"/>
 
                 <LinearLayout
+                    android:id="@+id/add_story_layout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/story_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="Story Title"
+                        android:textColor="@color/colorBlack"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
 
                     <EditText
                         android:id="@+id/story_details"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:minHeight="80dp"
                         android:layout_marginTop="5dp"
                         android:background="@drawable/rectangle_corner_round_five"
                         android:hint=""
+                        android:minHeight="80dp"
                         android:paddingStart="10dp"
                         android:paddingEnd="10dp"
                         android:textSize="14sp" />
@@ -656,21 +814,13 @@
 
                     </RelativeLayout>
 
-                    <Spinner
-                        android:id="@+id/story_type_spinner"
-                        android:layout_width="wrap_content"
-                        android:layout_height="35dp"
-                        android:layout_marginEnd="10dp"
-                        android:layout_marginTop="10dp"
-                        android:background="@drawable/rectangle_corner_round_five" />
-
-                    <android.support.v7.widget.RecyclerView
-                        android:id="@+id/story_recycler_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:visibility="gone"/>
-
                 </LinearLayout>
+
+                <android.support.v7.widget.RecyclerView
+                    android:id="@+id/story_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible" />
 
             </LinearLayout>
 

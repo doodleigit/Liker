@@ -2,6 +2,9 @@ package com.doodle.Profile.service;
 
 import com.doodle.Profile.model.AlbumPhoto;
 import com.doodle.Profile.model.AllFriend;
+import com.doodle.Profile.model.Cities;
+import com.doodle.Profile.model.Country;
+import com.doodle.Profile.model.PhoneCountry;
 import com.doodle.Profile.model.PhotoAlbum;
 import com.doodle.Profile.model.RecentPhoto;
 import com.doodle.Profile.model.Star;
@@ -437,6 +440,127 @@ public interface ProfileService {
             @Header("Security-Token") String token,
             @Header("User-Id") String userId,
             @Field("profile_username") String profile_username
+    );
+
+    @POST(AppConstants.EMAIL_ADD)
+    @FormUrlEncoded
+    Call<String> addEmail(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String id,
+            @Field("email") String email,
+            @Field("permission_type") String permissionType
+    );
+
+    @POST(AppConstants.PHONE_ADD)
+    @FormUrlEncoded
+    Call<String> addPhone(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String id,
+            @Field("phone_number") String phoneNumber,
+            @Field("type") String type,
+            @Field("permission_type") String permissionType,
+            @Field("country_id") String countryId
+    );
+
+    @POST(AppConstants.SET_STORY)
+    @FormUrlEncoded
+    Call<String> setStory(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String id,
+            @Field("type") String type,
+            @Field("permission_type") String permissionType,
+            @Field("description") String description
+    );
+
+    @POST(AppConstants.SET_LIVE_PLACE)
+    @FormUrlEncoded
+    Call<String> setLivePlace(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String id,
+            @Field("country_id") String countryId,
+            @Field("city_id") String cityId,
+            @Field("type") String type,
+            @Field("permission_type") String permissionType
+    );
+
+    @POST(AppConstants.COUNTRY_LIST)
+    @FormUrlEncoded
+    Call<Country> getCountryList(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String id
+    );
+
+    @POST(AppConstants.GET_CITY_LIST)
+    @FormUrlEncoded
+    Call<Cities> getCityList(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String id,
+            @Field("country_id") String countryId
+    );
+
+    @POST(AppConstants.GET_COUNTRY_PHONE_CODES)
+    @FormUrlEncoded
+    Call<ArrayList<PhoneCountry>> getCountryPhoneCodes(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String id
+    );
+
+    @POST(AppConstants.SET_INTRO)
+    @FormUrlEncoded
+    Call<String> setIntro(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String id,
+            @Field("first_name") String first_name,
+            @Field("last_name") String last_name,
+            @Field("headline") String headline,
+            @Field("sex") String sex,
+            @Field("address") String address,
+            @Field("location_name") String location_name,
+            @Field("year") String year,
+            @Field("month") String month,
+            @Field("date") String date,
+            @Field("year_permission") String year_permission,
+            @Field("day_month_permission") String day_month_permission,
+            @Field("location_actual_name") String location_actual_name,
+            @Field("location_latitude") String location_latitude,
+            @Field("location_longitude") String location_longitude,
+            @Field("location_country_name") String location_country_name
+    );
+
+    @POST(AppConstants.EMAIL_REMOVE)
+    @FormUrlEncoded
+    Call<String> removeEmail(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String id,
+            @Field("email") String email
+    );
+
+    @POST(AppConstants.PHONE_REMOVE)
+    @FormUrlEncoded
+    Call<String> removePhone(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String id,
+            @Field("phone_number") String phoneNumber
     );
 
 }

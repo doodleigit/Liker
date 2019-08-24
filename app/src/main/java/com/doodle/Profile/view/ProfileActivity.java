@@ -29,7 +29,6 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.doodle.App;
-import com.doodle.Post.service.PostService;
 import com.doodle.Profile.adapter.ViewPagerAdapter;
 import com.doodle.Profile.model.UserAllInfo;
 import com.doodle.Profile.service.ProfileService;
@@ -38,7 +37,7 @@ import com.doodle.Search.LikerSearch;
 import com.doodle.utils.AppConstants;
 import com.doodle.utils.PrefManager;
 import com.doodle.utils.Utils;
-import com.soundcloud.android.crop.Crop;
+import com.theartofdev.edmodo.cropper.CropImage;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -63,7 +62,7 @@ import static android.widget.Toast.makeText;
 public class ProfileActivity extends AppCompatActivity {
 
     private TabLayout tabLayout;
-//    private ViewPager viewPager;
+    //    private ViewPager viewPager;
     private Toolbar toolbar;
     LinearLayout searchLayout;
     private RelativeLayout coverImageLayout, profileImageLayout;
@@ -138,7 +137,6 @@ public class ProfileActivity extends AppCompatActivity {
             public void onClick(View view) {
                 uploadContentType = 0;
                 selectImageSource(ivChangeProfileImage);
-//                Crop.of(inputUri, outputUri).asSquare().start(this);
             }
         });
 
@@ -283,8 +281,19 @@ public class ProfileActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == Crop.REQUEST_CROP && resultCode == RESULT_OK) {
-//            uploadImage();
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == RESULT_OK) {
+                if (result != null) {
+                    imageUri = result.getUri();
+//                    uploadImage();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Somethings went wrong", LENGTH_SHORT).show();
+                }
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+                Toast.makeText(getApplicationContext(), error.getMessage(), LENGTH_SHORT).show();
+            }
         }
         if (requestCode == REQUEST_TAKE_GALLERY_IMAGE) {
             if (resultCode == RESULT_OK) {
@@ -299,7 +308,7 @@ public class ProfileActivity extends AppCompatActivity {
         }
         if (requestCode == REQUEST_TAKE_CAMERA) {
             if (resultCode == RESULT_OK) {
-                cropImage(imageUri, imageUri);
+                cropImage(imageUri);
             } else {
                 Toast.makeText(this, "Cancel Camera Capture", Toast.LENGTH_SHORT).show();
             }
@@ -328,19 +337,28 @@ public class ProfileActivity extends AppCompatActivity {
                 ClipData.Item item = clipData.getItemAt(i);
                 uri = item.getUri();
             }
-            cropImage(uri, imageUri);
+            cropImage(uri);
         } else {
             Uri uri = data.getData();
-            cropImage(uri, imageUri);
+            cropImage(uri);
         }
     }
 
-    private void cropImage(Uri uri, Uri uriImage) {
+    private void cropImage(Uri uri) {
         if (uploadContentType == 0) {
-            Crop.of(uri, uriImage).asSquare().start(this);
+            CropImage.activity(uri)
+                    .setRequestedSize(300, 300)
+                    .setAspectRatio(1, 1)
+                    .setMinCropResultSize(300, 300)
+                    .start(this);
         } else {
-            Crop.of(uri, uriImage).withAspect(5, 1).start(this);
+            CropImage.activity(uri)
+                    .setRequestedSize(1150, 235)
+                    .setAspectRatio(4, 1)
+                    .setMinCropResultSize(1150, 235)
+                    .start(this);
         }
+
     }
 
     private void setupViewPager(ViewPager viewPager) {
@@ -412,7 +430,7 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
-       private void sendImageRequest(Call<String> call) {
+    private void sendImageRequest(Call<String> call) {
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
@@ -446,7 +464,6 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
     }
-
 
 
 }

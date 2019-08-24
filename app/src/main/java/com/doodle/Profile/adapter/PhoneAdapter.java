@@ -37,11 +37,11 @@ public class PhoneAdapter extends RecyclerView.Adapter<PhoneAdapter.ViewHolder> 
         viewHolder.tvPhone.setText(arrayList.get(i).getCountryPhoneCode() + arrayList.get(i).getPhoneNumber());
 
         if (arrayList.get(i).getPermissionType().equals("1")) {
-            viewHolder.tvPermissionIcon.setImageResource(R.drawable.plus);
+            viewHolder.tvPermissionIcon.setImageResource(R.drawable.only_me);
         } else if (arrayList.get(i).getPermissionType().equals("2")) {
-            viewHolder.tvPermissionIcon.setImageResource(R.drawable.plus);
+            viewHolder.tvPermissionIcon.setImageResource(R.drawable.friends);
         } else {
-            viewHolder.tvPermissionIcon.setImageResource(R.drawable.plus);
+            viewHolder.tvPermissionIcon.setImageResource(R.drawable.public_);
         }
     }
 

@@ -17,20 +17,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.Toast;
 
 import com.doodle.App;
-import com.doodle.Comment.model.Comment;
 import com.doodle.Comment.model.CommentItem;
 import com.doodle.Home.adapter.BreakingPostAdapter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.service.HomeService;
-import com.doodle.Home.service.TextHolder;
 import com.doodle.Home.view.activity.Home;
-import com.doodle.Post.model.CategoryItem;
-import com.doodle.Post.service.PostService;
-import com.doodle.Post.view.fragment.ContributorStatus;
 import com.doodle.R;
-import com.doodle.Search.model.AdvanceSearches;
 import com.doodle.utils.AppConstants;
 import com.doodle.utils.NetworkHelper;
 import com.doodle.utils.PrefManager;
@@ -49,7 +44,7 @@ import retrofit2.Response;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class BreakingPost extends Fragment {
+public class BreakingPost extends Fragment implements Home.FragmentCaller {
 
 
     public BreakingPost() {
@@ -57,7 +52,7 @@ public class BreakingPost extends Fragment {
     }
 
     public List<PostItem> postItemList;
-  //  private List<Comment> comments = new ArrayList<Comment>();
+    //  private List<Comment> comments = new ArrayList<Comment>();
     private HomeService webService;
     private PrefManager manager;
     private String deviceId, profileId, token, userIds;
@@ -99,7 +94,7 @@ public class BreakingPost extends Fragment {
         userIds = manager.getProfileId();
         webService = HomeService.mRetrofit.create(HomeService.class);
         networkOk = NetworkHelper.hasNetworkAccess(getActivity());
-
+        postItemList = new ArrayList<>();
 
     }
 
@@ -233,7 +228,7 @@ public class BreakingPost extends Fragment {
             public void onResponse(Call<CommentItem> mCall, Response<CommentItem> response) {
 
                 CommentItem commentItem = response.body();
-              //  comments = commentItem.getComments();
+                //  comments = commentItem.getComments();
                 Log.d("commentItem", commentItem.toString());
                 if (postItemList != null) {
                     adapter.addPagingData(postItemList);
@@ -283,7 +278,7 @@ public class BreakingPost extends Fragment {
                     totalPostIDs = sb.substring(separator.length()).replaceAll("\\s+", "");
                     Log.d("friends", totalPostIDs);
                     Call<CommentItem> mCall = webService.getPostComments(deviceId, profileId, token, "false", 1, 0, "DESC", totalPostIDs, userIds);
-                     sendCommentItemRequest(mCall);
+                    sendCommentItemRequest(mCall);
 
 //             adapter = new BreakingPostAdapter(getActivity(), postItemList);
 //
@@ -326,9 +321,9 @@ public class BreakingPost extends Fragment {
             public void onResponse(Call<CommentItem> mCall, Response<CommentItem> response) {
 
                 CommentItem commentItem = response.body();
-              //  comments = commentItem.getComments();
+                //  comments = commentItem.getComments();
                 Log.d("commentItem", commentItem.toString());
-                if (postItemList != null ) {
+                if (postItemList != null) {
                     adapter = new BreakingPostAdapter(getActivity(), postItemList);
                     offset += 5;
                     new Handler().postDelayed(new Runnable() {
@@ -406,5 +401,24 @@ public class BreakingPost extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         Objects.requireNonNull(getActivity()).unregisterReceiver(broadcastReceiver);
+    }
+
+
+    @Override
+    public void CallFragment() {
+
+//        PostItem item = new PostItem();
+//        item = App.getItem();
+//        int position = App.getPosition();
+//        if (postItemList != null) {
+//            postItemList.remove(item);
+//            adapter.deleteItem(position);
+//        }
+
+//   getData();
+
+        Call<List<PostItem>> call = webService.feed(deviceId, profileId, token, userIds, limit, offset, "breaking", catIds, 1, false);
+        sendPostItemRequest(call);
+
     }
 }

@@ -83,7 +83,7 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         if (viewHolder instanceof TextHolder) {
             TextHolder vh = (TextHolder) viewHolder;
-            vh.setItem(postItems.get(position));
+            vh.setItem(postItems.get(position),position);
         }
         if (viewHolder instanceof TextMimHolder) {
             TextMimHolder vh = (TextMimHolder) viewHolder;
@@ -153,5 +153,17 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         notifyDataSetChanged();
     }
 
+
+    public void deleteItem(int position) {
+
+
+        // comment_list.remove(position);
+        // comment_list.remove(position);
+
+     //   postItems.remove(position);
+        //   notifyItemRemoved(position);
+        notifyDataSetChanged();
+
+    }
 
 }

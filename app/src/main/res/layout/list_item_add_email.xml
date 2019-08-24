@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/colorBorderBackground">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp">
+
+        <TextView
+            android:id="@+id/email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_alignParentStart="true"
+            android:text="example@gmail.com"
+            android:textColor="@color/colorBlack"
+            android:textSize="14sp"/>
+
+        <TextView
+            android:id="@+id/remove"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:layout_alignParentEnd="true"
+            android:padding="5dp"
+            android:text="Remove"
+            android:textColor="@color/text_selected"
+            android:textSize="14sp"/>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="start|center"
+        android:layout_marginStart="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/email_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:text="Office"
+            android:textSize="12sp"/>
+
+        <TextView
+            android:id="@+id/resend_verification"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10dp"
+            android:padding="5dp"
+            android:text="Resend Verification"
+            android:textSize="12sp"
+            android:textColor="@color/colorPrimary"
+            android:visibility="invisible"/>
+
+        <Spinner
+            android:id="@+id/email_privacy_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="30dp"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/rectangle_corner_round_five"
+            android:paddingStart="10dp"
+            android:paddingEnd="10dp" />
+
+    </LinearLayout>
+
+</LinearLayout>

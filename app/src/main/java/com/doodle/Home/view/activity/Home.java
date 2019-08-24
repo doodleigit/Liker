@@ -46,6 +46,7 @@ import com.doodle.Comment.model.Comment_;
 import com.doodle.Comment.model.ReportReason;
 import com.doodle.Comment.service.CommentService;
 import com.doodle.Comment.view.fragment.BlockUserDialog;
+import com.doodle.Comment.view.fragment.DeletePostDialog;
 import com.doodle.Comment.view.fragment.FollowSheet;
 import com.doodle.Comment.view.fragment.ReportLikerMessageSheet;
 import com.doodle.Comment.view.fragment.ReportPersonMessageSheet;
@@ -80,6 +81,7 @@ import com.doodle.Post.view.activity.PostNew;
 import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.R;
 import com.doodle.Search.LikerSearch;
+import com.doodle.Setting.view.SettingActivity;
 import com.doodle.utils.AppConstants;
 import com.doodle.utils.NetworkHelper;
 import com.doodle.utils.PrefManager;
@@ -107,6 +109,7 @@ import static com.doodle.Authentication.view.activity.Welcome.USER_INFO_ITEM_KEY
 import static com.doodle.Home.service.TextHolder.ITEM_KEY;
 import static com.doodle.utils.AppConstants.IN_CHAT_MODE;
 import static com.doodle.utils.Utils.isEmpty;
+import static com.doodle.utils.Utils.sendNotificationRequest;
 
 public class Home extends AppCompatActivity implements
         View.OnClickListener,
@@ -116,7 +119,10 @@ public class Home extends AppCompatActivity implements
         ReportPersonMessageSheet.BottomSheetListener,
         ReportLikerMessageSheet.BottomSheetListener,
         FollowSheet.BottomSheetListener,
-        BlockUserDialog.BlockListener {
+        BlockUserDialog.BlockListener,
+        DeletePostDialog.DeleteListener
+
+{
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
@@ -126,11 +132,8 @@ public class Home extends AppCompatActivity implements
     private ProgressDialog progressDialog;
     private PrefManager manager;
     private String image_url;
-    private String token, deviceId, userId, socketId, mSocketId, selectedCategory = "";
+    private String token, deviceId, userId, selectedCategory = "";
     int categoryPosition = 0;
-    int limit = 5;
-    int offset = 0;
-    private boolean isApps = true;
     private Socket socket, mSocket;
     private HomeService webService;
     private static final String TAG = Home.class.getSimpleName();
@@ -155,6 +158,17 @@ public class Home extends AppCompatActivity implements
     private boolean networkOk;
     private String profileId;
     private String blockUserId;
+
+
+
+    FragmentCaller fragListerner = null;
+    public interface FragmentCaller {
+        void CallFragment();
+    }
+
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -232,7 +246,7 @@ public class Home extends AppCompatActivity implements
         imageProfile = findViewById(R.id.imageProfile);
         imageProfile.setOnClickListener(this);
         imageStarContributor = findViewById(R.id.imageStarContributor);
-// imageStarContributor.setOnClickListener(this);
+        imageStarContributor.setOnClickListener(this);
         profileImage = findViewById(R.id.profile_image);
         categorySpinner = findViewById(R.id.spinnerCategoryType);
         categorySpinner.setOnItemSelectedListener(this);
@@ -867,6 +881,8 @@ public class Home extends AppCompatActivity implements
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+
+        fragListerner = (FragmentCaller) new BreakingPost();
         adapter.addFrag(new TrendingPost(), "Tab 1");
         adapter.addFrag(new BreakingPost(), "Tab 2");
         adapter.addFrag(new FollowingPost(), "Tab 3");
@@ -912,6 +928,48 @@ public class Home extends AppCompatActivity implements
                 finish();
                 return true;
 
+            case R.id.action_account_setting:
+                Intent accountIntent = new Intent(this, SettingActivity.class);
+                accountIntent.putExtra("type", "account");
+                accountIntent.putExtra("link", getString(R.string.how_to_use_liker_link));
+                startActivity(accountIntent);
+                return true;
+
+            case R.id.action_privacy_security:
+                Intent privacyIntent = new Intent(this, SettingActivity.class);
+                privacyIntent.putExtra("type", "privacy");
+                privacyIntent.putExtra("link", getString(R.string.how_to_use_liker_link));
+                startActivity(privacyIntent);
+                return true;
+
+            case R.id.action_notification_settings:
+                Intent notificationIntent = new Intent(this, SettingActivity.class);
+                notificationIntent.putExtra("type", "notification");
+                notificationIntent.putExtra("link", getString(R.string.how_to_use_liker_link));
+                startActivity(notificationIntent);
+                return true;
+
+            case R.id.action_contributor_settings:
+                Intent contributorIntent = new Intent(this, SettingActivity.class);
+                contributorIntent.putExtra("type", "contributor");
+                contributorIntent.putExtra("link", getString(R.string.how_to_use_liker_link));
+                startActivity(contributorIntent);
+                return true;
+
+            case R.id.action_how_to_use_liker:
+                Intent intent = new Intent(this, SettingActivity.class);
+                intent.putExtra("type", getString(R.string.how_to_use_liker));
+                intent.putExtra("link", getString(R.string.how_to_use_liker_link));
+                startActivity(intent);
+                return true;
+
+            case R.id.action_find_friends:
+                Intent findFriendsIntent = new Intent(this, SettingActivity.class);
+                findFriendsIntent.putExtra("type", getString(R.string.find_friends));
+                findFriendsIntent.putExtra("link", getString(R.string.find_friends_link));
+                startActivity(findFriendsIntent);
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -951,9 +1009,7 @@ public class Home extends AppCompatActivity implements
                 break;
 
             case R.id.imageStarContributor:
-//                startActivity(new Intent(this, PostNew.class));
-// imageStarContributor.setCircleBackgroundColor(getResources().getColor(R.color.colorWhite));
-// imageStarContributor.setImageResource(R.drawable.ic_star_border_blue_24dp);
+                startActivity(new Intent(this, StarContributorActivity.class));
                 break;
         }
     }
@@ -1175,9 +1231,71 @@ public class Home extends AppCompatActivity implements
 
 
     @Override
+    public void onDeleteResult(DialogFragment dlg) {
+
+        PostItem item = new PostItem();
+        item = App.getItem();
+
+
+        if (networkOk) {
+            Call<String> call = webService.postDelete(deviceId, profileId, token, userId, item.getPostId());
+            sendDeletePostRequest(call);
+        } else {
+            Utils.showNetworkDialog(getSupportFragmentManager());
+        }
+
+    }
+
+    @Override
     public void onCancelResult(DialogFragment dlg) {
        // Toast.makeText(this, "Neutral button", Toast.LENGTH_SHORT).show();
     }
 
+
+    public  void  sendDeletePostRequest(Call<String> call) {
+
+
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        try {
+                            JSONObject object = new JSONObject(response.body());
+                            boolean status = object.getBoolean("status");
+
+                            if(status){
+                                Toast.makeText(App.getAppContext(), "status: "+status, Toast.LENGTH_SHORT).show();
+
+                                if(fragListerner!=null){
+                                    if(fragListerner instanceof BreakingPost){
+                                        fragListerner.CallFragment();
+                                    }/*else if(fragListerner instanceof MyFragB){
+                                        fragListerner.CallFragment();
+                                    }*/
+                                }
+
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Log.i("onSuccess", response.body().toString());
+                    } else {
+                        Log.i("onEmptyResponse", "Returned empty response");
+                    }
+                }
+
+            }
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+
+        });
+
+
+    }
 
 }
