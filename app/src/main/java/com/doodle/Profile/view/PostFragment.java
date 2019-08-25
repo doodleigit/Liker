@@ -1,24 +1,478 @@
 package com.doodle.Profile.view;
 
+import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.ProgressBar;
 
+import com.doodle.App;
+import com.doodle.Comment.model.CommentItem;
+import com.doodle.Home.adapter.BreakingPostAdapter;
+import com.doodle.Home.model.PostItem;
+import com.doodle.Home.service.HomeService;
+import com.doodle.Home.service.TextHolder;
+import com.doodle.Home.service.TextMimHolder;
+import com.doodle.Home.view.activity.Home;
+import com.doodle.Profile.service.ProfileService;
 import com.doodle.R;
+import com.doodle.utils.AppConstants;
+import com.doodle.utils.NetworkHelper;
+import com.doodle.utils.PrefManager;
+import com.doodle.utils.Utils;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class PostFragment extends Fragment {
 
-    View view;
 
-    @Nullable
+    View v;
+
+    public List<PostItem> postItemList;
+    //  private List<Comment> comments = new ArrayList<Comment>();
+    private ProfileService profileService;
+    private PrefManager manager;
+    private String deviceId, profileId, profileUserName, token, userIds;
+    private int cat_id, filter;
+    private boolean isPublic;
+    private boolean networkOk;
+    private ProgressBar progressView;
+    private ProgressDialog progressDialog;
+    //  private PostAdapter adapter;
+    private BreakingPostAdapter adapter;
+    private RecyclerView recyclerView;
+    private LinearLayoutManager layoutManager;
+    private int totalItems;
+    private int scrollOutItems;
+    private int currentItems;
+    private boolean isScrolling;
+    int limit = 5;
+    int offset = 0;
+    private String catIds = "";
+
+    //Delete post item
+    public static TextHolder.PostItemListener mCallback;
+    public static TextMimHolder.PostItemListener mimListener;
+    PostItem deletePostItem;
+    int deletePosition;
+
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.post_fragment_layout, container, false);
-
-        return view;
+    public void onAttach(Context context) {
+        super.onAttach(context);
     }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        manager = new PrefManager(getActivity());
+        deviceId = manager.getDeviceId();
+        profileId = manager.getProfileId();
+        profileUserName = manager.getUserName();
+        token = manager.getToken();
+        userIds = manager.getProfileId();
+        profileService = ProfileService.mRetrofit.create(ProfileService.class);
+        networkOk = NetworkHelper.hasNetworkAccess(getActivity());
+        postItemList = new ArrayList<>();
+        deletePostItem = new PostItem();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View root = inflater.inflate(R.layout.post_fragment_layout, container, false);
+
+        progressDialog = new ProgressDialog(getContext());
+        progressDialog.setMessage(getString(R.string.loading));
+        progressDialog.show();
+
+        layoutManager = new LinearLayoutManager(getContext());
+        progressView = root.findViewById(R.id.progress_view);
+        recyclerView = root.findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setNestedScrollingEnabled(false);
+//        DisplayMetrics displayMetrics = new DisplayMetrics();
+//        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+//        int height = displayMetrics.heightPixels;
+//        recyclerView.setMinimumHeight(height);
+        v = root;
+        getData();
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+                    isScrolling = true;
+                }
+            }
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                currentItems = layoutManager.getChildCount();
+                scrollOutItems = layoutManager.findFirstVisibleItemPosition();
+                totalItems = layoutManager.getItemCount();
+
+                if (isScrolling && (currentItems + scrollOutItems == totalItems)) {
+                    isScrolling = false;
+                    PerformPagination();
+                }
+
+            }
+        });
+
+
+        mCallback = new TextHolder.PostItemListener() {
+            @Override
+            public void deletePost(PostItem postItem, int position) {
+                deletePosition = position;
+                deletePostItem = postItem;
+                PostFragment.this.deletePost(deletePostItem, deletePosition);
+
+            }
+        };
+        mimListener = new TextMimHolder.PostItemListener() {
+            @Override
+            public void deletePost(PostItem postItem, int position) {
+                deletePosition = position;
+                deletePostItem = postItem;
+                PostFragment.this.deletePost(deletePostItem, deletePosition);
+            }
+        };
+
+        return root;
+    }
+
+    private void deletePost(PostItem deletePostItem, int deletePosition) {
+        new AlertDialog.Builder(getActivity())
+                //  .setTitle("Delete entry")
+                .setMessage("Are you sure you want to delete this post? You will permanently lose this post !")
+
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        if (networkOk) {
+                            Call<String> call = profileService.postDelete(deviceId, profileId, token, userIds, deletePostItem.getPostId());
+                            sendDeletePostRequest(call);
+                        } else {
+                            Utils.showNetworkDialog(getActivity().getSupportFragmentManager());
+                        }
+
+
+                    }
+                })
+                .setNegativeButton(android.R.string.no, null)
+                // .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+    }
+
+
+    public void sendDeletePostRequest(Call<String> call) {
+
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        try {
+                            JSONObject object = new JSONObject(response.body());
+                            boolean status = object.getBoolean("status");
+                            if (status) {
+                                postItemList.remove(deletePostItem);
+                                adapter.deleteItem(deletePosition);
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Log.i("onSuccess", response.body().toString());
+                    } else {
+                        Log.i("onEmptyResponse", "Returned empty response");
+                    }
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+
+        });
+
+
+    }
+
+    private void getData() {
+        if (networkOk) {
+            progressView.setVisibility(View.VISIBLE);
+            Call<List<PostItem>> call = profileService.feed(deviceId, profileId, token, userIds, limit, offset, catIds, profileUserName, false);
+            sendPostItemRequest(call);
+        } else {
+            Utils.showNetworkDialog(getActivity().getSupportFragmentManager());
+            progressView.setVisibility(View.GONE);
+        }
+    }
+
+    private void PerformPagination() {
+        progressView.setVisibility(View.VISIBLE);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (networkOk) {
+                    String queryResult = App.getQueryResult();
+                    Call<List<PostItem>> call = profileService.feed(deviceId, profileId, token, userIds, limit, offset, catIds, profileUserName, false);
+                    PostItemPagingRequest(call);
+
+                } else {
+                    Utils.showNetworkDialog(getActivity().getSupportFragmentManager());
+                    progressView.setVisibility(View.GONE);
+                }
+            }
+        }, 2000);
+
+    }
+
+    private void PostItemPagingRequest(Call<List<PostItem>> call) {
+        call.enqueue(new Callback<List<PostItem>>() {
+
+            @Override
+            public void onResponse(Call<List<PostItem>> call, Response<List<PostItem>> response) {
+
+                postItemList = response.body();
+
+                if (postItemList != null) {
+                    String totalPostIDs;
+                    List<String> postIdSet = new ArrayList<>();
+                    for (PostItem temp : postItemList) {
+
+                        postIdSet.add(temp.getPostId());
+                    }
+                    String separator = ", ";
+                    int total = postIdSet.size() * separator.length();
+                    for (String s : postIdSet) {
+                        total += s.length();
+                    }
+
+                    StringBuilder sb = new StringBuilder(total);
+                    for (String s : postIdSet) {
+                        sb.append(separator).append(s);
+                    }
+
+                    totalPostIDs = sb.substring(separator.length()).replaceAll("\\s+", "");
+                    Log.d("friends", totalPostIDs);
+                    Call<CommentItem> mCall = profileService.getPostComments(deviceId, profileId, token, "false", 1, 0, "DESC", totalPostIDs, userIds);
+                    sendCommentItemPagingRequest(mCall);
+
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<PostItem>> call, Throwable t) {
+                Log.d("MESSAGE: ", t.getMessage());
+                progressView.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    private void sendCommentItemPagingRequest(Call<CommentItem> mCall) {
+
+        mCall.enqueue(new Callback<CommentItem>() {
+
+            @Override
+            public void onResponse(Call<CommentItem> mCall, Response<CommentItem> response) {
+
+                CommentItem commentItem = response.body();
+                //  comments = commentItem.getComments();
+                Log.d("commentItem", commentItem.toString());
+                if (postItemList != null) {
+                    adapter.addPagingData(postItemList);
+                    offset += 5;
+                    progressView.setVisibility(View.GONE);
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<CommentItem> mCall, Throwable t) {
+                Log.d("MESSAGE: ", t.getMessage());
+                progressView.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    private void sendPostItemRequest(Call<List<PostItem>> call) {
+
+        call.enqueue(new Callback<List<PostItem>>() {
+
+            @Override
+            public void onResponse(Call<List<PostItem>> call, Response<List<PostItem>> response) {
+
+                postItemList = response.body();
+                if (postItemList != null) {
+
+                    String totalPostIDs;
+                    List<String> postIdSet = new ArrayList<>();
+                    for (PostItem temp : postItemList) {
+
+                        postIdSet.add(temp.getPostId());
+                    }
+                    String separator = ", ";
+                    int total = postIdSet.size() * separator.length();
+                    for (String s : postIdSet) {
+                        total += s.length();
+                    }
+
+                    StringBuilder sb = new StringBuilder(total);
+                    for (String s : postIdSet) {
+                        sb.append(separator).append(s);
+                    }
+
+                    totalPostIDs = sb.substring(separator.length()).replaceAll("\\s+", "");
+                    Log.d("friends", totalPostIDs);
+                    Call<CommentItem> mCall = profileService.getPostComments(deviceId, profileId, token, "false", 1, 0, "DESC", totalPostIDs, userIds);
+                    sendCommentItemRequest(mCall);
+
+//             adapter = new BreakingPostAdapter(getActivity(), postItemList);
+//
+//                    new Handler().postDelayed(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            shimmerFrameLayout.stopShimmer();
+//                            shimmerFrameLayout.setVisibility(View.GONE);
+//
+//                            recyclerView.setVisibility(View.VISIBLE);
+//                            recyclerView.setAdapter(adapter);
+//                        }
+//                    }, 5000);
+//
+
+                    //  Log.d("PostItem: ", categoryItem.toString() + "");
+                    progressView.setVisibility(View.GONE);
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<List<PostItem>> call, Throwable t) {
+                Log.d("MESSAGE: ", t.getMessage());
+                progressView.setVisibility(View.GONE);
+                ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(1);
+
+            }
+        });
+
+    }
+
+    private void sendCommentItemRequest(Call<CommentItem> mCall) {
+
+        mCall.enqueue(new Callback<CommentItem>() {
+
+            @Override
+            public void onResponse(Call<CommentItem> mCall, Response<CommentItem> response) {
+
+                CommentItem commentItem = response.body();
+                //  comments = commentItem.getComments();
+                Log.d("commentItem", commentItem.toString());
+                if (postItemList != null) {
+                    adapter = new BreakingPostAdapter(getActivity(), postItemList, mCallback, mimListener);
+                    offset += 5;
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            progressDialog.hide();
+
+                            recyclerView.setVisibility(View.VISIBLE);
+                            recyclerView.setAdapter(adapter);
+                        }
+                    }, 1000);
+
+
+                    //  Log.d("PostItem: ", categoryItem.toString() + "");
+                    progressView.setVisibility(View.GONE);
+                }
+                try {
+                    ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(1);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<CommentItem> mCall, Throwable t) {
+                Log.d("MESSAGE: ", t.getMessage());
+                progressDialog.hide();
+                progressView.setVisibility(View.GONE);
+                ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(1);
+            }
+        });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    private boolean isViewShown = false;
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (getView() != null) {
+            isViewShown = true;
+            // call your function
+            recyclerView.setVisibility(View.VISIBLE);
+            recyclerView.setAdapter(adapter);
+        } else {
+            isViewShown = false;
+        }
+
+      /*  if (isVisibleToUser) {
+            // Refresh your fragment here
+            getFragmentManager().beginTransaction().detach(this).attach(this).commit();
+            Log.i("IsRefresh", "Yes");
+        }*/
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
+
 }

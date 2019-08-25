@@ -290,9 +290,16 @@
     <string name="send_facebook_invitation">Send Facebook Invitation</string>
     <string name="send_twitter_invitation">Send Twitter Invitation</string>
     <string name="send_linkedin_invitation">Send Linkedin Invitation</string>
+    <string name="there_is_no_followers">There are no followers.</string>
+    <string name="there_is_no_following">There are no following.</string>
     <string name="there_is_no_facebook_friends">There are no facebook friends.</string>
     <string name="there_is_no_twitter_friends">There are no twitter friends.</string>
     <string name="there_is_no_likedin_friends">There are no linkedin friends.</string>
     <string name="report_post">Report Post</string>
+    <string name="follow">follow</string>
+    <string name="unfollow">Unfollow</string>
+    <string name="followers">Followers</string>
+    <string name="followings">Followings</string>
+    <string name="posts">Posts</string>
 
 </resources>

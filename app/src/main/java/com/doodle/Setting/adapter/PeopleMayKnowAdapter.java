@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide;
 import com.doodle.App;
 import com.doodle.R;
 import com.doodle.Setting.model.PeopleMayKnow;
+import com.doodle.Setting.service.FollowUnfollowClickListener;
 import com.doodle.utils.AppConstants;
 
 import java.util.ArrayList;
@@ -21,16 +22,18 @@ public class PeopleMayKnowAdapter extends RecyclerView.Adapter<PeopleMayKnowAdap
 
     private Context context;
     private ArrayList<PeopleMayKnow> arrayList;
+    private FollowUnfollowClickListener followUnfollowClickListener;
 
-    public PeopleMayKnowAdapter(Context context, ArrayList<PeopleMayKnow> arrayList) {
+    public PeopleMayKnowAdapter(Context context, ArrayList<PeopleMayKnow> arrayList, FollowUnfollowClickListener followUnfollowClickListener) {
         this.context = context;
         this.arrayList = arrayList;
+        this.followUnfollowClickListener = followUnfollowClickListener;
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_item_friend, viewGroup, false);
+        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_item_follow, viewGroup, false);
         ViewHolder viewHolder = new ViewHolder(view);
         return viewHolder;
     }
@@ -48,9 +51,9 @@ public class PeopleMayKnowAdapter extends RecyclerView.Adapter<PeopleMayKnowAdap
         viewHolder.stars.setText(stars + " " + context.getString(R.string.stars));
 
         if (arrayList.get(i).getPrivacy().getIsFollowing()) {
-            viewHolder.follow.setText("Unfollow");
+            viewHolder.follow.setText(context.getString(R.string.unfollow));
         } else {
-            viewHolder.follow.setText("Follow");
+            viewHolder.follow.setText(context.getString(R.string.follow));
         }
 
         Glide.with(App.getAppContext())
@@ -60,6 +63,17 @@ public class PeopleMayKnowAdapter extends RecyclerView.Adapter<PeopleMayKnowAdap
                 .centerCrop()
                 .dontAnimate()
                 .into(viewHolder.userImage);
+
+        viewHolder.follow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (arrayList.get(i).getPrivacy().getIsFollowing()) {
+                    followUnfollowClickListener.onUnFollowClick(arrayList.get(i).getUserId(), i);
+                } else {
+                    followUnfollowClickListener.onFollowClick(arrayList.get(i).getUserId(), i);
+                }
+            }
+        });
 
     }
 

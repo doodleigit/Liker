@@ -4,15 +4,14 @@ public class AppConstants {
 
     //===============LOCAL SERVER==================
 
-   /* public static final String BASE_URL = "http://192.168.0.77:8040/sites/likerapp/";
-    public static final String BASE_URL_MEDIA = "http://192.168.0.77:8040/sites/likeropt/";
-    public static final String BASE_URL_IMAGES = "http://192.168.0.77:8040/sites/likeropt/";
-    public static final String LINK_IMAGES = "http://192.168.0.77:8040/sites/likeropt/uploads/link_images";
-    public static final String SOCKET_WEB = "http://192.168.0.77:4001";
-    public static final String SOCKET_MESSAGE = "http://192.168.0.77:4002";
-    public static final String SOCKET_VIDEO = "http://192.168.0.77:4004";
-    public static final String FACEBOOK_SHARE = "http://192.168.0.77:8040/sites/likerapp/public/posts/";
-*/
+//    public static final String BASE_URL = "http://192.168.0.77:8040/sites/likerapp/";
+//    public static final String BASE_URL_MEDIA = "http://192.168.0.77:8040/sites/likeropt/";
+//    public static final String BASE_URL_IMAGES = "http://192.168.0.77:8040/sites/likeropt/";
+//    public static final String LINK_IMAGES = "http://192.168.0.77:8040/sites/likeropt/uploads/link_images";
+//    public static final String SOCKET_WEB = "http://192.168.0.77:4001";
+//    public static final String SOCKET_MESSAGE = "http://192.168.0.77:4002";
+//    public static final String SOCKET_VIDEO = "http://192.168.0.77:4004";
+//    public static final String FACEBOOK_SHARE = "http://192.168.0.77:8040/sites/likerapp/public/posts/";
     //==========================STG SERVER=====================
 
     public static final String BASE_URL = "https://www.stg.liker.com/";
@@ -87,6 +86,7 @@ public class AppConstants {
     //FEED
 
     public static final String FEED = "feed";
+    public static final String WALL_FEED = "wallfeed";
     public static final String GET_POST_COMMENTS = "get_postscomments";
     public static final String GET_POST_COMMENT_REPLY_LIST = "get_post_comment_reply_list";
     public static final String ADDED_COMMENTS = "added_comment";
@@ -98,7 +98,6 @@ public class AppConstants {
     public static final String GET_REPORT_REASON = "get_report_reason";
     public static final String REPORT_USER = "reportUser";
     public static final String UN_FOLLOW = "unfollow";
-    public static final String BLOCKED_USER = "blocked_user";
 
     //Post share
     public static final String GET_POST_DETAILS = "get_postdetails";
@@ -117,6 +116,7 @@ public class AppConstants {
     public static final String NEW_NOTIFICATION_BROADCAST = "new_notification_broadcast";
     public static final String RECONNECT_SOCKET_BROADCAST = "reconnect_socket_broadcast";
     public static final String CATEGORY_CHANGE_BROADCAST = "category_change_broadcast";
+    public static final String PROFILE_PAGE_PAGINATION_BROADCAST = "profile_page_pagination_broadcast";
 
     public static final String NOTIFICATION = "newNotification";
     public static final String CHAT_USERS = "get_chat_users";
@@ -178,5 +178,9 @@ public class AppConstants {
     public static final String PEOPLE_YOU_MAY_KNOW = "people_may_know";
     public static final String GET_SOCIAL_FRIENDS = "get_social_friends";
     public static final String GET_SOCIAL_LINKS = "get_social_links";
+    public static final String FOLLOW = "follow";
+    public static final String UNFOLLOW = "unfollow";
+    public static final String GET_FOLLOWERS = "get_followers";
+    public static final String GET_FOLLOWINGS = "get_followings";
 
 }

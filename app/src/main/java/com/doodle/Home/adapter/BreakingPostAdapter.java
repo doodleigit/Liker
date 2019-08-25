@@ -36,12 +36,11 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     public TextMimHolder.PostItemListener mimListener;
 
 
-
-    public BreakingPostAdapter(Context context, List<PostItem> postItems,TextHolder.PostItemListener listener,TextMimHolder.PostItemListener mimListener) {
+    public BreakingPostAdapter(Context context, List<PostItem> postItems, TextHolder.PostItemListener listener, TextMimHolder.PostItemListener mimListener) {
         this.mContext = context;
         this.postItems = postItems;
-        this.listener=listener;
-        this.mimListener=mimListener;
+        this.listener = listener;
+        this.mimListener = mimListener;
 
     }
 
@@ -51,12 +50,12 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         View view;
         if (viewType == VIEW_TYPE_TEXT) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_post_text, parent, false);
-            return new TextHolder(view, mContext,listener);
+            return new TextHolder(view, mContext, listener);
         }
 
         if (viewType == VIEW_TYPE_TEX_MIM) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_post_text_mim, parent, false);
-            return new TextMimHolder(view, mContext,mimListener);
+            return new TextMimHolder(view, mContext, mimListener);
         }
         if (viewType == VIEW_TYPE_TEXT_IMAGE) {
 
@@ -86,11 +85,11 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         if (viewHolder instanceof TextHolder) {
             TextHolder vh = (TextHolder) viewHolder;
-            vh.setItem(postItems.get(position),position);
+            vh.setItem(postItems.get(position), position);
         }
         if (viewHolder instanceof TextMimHolder) {
             TextMimHolder vh = (TextMimHolder) viewHolder;
-            vh.setItem(postItems.get(position),position);
+            vh.setItem(postItems.get(position), position);
         }
         if (viewHolder instanceof LinkScriptHolder) {
             LinkScriptHolder vh = (LinkScriptHolder) viewHolder;
@@ -163,7 +162,7 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         // comment_list.remove(position);
         // comment_list.remove(position);
 
-     //   postItems.remove(position);
+        //   postItems.remove(position);
         //   notifyItemRemoved(position);
         notifyDataSetChanged();
 
