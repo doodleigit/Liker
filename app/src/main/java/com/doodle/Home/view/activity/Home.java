@@ -1,5 +1,6 @@
 package com.doodle.Home.view.activity;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -15,6 +16,8 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuCompat;
 import android.support.v4.view.ViewPager;
@@ -41,6 +44,16 @@ import com.doodle.Authentication.model.UserInfo;
 import com.doodle.Authentication.view.activity.LoginAgain;
 import com.doodle.Comment.adapter.AllCommentAdapter;
 import com.doodle.Comment.model.CommentItem;
+import com.doodle.Comment.model.Comment_;
+import com.doodle.Comment.model.ReportReason;
+import com.doodle.Comment.service.CommentService;
+import com.doodle.Comment.view.fragment.BlockUserDialog;
+import com.doodle.Comment.view.fragment.DeletePostDialog;
+import com.doodle.Comment.view.fragment.FollowSheet;
+import com.doodle.Comment.view.fragment.ReportLikerMessageSheet;
+import com.doodle.Comment.view.fragment.ReportPersonMessageSheet;
+import com.doodle.Comment.view.fragment.ReportReasonSheet;
+import com.doodle.Comment.view.fragment.ReportSendCategorySheet;
 import com.doodle.Home.adapter.CategoryTitleAdapter;
 import com.doodle.Home.adapter.SubCategoryAdapter;
 import com.doodle.Authentication.view.fragment.ResendEmail;
@@ -49,6 +62,7 @@ import com.doodle.Home.model.CommonCategory;
 import com.doodle.Home.model.PostFilterCategory;
 import com.doodle.Home.model.PostFilterItem;
 import com.doodle.Home.model.PostFilterSubCategory;
+import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.TopContributorStatus;
 import com.doodle.Home.service.CategoryRemoveListener;
 import com.doodle.Home.service.FilterClickListener;
@@ -71,6 +85,7 @@ import com.doodle.R;
 import com.doodle.Search.LikerSearch;
 import com.doodle.Setting.view.SettingActivity;
 import com.doodle.utils.AppConstants;
+import com.doodle.utils.NetworkHelper;
 import com.doodle.utils.PrefManager;
 import com.doodle.utils.ScreenOnOffBroadcast;
 import com.doodle.utils.Utils;
@@ -82,6 +97,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import cn.jzvd.JZVideoPlayer;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -95,8 +111,19 @@ import retrofit2.Response;
 import static com.doodle.Authentication.view.activity.Welcome.USER_INFO_ITEM_KEY;
 import static com.doodle.Home.service.TextHolder.ITEM_KEY;
 import static com.doodle.utils.AppConstants.IN_CHAT_MODE;
+import static com.doodle.utils.Utils.isEmpty;
+import static com.doodle.utils.Utils.sendNotificationRequest;
+import static java.security.AccessController.getContext;
 
-public class Home extends AppCompatActivity implements View.OnClickListener, AdapterView.OnItemSelectedListener {
+public class Home extends AppCompatActivity implements
+        View.OnClickListener,
+        AdapterView.OnItemSelectedListener,
+        ReportReasonSheet.BottomSheetListener,
+        ReportSendCategorySheet.BottomSheetListener,
+        ReportPersonMessageSheet.BottomSheetListener,
+        ReportLikerMessageSheet.BottomSheetListener,
+        FollowSheet.BottomSheetListener,
+        BlockUserDialog.BlockListener {
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
@@ -127,11 +154,19 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
 
     public LoadCompleteListener loadCompleteListener;
     public UserInfo userInfo;
+    private boolean isFriend;
+    private CommentService commentService;
+    private boolean networkOk;
+    private String profileId;
+    private String blockUserId;
+    public static Context mContext;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        mContext = this;
 
 //        userInfo = getIntent().getExtras().getParcelable(USER_INFO_ITEM_KEY);
 //        if (userInfo == null) {
@@ -174,7 +209,9 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
         progressDialog.setMessage(getString(R.string.loading));
         progressDialog.show();
         manager = new PrefManager(this);
+        networkOk = NetworkHelper.hasNetworkAccess(this);
         webService = HomeService.mRetrofit.create(HomeService.class);
+        commentService = CommentService.mRetrofit.create(CommentService.class);
         setUser = new SetUser();
         headers = new Headers();
         categories = new ArrayList<>();
@@ -219,6 +256,7 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
         image_url = manager.getProfileImage();
         deviceId = manager.getDeviceId();
         userId = manager.getProfileId();
+        profileId = manager.getProfileId();
         token = manager.getToken();
 
 
@@ -749,6 +787,16 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
     @Override
     protected void onResume() {
         super.onResume();
+        if (App.isIsBockComment()) {
+            App.setIsBockComment(false);
+            startActivity(getIntent());
+            finish();
+
+        } else {
+
+        }
+        // code to update the UI in the fragment
+
         socket.on("web_notification", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
@@ -825,6 +873,8 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+
+
         adapter.addFrag(new TrendingPost(), "Tab 1");
         adapter.addFrag(new BreakingPost(), "Tab 2");
         adapter.addFrag(new FollowingPost(), "Tab 3");
@@ -1010,6 +1060,8 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
         unregisterReceiver(broadcastReceiver);
         unregisterReceiver(mReceiver);
         socket.off("web_notification");
+        Utils.dismissDialog();
+
     }
 
     @Override
@@ -1054,5 +1106,163 @@ public class Home extends AppCompatActivity implements View.OnClickListener, Ada
     public void onNothingSelected(AdapterView<?> adapterView) {
 
     }
+
+
+    String reportId;
+
+    @Override
+    public void onButtonClicked(int image, String text) {
+        reportId = text;
+        Comment_ commentChild = new Comment_();
+        commentChild = App.getCommentItem();
+        boolean isFollow = App.isIsFollow();
+        ReportSendCategorySheet reportSendCategorySheet = ReportSendCategorySheet.newInstance(reportId, commentChild, isFollow);
+        reportSendCategorySheet.show(getSupportFragmentManager(), "ReportSendCategorySheet");
+    }
+
+    @Override
+    public void onFollowClicked(int image, String text) {
+        String message = text;
+
+        Comment_ commentChild = new Comment_();
+        commentChild = App.getCommentItem();
+
+        FollowSheet followSheet = FollowSheet.newInstance(reportId, commentChild);
+        followSheet.show(getSupportFragmentManager(), "FollowSheet");
+    }
+
+    @Override
+    public void onReportLikerClicked(int image, String text) {
+        String message = text;
+        Comment_ commentChild = new Comment_();
+        commentChild = App.getCommentItem();
+        ReportLikerMessageSheet reportLikerMessageSheet = ReportLikerMessageSheet.newInstance(reportId, commentChild);
+        reportLikerMessageSheet.show(getSupportFragmentManager(), "ReportLikerMessageSheet");
+    }
+
+    @Override
+    public void onPersonLikerClicked(int image, String text) {
+        String message = text;
+        Comment_ commentChild = new Comment_();
+        commentChild = App.getCommentItem();
+        ReportPersonMessageSheet reportPersonMessageSheet = ReportPersonMessageSheet.newInstance(reportId, commentChild);
+        reportPersonMessageSheet.show(getSupportFragmentManager(), "ReportPersonMessageSheet");
+    }
+
+    @Override
+    public void onReportPersonMessageClicked(int image, String text) {
+
+    }
+
+    @Override
+    public void onReportLikerMessageClicked(int image, String text) {
+
+    }
+
+    @Override
+    public void onUnfollowClicked(int image, String text) {
+
+    }
+
+    @Override
+    public void onBlockResult(DialogFragment dlg) {
+
+
+        PostItem item = new PostItem();
+        item = App.getItem();
+        if (!isEmpty(item)) {
+
+            blockUserId = item.getPostUserid();
+        }
+
+
+        if (networkOk) {
+            Call<String> call = commentService.blockedUser(deviceId, profileId, token, blockUserId, userId);
+            sendBlockUserRequest(call);
+        } else {
+            Utils.showNetworkDialog(getSupportFragmentManager());
+        }
+
+    }
+
+    private void sendBlockUserRequest(Call<String> call) {
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        try {
+                            JSONObject object = new JSONObject(response.body());
+                            boolean status = object.getBoolean("status");
+
+                            if (status) {
+                                // Utils.toast(Home.this, "your message was successfully sent", R.drawable.icon_checked);
+                                startActivity(getIntent());
+                                finish();
+
+                            }
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    } else {
+
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.d("message", t.getMessage());
+            }
+        });
+    }
+
+
+
+
+    @Override
+    public void onCancelResult(DialogFragment dlg) {
+        // Toast.makeText(this, "Neutral button", Toast.LENGTH_SHORT).show();
+    }
+
+
+    public void sendDeletePostRequest(Call<String> call) {
+
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        try {
+                            JSONObject object = new JSONObject(response.body());
+                            boolean status = object.getBoolean("status");
+                            App.setDeleteStatus(status);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Log.i("onSuccess", response.body().toString());
+                    } else {
+                        Log.i("onEmptyResponse", "Returned empty response");
+                    }
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+
+        });
+
+
+    }
+
 
 }

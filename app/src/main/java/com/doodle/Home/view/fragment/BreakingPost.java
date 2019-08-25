@@ -3,13 +3,19 @@ package com.doodle.Home.view.fragment;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,26 +23,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.Toast;
 
 import com.doodle.App;
-import com.doodle.Comment.model.Comment;
 import com.doodle.Comment.model.CommentItem;
+import com.doodle.Comment.view.fragment.DeletePostDialog;
 import com.doodle.Home.adapter.BreakingPostAdapter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.service.HomeService;
 import com.doodle.Home.service.TextHolder;
+import com.doodle.Home.service.TextMimHolder;
 import com.doodle.Home.view.activity.Home;
-import com.doodle.Post.model.CategoryItem;
-import com.doodle.Post.service.PostService;
-import com.doodle.Post.view.fragment.ContributorStatus;
 import com.doodle.R;
-import com.doodle.Search.model.AdvanceSearches;
 import com.doodle.utils.AppConstants;
 import com.doodle.utils.NetworkHelper;
 import com.doodle.utils.PrefManager;
 import com.doodle.utils.Utils;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,18 +53,23 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.doodle.utils.Utils.showDeletePost;
+
 /**
  * A simple {@link Fragment} subclass.
  */
-public class BreakingPost extends Fragment {
+public class BreakingPost extends Fragment
+{
 
+
+    private View v;
 
     public BreakingPost() {
         // Required empty public constructor
     }
 
     public List<PostItem> postItemList;
-  //  private List<Comment> comments = new ArrayList<Comment>();
+    //  private List<Comment> comments = new ArrayList<Comment>();
     private HomeService webService;
     private PrefManager manager;
     private String deviceId, profileId, token, userIds;
@@ -78,6 +90,11 @@ public class BreakingPost extends Fragment {
     private String catIds = "";
     private ShimmerFrameLayout shimmerFrameLayout;
 
+    //Delete post item
+    public static TextHolder.PostItemListener mCallback;
+    public static TextMimHolder.PostItemListener mimListener;
+    PostItem deletePostItem;
+    int deletePosition;
 
     @Override
     public void onAttach(Context context) {
@@ -99,8 +116,8 @@ public class BreakingPost extends Fragment {
         userIds = manager.getProfileId();
         webService = HomeService.mRetrofit.create(HomeService.class);
         networkOk = NetworkHelper.hasNetworkAccess(getActivity());
-
-
+        postItemList = new ArrayList<>();
+        deletePostItem=new PostItem();
     }
 
     @Override
@@ -113,7 +130,7 @@ public class BreakingPost extends Fragment {
         shimmerFrameLayout = (ShimmerFrameLayout) root.findViewById(R.id.shimmer_view_post_container);
         recyclerView = (RecyclerView) root.findViewById(R.id.rvBreakingPost);
         recyclerView.setLayoutManager(layoutManager);
-
+        v=root;
         getData();
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -142,9 +159,87 @@ public class BreakingPost extends Fragment {
         });
 
 
+        mCallback = new TextHolder.PostItemListener() {
+            @Override
+            public void deletePost(PostItem postItem, int position) {
+                deletePosition=position;
+                deletePostItem=postItem;
+                BreakingPost.this.deletePost(deletePostItem, deletePosition);
+
+            }
+        };
+        mimListener=new TextMimHolder.PostItemListener() {
+            @Override
+            public void deletePost(PostItem postItem, int position) {
+                deletePosition=position;
+                deletePostItem=postItem;
+                BreakingPost.this.deletePost(deletePostItem, deletePosition);
+            }
+        };
+
         return root;
     }
 
+    private void deletePost(PostItem deletePostItem, int deletePosition) {
+        new AlertDialog.Builder(getActivity())
+              //  .setTitle("Delete entry")
+                .setMessage("Are you sure you want to delete this post? You will permanently lose this post !")
+
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        if (networkOk) {
+                            Call<String> call = webService.postDelete(deviceId, profileId, token, userIds, deletePostItem.getPostId());
+                            sendDeletePostRequest(call);
+                        } else {
+                            Utils.showNetworkDialog(getActivity().getSupportFragmentManager());
+                        }
+
+
+                    }
+                })
+                .setNegativeButton(android.R.string.no, null)
+               // .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+    }
+
+
+    public void sendDeletePostRequest(Call<String> call) {
+
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        try {
+                            JSONObject object = new JSONObject(response.body());
+                            boolean status = object.getBoolean("status");
+                           if(status){
+                               postItemList.remove(deletePostItem);
+                               adapter.deleteItem(deletePosition);
+                           }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Log.i("onSuccess", response.body().toString());
+                    } else {
+                        Log.i("onEmptyResponse", "Returned empty response");
+                    }
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+
+        });
+
+
+    }
     private void getData() {
         if (networkOk) {
             progressView.setVisibility(View.VISIBLE);
@@ -188,6 +283,7 @@ public class BreakingPost extends Fragment {
             public void onResponse(Call<List<PostItem>> call, Response<List<PostItem>> response) {
 
                 postItemList = response.body();
+
                 if (postItemList != null) {
                     String totalPostIDs;
                     List<String> postIdSet = new ArrayList<>();
@@ -233,7 +329,7 @@ public class BreakingPost extends Fragment {
             public void onResponse(Call<CommentItem> mCall, Response<CommentItem> response) {
 
                 CommentItem commentItem = response.body();
-              //  comments = commentItem.getComments();
+                //  comments = commentItem.getComments();
                 Log.d("commentItem", commentItem.toString());
                 if (postItemList != null) {
                     adapter.addPagingData(postItemList);
@@ -283,7 +379,7 @@ public class BreakingPost extends Fragment {
                     totalPostIDs = sb.substring(separator.length()).replaceAll("\\s+", "");
                     Log.d("friends", totalPostIDs);
                     Call<CommentItem> mCall = webService.getPostComments(deviceId, profileId, token, "false", 1, 0, "DESC", totalPostIDs, userIds);
-                     sendCommentItemRequest(mCall);
+                    sendCommentItemRequest(mCall);
 
 //             adapter = new BreakingPostAdapter(getActivity(), postItemList);
 //
@@ -326,10 +422,10 @@ public class BreakingPost extends Fragment {
             public void onResponse(Call<CommentItem> mCall, Response<CommentItem> response) {
 
                 CommentItem commentItem = response.body();
-              //  comments = commentItem.getComments();
+                //  comments = commentItem.getComments();
                 Log.d("commentItem", commentItem.toString());
-                if (postItemList != null ) {
-                    adapter = new BreakingPostAdapter(getActivity(), postItemList);
+                if (postItemList != null) {
+                    adapter = new BreakingPostAdapter(getActivity(), postItemList,mCallback,mimListener);
                     offset += 5;
                     new Handler().postDelayed(new Runnable() {
                         @Override
@@ -347,7 +443,11 @@ public class BreakingPost extends Fragment {
                     progressView.setVisibility(View.GONE);
                     progressView.stopAnimation();
                 }
-                ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(1);
+                try {
+                    ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(1);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
             }
 
@@ -365,12 +465,23 @@ public class BreakingPost extends Fragment {
     public void onResume() {
         super.onResume();
         shimmerFrameLayout.startShimmer();
+
     }
+
+
 
     @Override
     public void onPause() {
         super.onPause();
         shimmerFrameLayout.stopShimmer();
+
+        /*
+        if (networkOk) {
+            Call<String> call = webService.postDelete(deviceId, profileId, token, userId, item.getPostId());
+            sendDeletePostRequest(call);
+        } else {
+            Utils.showNetworkDialog(getSupportFragmentManager());
+        }*/
     }
 
     private boolean isViewShown = false;
@@ -386,6 +497,12 @@ public class BreakingPost extends Fragment {
         } else {
             isViewShown = false;
         }
+
+      /*  if (isVisibleToUser) {
+            // Refresh your fragment here
+            getFragmentManager().beginTransaction().detach(this).attach(this).commit();
+            Log.i("IsRefresh", "Yes");
+        }*/
     }
 
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
@@ -403,4 +520,6 @@ public class BreakingPost extends Fragment {
         super.onDestroy();
         Objects.requireNonNull(getActivity()).unregisterReceiver(broadcastReceiver);
     }
+
+
 }

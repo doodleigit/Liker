@@ -12,6 +12,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.danikula.videocache.HttpProxyCacheServer;
+import com.doodle.Comment.model.Comment_;
+import com.doodle.Home.model.PostItem;
 import com.doodle.Post.model.Category;
 import com.doodle.Post.model.Subcatg;
 import com.doodle.utils.Operation;
@@ -48,6 +50,78 @@ public class App extends Application {
     private static int commentCount;
     private static String profilePhoto;
     private static boolean isFirstTimeShowReply;
+    private static Comment_ commentItem;
+    private static PostItem item;
+    private static boolean isFollow;
+    private static boolean isBockComment;
+    private static boolean isBockReply;
+    private static boolean notificationStatus;
+    private static boolean deleteStatus;
+    private static int position;
+
+    public static boolean isDeleteStatus() {
+        return deleteStatus;
+    }
+
+    public static void setDeleteStatus(boolean deleteStatus) {
+        App.deleteStatus = deleteStatus;
+    }
+
+    public static int getPosition() {
+        return position;
+    }
+
+    public static void setPosition(int position) {
+        App.position = position;
+    }
+
+    public static boolean isNotificationStatus() {
+        return notificationStatus;
+    }
+
+    public static void setNotificationStatus(boolean notificationStatus) {
+        App.notificationStatus = notificationStatus;
+    }
+
+    public static boolean isIsBockReply() {
+        return isBockReply;
+    }
+
+    public static void setIsBockReply(boolean isBockReply) {
+        App.isBockReply = isBockReply;
+    }
+
+    public static boolean isIsBockComment() {
+        return isBockComment;
+    }
+
+    public static void setIsBockComment(boolean isBockComment) {
+        App.isBockComment = isBockComment;
+    }
+
+    public static boolean isIsFollow() {
+        return isFollow;
+    }
+
+    public static void setIsFollow(boolean isFollow) {
+        App.isFollow = isFollow;
+    }
+
+    public static PostItem getItem() {
+        return item;
+    }
+
+    public static void setItem(PostItem item) {
+        App.item = item;
+    }
+
+    public static Comment_ getCommentItem() {
+        return commentItem;
+    }
+
+    public static void setCommentItem(Comment_ commentItem) {
+        App.commentItem = commentItem;
+    }
 
     public static boolean isIsFirstTimeShowReply() {
         return isFirstTimeShowReply;
@@ -235,7 +309,7 @@ public class App extends Application {
     }
 
 
-    public static void toggleCustomise(Context context, ActionBarDrawerToggle toggle, String userId ) {
+    public static void toggleCustomise(Context context, ActionBarDrawerToggle toggle, String userId) {
         if (!TextUtils.isEmpty(userId)) {
 
             Bitmap bitmap = Operation.getFacebookProfilePicture(userId);

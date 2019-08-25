@@ -18,7 +18,9 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.os.Handler;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -42,8 +44,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.borjabravo.readmoretextview.ReadMoreTextView;
+import com.doodle.App;
 import com.doodle.Authentication.service.MyService;
 import com.doodle.Comment.model.Comment_;
+import com.doodle.Comment.view.fragment.BlockUserDialog;
+import com.doodle.Comment.view.fragment.DeletePostDialog;
 import com.doodle.Home.adapter.PostAdapter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.PostTextIndex;
@@ -57,6 +62,8 @@ import org.joda.time.DateTime;
 import org.joda.time.Days;
 import org.joda.time.Hours;
 import org.joda.time.Minutes;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -81,9 +88,15 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 import static com.twitter.sdk.android.core.Twitter.TAG;
 
 public class Utils {
+
+
 
     public static boolean isNetworkConnected(Context context) {
         ConnectivityManager mConnectManager = (ConnectivityManager) context
@@ -151,6 +164,33 @@ public class Utils {
         network.show(manager, "NetworkDialogFragment");
     }
 
+   public static void showBlockUser(View v) {
+        AppCompatActivity activity = (AppCompatActivity) v.getContext();
+        BlockUserDialog blockUserDialog = new BlockUserDialog();
+        // TODO: Use setCancelable() to make the dialog non-cancelable
+        blockUserDialog.setCancelable(false);
+        blockUserDialog.show(activity.getSupportFragmentManager(), "BlockUserDialog");
+    }
+
+    public static void showDeletePost(View v) {
+        AppCompatActivity activity = (AppCompatActivity) v.getContext();
+        DeletePostDialog blockUserDialog = new DeletePostDialog();
+        // TODO: Use setCancelable() to make the dialog non-cancelable
+        blockUserDialog.setCancelable(false);
+        blockUserDialog.show(activity.getSupportFragmentManager(), "DeletePostDialog");
+    }
+
+    public  static void closeBlockUser(View view){
+        BlockUserDialog blockUserDialog = new BlockUserDialog();
+        // TODO: Use setCancelable() to make the dialog non-cancelable
+        blockUserDialog.setCancelable(false);
+
+    }
+    public static void dismissDialog(){
+        BlockUserDialog prev = new BlockUserDialog();
+        prev.setCancelable(true);
+
+    }
     public static void stripUnderlines(EmojiTextView tvPostEmojiContent) {
 
         Spannable s = new SpannableString(tvPostEmojiContent.getText());
@@ -846,4 +886,45 @@ public class Utils {
             view.setVisibility(View.INVISIBLE);
         }
     }
+
+    public static boolean isNullOrWhiteSpace(String value) {
+        return value == null || value.trim().isEmpty();
+    }
+
+
+    public static void  sendNotificationRequest(Call<String> call) {
+
+
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        try {
+                            JSONObject object = new JSONObject(response.body());
+                            boolean status = object.getBoolean("status");
+                            App.setNotificationStatus(status);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Log.i("onSuccess", response.body().toString());
+                    } else {
+                        Log.i("onEmptyResponse", "Returned empty response");
+                    }
+                }
+
+            }
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+
+        });
+
+
+    }
+
+
+
 }

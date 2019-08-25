@@ -7,8 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.doodle.Comment.adapter.AllCommentAdapter;
-import com.doodle.Comment.model.Comment;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.service.ImageHolder;
 import com.doodle.Home.service.LinkScriptHolder;
@@ -20,7 +18,6 @@ import com.doodle.Post.model.Mim;
 import com.doodle.Post.service.DataProvider;
 import com.doodle.R;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -35,25 +32,31 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     List<Mim> viewColors = DataProvider.mimList;
     private Context mContext;
     Drawable mDrawable;
+    public TextHolder.PostItemListener listener;
+    public TextMimHolder.PostItemListener mimListener;
 
 
-    public BreakingPostAdapter(Context context, List<PostItem> postItems) {
+
+    public BreakingPostAdapter(Context context, List<PostItem> postItems,TextHolder.PostItemListener listener,TextMimHolder.PostItemListener mimListener) {
         this.mContext = context;
         this.postItems = postItems;
+        this.listener=listener;
+        this.mimListener=mimListener;
 
     }
+
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view;
         if (viewType == VIEW_TYPE_TEXT) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_post_text, parent, false);
-            return new TextHolder(view, mContext);
+            return new TextHolder(view, mContext,listener);
         }
 
         if (viewType == VIEW_TYPE_TEX_MIM) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_post_text_mim, parent, false);
-            return new TextMimHolder(view, mContext);
+            return new TextMimHolder(view, mContext,mimListener);
         }
         if (viewType == VIEW_TYPE_TEXT_IMAGE) {
 
@@ -83,11 +86,11 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         if (viewHolder instanceof TextHolder) {
             TextHolder vh = (TextHolder) viewHolder;
-            vh.setItem(postItems.get(position));
+            vh.setItem(postItems.get(position),position);
         }
         if (viewHolder instanceof TextMimHolder) {
             TextMimHolder vh = (TextMimHolder) viewHolder;
-            vh.setItem(postItems.get(position));
+            vh.setItem(postItems.get(position),position);
         }
         if (viewHolder instanceof LinkScriptHolder) {
             LinkScriptHolder vh = (LinkScriptHolder) viewHolder;
@@ -153,5 +156,17 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         notifyDataSetChanged();
     }
 
+
+    public void deleteItem(int position) {
+
+
+        // comment_list.remove(position);
+        // comment_list.remove(position);
+
+     //   postItems.remove(position);
+        //   notifyItemRemoved(position);
+        notifyDataSetChanged();
+
+    }
 
 }

@@ -1,12 +1,14 @@
 package com.doodle.Comment.service;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Parcelable;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.view.menu.MenuPopupHelper;
@@ -28,11 +30,15 @@ import android.widget.Toast;
 import com.borjabravo.readmoretextview.ReadMoreTextView;
 import com.bumptech.glide.Glide;
 import com.doodle.App;
+import com.doodle.Comment.model.CommentItem;
 import com.doodle.Comment.model.CommentTextIndex;
 import com.doodle.Comment.model.Comment_;
+import com.doodle.Comment.model.Reason;
 import com.doodle.Comment.model.Reply;
 import com.doodle.Comment.model.ReportReason;
+import com.doodle.Comment.view.activity.CommentPost;
 import com.doodle.Comment.view.activity.ReplyPost;
+import com.doodle.Comment.view.fragment.BlockUserDialog;
 import com.doodle.Comment.view.fragment.ReportReasonSheet;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.service.HomeService;
@@ -53,14 +59,18 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.doodle.Home.service.TextHolder.COMMENT_KEY;
+import static com.doodle.Home.service.TextHolder.ITEM_KEY;
 import static com.doodle.utils.AppConstants.PROFILE_IMAGE;
 import static com.doodle.utils.Utils.containsIllegalCharacters;
 import static com.doodle.utils.Utils.delayLoadComment;
+import static com.doodle.utils.Utils.dismissDialog;
 import static com.doodle.utils.Utils.extractMentionText;
 import static com.doodle.utils.Utils.extractMentionUser;
 import static com.doodle.utils.Utils.extractUrls;
 import static com.doodle.utils.Utils.getSpannableStringBuilder;
 import static com.doodle.utils.Utils.isNullOrEmpty;
+import static com.doodle.utils.Utils.showBlockUser;
 import static java.lang.Integer.getInteger;
 import static java.lang.Integer.parseInt;
 
@@ -110,14 +120,14 @@ public class CommentTextHolder extends RecyclerView.ViewHolder  {
 
     //ReplyAllComment
     private ProgressBar mProgressBar;
-    public static final String REPLY_ITEM_KEY = "reply_item_key";
     public static final String REPLY_KEY = "reply_key";
     public static final String COMMENT_ITEM_KEY = "comment_item_key";
     public static final String POST_ITEM_KEY = "post_item_key";
-    public static final String COMMENT_ITEM_TEXT_KEY = "comment_item_text_key";
+
+
     PostItem postItem;
     List<Reply> replyItem;
-    Reply itemReply;
+
 
     //EDIT COMMENT
     CommentListener listener;
@@ -127,14 +137,16 @@ public class CommentTextHolder extends RecyclerView.ViewHolder  {
 
     boolean isFirstTimeShowReply;
 
+    public static final String REASON_KEY = "reason_key";
+
 
 
 
     public interface CommentListener {
 
-        void onTitleClicked(Comment_ commentItem, int position,Reply reply);
+        void onTitleClicked(Comment_ commentItem, int position, Reply reply);
 
-        void commentDelete(Comment_ commentItem, int position,Reply reply);
+        void commentDelete(Comment_ commentItem, int position, Reply reply);
     }
 
     public CommentTextHolder(View itemView, Context context, final CommentListener listener) {
@@ -147,7 +159,6 @@ public class CommentTextHolder extends RecyclerView.ViewHolder  {
         profileId = manager.getProfileId();
         token = manager.getToken();
         userIds = manager.getProfileId();
-        itemReply = new Reply();
 
 
         //tvPostContent = (ReadMoreTextView) itemView.findViewById(R.id.tvPostContent);
@@ -223,12 +234,14 @@ public class CommentTextHolder extends RecyclerView.ViewHolder  {
     int goldStar;
     int silverStar;
     int position;
+    AppCompatActivity activity;
 
-    public void setItem(Comment_ commentItem, PostItem postItem,int position) {
+    public void setItem(Comment_ commentItem, PostItem postItem, int position) {
 
         this.commentItem = commentItem;
         this.postItem = postItem;
         this.position = position;
+
 
         //  userPostId = item.getPostId();
 //        commentPostId = commentItem.getPostId();
@@ -292,7 +305,7 @@ public class CommentTextHolder extends RecyclerView.ViewHolder  {
 
                 String commentReply = commentItem.getTotalReply();
 
-                if(!isNullOrEmpty(commentReply)){
+                if (!isNullOrEmpty(commentReply)) {
                     if (Integer.parseInt(commentReply) > 0) {
                         if (networkOk) {
 
@@ -303,24 +316,20 @@ public class CommentTextHolder extends RecyclerView.ViewHolder  {
                             Utils.showNetworkDialog(activity.getSupportFragmentManager());
 
                         }
-                    } else if(Integer.parseInt(commentReply) == 0) {
+                    } else if (Integer.parseInt(commentReply) == 0) {
                         Intent intent = new Intent(mContext, ReplyPost.class);
                         intent.putExtra(COMMENT_ITEM_KEY, (Parcelable) commentItem);
                         intent.putExtra(POST_ITEM_KEY, (Parcelable) postItem);
-                        intent.putExtra(REPLY_ITEM_KEY, (Parcelable) itemReply);
                         intent.putParcelableArrayListExtra(REPLY_KEY, (ArrayList<? extends Parcelable>) replyItem);
-
                         mContext.startActivity(intent);
                     }
-                }else {
+                } else {
                     Intent intent = new Intent(mContext, ReplyPost.class);
                     intent.putExtra(COMMENT_ITEM_KEY, (Parcelable) commentItem);
                     intent.putExtra(POST_ITEM_KEY, (Parcelable) postItem);
-                    intent.putExtra(REPLY_ITEM_KEY, (Parcelable) itemReply);
                     intent.putParcelableArrayListExtra(REPLY_KEY, (ArrayList<? extends Parcelable>) replyItem);
                     mContext.startActivity(intent);
                 }
-
 
 
             }
@@ -619,60 +628,57 @@ public class CommentTextHolder extends RecyclerView.ViewHolder  {
                         int id = menuItem.getItemId();
 
                         if (id == R.id.reportComment) {
-
-                            AppCompatActivity activity = (AppCompatActivity) v.getContext();
-
-//                    AppCompatActivity activity = (AppCompatActivity) v.getContext();
-                    ReportReasonSheet reportReasonSheet = ReportReasonSheet.newInstance("message");
-                    reportReasonSheet.show(activity.getSupportFragmentManager(), "ReportReasonSheet");
-//                            if (networkOk) {
-//
-//                                Call<ReportReason> call = commentService.getReportReason(deviceId, profileId, token, commentItem.getUserId(),  "2", userIds);
-//                                sendReportReason(call);
-//                              //  delayLoadComment(mProgressBar);
-//                            } else {
-//                                Utils.showNetworkDialog(activity.getSupportFragmentManager());
-//
-//                            }
+                            App.setCommentItem(commentItem);
+                            activity = (AppCompatActivity) v.getContext();
+                            if (networkOk) {
+                                Call<ReportReason> call = commentService.getReportReason(deviceId, profileId, token, commentItem.getUserId(), "2", userIds);
+                                sendReportReason(call);
+                            } else {
+                                Utils.showNetworkDialog(activity.getSupportFragmentManager());
+                            }
                         }
 
                         if (id == R.id.blockUser) {
-                            Toast.makeText(App.getAppContext(), "blockUser : ", Toast.LENGTH_SHORT).show();
+
+                            if (!((Activity) mContext).isFinishing()) {
+                                App.setCommentItem(commentItem);
+                                showBlockUser(v);
+                            }else {
+                                dismissDialog();
+                            }
+
                         }
                         if (id == R.id.editComment) {
 
-                            Reply replyItem=new Reply();
+                            Reply replyItem = new Reply();
                             List<Reply> replyList = commentItem.getReplies();
-                            if(replyList.size()==0){
+                            if (replyList.size() == 0) {
                                 Reply reply = new Reply();
                                 reply.setId("1");
                                 reply.setCommentId("2");
-                                listener.onTitleClicked(commentItem, position,reply);
-                            }else {
+                                listener.onTitleClicked(commentItem, position, reply);
+                            } else {
                                 replyItem = replyList.get(0);
-                                listener.onTitleClicked(commentItem, position,replyItem);
+                                listener.onTitleClicked(commentItem, position, replyItem);
                             }
 
 
-
-
-                          //  Utils.showNetworkDialog(activity.getSupportFragmentManager());
+                            //  Utils.showNetworkDialog(activity.getSupportFragmentManager());
                         }
 
                         if (id == R.id.deleteComment) {
 
-                            Reply replyItem=new Reply();
+                            Reply replyItem = new Reply();
                             List<Reply> replyList = commentItem.getReplies();
-                            if(replyList.size()==0){
-                               Reply reply = new Reply();
-                               reply.setId("1");
-                               reply.setCommentId("2");
-                                listener.commentDelete(commentItem, position,reply);
-                            }else{
+                            if (replyList.size() == 0) {
+                                Reply reply = new Reply();
+                                reply.setId("1");
+                                reply.setCommentId("2");
+                                listener.commentDelete(commentItem, position, reply);
+                            } else {
                                 replyItem = replyList.get(0);
-                                listener.commentDelete(commentItem, position,replyItem);
+                                listener.commentDelete(commentItem, position, replyItem);
                             }
-
 
 
                         }
@@ -686,6 +692,7 @@ public class CommentTextHolder extends RecyclerView.ViewHolder  {
 
     }
 
+
     private void sendReportReason(Call<ReportReason> call) {
 
         call.enqueue(new Callback<ReportReason>() {
@@ -695,11 +702,21 @@ public class CommentTextHolder extends RecyclerView.ViewHolder  {
 
 
                 if (response.body() != null) {
-                ReportReason    replyItem = response.body();
-                   Log.d("replyItem: ",replyItem.toString());
-//                    AppCompatActivity activity = (AppCompatActivity) v.getContext();
-//                    ReportReasonSheet reportReasonSheet = ReportReasonSheet.newInstance("message");
-//                    reportReasonSheet.show(activity.getSupportFragmentManager(), "ReportReasonSheet");
+                    ReportReason reportReason = response.body();
+                    boolean isFollowed = reportReason.isFollowed();
+                    App.setIsFollow(isFollowed);
+                    List<Reason> reasonList = reportReason.getReason();
+                    PostItem item = new PostItem();
+                    CommentItem commentItems = new CommentItem();
+//                    Intent intent = new Intent(mContext, CommentPost.class);
+//                    intent.putExtra(COMMENT_CHILD_KEY, (Parcelable) commentItem);
+//                    intent.putExtra(COMMENT_KEY, (Parcelable) commentItems);
+//                    intent.putExtra(ITEM_KEY, (Parcelable) item);
+//                    intent.putExtra(REASON_KEY, (Parcelable) reportReason);
+//                    mContext.startActivity(intent);
+//                    Log.d("replyItem: ", replyItem.toString());
+                    ReportReasonSheet reportReasonSheet = ReportReasonSheet.newInstance(reasonList);
+                    reportReasonSheet.show(activity.getSupportFragmentManager(), "ReportReasonSheet");
 
                 }
 
@@ -726,16 +743,13 @@ public class CommentTextHolder extends RecyclerView.ViewHolder  {
 
                 if (response.body() != null) {
                     replyItem = response.body();
-                    itemReply = replyItem.get(position);
 
-                    if(replyItem.size()>0){
-                        Intent intent = new Intent(mContext, ReplyPost.class);
-                        intent.putExtra(COMMENT_ITEM_KEY, (Parcelable) commentItem);
-                        intent.putExtra(POST_ITEM_KEY, (Parcelable) postItem);
-                        intent.putExtra(REPLY_ITEM_KEY, (Parcelable) itemReply);
-                        intent.putParcelableArrayListExtra(REPLY_KEY, (ArrayList<? extends Parcelable>) replyItem);
-                        mContext.startActivity(intent);
-                    }
+                    Intent intent = new Intent(mContext, ReplyPost.class);
+                    intent.putExtra(COMMENT_ITEM_KEY, (Parcelable) commentItem);
+                    intent.putExtra(POST_ITEM_KEY, (Parcelable) postItem);
+
+                    intent.putParcelableArrayListExtra(REPLY_KEY, (ArrayList<? extends Parcelable>) replyItem);
+                    mContext.startActivity(intent);
 
 
                 }

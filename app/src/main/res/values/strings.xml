@@ -293,5 +293,6 @@
     <string name="there_is_no_facebook_friends">There are no facebook friends.</string>
     <string name="there_is_no_twitter_friends">There are no twitter friends.</string>
     <string name="there_is_no_likedin_friends">There are no linkedin friends.</string>
+    <string name="report_post">Report Post</string>
 
 </resources>

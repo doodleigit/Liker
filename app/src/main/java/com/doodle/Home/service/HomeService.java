@@ -52,6 +52,7 @@ public interface HomeService {
             @Field("is_public") boolean isPublic
 
     );
+
     //https://www.stg.liker.com/get_postscomments
     @POST(AppConstants.GET_POST_COMMENTS)
     @FormUrlEncoded
@@ -77,7 +78,7 @@ public interface HomeService {
             @Field("post_id") String postId
     );
 
-//https://www.stg.liker.com/addSharedpost
+    //https://www.stg.liker.com/addSharedpost
     @POST(AppConstants.ADD_SHARED_POST)
     @FormUrlEncoded
     Call<String> addSharedPost(
@@ -118,6 +119,7 @@ public interface HomeService {
             @Field("user_id") String id
     );
 
+
     @POST(AppConstants.GET_USER_RANKINGS)
     @FormUrlEncoded
     Call<ArrayList<StarContributor>> getUserRanking(
@@ -129,5 +131,46 @@ public interface HomeService {
             @Field("offset") int offset,
             @Field("limit") int limit
     );
+
+
+    @POST(AppConstants.POST_PERMISSION)
+    @FormUrlEncoded
+    Call<String> postPermission(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("permission") String permission,
+            @Field("post_id") String postId
+    );
+   @POST(AppConstants.POST_NOTIFICATION_TURN_OFF)
+    @FormUrlEncoded
+    Call<String> postNotificationTurnOff(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("user_id") String userIds,
+            @Field("post_id") String postId
+    );
+
+   @POST(AppConstants.POST_NOTIFICATION_TURN_ON)
+    @FormUrlEncoded
+    Call<String> postNotificationTurnOn(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("user_id") String userIds,
+            @Field("post_id") String postId
+    );
+
+   @POST(AppConstants.POST_DELETE)
+    @FormUrlEncoded
+    Call<String> postDelete(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("user_id") String userIds,
+            @Field("post_id") String postId
+    );
+
 
 }

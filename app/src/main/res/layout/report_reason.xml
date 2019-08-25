@@ -66,7 +66,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-
+<!--
             <RadioButton
                 android:id="@+id/radioNudity"
                 android:layout_width="wrap_content"
@@ -108,20 +108,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Contains Unauthorized Sales" />
-
-
-
             <RadioButton
                 android:id="@+id/radioHateSpeech"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Contains Hate Speech" />
-
             <RadioButton
                 android:id="@+id/radioOthers"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Contains Others" />
+                android:text="Contains Others" />-->
+
         </RadioGroup>
     </LinearLayout>
     <Button

@@ -88,32 +88,54 @@ public interface CommentService {
             @Field("user_id") String userIds
     );
 
+    @POST(AppConstants.REPORT_USER)
+    @FormUrlEncoded
+    Call<String> reportUser(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("comment_id") String commentId,
+            @Field("msg") String message,
+            @Field("post_id") String postId,
+            @Field("reasonid") String reasonid,
+            @Field("report_type") String reportType,
+            @Field("send_type") String sendType,
+            @Field("to_id") String toId,
+            @Field("user_id") String userIds
+    );
 
+    @POST(AppConstants.UN_FOLLOW)
+    @FormUrlEncoded
+    Call<String> unfollow(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("follow_id") String toId,
+            @Field("user_id") String userIds
+    );
 
-    /*comment_id	95101
-is_public	false
-limit	5
-offset	2
-post_id	33486
-user_id	26444*/
+//http://192.168.0.77:8040/sites/likerapp/blocked_user
 
-    //https://www.stg.liker.com/added_comment
+    @POST(AppConstants.BLOCKED_USER)
+    @FormUrlEncoded
+    Call<String> blockedUser(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("block_user_id") String blockUserId,
+            @Field("user_id") String userIds
+            );
 
-//    @POST(AppConstants.ADDED_COMMENTS)
-//    @FormUrlEncoded
-//    Call<Comment_> addedComment(
-//            @Header("Device-Id") String deviceId,
-//            @Header("User-Id") String userId,
-//            @Header("Security-Token") String token,
-//            @Field("comment_image") String commentImage,
-//            @Field("comment_text") String commentText,
-//            @Field("comment_type") int commentType,
-//            @Field("has_mention") int hasMention,
-//            @Field("link_url") String linkUrl,
-//            @Field("mention") int mention,
-//            @Field("post_id") String postId,
-//            @Field("user_id") String userIds
-//    );
+/*
+comment_id	715
+msg	xvv
+post_id	13596
+reasonid	1
+report_type	4
+send_type	1
+to_id	28834
+user_id	28827
+ */
 
 
     @Multipart
