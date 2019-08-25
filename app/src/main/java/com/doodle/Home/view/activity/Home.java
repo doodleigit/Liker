@@ -1,5 +1,6 @@
 package com.doodle.Home.view.activity;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -16,6 +17,7 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuCompat;
 import android.support.v4.view.ViewPager;
@@ -95,6 +97,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import cn.jzvd.JZVideoPlayer;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -110,6 +113,7 @@ import static com.doodle.Home.service.TextHolder.ITEM_KEY;
 import static com.doodle.utils.AppConstants.IN_CHAT_MODE;
 import static com.doodle.utils.Utils.isEmpty;
 import static com.doodle.utils.Utils.sendNotificationRequest;
+import static java.security.AccessController.getContext;
 
 public class Home extends AppCompatActivity implements
         View.OnClickListener,
@@ -119,10 +123,7 @@ public class Home extends AppCompatActivity implements
         ReportPersonMessageSheet.BottomSheetListener,
         ReportLikerMessageSheet.BottomSheetListener,
         FollowSheet.BottomSheetListener,
-        BlockUserDialog.BlockListener,
-        DeletePostDialog.DeleteListener
-
-{
+        BlockUserDialog.BlockListener {
 
     private TabLayout tabLayout;
     private ViewPager viewPager;
@@ -158,23 +159,14 @@ public class Home extends AppCompatActivity implements
     private boolean networkOk;
     private String profileId;
     private String blockUserId;
-
-
-
-    FragmentCaller fragListerner = null;
-    public interface FragmentCaller {
-        void CallFragment();
-    }
-
-
-
+    public static Context mContext;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-
+        mContext = this;
 
 //        userInfo = getIntent().getExtras().getParcelable(USER_INFO_ITEM_KEY);
 //        if (userInfo == null) {
@@ -795,15 +787,15 @@ public class Home extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        if(App.isIsBockComment()){
+        if (App.isIsBockComment()) {
             App.setIsBockComment(false);
             startActivity(getIntent());
             finish();
 
-        }else {
+        } else {
 
         }
-
+        // code to update the UI in the fragment
 
         socket.on("web_notification", new Emitter.Listener() {
             @Override
@@ -882,7 +874,7 @@ public class Home extends AppCompatActivity implements
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
-        fragListerner = (FragmentCaller) new BreakingPost();
+
         adapter.addFrag(new TrendingPost(), "Tab 1");
         adapter.addFrag(new BreakingPost(), "Tab 2");
         adapter.addFrag(new FollowingPost(), "Tab 3");
@@ -1205,7 +1197,7 @@ public class Home extends AppCompatActivity implements
                             boolean status = object.getBoolean("status");
 
                             if (status) {
-                               // Utils.toast(Home.this, "your message was successfully sent", R.drawable.icon_checked);
+                                // Utils.toast(Home.this, "your message was successfully sent", R.drawable.icon_checked);
                                 startActivity(getIntent());
                                 finish();
 
@@ -1230,30 +1222,15 @@ public class Home extends AppCompatActivity implements
     }
 
 
-    @Override
-    public void onDeleteResult(DialogFragment dlg) {
 
-        PostItem item = new PostItem();
-        item = App.getItem();
-
-
-        if (networkOk) {
-            Call<String> call = webService.postDelete(deviceId, profileId, token, userId, item.getPostId());
-            sendDeletePostRequest(call);
-        } else {
-            Utils.showNetworkDialog(getSupportFragmentManager());
-        }
-
-    }
 
     @Override
     public void onCancelResult(DialogFragment dlg) {
-       // Toast.makeText(this, "Neutral button", Toast.LENGTH_SHORT).show();
+        // Toast.makeText(this, "Neutral button", Toast.LENGTH_SHORT).show();
     }
 
 
-    public  void  sendDeletePostRequest(Call<String> call) {
-
+    public void sendDeletePostRequest(Call<String> call) {
 
 
         call.enqueue(new Callback<String>() {
@@ -1264,19 +1241,7 @@ public class Home extends AppCompatActivity implements
                         try {
                             JSONObject object = new JSONObject(response.body());
                             boolean status = object.getBoolean("status");
-
-                            if(status){
-                                Toast.makeText(App.getAppContext(), "status: "+status, Toast.LENGTH_SHORT).show();
-
-                                if(fragListerner!=null){
-                                    if(fragListerner instanceof BreakingPost){
-                                        fragListerner.CallFragment();
-                                    }/*else if(fragListerner instanceof MyFragB){
-                                        fragListerner.CallFragment();
-                                    }*/
-                                }
-
-                            }
+                            App.setDeleteStatus(status);
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -1288,6 +1253,7 @@ public class Home extends AppCompatActivity implements
                 }
 
             }
+
             @Override
             public void onFailure(Call<String> call, Throwable t) {
 
@@ -1297,5 +1263,6 @@ public class Home extends AppCompatActivity implements
 
 
     }
+
 
 }

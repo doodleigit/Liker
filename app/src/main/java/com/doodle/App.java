@@ -56,7 +56,16 @@ public class App extends Application {
     private static boolean isBockComment;
     private static boolean isBockReply;
     private static boolean notificationStatus;
+    private static boolean deleteStatus;
     private static int position;
+
+    public static boolean isDeleteStatus() {
+        return deleteStatus;
+    }
+
+    public static void setDeleteStatus(boolean deleteStatus) {
+        App.deleteStatus = deleteStatus;
+    }
 
     public static int getPosition() {
         return position;

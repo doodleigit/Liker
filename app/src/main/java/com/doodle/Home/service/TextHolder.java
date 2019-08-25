@@ -40,6 +40,7 @@ import com.bumptech.glide.Glide;
 import com.doodle.App;
 import com.doodle.Comment.adapter.AllCommentAdapter;
 import com.doodle.Comment.model.Reason;
+import com.doodle.Comment.model.Reply;
 import com.doodle.Comment.model.ReportReason;
 import com.doodle.Comment.view.activity.CommentPost;
 import com.doodle.Comment.model.Comment;
@@ -168,10 +169,18 @@ public class TextHolder extends RecyclerView.ViewHolder {
     private boolean notificationOff;
 
 
-    public TextHolder(View itemView, Context context) {
+    //Delete post
+   public PostItemListener postTextListener;
+    public interface PostItemListener {
+        void deletePost(PostItem postItem, int position);
+
+    }
+    public TextHolder(View itemView, Context context, PostItemListener postTextListener) {
         super(itemView);
 
         mContext = context;
+        this.postTextListener=postTextListener;
+
         callbackManager = CallbackManager.Factory.create();
         shareDialog = new ShareDialog((Activity) context);
         manager = new PrefManager(App.getAppContext());
@@ -259,7 +268,8 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
     String text;
     AppCompatActivity activity;
-int position;
+    int position;
+
     public void setItem(final PostItem item, int position) {
         this.item = item;
         this.position = position;
@@ -829,7 +839,7 @@ int position;
                             if (!((Activity) mContext).isFinishing()) {
                                 App.setItem(item);
                                 App.setPosition(position);
-                                showDeletePost(v);
+                                postTextListener.deletePost(item,position);
                             } else {
                                 dismissDialog();
                             }
@@ -852,7 +862,7 @@ int position;
                                     notificationOff = false;
                                     if (networkOk) {
                                         Call<String> call = webService.postNotificationTurnOn(deviceId, profileId, token, userIds, item.getPostId());
-                                       sendNotificationRequest(call);
+                                        sendNotificationRequest(call);
                                     } else {
                                         Utils.showNetworkDialog(activity.getSupportFragmentManager());
                                     }

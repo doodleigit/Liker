@@ -23,9 +23,7 @@ public class DeletePostDialog extends DialogFragment {
     // TODO: Implement an interface for hosts to get callbacks
     public interface DeleteListener {
         public void onDeleteResult(DialogFragment dlg);
-
         public void onCancelResult(DialogFragment dlg);
-
     }
 
 

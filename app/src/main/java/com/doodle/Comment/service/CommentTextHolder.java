@@ -74,7 +74,7 @@ import static com.doodle.utils.Utils.showBlockUser;
 import static java.lang.Integer.getInteger;
 import static java.lang.Integer.parseInt;
 
-public class CommentTextHolder extends RecyclerView.ViewHolder {
+public class CommentTextHolder extends RecyclerView.ViewHolder  {
 
 
     public CircleImageView imagePostUser;
@@ -138,6 +138,8 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
     boolean isFirstTimeShowReply;
 
     public static final String REASON_KEY = "reason_key";
+
+
 
 
     public interface CommentListener {

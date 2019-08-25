@@ -201,7 +201,6 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
     private String name;
     Comment_ commentItem;
     private UserInfo userInfo;
-    // private CallBack mCallBack;
 
     public static final String USER_ID_KEY = "user_id_key";
 
