@@ -22,13 +22,14 @@ public class EducationAdapter extends RecyclerView.Adapter<EducationAdapter.View
     private Context context;
     private ArrayList<Education> arrayList;
     private AboutComponentUpdateListener aboutComponentUpdateListener;
+    private boolean isOwnProfile;
 
-    public EducationAdapter(Context context, ArrayList<Education> arrayList, AboutComponentUpdateListener aboutComponentUpdateListener) {
+    public EducationAdapter(Context context, ArrayList<Education> arrayList, AboutComponentUpdateListener aboutComponentUpdateListener, boolean isOwnProfile) {
         this.context = context;
         this.arrayList = arrayList;
         this.aboutComponentUpdateListener = aboutComponentUpdateListener;
+        this.isOwnProfile = isOwnProfile;
     }
-
 
     @NonNull
     @Override
@@ -60,6 +61,12 @@ public class EducationAdapter extends RecyclerView.Adapter<EducationAdapter.View
             viewHolder.tvInstituteSite.setVisibility(View.VISIBLE);
         } else {
             viewHolder.tvInstituteSite.setVisibility(View.GONE);
+        }
+
+        if (isOwnProfile) {
+            viewHolder.ivEdit.setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.ivEdit.setVisibility(View.INVISIBLE);
         }
 
         String finalInstituteSite = instituteSite;

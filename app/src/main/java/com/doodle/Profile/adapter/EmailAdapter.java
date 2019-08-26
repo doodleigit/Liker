@@ -18,10 +18,12 @@ public class EmailAdapter extends RecyclerView.Adapter<EmailAdapter.ViewHolder> 
 
     private Context context;
     private ArrayList<Email> arrayList;
+    private boolean isOwnProfile;
 
-    public EmailAdapter(Context context, ArrayList<Email> arrayList) {
+    public EmailAdapter(Context context, ArrayList<Email> arrayList, boolean isOwnProfile) {
         this.context = context;
         this.arrayList = arrayList;
+        this.isOwnProfile = isOwnProfile;
     }
 
     @NonNull
@@ -42,6 +44,12 @@ public class EmailAdapter extends RecyclerView.Adapter<EmailAdapter.ViewHolder> 
             viewHolder.tvPermissionIcon.setImageResource(R.drawable.friends);
         } else {
             viewHolder.tvPermissionIcon.setImageResource(R.drawable.public_);
+        }
+
+        if (isOwnProfile) {
+            viewHolder.tvPermissionIcon.setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.tvPermissionIcon.setVisibility(View.INVISIBLE);
         }
     }
 

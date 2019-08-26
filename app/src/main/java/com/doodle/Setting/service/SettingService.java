@@ -245,4 +245,36 @@ public interface SettingService {
             @Field("user_id") String userIds
     );
 
+    @POST(AppConstants.FOLLOW)
+    @FormUrlEncoded
+    Call<String> setFollow(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String userIds,
+            @Field("follow_id") String followId
+    );
+
+    @POST(AppConstants.UNFOLLOW)
+    @FormUrlEncoded
+    Call<String> setUnFollow(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String userIds,
+            @Field("follow_id") String followId
+    );
+
+    @POST(AppConstants.SEND_BROWSER_NOTIFICATION)
+    @FormUrlEncoded
+    Call<String> sendBrowserNotification(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("from_user_id") String userIds,
+            @Field("to_user_id") String toUserId,
+            @Field("content_id") String content_id,
+            @Field("type") String type
+    );
+
 }

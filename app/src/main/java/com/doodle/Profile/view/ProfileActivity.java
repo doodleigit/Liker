@@ -17,13 +17,15 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
+import android.util.DisplayMetrics;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,7 +47,6 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
@@ -64,7 +65,8 @@ public class ProfileActivity extends AppCompatActivity {
     private TabLayout tabLayout;
     //    private ViewPager viewPager;
     private Toolbar toolbar;
-    LinearLayout searchLayout;
+    private ScrollView scrollView;
+    private LinearLayout searchLayout;
     private RelativeLayout coverImageLayout, profileImageLayout;
     private ImageView ivCoverImage, ivProfileImage, ivChangeCoverImage, ivChangeProfileImage;
     private TextView tvUserName, tvTotalInfoCount;
@@ -80,6 +82,7 @@ public class ProfileActivity extends AppCompatActivity {
     private final int REQUEST_TAKE_GALLERY_IMAGE = 102;
     private int uploadContentType = 0;
     private String deviceId, profileId, token, userName, fullName, profileImage, coverImage, allCountInfo;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +102,7 @@ public class ProfileActivity extends AppCompatActivity {
         userName = manager.getUserName();
 
         toolbar = findViewById(R.id.toolbar);
+        scrollView = findViewById(R.id.scrollView);
         searchLayout = findViewById(R.id.search_layout);
         coverImageLayout = findViewById(R.id.cover_image_layout);
         profileImageLayout = findViewById(R.id.profile_image_layout);
@@ -144,6 +148,20 @@ public class ProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 finish();
+            }
+        });
+
+        scrollView.getViewTreeObserver().addOnScrollChangedListener(new ViewTreeObserver.OnScrollChangedListener() {
+            @Override
+            public void onScrollChanged() {
+                View view = (View) scrollView.getChildAt(scrollView.getChildCount() - 1);
+
+                int diff = (view.getBottom() - (scrollView.getHeight() + scrollView
+                        .getScrollY()));
+
+                if (diff == 0) {
+                    sendBroadcast((new Intent()).setAction(AppConstants.PROFILE_PAGE_PAGINATION_BROADCAST));
+                }
             }
         });
     }
@@ -365,7 +383,7 @@ public class ProfileActivity extends AppCompatActivity {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFrag(new PostFragment(), "Post");
         adapter.addFrag(new AboutFragment(), "About");
-        adapter.addFrag(new FriendsFragment(), "Friends");
+        adapter.addFrag(new FollowersFragment(), "Friends");
         adapter.addFrag(new PhotosFragment(), "Photos");
         adapter.addFrag(new StarFragment(), "Star");
         viewPager.setAdapter(adapter);
@@ -379,11 +397,12 @@ public class ProfileActivity extends AppCompatActivity {
 //    }
 
     private void setupTabIcons() {
-        tabLayout.addTab(tabLayout.newTab().setText("Posts"));
-        tabLayout.addTab(tabLayout.newTab().setText("About"));
-        tabLayout.addTab(tabLayout.newTab().setText("Friends"));
-        tabLayout.addTab(tabLayout.newTab().setText("Photos"));
-        tabLayout.addTab(tabLayout.newTab().setText("Stars"));
+        tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.posts)));
+        tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.about)));
+        tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.followers)));
+        tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.followings)));
+        tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.photos)));
+        tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.stars)));
         initialFragment(new PostFragment());
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -394,10 +413,12 @@ public class ProfileActivity extends AppCompatActivity {
                 } else if (tab.getPosition() == 1) {
                     initialFragment(new AboutFragment());
                 } else if (tab.getPosition() == 2) {
-                    initialFragment(new FriendsFragment());
+                    initialFragment(new FollowersFragment());
                 } else if (tab.getPosition() == 3) {
-                    initialFragment(new PhotosFragment());
+                    initialFragment(new FollowingFragment());
                 } else if (tab.getPosition() == 4) {
+                    initialFragment(new PhotosFragment());
+                } else if (tab.getPosition() == 5) {
                     initialFragment(new StarFragment());
                 }
             }

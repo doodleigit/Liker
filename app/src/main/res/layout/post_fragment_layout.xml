@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <LinearLayout
@@ -28,28 +28,29 @@
                     android:layout_marginBottom="10dp"
                     android:src="@drawable/profile" />
 
-                <EditText
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_toEndOf="@+id/image"
-                    android:layout_toStartOf="@+id/add_photo"
                     android:layout_marginStart="8dp"
-                    android:layout_marginEnd="8dp"
                     android:layout_marginTop="12dp"
+                    android:layout_marginEnd="8dp"
                     android:layout_marginBottom="12dp"
+                    android:layout_toStartOf="@+id/add_photo"
+                    android:layout_toEndOf="@+id/image"
+                    android:background="@drawable/rectangle_corner_round_eight"
+                    android:gravity="start|center"
                     android:paddingStart="20dp"
                     android:paddingEnd="20dp"
-                    android:background="@drawable/rectangle_corner_round_eight"
                     android:text="What's on your mind?"
-                    android:textSize="14sp"/>
+                    android:textSize="14sp" />
 
                 <LinearLayout
                     android:id="@+id/add_photo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="10dp"
-                    android:layout_centerInParent="true"
                     android:layout_alignParentEnd="true"
+                    android:layout_centerInParent="true"
+                    android:layout_marginEnd="10dp"
                     android:orientation="vertical">
 
                     <ImageView
@@ -73,10 +74,17 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@color/colorWhite"
-            android:layout_marginTop="10dp"/>
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp" />
 
     </LinearLayout>
 
-</android.support.constraint.ConstraintLayout>
+    <ProgressBar
+        android:id="@+id/progress_view"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
+</RelativeLayout>

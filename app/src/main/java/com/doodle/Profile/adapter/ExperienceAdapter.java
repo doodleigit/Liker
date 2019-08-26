@@ -20,11 +20,13 @@ public class ExperienceAdapter extends RecyclerView.Adapter<ExperienceAdapter.Vi
     private Context context;
     private ArrayList<Experience> arrayList;
     private AboutComponentUpdateListener aboutComponentUpdateListener;
+    private boolean isOwnProfile;
 
-    public ExperienceAdapter(Context context, ArrayList<Experience> arrayList, AboutComponentUpdateListener aboutComponentUpdateListener) {
+    public ExperienceAdapter(Context context, ArrayList<Experience> arrayList, AboutComponentUpdateListener aboutComponentUpdateListener, boolean isOwnProfile) {
         this.context = context;
         this.arrayList = arrayList;
         this.aboutComponentUpdateListener = aboutComponentUpdateListener;
+        this.isOwnProfile = isOwnProfile;
     }
 
     @NonNull
@@ -54,6 +56,12 @@ public class ExperienceAdapter extends RecyclerView.Adapter<ExperienceAdapter.Vi
         viewHolder.tvCompanyName.setText(companyName);
         viewHolder.tvDuration.setText(duration);
         viewHolder.tvSummary.setText(summary);
+
+        if (isOwnProfile) {
+            viewHolder.ivEdit.setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.ivEdit.setVisibility(View.INVISIBLE);
+        }
 
         viewHolder.ivEdit.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -997,7 +997,7 @@ public class Home extends AppCompatActivity implements
                 break;
 
             case R.id.imageProfile:
-                startActivity(new Intent(this, ProfileActivity.class));
+                startActivity(new Intent(this, ProfileActivity.class).putExtra("user_id", userId));
                 break;
 
             case R.id.imageStarContributor:

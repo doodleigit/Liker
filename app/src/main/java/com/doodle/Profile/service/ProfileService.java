@@ -1,9 +1,13 @@
 package com.doodle.Profile.service;
 
+import com.doodle.Comment.model.CommentItem;
+import com.doodle.Home.model.PostItem;
 import com.doodle.Profile.model.AlbumPhoto;
 import com.doodle.Profile.model.AllFriend;
 import com.doodle.Profile.model.Cities;
 import com.doodle.Profile.model.Country;
+import com.doodle.Profile.model.Followers;
+import com.doodle.Profile.model.Following;
 import com.doodle.Profile.model.PhoneCountry;
 import com.doodle.Profile.model.PhotoAlbum;
 import com.doodle.Profile.model.RecentPhoto;
@@ -12,6 +16,7 @@ import com.doodle.Profile.model.UserAllInfo;
 import com.doodle.utils.AppConstants;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.MultipartBody;
 import retrofit2.Call;
@@ -561,6 +566,103 @@ public interface ProfileService {
             @Header("User-Id") String userId,
             @Field("user_id") String id,
             @Field("phone_number") String phoneNumber
+    );
+
+    @POST(AppConstants.FOLLOW)
+    @FormUrlEncoded
+    Call<String> setFollow(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String userIds,
+            @Field("follow_id") String followId
+    );
+
+    @POST(AppConstants.UNFOLLOW)
+    @FormUrlEncoded
+    Call<String> setUnFollow(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String userIds,
+            @Field("follow_id") String followId
+    );
+
+    @POST(AppConstants.SEND_BROWSER_NOTIFICATION)
+    @FormUrlEncoded
+    Call<String> sendBrowserNotification(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("from_user_id") String userIds,
+            @Field("to_user_id") String toUserId,
+            @Field("content_id") String content_id,
+            @Field("type") String type
+    );
+
+    @POST(AppConstants.GET_FOLLOWERS)
+    @FormUrlEncoded
+    Call<Followers> getFollowers(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String userIds,
+            @Field("profile_user_id") String toUserId,
+            @Field("limit") int limit,
+            @Field("offset") int offset,
+            @Field("fetch_more") boolean fetchMore
+    );
+
+    @POST(AppConstants.GET_FOLLOWINGS)
+    @FormUrlEncoded
+    Call<Following> getFollowings(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String userIds,
+            @Field("profile_user_id") String toUserId,
+            @Field("limit") int limit,
+            @Field("offset") int offset,
+            @Field("fetch_more") boolean fetchMore
+    );
+
+    @POST(AppConstants.WALL_FEED)
+    @FormUrlEncoded
+    Call<List<PostItem>> feed(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("user_id") String userIds,
+            @Field("limit") int limit,
+            @Field("offset") int offset,
+            @Field("cat_id") String cat_id,
+            @Field("profile_username") String profileUsername,
+            @Field("is_public") boolean isPublic
+    );
+
+    @POST(AppConstants.POST_DELETE)
+    @FormUrlEncoded
+    Call<String> postDelete(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("user_id") String userIds,
+            @Field("post_id") String postId
+    );
+
+    //https://www.stg.liker.com/get_postscomments
+    @POST(AppConstants.GET_POST_COMMENTS)
+    @FormUrlEncoded
+    Call<CommentItem> getPostComments(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("is_public") String isPublic,
+            @Field("limit") int limit,
+            @Field("offset") int offset,
+            @Field("orderby") String orderBy,
+            @Field("post_id") String feed,
+            @Field("user_id") String userIds
     );
 
 }

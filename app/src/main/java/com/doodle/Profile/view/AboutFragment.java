@@ -110,7 +110,8 @@ public class AboutFragment extends Fragment {
     private ArrayList<Links> links;
     private ArrayList<PhoneCountry> phoneCountries;
 
-    private String deviceId, profileId, token, userIds;
+    private String deviceId, profileId, profileUserId, token, userIds;
+    private boolean isOwnProfile;
 
     private EmailAdapter emailAdapter;
     private PhoneAdapter phoneAdapter;
@@ -149,6 +150,7 @@ public class AboutFragment extends Fragment {
         links = new ArrayList<>();
         phoneCountries = new ArrayList<>();
 
+        profileUserId = getArguments().getString("user_id");
         deviceId = manager.getDeviceId();
         profileId = manager.getProfileId();
         token = manager.getToken();
@@ -203,6 +205,8 @@ public class AboutFragment extends Fragment {
         socialRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         socialRecyclerView.setNestedScrollingEnabled(false);
 
+        ownProfileCheck();
+
         AboutComponentUpdateListener aboutComponentUpdateListener = new AboutComponentUpdateListener() {
             @Override
             public void onEducationUpdate(Education education) {
@@ -230,14 +234,14 @@ public class AboutFragment extends Fragment {
             }
         };
 
-        emailAdapter = new EmailAdapter(getActivity(), emails);
-        phoneAdapter = new PhoneAdapter(getActivity(), phones);
+        emailAdapter = new EmailAdapter(getActivity(), emails, isOwnProfile);
+        phoneAdapter = new PhoneAdapter(getActivity(), phones, isOwnProfile);
         storyAdapter = new StoryAdapter(getActivity(), stories);
-        educationAdapter = new EducationAdapter(getActivity(), educations, aboutComponentUpdateListener);
-        experienceAdapter = new ExperienceAdapter(getActivity(), experiences, aboutComponentUpdateListener);
-        awardsAdapter = new AwardsAdapter(getActivity(), awards, aboutComponentUpdateListener);
-        certificationAdapter = new CertificationAdapter(getActivity(), certifications, aboutComponentUpdateListener);
-        socialAdapter = new SocialAdapter(getActivity(), links, aboutComponentUpdateListener);
+        educationAdapter = new EducationAdapter(getActivity(), educations, aboutComponentUpdateListener, isOwnProfile);
+        experienceAdapter = new ExperienceAdapter(getActivity(), experiences, aboutComponentUpdateListener, isOwnProfile);
+        awardsAdapter = new AwardsAdapter(getActivity(), awards, aboutComponentUpdateListener, isOwnProfile);
+        certificationAdapter = new CertificationAdapter(getActivity(), certifications, aboutComponentUpdateListener, isOwnProfile);
+        socialAdapter = new SocialAdapter(getActivity(), links, aboutComponentUpdateListener, isOwnProfile);
 
         emailRecyclerView.setAdapter(emailAdapter);
         phoneRecyclerView.setAdapter(phoneAdapter);
@@ -287,6 +291,26 @@ public class AboutFragment extends Fragment {
             }
         });
 
+    }
+
+    private void ownProfileCheck() {
+        if (profileId.equals(profileUserId)) {
+            isOwnProfile = true;
+            ivEditUserInfo.setVisibility(View.VISIBLE);
+            ivAddEducation.setVisibility(View.VISIBLE);
+            ivAddAwards.setVisibility(View.VISIBLE);
+            ivAddCertificate.setVisibility(View.VISIBLE);
+            ivAddExperience.setVisibility(View.VISIBLE);
+            ivAddSocialLinks.setVisibility(View.VISIBLE);
+        } else {
+            isOwnProfile = false;
+            ivEditUserInfo.setVisibility(View.INVISIBLE);
+            ivAddEducation.setVisibility(View.INVISIBLE);
+            ivAddAwards.setVisibility(View.INVISIBLE);
+            ivAddCertificate.setVisibility(View.INVISIBLE);
+            ivAddExperience.setVisibility(View.INVISIBLE);
+            ivAddSocialLinks.setVisibility(View.INVISIBLE);
+        }
     }
 
     private void setData() {

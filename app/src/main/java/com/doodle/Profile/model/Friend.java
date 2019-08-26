@@ -2,14 +2,15 @@
 package com.doodle.Profile.model;
 
 import java.io.Serializable;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.Parcelable.Creator;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Friend implements Serializable, Parcelable
-{
+public class Friend implements Serializable, Parcelable {
 
     @SerializedName("id")
     @Expose
@@ -63,7 +64,7 @@ public class Friend implements Serializable, Parcelable
 
 
         @SuppressWarnings({
-            "unchecked"
+                "unchecked"
         })
         public Friend createFromParcel(Parcel in) {
             return new Friend(in);
@@ -73,8 +74,7 @@ public class Friend implements Serializable, Parcelable
             return (new Friend[size]);
         }
 
-    }
-    ;
+    };
     private final static long serialVersionUID = 64324038426518160L;
 
     protected Friend(Parcel in) {
@@ -247,7 +247,7 @@ public class Friend implements Serializable, Parcelable
     }
 
     public int describeContents() {
-        return  0;
+        return 0;
     }
 
 }

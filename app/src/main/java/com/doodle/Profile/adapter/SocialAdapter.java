@@ -23,11 +23,13 @@ public class SocialAdapter extends RecyclerView.Adapter<SocialAdapter.ViewHolder
     private Context context;
     private ArrayList<Links> arrayList;
     private AboutComponentUpdateListener aboutComponentUpdateListener;
+    private boolean isOwnProfile;
 
-    public SocialAdapter(Context context, ArrayList<Links> arrayList, AboutComponentUpdateListener aboutComponentUpdateListener) {
+    public SocialAdapter(Context context, ArrayList<Links> arrayList, AboutComponentUpdateListener aboutComponentUpdateListener, boolean isOwnProfile) {
         this.context = context;
         this.arrayList = arrayList;
         this.aboutComponentUpdateListener = aboutComponentUpdateListener;
+        this.isOwnProfile = isOwnProfile;
     }
 
     @NonNull
@@ -51,6 +53,12 @@ public class SocialAdapter extends RecyclerView.Adapter<SocialAdapter.ViewHolder
             if (!link.startsWith("http://") && !link.startsWith("https://")) {
                 link = "http://" + link;
             }
+        }
+
+        if (isOwnProfile) {
+            viewHolder.ivEdit.setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.ivEdit.setVisibility(View.INVISIBLE);
         }
 
         String finalInstituteSite = link;

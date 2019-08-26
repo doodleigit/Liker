@@ -8,19 +8,23 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.doodle.R;
 import com.doodle.Setting.adapter.PeopleMayKnowAdapter;
 import com.doodle.Setting.model.PeopleMayKnow;
+import com.doodle.Setting.service.FollowUnfollowClickListener;
 import com.doodle.Setting.service.SettingService;
 import com.doodle.utils.PrefManager;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -73,7 +77,19 @@ public class SuggestedFriendsFragment extends Fragment {
         token = manager.getToken();
         userIds = manager.getProfileId();
 
-        peopleMayKnowAdapter = new PeopleMayKnowAdapter(getActivity(), peopleMayKnows);
+        FollowUnfollowClickListener followUnfollowClickListener = new FollowUnfollowClickListener() {
+            @Override
+            public void onFollowClick(String followUserId, int position) {
+                setFollow(followUserId, position);
+            }
+
+            @Override
+            public void onUnFollowClick(String followUserId, int position) {
+                setUnFollow(followUserId, position);
+            }
+        };
+
+        peopleMayKnowAdapter = new PeopleMayKnowAdapter(getActivity(), peopleMayKnows, followUnfollowClickListener);
 
         progressBar = view.findViewById(R.id.progress_bar);
         tvAlertText = view.findViewById(R.id.alertText);
@@ -165,6 +181,79 @@ public class SuggestedFriendsFragment extends Fragment {
             @Override
             public void onFailure(Call<ArrayList<PeopleMayKnow>> call, Throwable t) {
                 progressBar.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    private void setFollow(String followUserId, int position) {
+        progressDialog.show();
+        Call<String> call = settingService.setFollow(deviceId, token, userIds, userIds, followUserId);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                String jsonResponse = response.body();
+                try {
+                    JSONObject obj = new JSONObject(jsonResponse);
+                    boolean status = obj.getBoolean("status");
+                    if (status) {
+                        peopleMayKnows.get(position).getPrivacy().setIsFollowing(true);
+                        peopleMayKnowAdapter.notifyItemChanged(position);
+                        sendBrowserNotification(followUserId);
+                    } else {
+                        Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                progressDialog.hide();
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                progressDialog.hide();
+            }
+        });
+    }
+
+    private void setUnFollow(String followUserId, int position) {
+        progressDialog.show();
+        Call<String> call = settingService.setUnFollow(deviceId, token, userIds, userIds, followUserId);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                String jsonResponse = response.body();
+                try {
+                    JSONObject obj = new JSONObject(jsonResponse);
+                    boolean status = obj.getBoolean("status");
+                    if (status) {
+                        peopleMayKnows.get(position).getPrivacy().setIsFollowing(false);
+                        peopleMayKnowAdapter.notifyItemChanged(position);
+                    } else {
+                        Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                progressDialog.hide();
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                progressDialog.hide();
+            }
+        });
+    }
+
+    private void sendBrowserNotification(String followUserId) {
+        Call<String> call = settingService.sendBrowserNotification(deviceId, token, userIds, userIds, followUserId, "0", "follow");
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
             }
         });
     }
