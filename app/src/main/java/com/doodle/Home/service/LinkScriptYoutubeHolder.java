@@ -42,6 +42,7 @@ import com.doodle.Comment.view.fragment.ReportReasonSheet;
 import com.doodle.Home.model.PostFooter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.postshare.PostShareItem;
+import com.doodle.Home.view.activity.EditPost;
 import com.doodle.Home.view.activity.Home;
 import com.doodle.Home.view.activity.PostShare;
 import com.doodle.R;
@@ -136,9 +137,16 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
     private boolean notificationOff;
     private String postPermissions;
 
-    public LinkScriptYoutubeHolder(View itemView,Context context) {
+    //Delete post
+    public LinkScriptYoutubeHolder.PostItemListener listener;
+    public interface PostItemListener {
+        void deletePost(PostItem postItem, int position);
+    }
+
+    public LinkScriptYoutubeHolder(View itemView,Context context,LinkScriptYoutubeHolder.PostItemListener listener) {
         super(itemView);
         mContext=context;
+        this.listener=listener;
         callbackManager = CallbackManager.Factory.create();
         shareDialog = new ShareDialog((Activity) context);
         manager = new PrefManager(App.getAppContext());
@@ -209,9 +217,10 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
 
     }
 
-
-    public void setItem(PostItem item) {
+    int position;
+    public void setItem(PostItem item, int position) {
         this.item = item;
+         this.position=position;
 
         userPostId = item.getPostId();
 
@@ -597,7 +606,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
                     popupMenu.getMenu().findItem(R.id.onlyMe).setVisible(true);
                     popupMenu.getMenu().findItem(R.id.edit).setVisible(true);
                     popupMenu.getMenu().findItem(R.id.delete).setVisible(true);
-                    popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(true);
+                   // popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(true);
                 } else {
                     popupMenu.getMenu().findItem(R.id.blockedUser).setVisible(true);
                     popupMenu.getMenu().findItem(R.id.reportedPost).setVisible(true);
@@ -606,7 +615,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
                     popupMenu.getMenu().findItem(R.id.onlyMe).setVisible(false);
                     popupMenu.getMenu().findItem(R.id.edit).setVisible(false);
                     popupMenu.getMenu().findItem(R.id.delete).setVisible(false);
-                    popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(true);
+                   // popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(true);
                 }
 
 
@@ -693,10 +702,14 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
                         }
 
                         if (id == R.id.edit) {
-                            Toast.makeText(App.getAppContext(), "edit : ", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(mContext, EditPost.class);
+                            App.setPosition(position);
+                            intent.putExtra(ITEM_KEY,(Parcelable) item);
+                            mContext.startActivity(intent);
+                            ((Activity) mContext ).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
                         }
                         if (id == R.id.delete) {
-                            Toast.makeText(App.getAppContext(), "delete : ", Toast.LENGTH_SHORT).show();
+                            listener.deletePost(item,position);
                         }
                         if (id == R.id.turnOffNotification) {
                             activity = (AppCompatActivity) v.getContext();

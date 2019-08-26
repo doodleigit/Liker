@@ -2,7 +2,11 @@ package com.doodle.Post.service;
 
 import com.doodle.Post.model.CategoryItem;
 import com.doodle.Post.model.MentionUser;
+import com.doodle.Post.model.MultipleMediaFile;
 import com.doodle.utils.AppConstants;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -90,16 +94,52 @@ public interface PostService {
             @Field("user_name") String userName,
             @Field("friends") String friends,
             @Field("schedule_time") int scheduleTime,
-            @Field("has_meme") int hasMeme
+            @Field("has_meme") int hasMeme,
+            @Field("files") String mediaFiles
     );
 
-//
-//    @POST(AppConstants.TEST)
-//    @FormUrlEncoded
-//    Call<String> postImage(
-//            @Field("azhar") Bitmap userIds
-//
-//    );
+
+
+    @POST(AppConstants.POST_EDITED)
+    @FormUrlEncoded
+    Call<String> postEdited(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("user_id") int userIds,
+            @Field("to_user_id") String toUserId,
+            @Field("post_type") String postType,
+            @Field("status") int status,
+            @Field("image") String image,
+            @Field("file_encode") String fileEncoded,
+            @Field("post_permission") int postPermission,
+            @Field("category_id") int categoryId,
+            @Field("sub_category_id") int subCategoryId,
+            @Field("content_type") int contentType,
+            @Field("content_title") String contentTitle,
+            @Field("content_link_url") String contentLinkUrl,
+            @Field("content_link_host") String contentLinkHost,
+            @Field("content_link_title") String contentLinkTitle,
+            @Field("content_link_desc") String contentLinkDesc,
+            @Field("content_link_image") String contentLinkImage,
+            @Field("video_tmp_link") String videoTmpLink,
+            @Field("user_name") String userName,
+            @Field("friends") String friends,
+            @Field("schedule_time") int scheduleTime,
+            @Field("has_meme") int hasMeme,
+            @Field("content_new_scrap") int contentNewScrap,
+            @Field("post_id") String postId
+    );
+
+/*
+
+
+content_new_scrap	0
+post_id	13656
+
+
+
+* */
 
 
     @Multipart

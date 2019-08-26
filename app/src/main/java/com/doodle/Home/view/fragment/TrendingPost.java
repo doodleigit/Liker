@@ -27,8 +27,12 @@ import com.doodle.Comment.model.CommentItem;
 import com.doodle.Home.adapter.BreakingPostAdapter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.service.HomeService;
+import com.doodle.Home.service.ImageHolder;
+import com.doodle.Home.service.LinkScriptHolder;
+import com.doodle.Home.service.LinkScriptYoutubeHolder;
 import com.doodle.Home.service.TextHolder;
 import com.doodle.Home.service.TextMimHolder;
+import com.doodle.Home.service.VideoHolder;
 import com.doodle.Home.view.activity.Home;
 import com.doodle.R;
 import com.doodle.utils.AppConstants;
@@ -54,8 +58,7 @@ import retrofit2.Response;
  */
 public class TrendingPost extends Fragment   {
 
-    TextHolder.PostItemListener postItemListener;
-    TextMimHolder.PostItemListener mimListener;
+
     public TrendingPost() {
         // Required empty public constructor
     }
@@ -87,6 +90,11 @@ public class TrendingPost extends Fragment   {
 
     //Delete post item
     public static TextHolder.PostItemListener mCallback;
+    public static TextMimHolder.PostItemListener mimListener;
+    public static VideoHolder.PostItemListener videoListener;
+    public static LinkScriptYoutubeHolder.PostItemListener youtubeListener;
+    public static LinkScriptHolder.PostItemListener linkListener;
+    public static ImageHolder.PostItemListener imageListener;
     PostItem deletePostItem;
     int deletePosition;
 
@@ -154,7 +162,7 @@ public class TrendingPost extends Fragment   {
             }
         });
 
-        postItemListener=new TextHolder.PostItemListener() {
+        mCallback=new TextHolder.PostItemListener() {
             @Override
             public void deletePost(PostItem postItem, int position) {
                 deletePosition=position;
@@ -170,6 +178,45 @@ public class TrendingPost extends Fragment   {
                 TrendingPost.this.deletePost(deletePostItem, deletePosition);
             }
         };
+
+
+        videoListener = new VideoHolder.PostItemListener() {
+            @Override
+            public void deletePost(PostItem postItem, int position) {
+                deletePosition = position;
+                deletePostItem = postItem;
+                TrendingPost.this.deletePost(deletePostItem, deletePosition);
+            }
+        };
+
+        youtubeListener =new LinkScriptYoutubeHolder.PostItemListener() {
+            @Override
+            public void deletePost(PostItem postItem, int position) {
+                deletePosition = position;
+                deletePostItem = postItem;
+                TrendingPost.this.deletePost(deletePostItem, deletePosition);
+            }
+        };
+
+        linkListener = new LinkScriptHolder.PostItemListener() {
+            @Override
+            public void deletePost(PostItem postItem, int position) {
+                deletePosition = position;
+                deletePostItem = postItem;
+                TrendingPost.this.deletePost(deletePostItem, deletePosition);
+            }
+        };
+
+        imageListener = new ImageHolder.PostItemListener() {
+            @Override
+            public void deletePost(PostItem postItem, int position) {
+                deletePosition = position;
+                deletePostItem = postItem;
+                TrendingPost.this.deletePost(deletePostItem, deletePosition);
+            }
+        };
+
+
 
         return root;
     }
@@ -413,8 +460,7 @@ public class TrendingPost extends Fragment   {
                 comments = commentItem.getComments();
                 Log.d("commentItem", commentItem.toString());
                 if (postItemList != null && comments != null) {
-                    adapter = new BreakingPostAdapter(getActivity(), postItemList,postItemListener,mimListener);
-
+                    adapter = new BreakingPostAdapter(getActivity(), postItemList, mCallback, mimListener,videoListener,youtubeListener,linkListener,imageListener);
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {

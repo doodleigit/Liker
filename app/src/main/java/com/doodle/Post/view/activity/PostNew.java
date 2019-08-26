@@ -66,6 +66,7 @@ import com.doodle.Post.model.Category;
 import com.doodle.Post.model.CategoryItem;
 import com.doodle.Post.model.MentionUser;
 import com.doodle.Post.model.Mim;
+import com.doodle.Post.model.MultipleMediaFile;
 import com.doodle.Post.model.PostImage;
 import com.doodle.Post.model.PostVideo;
 import com.doodle.Post.model.Subcatg;
@@ -81,6 +82,7 @@ import com.doodle.utils.PageTransformer;
 import com.doodle.utils.PrefManager;
 import com.doodle.utils.Utils;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
+import com.google.gson.Gson;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewCallback;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.leocardz.link.preview.library.LinkPreviewCallback;
@@ -91,6 +93,7 @@ import com.squareup.picasso.Target;
 import com.vanniktech.emoji.EmojiEditText;
 import com.vanniktech.emoji.EmojiPopup;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -255,6 +258,14 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
     private int postId;
     private String name;
 
+    //Multiple Media File
+    List<String> mediaFiles;
+    JSONObject mediaObject;
+    JSONArray jsonArray;
+    String stringMediaFile;
+    JSONObject jsonObject;
+    List<JSONObject> jsonObjects;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -267,6 +278,11 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
         networkOk = NetworkHelper.hasNetworkAccess(this);
         progressView = (CircularProgressView) findViewById(R.id.progress_view);
         mView = new View(this);
+        mediaFiles = new ArrayList<>();
+        mediaObject = new JSONObject();
+        jsonArray = new JSONArray();
+        jsonObject = new JSONObject();
+        jsonObjects = new ArrayList<>();
 
         mediaRecyclerView = findViewById(R.id.rvPostMedia);
         mimRecyclerView = (RecyclerView) findViewById(R.id.rvMim);
@@ -1015,11 +1031,11 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                     profileId,//"june8045",
                     friends,//"",
                     scheduleTime,//0,
-                    hasMim//0
+                    hasMim,//0
+                    mediaFiles.toString()
             );
             sendNewPostRequest(call);
-        }
-        else {
+        } else {
             Utils.showNetworkDialog(getSupportFragmentManager());
             progressView.setVisibility(View.GONE);
             progressView.stopAnimation();
@@ -1457,6 +1473,18 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                             JSONObject object = new JSONObject(response.body());
                             imageFile = object.getString("filename");
                             uploadImageName.add(imageFile);
+                            MultipleMediaFile mediaFile = new MultipleMediaFile();
+                            mediaFile.setBase64Md5(fileEncoded);
+                            // mediaFile.setDuration();
+                            mediaFile.setFileType("image");
+                            // mediaFile.setImageName();
+                            //   mediaFile.setLargeImageName();
+                            mediaFile.setName(imageFile);
+                            Gson gson = new Gson();
+                            String gsonString = gson.toJson(mediaFile);
+                            mediaFiles.add(gsonString);
+
+
                             if (!isNullOrEmpty(imageFilePath)) {
                                 String imagePath = "file://" + imageFilePath;
                                 postImages.add(new PostImage(imagePath));
@@ -1468,7 +1496,9 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                                 progressView.setVisibility(View.GONE);
                                 progressView.stopAnimation();
                             }
-                          /*  if (!isNullOrEmpty(videoFilePath)) {
+
+
+                            /*  if (!isNullOrEmpty(videoFilePath)) {
                                 String videoPath = "file://" + videoFilePath;
                                 postVideos.add(new PostVideo(videoPath));
                                 if (postVideos.size() > 0)

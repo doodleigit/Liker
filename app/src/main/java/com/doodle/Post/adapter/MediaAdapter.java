@@ -17,6 +17,7 @@ import com.doodle.Post.model.PostImage;
 import com.doodle.Post.model.PostVideo;
 import com.doodle.Post.view.activity.GalleryView;
 import com.doodle.R;
+import com.doodle.utils.AppConstants;
 
 import java.util.List;
 
@@ -87,7 +88,7 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     public class ImageViewHolder extends RecyclerView.ViewHolder {
-        ImageView imgPost,imgPostCancel;
+        ImageView imgPost, imgPostCancel;
 
         public ImageViewHolder(View itemView) {
             super(itemView);
@@ -99,24 +100,32 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         @SuppressLint("ClickableViewAccessibility")
         public void populate(PostImage postImage) {
 
-            String imagePhoto =postImage.getImagePath();
-            if (imagePhoto != null && imagePhoto.length() > 0) {
+            String imagePhoto = postImage.getImagePath();
 
+            if (imagePhoto.startsWith("file:")) {
                 Glide.with(App.getAppContext()).load(imagePhoto)
                         .skipMemoryCache(false)
                         .into(imgPost);
-
+            } else {
+                String postImages = AppConstants.POST_IMAGES + imagePhoto;
+                Glide.with(App.getAppContext())
+                        .load(postImages)
+                        .centerCrop()
+                        .dontAnimate()
+                        .into(imgPost);
             }
+
 
             imgPostCancel.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
                     postImages.remove(getPosition());
                     notifyDataSetChanged();
-
                     return false;
                 }
             });
+
+
         }
     }
 
@@ -146,7 +155,7 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 @Override
                 public void onClick(View view) {
                     Intent intent_gallery = new Intent(context, GalleryView.class);
-                    intent_gallery.putExtra("video",videoPhoto);
+                    intent_gallery.putExtra("video", videoPhoto);
                     intent_gallery.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     App.getAppContext().startActivity(intent_gallery);
                 }

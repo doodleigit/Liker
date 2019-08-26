@@ -49,6 +49,7 @@ import com.doodle.Comment.view.fragment.ReportReasonSheet;
 import com.doodle.Home.model.PostFooter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.postshare.PostShareItem;
+import com.doodle.Home.view.activity.EditPost;
 import com.doodle.Home.view.activity.Home;
 import com.doodle.Home.view.activity.PostShare;
 import com.doodle.R;
@@ -96,7 +97,7 @@ import static java.lang.Integer.parseInt;
 public class VideoHolder extends RecyclerView.ViewHolder {
 
 
-    public TextView tvHeaderInfo, tvPostTime, tvPostUserName, tvImgShareCount, tvPostLikeCount, tvLinkScriptText,tvCommentCount;
+    public TextView tvHeaderInfo, tvPostTime, tvPostUserName, tvImgShareCount, tvPostLikeCount, tvLinkScriptText, tvCommentCount;
     public CircleImageView imagePostUser;
     public ReadMoreTextView tvPostContent;
     public EmojiTextView tvPostEmojiContent;
@@ -126,7 +127,7 @@ public class VideoHolder extends RecyclerView.ViewHolder {
     RelativeLayout commentHold;
     private String commentText, commentUserName, commentUserImage, commentImage, commentTime;
     public EmojiTextView tvCommentMessage;
-    public ImageView imagePostCommenting, imageCommentLikeThumb, imageCommentSettings,imagePostComment;
+    public ImageView imagePostCommenting, imageCommentLikeThumb, imageCommentSettings, imagePostComment;
     public CircleImageView imageCommentUser;
     public TextView tvCommentUserName, tvCommentTime, tvCommentLike, tvCommentReply, tvCountCommentLike;
     private String userPostId;
@@ -145,11 +146,22 @@ public class VideoHolder extends RecyclerView.ViewHolder {
     private String postPermissions;
     private boolean notificationOff;
 
-    public VideoHolder(View itemView, Context context) {
+
+    //Delete post
+    public VideoHolder.PostItemListener listener;
+
+    public interface PostItemListener {
+        void deletePost(PostItem postItem, int position);
+
+    }
+
+    public VideoHolder(View itemView, Context context, PostItemListener listener) {
         super(itemView);
 
 
         mContext = context;
+        this.listener = listener;
+
         callbackManager = CallbackManager.Factory.create();
         shareDialog = new ShareDialog((Activity) context);
         manager = new PrefManager(App.getAppContext());
@@ -174,8 +186,7 @@ public class VideoHolder extends RecyclerView.ViewHolder {
         tvLinkScriptText = (ReadMoreTextView) itemView.findViewById(R.id.tvLinkScriptText);
         tvPostEmojiContent = (EmojiTextView) itemView.findViewById(R.id.tvPostEmojiContent);
         postBodyLayer = (LinearLayout) itemView.findViewById(R.id.postBodyLayer);
-        tvCommentCount =  itemView.findViewById(R.id.tvCommentCount);
-
+        tvCommentCount = itemView.findViewById(R.id.tvCommentCount);
 
 
         star1 = itemView.findViewById(R.id.star1);
@@ -221,9 +232,11 @@ public class VideoHolder extends RecyclerView.ViewHolder {
         mProgressBar = (ProgressBar) itemView.findViewById(R.id.ProgressBar);
     }
 
+    int position;
 
-    public void setItem(PostItem item) {
+    public void setItem(PostItem item, int position) {
         this.item = item;
+        this.position = position;
         userPostId = item.getPostId();
 
         String postPermission = item.getPermission();
@@ -277,7 +290,7 @@ public class VideoHolder extends RecyclerView.ViewHolder {
 
         }
 
-        if(!isNullOrEmpty(item.getTotalComment())&& !"0".equalsIgnoreCase(item.getTotalComment())){
+        if (!isNullOrEmpty(item.getTotalComment()) && !"0".equalsIgnoreCase(item.getTotalComment())) {
             tvCommentCount.setText(item.getTotalComment());
         }
 
@@ -627,7 +640,7 @@ public class VideoHolder extends RecyclerView.ViewHolder {
                     popupMenu.getMenu().findItem(R.id.onlyMe).setVisible(true);
                     popupMenu.getMenu().findItem(R.id.edit).setVisible(true);
                     popupMenu.getMenu().findItem(R.id.delete).setVisible(true);
-                  //  popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(true);
+                    //  popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(true);
                 } else {
                     popupMenu.getMenu().findItem(R.id.blockedUser).setVisible(true);
                     popupMenu.getMenu().findItem(R.id.reportedPost).setVisible(true);
@@ -636,7 +649,7 @@ public class VideoHolder extends RecyclerView.ViewHolder {
                     popupMenu.getMenu().findItem(R.id.onlyMe).setVisible(false);
                     popupMenu.getMenu().findItem(R.id.edit).setVisible(false);
                     popupMenu.getMenu().findItem(R.id.delete).setVisible(false);
-                //    popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(true);
+                    //    popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(true);
                 }
 
 
@@ -661,8 +674,6 @@ public class VideoHolder extends RecyclerView.ViewHolder {
                 }
 
 
-
-
 //                popup.show();
                 MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popupMenu.getMenu(), v);
                 menuHelper.setForceShowIcon(true);
@@ -677,7 +688,7 @@ public class VideoHolder extends RecyclerView.ViewHolder {
                             if (!((Activity) mContext).isFinishing()) {
                                 App.setItem(item);
                                 showBlockUser(v);
-                            }else {
+                            } else {
                                 dismissDialog();
                             }
 
@@ -725,10 +736,13 @@ public class VideoHolder extends RecyclerView.ViewHolder {
                         }
 
                         if (id == R.id.edit) {
-                            Toast.makeText(App.getAppContext(), "edit : ", Toast.LENGTH_SHORT).show();
-                        }
+                            Intent intent = new Intent(mContext, EditPost.class);
+                            App.setPosition(position);
+                            intent.putExtra(ITEM_KEY,(Parcelable) item);
+                            mContext.startActivity(intent);
+                            ((Activity) mContext ).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);                        }
                         if (id == R.id.delete) {
-                            Toast.makeText(App.getAppContext(), "delete : ", Toast.LENGTH_SHORT).show();
+                            listener.deletePost(item, position);
                         }
                         if (id == R.id.turnOffNotification) {
                             activity = (AppCompatActivity) v.getContext();
@@ -769,12 +783,12 @@ public class VideoHolder extends RecyclerView.ViewHolder {
                 popupCommentMenu = new PopupMenu(mContext, v);
                 popupCommentMenu.getMenuInflater().inflate(R.menu.post_comment_menu, popupCommentMenu.getMenu());
 
-                if(userPostId.equalsIgnoreCase(commentPostId)){
+                if (userPostId.equalsIgnoreCase(commentPostId)) {
                     popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(false);
                     popupCommentMenu.getMenu().findItem(R.id.blockUser).setVisible(false);
                     popupCommentMenu.getMenu().findItem(R.id.editComment).setVisible(true);
                     popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(true);
-                }else {
+                } else {
                     popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(true);
                     popupCommentMenu.getMenu().findItem(R.id.blockUser).setVisible(true);
                     popupCommentMenu.getMenu().findItem(R.id.editComment).setVisible(false);
@@ -840,7 +854,6 @@ public class VideoHolder extends RecyclerView.ViewHolder {
         });
 
 
-
     }
 
     private void sendReportReason(Call<ReportReason> call) {
@@ -852,11 +865,11 @@ public class VideoHolder extends RecyclerView.ViewHolder {
 
                 if (response.body() != null) {
                     ReportReason reportReason = response.body();
-                    boolean isFollowed=reportReason.isFollowed();
+                    boolean isFollowed = reportReason.isFollowed();
                     App.setIsFollow(isFollowed);
-                    List<Reason> reasonList=reportReason.getReason();
-                    PostItem item=new PostItem();
-                    CommentItem commentItems=new CommentItem();
+                    List<Reason> reasonList = reportReason.getReason();
+                    PostItem item = new PostItem();
+                    CommentItem commentItems = new CommentItem();
                     ReportReasonSheet reportReasonSheet = ReportReasonSheet.newInstance(reasonList);
                     reportReasonSheet.show(activity.getSupportFragmentManager(), "ReportReasonSheet");
 
@@ -881,7 +894,7 @@ public class VideoHolder extends RecyclerView.ViewHolder {
             public void onResponse(Call<CommentItem> mCall, Response<CommentItem> response) {
 
 
-                if(response.body()!=null){
+                if (response.body() != null) {
                     CommentItem commentItem = response.body();
                     Intent intent = new Intent(mContext, CommentPost.class);
                     intent.putExtra(COMMENT_KEY, (Parcelable) commentItem);
@@ -958,7 +971,6 @@ public class VideoHolder extends RecyclerView.ViewHolder {
         }
         return bitmap;
     }
-
 
 
     private void sendPostPermissionRequest(Call<String> call) {

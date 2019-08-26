@@ -49,10 +49,15 @@
                 android:imeOptions="actionSend"
                 android:inputType="textCapSentences|textMultiLine" />
 
-            <ImageView
-                android:id="@+id/imageMedia"
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rvMultiImage"
+                app:layoutManager="android.support.v7.widget.GridLayoutManager"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_200sdp" />
+                android:layout_height="@dimen/_200sdp">
+
+            </android.support.v7.widget.RecyclerView>
+
+
         </LinearLayout>
 
         <include
