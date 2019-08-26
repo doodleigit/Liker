@@ -49,7 +49,7 @@ public class FollowingFragment extends Fragment {
     private PrefManager manager;
     private FollowingAdapter followingAdapter;
     private ArrayList<FollowingResult> followings;
-    private String deviceId, profileId, token, userIds;
+    private String deviceId, profileUserId, token, userIds;
     int limit = 10;
     int offset = 0;
     private boolean isScrolling;
@@ -77,9 +77,9 @@ public class FollowingFragment extends Fragment {
         manager = new PrefManager(getContext());
         followings = new ArrayList<>();
         deviceId = manager.getDeviceId();
-        profileId = manager.getProfileId();
         token = manager.getToken();
         userIds = manager.getProfileId();
+        profileUserId = getArguments().getString("user_id");
 
         progressBar = view.findViewById(R.id.progress_bar);
         tvAlertText = view.findViewById(R.id.alertText);
@@ -138,7 +138,7 @@ public class FollowingFragment extends Fragment {
     }
 
     private void sendFriendListRequest() {
-        Call<Following> call = profileService.getFollowings(deviceId, token, userIds, userIds, profileId, limit, offset, false);
+        Call<Following> call = profileService.getFollowings(deviceId, token, userIds, userIds, profileUserId, limit, offset, false);
         call.enqueue(new Callback<Following>() {
             @Override
             public void onResponse(Call<Following> call, Response<Following> response) {
@@ -172,7 +172,7 @@ public class FollowingFragment extends Fragment {
 
     private void sendFriendListPaginationRequest() {
         progressBar.setVisibility(View.VISIBLE);
-        Call<Following> call = profileService.getFollowings(deviceId, token, userIds, userIds, profileId, limit, offset, false);
+        Call<Following> call = profileService.getFollowings(deviceId, token, userIds, userIds, profileUserId, limit, offset, false);
         call.enqueue(new Callback<Following>() {
             @Override
             public void onResponse(Call<Following> call, Response<Following> response) {

@@ -22,11 +22,13 @@ public class AwardsAdapter extends RecyclerView.Adapter<AwardsAdapter.ViewHolder
     private Context context;
     private ArrayList<Awards> arrayList;
     private AboutComponentUpdateListener aboutComponentUpdateListener;
+    private boolean isOwnProfile;
 
-    public AwardsAdapter(Context context, ArrayList<Awards> arrayList, AboutComponentUpdateListener aboutComponentUpdateListener) {
+    public AwardsAdapter(Context context, ArrayList<Awards> arrayList, AboutComponentUpdateListener aboutComponentUpdateListener, boolean isOwnProfile) {
         this.context = context;
         this.arrayList = arrayList;
         this.aboutComponentUpdateListener = aboutComponentUpdateListener;
+        this.isOwnProfile = isOwnProfile;
     }
 
 
@@ -49,6 +51,12 @@ public class AwardsAdapter extends RecyclerView.Adapter<AwardsAdapter.ViewHolder
         viewHolder.tvAwardsName.setText(awardsName);
         viewHolder.tvInstituteNameDuration.setText(instituteNameDuration);
         viewHolder.tvSummary.setText(summary);
+
+        if (isOwnProfile) {
+            viewHolder.ivEdit.setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.ivEdit.setVisibility(View.INVISIBLE);
+        }
 
         viewHolder.ivEdit.setOnClickListener(new View.OnClickListener() {
             @Override

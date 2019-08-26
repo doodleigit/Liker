@@ -1,6 +1,8 @@
 package com.doodle.Setting.view;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -179,7 +181,12 @@ public class LinkedinFriendsFragment extends Fragment {
     }
 
     private void sendInvitation() {
-
+        if (FindFriendsFragment.socialLink != null) {
+            String url = FindFriendsFragment.socialLink.getLinkedin();
+            Intent i = new Intent(Intent.ACTION_VIEW);
+            i.setData(Uri.parse(url));
+            startActivity(i);
+        }
     }
 
 }

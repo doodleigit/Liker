@@ -18,10 +18,12 @@ public class PhoneAdapter extends RecyclerView.Adapter<PhoneAdapter.ViewHolder> 
 
     private Context context;
     private ArrayList<Phone> arrayList;
+    private boolean isOwnProfile;
 
-    public PhoneAdapter(Context context, ArrayList<Phone> arrayList) {
+    public PhoneAdapter(Context context, ArrayList<Phone> arrayList, boolean isOwnProfile) {
         this.context = context;
         this.arrayList = arrayList;
+        this.isOwnProfile = isOwnProfile;
     }
 
     @NonNull
@@ -42,6 +44,12 @@ public class PhoneAdapter extends RecyclerView.Adapter<PhoneAdapter.ViewHolder> 
             viewHolder.tvPermissionIcon.setImageResource(R.drawable.friends);
         } else {
             viewHolder.tvPermissionIcon.setImageResource(R.drawable.public_);
+        }
+
+        if (isOwnProfile) {
+            viewHolder.tvPermissionIcon.setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.tvPermissionIcon.setVisibility(View.INVISIBLE);
         }
     }
 

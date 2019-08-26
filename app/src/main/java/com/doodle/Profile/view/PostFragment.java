@@ -41,6 +41,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -49,10 +50,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class PostFragment extends Fragment {
-
-
     View v;
-
     public List<PostItem> postItemList;
     //  private List<Comment> comments = new ArrayList<Comment>();
     private ProfileService profileService;
@@ -107,6 +105,10 @@ public class PostFragment extends Fragment {
         // Inflate the layout for this fragment
         View root = inflater.inflate(R.layout.post_fragment_layout, container, false);
 
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(AppConstants.PROFILE_PAGE_PAGINATION_BROADCAST);
+        Objects.requireNonNull(getActivity()).registerReceiver(broadcastReceiver, filter);
+
         progressDialog = new ProgressDialog(getContext());
         progressDialog.setMessage(getString(R.string.loading));
         progressDialog.show();
@@ -116,37 +118,33 @@ public class PostFragment extends Fragment {
         recyclerView = root.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setNestedScrollingEnabled(false);
-//        DisplayMetrics displayMetrics = new DisplayMetrics();
-//        getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-//        int height = displayMetrics.heightPixels;
-//        recyclerView.setMinimumHeight(height);
         v = root;
         getData();
 
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
-                    isScrolling = true;
-                }
-            }
-
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                currentItems = layoutManager.getChildCount();
-                scrollOutItems = layoutManager.findFirstVisibleItemPosition();
-                totalItems = layoutManager.getItemCount();
-
-                if (isScrolling && (currentItems + scrollOutItems == totalItems)) {
-                    isScrolling = false;
-                    PerformPagination();
-                }
-
-            }
-        });
-
+//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+//                super.onScrollStateChanged(recyclerView, newState);
+//                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+//                    isScrolling = true;
+//                }
+//            }
+//
+//            @Override
+//            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+//                super.onScrolled(recyclerView, dx, dy);
+////                currentItems = layoutManager.getChildCount();
+////                scrollOutItems = layoutManager.findFirstVisibleItemPosition();
+////                totalItems = layoutManager.getItemCount();
+////
+////                if (isScrolling && (currentItems + scrollOutItems == totalItems)) {
+//////                    isScrolling = false;
+////                    PerformPagination();
+////                }
+//            }
+//
+//
+//        });
 
         mCallback = new TextHolder.PostItemListener() {
             @Override
@@ -194,8 +192,6 @@ public class PostFragment extends Fragment {
 
 
     public void sendDeletePostRequest(Call<String> call) {
-
-
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
@@ -242,22 +238,17 @@ public class PostFragment extends Fragment {
     }
 
     private void PerformPagination() {
+        isScrolling = false;
         progressView.setVisibility(View.VISIBLE);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (networkOk) {
-                    String queryResult = App.getQueryResult();
-                    Call<List<PostItem>> call = profileService.feed(deviceId, profileId, token, userIds, limit, offset, catIds, profileUserName, false);
-                    PostItemPagingRequest(call);
+        if (networkOk) {
+            Call<List<PostItem>> call = profileService.feed(deviceId, profileId, token, userIds, limit, offset, catIds, profileUserName, false);
+            PostItemPagingRequest(call);
 
-                } else {
-                    Utils.showNetworkDialog(getActivity().getSupportFragmentManager());
-                    progressView.setVisibility(View.GONE);
-                }
-            }
-        }, 2000);
-
+        } else {
+            Utils.showNetworkDialog(getActivity().getSupportFragmentManager());
+            progressView.setVisibility(View.GONE);
+            isScrolling = true;
+        }
     }
 
     private void PostItemPagingRequest(Call<List<PostItem>> call) {
@@ -318,13 +309,14 @@ public class PostFragment extends Fragment {
                     offset += 5;
                     progressView.setVisibility(View.GONE);
                 }
-
+                isScrolling = true;
             }
 
             @Override
             public void onFailure(Call<CommentItem> mCall, Throwable t) {
                 Log.d("MESSAGE: ", t.getMessage());
                 progressView.setVisibility(View.GONE);
+                isScrolling = true;
             }
         });
     }
@@ -405,26 +397,14 @@ public class PostFragment extends Fragment {
                 if (postItemList != null) {
                     adapter = new BreakingPostAdapter(getActivity(), postItemList, mCallback, mimListener);
                     offset += 5;
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            progressDialog.hide();
+                    progressDialog.hide();
 
-                            recyclerView.setVisibility(View.VISIBLE);
-                            recyclerView.setAdapter(adapter);
-                        }
-                    }, 1000);
-
-
+                    recyclerView.setVisibility(View.VISIBLE);
+                    recyclerView.setAdapter(adapter);
                     //  Log.d("PostItem: ", categoryItem.toString() + "");
                     progressView.setVisibility(View.GONE);
                 }
-                try {
-                    ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(1);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
+                isScrolling = true;
             }
 
             @Override
@@ -432,7 +412,7 @@ public class PostFragment extends Fragment {
                 Log.d("MESSAGE: ", t.getMessage());
                 progressDialog.hide();
                 progressView.setVisibility(View.GONE);
-                ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(1);
+                isScrolling = true;
             }
         });
     }
@@ -469,9 +449,18 @@ public class PostFragment extends Fragment {
         }*/
     }
 
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (isScrolling)
+                PerformPagination();
+        }
+    };
+
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Objects.requireNonNull(getActivity()).unregisterReceiver(broadcastReceiver);
     }
 
 

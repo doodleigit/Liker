@@ -49,7 +49,7 @@ public class FollowersFragment extends Fragment {
     private PrefManager manager;
     private FollowersAdapter followersAdapter;
     private ArrayList<FollowersResult> followers;
-    private String deviceId, profileId, token, userIds;
+    private String deviceId, profileUserId, token, userIds;
     int limit = 10;
     int offset = 0;
     private boolean isScrolling;
@@ -77,9 +77,9 @@ public class FollowersFragment extends Fragment {
         manager = new PrefManager(getContext());
         followers = new ArrayList<>();
         deviceId = manager.getDeviceId();
-        profileId = manager.getProfileId();
         token = manager.getToken();
         userIds = manager.getProfileId();
+        profileUserId = getArguments().getString("user_id");
 
         progressBar = view.findViewById(R.id.progress_bar);
         tvAlertText = view.findViewById(R.id.alertText);
@@ -138,7 +138,7 @@ public class FollowersFragment extends Fragment {
     }
 
     private void sendFriendListRequest() {
-        Call<Followers> call = profileService.getFollowers(deviceId, token, userIds, userIds, profileId, limit, offset, false);
+        Call<Followers> call = profileService.getFollowers(deviceId, token, userIds, userIds, profileUserId, limit, offset, false);
         call.enqueue(new Callback<Followers>() {
             @Override
             public void onResponse(Call<Followers> call, Response<Followers> response) {
@@ -172,7 +172,7 @@ public class FollowersFragment extends Fragment {
 
     private void sendFriendListPaginationRequest() {
         progressBar.setVisibility(View.VISIBLE);
-        Call<Followers> call = profileService.getFollowers(deviceId, token, userIds, userIds, profileId, limit, offset, false);
+        Call<Followers> call = profileService.getFollowers(deviceId, token, userIds, userIds, profileUserId, limit, offset, false);
         call.enqueue(new Callback<Followers>() {
             @Override
             public void onResponse(Call<Followers> call, Response<Followers> response) {

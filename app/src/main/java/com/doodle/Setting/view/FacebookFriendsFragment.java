@@ -24,6 +24,7 @@ import com.doodle.Setting.adapter.SocialFriendsAdapter;
 import com.doodle.Setting.model.Social;
 import com.doodle.Setting.model.SocialFriend;
 import com.doodle.Setting.service.SettingService;
+import com.doodle.utils.AppConstants;
 import com.doodle.utils.PrefManager;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -33,6 +34,7 @@ import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -212,16 +214,22 @@ public class FacebookFriendsFragment extends Fragment {
             }
         });
 
-        if (FindFriendsFragment.socialLink != null){
-//            if (!isNullOrEmpty(FindFriendsFragment.socialLink.getFacebook())) {
-                ShareLinkContent linkContent = new ShareLinkContent.Builder()
-                        .setContentUrl(Uri.parse("https://www.d.liker.com/settings/fbinvite/100000003299371244796?fbclid=IwAR3gIMmrRJRAB5vd1Tn6LYFyug1Asxt3z83GvuH5VkS-1MMhSFCe2g_yczM"))
-                        .setQuote("")
-                        .build();
-                if (ShareDialog.canShow(ShareLinkContent.class)) {
+        if (FindFriendsFragment.socialLink != null) {
 
-                    shareDialog.show(linkContent);
-                }
+            Random random = new Random();
+            int firstNumber = 10000000 + random.nextInt(90000000);
+            int secondNumber = 10000000 + random.nextInt(90000000);
+
+//            if (!isNullOrEmpty(FindFriendsFragment.socialLink.getFacebook())) {
+            String shareUrl = AppConstants.FACEBOOK_INVITATION + firstNumber + userIds + secondNumber;
+            ShareLinkContent linkContent = new ShareLinkContent.Builder()
+                    .setContentUrl(Uri.parse(shareUrl))
+                    .setQuote("")
+                    .build();
+            if (ShareDialog.canShow(ShareLinkContent.class)) {
+
+                shareDialog.show(linkContent);
+            }
 //            }
         }
     }

@@ -23,11 +23,13 @@ public class CertificationAdapter extends RecyclerView.Adapter<CertificationAdap
     private Context context;
     private ArrayList<Certification> arrayList;
     private AboutComponentUpdateListener aboutComponentUpdateListener;
+    private boolean isOwnProfile;
 
-    public CertificationAdapter(Context context, ArrayList<Certification> arrayList, AboutComponentUpdateListener aboutComponentUpdateListener) {
+    public CertificationAdapter(Context context, ArrayList<Certification> arrayList, AboutComponentUpdateListener aboutComponentUpdateListener, boolean isOwnProfile) {
         this.context = context;
         this.arrayList = arrayList;
         this.aboutComponentUpdateListener = aboutComponentUpdateListener;
+        this.isOwnProfile = isOwnProfile;
     }
 
 
@@ -59,6 +61,12 @@ public class CertificationAdapter extends RecyclerView.Adapter<CertificationAdap
             viewHolder.tvInstituteSite.setVisibility(View.VISIBLE);
         } else {
             viewHolder.tvInstituteSite.setVisibility(View.GONE);
+        }
+
+        if (isOwnProfile) {
+            viewHolder.ivEdit.setVisibility(View.VISIBLE);
+        } else {
+            viewHolder.ivEdit.setVisibility(View.INVISIBLE);
         }
 
         String finalInstituteSite = instituteSite;
