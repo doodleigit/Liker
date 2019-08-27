@@ -23,8 +23,12 @@ import android.widget.TextView;
 import com.doodle.Comment.model.CommentItem;
 import com.doodle.Home.adapter.BreakingPostAdapter;
 import com.doodle.Home.model.PostItem;
+import com.doodle.Home.service.ImageHolder;
+import com.doodle.Home.service.LinkScriptHolder;
+import com.doodle.Home.service.LinkScriptYoutubeHolder;
 import com.doodle.Home.service.TextHolder;
 import com.doodle.Home.service.TextMimHolder;
+import com.doodle.Home.service.VideoHolder;
 import com.doodle.Profile.adapter.StarAdapter;
 import com.doodle.Profile.model.Star;
 import com.doodle.Profile.service.ProfileService;
@@ -32,7 +36,6 @@ import com.doodle.Profile.service.StarClickListener;
 import com.doodle.R;
 import com.doodle.utils.AppConstants;
 import com.doodle.utils.PrefManager;
-import com.doodle.utils.Utils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -56,7 +59,7 @@ public class StarFragment extends Fragment {
 
     private PrefManager manager;
     private ProfileService profileService;
-    private String deviceId, profileName, token, userIds;
+    private String deviceId, profileUserName, token, userId;
     private ArrayList<Star> arrayList;
     private StarAdapter starAdapter;
     private BreakingPostAdapter adapter;
@@ -70,6 +73,10 @@ public class StarFragment extends Fragment {
     //Delete post item
     public static TextHolder.PostItemListener mCallback;
     public static TextMimHolder.PostItemListener mimListener;
+    public static VideoHolder.PostItemListener videoListener;
+    public static LinkScriptYoutubeHolder.PostItemListener youtubeListener;
+    public static LinkScriptHolder.PostItemListener linkListener;
+    public static ImageHolder.PostItemListener imageListener;
     PostItem deletePostItem;
     int deletePosition;
 
@@ -98,9 +105,9 @@ public class StarFragment extends Fragment {
         profileService = ProfileService.mRetrofit.create(ProfileService.class);
         manager = new PrefManager(getContext());
         deviceId = manager.getDeviceId();
-        profileName = manager.getUserName();
+        profileUserName = getArguments().getString("user_name");
         token = manager.getToken();
-        userIds = manager.getProfileId();
+        userId = manager.getProfileId();
         arrayList = new ArrayList<>();
 
         tvUserName = view.findViewById(R.id.user_name);
@@ -140,10 +147,47 @@ public class StarFragment extends Fragment {
                 StarFragment.this.deletePost(deletePostItem, deletePosition);
             }
         };
+
+        videoListener = new VideoHolder.PostItemListener() {
+            @Override
+            public void deletePost(PostItem postItem, int position) {
+                deletePosition = position;
+                deletePostItem = postItem;
+                StarFragment.this.deletePost(deletePostItem, deletePosition);
+            }
+        };
+
+        youtubeListener = new LinkScriptYoutubeHolder.PostItemListener() {
+            @Override
+            public void deletePost(PostItem postItem, int position) {
+                deletePosition = position;
+                deletePostItem = postItem;
+                StarFragment.this.deletePost(deletePostItem, deletePosition);
+            }
+        };
+
+        linkListener = new LinkScriptHolder.PostItemListener() {
+            @Override
+            public void deletePost(PostItem postItem, int position) {
+                deletePosition = position;
+                deletePostItem = postItem;
+                StarFragment.this.deletePost(deletePostItem, deletePosition);
+            }
+        };
+
+        imageListener = new ImageHolder.PostItemListener() {
+            @Override
+            public void deletePost(PostItem postItem, int position) {
+                deletePosition = position;
+                deletePostItem = postItem;
+                StarFragment.this.deletePost(deletePostItem, deletePosition);
+            }
+        };
+
     }
 
     private void getStarList() {
-        Call<ArrayList<Star>> call = profileService.getStarList(deviceId, token, userIds, profileName);
+        Call<ArrayList<Star>> call = profileService.getStarList(deviceId, token, userId, profileUserName);
         call.enqueue(new Callback<ArrayList<Star>>() {
             @Override
             public void onResponse(Call<ArrayList<Star>> call, Response<ArrayList<Star>> response) {
@@ -173,7 +217,7 @@ public class StarFragment extends Fragment {
 
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        Call<String> call = profileService.postDelete(deviceId, userIds, token, userIds, deletePostItem.getPostId());
+                        Call<String> call = profileService.postDelete(deviceId, userId, token, userId, deletePostItem.getPostId());
                         sendDeletePostRequest(call);
                     }
                 })
@@ -220,14 +264,14 @@ public class StarFragment extends Fragment {
     private void getData() {
 //        progressView.setVisibility(View.VISIBLE);
         offset = 0;
-        Call<List<PostItem>> call = profileService.feed(deviceId, userIds, token, userIds, limit, offset, catIds, profileName, false);
+        Call<List<PostItem>> call = profileService.feed(deviceId, userId, token, userId, limit, offset, catIds, profileUserName, false);
         sendPostItemRequest(call);
     }
 
     private void PerformPagination() {
         isScrolling = false;
 //        progressView.setVisibility(View.VISIBLE);
-        Call<List<PostItem>> call = profileService.feed(deviceId, userIds, token, userIds, limit, offset, catIds, profileName, false);
+        Call<List<PostItem>> call = profileService.feed(deviceId, userId, token, userId, limit, offset, catIds, profileUserName, false);
         PostItemPagingRequest(call);
     }
 
@@ -259,7 +303,7 @@ public class StarFragment extends Fragment {
 
                     totalPostIDs = sb.substring(separator.length()).replaceAll("\\s+", "");
                     Log.d("friends", totalPostIDs);
-                    Call<CommentItem> mCall = profileService.getPostComments(deviceId, userIds, token, "false", 1, 0, "DESC", totalPostIDs, userIds);
+                    Call<CommentItem> mCall = profileService.getPostComments(deviceId, userId, token, "false", 1, 0, "DESC", totalPostIDs, userId);
                     sendCommentItemPagingRequest(mCall);
 
 
@@ -330,7 +374,7 @@ public class StarFragment extends Fragment {
 
                     totalPostIDs = sb.substring(separator.length()).replaceAll("\\s+", "");
                     Log.d("friends", totalPostIDs);
-                    Call<CommentItem> mCall = profileService.getPostComments(deviceId, userIds, token, "false", 1, 0, "DESC", totalPostIDs, userIds);
+                    Call<CommentItem> mCall = profileService.getPostComments(deviceId, userId, token, "false", 1, 0, "DESC", totalPostIDs, userId);
                     sendCommentItemRequest(mCall);
                 } else {
                     progressDialog.hide();
@@ -360,7 +404,7 @@ public class StarFragment extends Fragment {
                 //  comments = commentItem.getComments();
                 Log.d("commentItem", commentItem.toString());
                 if (postItemList != null) {
-                    adapter = new BreakingPostAdapter(getActivity(), postItemList, mCallback, mimListener);
+                    adapter = new BreakingPostAdapter(getActivity(), postItemList, mCallback, mimListener, videoListener, youtubeListener, linkListener, imageListener);
                     offset += 5;
                     progressDialog.hide();
 

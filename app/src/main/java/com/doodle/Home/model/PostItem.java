@@ -125,6 +125,42 @@ public class PostItem implements Serializable, Parcelable
     @SerializedName("is_notification_off")
     @Expose
     private boolean isNotificationOff;
+
+    @SerializedName("mentioned_user_ids")
+    @Expose
+    private List<String> mentionedUserIds = new ArrayList<String>();
+    @SerializedName("post_link_host")
+    @Expose
+    private String postLinkHost;
+
+    @SerializedName("post_files")
+    @Expose
+    private List<PostFile> postFiles = new ArrayList<PostFile>();
+
+    public List<PostFile> getPostFiles() {
+        return postFiles;
+    }
+
+    public void setPostFiles(List<PostFile> postFiles) {
+        this.postFiles = postFiles;
+    }
+
+    public List<String> getMentionedUserIds() {
+        return mentionedUserIds;
+    }
+
+    public void setMentionedUserIds(List<String> mentionedUserIds) {
+        this.mentionedUserIds = mentionedUserIds;
+    }
+
+    public String getPostLinkHost() {
+        return postLinkHost;
+    }
+
+    public void setPostLinkHost(String postLinkHost) {
+        this.postLinkHost = postLinkHost;
+    }
+
     public final static Creator<PostItem> CREATOR = new Creator<PostItem>() {
 
 
@@ -181,6 +217,9 @@ public class PostItem implements Serializable, Parcelable
         this.videoUploadStatus = ((String) in.readValue((String.class.getClassLoader())));
         this.videoDuration = ((int) in.readValue((int.class.getClassLoader())));
         this.isNotificationOff = ((boolean) in.readValue((boolean.class.getClassLoader())));
+        in.readList(this.mentionedUserIds, (java.lang.String.class.getClassLoader()));
+        this.postLinkHost = ((String) in.readValue((String.class.getClassLoader())));
+        in.readList(this.postFiles, (PostFile.class.getClassLoader()));
     }
 
     public PostItem() {
@@ -522,6 +561,9 @@ public class PostItem implements Serializable, Parcelable
         dest.writeValue(videoUploadStatus);
         dest.writeValue(videoDuration);
         dest.writeValue(isNotificationOff);
+        dest.writeList(mentionedUserIds);
+        dest.writeValue(postLinkHost);
+        dest.writeList(postFiles);
     }
 
     public int describeContents() {

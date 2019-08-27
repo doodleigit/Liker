@@ -558,6 +558,16 @@ public interface ProfileService {
             @Field("email") String email
     );
 
+    @POST(AppConstants.EMAIL_VERIFICATION_SEND)
+    @FormUrlEncoded
+    Call<String> emailVerificationSend(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String id,
+            @Field("email") String email
+    );
+
     @POST(AppConstants.PHONE_REMOVE)
     @FormUrlEncoded
     Call<String> removePhone(

@@ -21,13 +21,11 @@ public class EmailAdapter extends RecyclerView.Adapter<EmailAdapter.ViewHolder> 
 
     private Context context;
     private ArrayList<Email> arrayList;
-    private List<String> emailTypes;
     private EmailModificationListener emailModificationListener;
 
     public EmailAdapter(Context context, ArrayList<Email> arrayList, EmailModificationListener emailModificationListener) {
         this.context = context;
         this.arrayList = arrayList;
-        this.emailTypes = Arrays.asList(context.getResources().getStringArray(R.array.phone_type_list));
         this.emailModificationListener = emailModificationListener;
     }
 

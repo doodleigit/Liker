@@ -55,10 +55,14 @@ import com.doodle.Home.model.PostFooter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.PostTextIndex;
 import com.doodle.Home.model.postshare.PostShareItem;
+import com.doodle.Home.view.activity.EditPost;
 import com.doodle.Home.view.activity.Home;
 import com.doodle.Home.view.activity.PostShare;
 import com.doodle.Post.model.Mim;
 import com.doodle.Post.service.DataProvider;
+import com.doodle.Post.view.activity.PostCategory;
+import com.doodle.Post.view.activity.PostNew;
+import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.R;
 import com.doodle.utils.AppConstants;
 import com.doodle.utils.NetworkHelper;
@@ -610,6 +614,19 @@ public class TextHolder extends RecyclerView.ViewHolder {
                 //  .crossFade()
                 .into(imagePostUser);
 
+        tvPostUserName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mContext.startActivity(new Intent(mContext, ProfileActivity.class).putExtra("user_id", item.getPostUserid()).putExtra("user_name", item.getPostUsername()));
+            }
+        });
+
+        imagePostUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mContext.startActivity(new Intent(mContext, ProfileActivity.class).putExtra("user_id", item.getPostUserid()).putExtra("user_name", item.getPostUsername()));
+            }
+        });
 
         imagePostComment.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -833,7 +850,11 @@ public class TextHolder extends RecyclerView.ViewHolder {
                         }
 
                         if (id == R.id.edit) {
-                            Toast.makeText(App.getAppContext(), "edit : ", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(mContext, EditPost.class);
+                            App.setPosition(position);
+                            intent.putExtra(ITEM_KEY,(Parcelable) item);
+                            mContext.startActivity(intent);
+                            ((Activity) mContext ).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
                         }
                         if (id == R.id.delete) {
                             if (!((Activity) mContext).isFinishing()) {

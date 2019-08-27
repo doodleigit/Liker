@@ -1,15 +1,18 @@
 package com.doodle.Home.service;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.view.menu.MenuPopupHelper;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
@@ -17,8 +20,10 @@ import android.text.SpannableStringBuilder;
 import android.text.style.UnderlineSpan;
 import android.text.util.Linkify;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -37,11 +42,15 @@ import com.doodle.Comment.model.CommentItem;
 import com.doodle.Comment.model.Comment_;
 import com.doodle.Comment.service.CommentService;
 import com.doodle.Comment.view.fragment.ReportReasonSheet;
+import com.doodle.Home.adapter.GalleryAdapter;
 import com.doodle.Home.model.PostFooter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.postshare.PostShareItem;
+import com.doodle.Home.view.activity.EditPost;
 import com.doodle.Home.view.activity.Home;
 import com.doodle.Home.view.activity.PostShare;
+import com.doodle.Post.adapter.MimAdapter;
+import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.R;
 import com.doodle.utils.AppConstants;
 import com.doodle.utils.NetworkHelper;
@@ -55,6 +64,7 @@ import com.facebook.share.Sharer;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
+import com.squareup.picasso.Picasso;
 import com.vanniktech.emoji.EmojiTextView;
 
 import org.json.JSONException;
@@ -80,19 +90,19 @@ import static com.doodle.utils.Utils.showBlockUser;
 import static java.lang.Integer.parseInt;
 
 public class ImageHolder extends RecyclerView.ViewHolder {
-    public TextView tvHeaderInfo, tvPostTime, tvPostUserName, tvImgShareCount, tvPostLikeCount, tvLinkScriptText,tvCommentCount;
+    public TextView tvHeaderInfo, tvPostTime, tvPostUserName, tvImgShareCount, tvPostLikeCount, tvLinkScriptText, tvCommentCount;
     public CircleImageView imagePostUser;
     public ReadMoreTextView tvPostContent;
     public EmojiTextView tvPostEmojiContent;
     public ImageView star1, star2, star3, star4, star5, star6, star7, star8,
             star9, star10, star11, star12, star13, star14, star15, star16;
-    public ImageView imageMedia;
+   // public ImageView imageMedia;
     public ImageView imagePostPermission;
     public LinearLayout postBodyLayer;
     PostItem item;
 
-    public ImageView imagePostShare,imagePermission;
-    private PopupMenu popup,popupMenu;
+    public ImageView imagePostShare, imagePermission;
+    private PopupMenu popup, popupMenu;
     public HomeService webService;
     public PrefManager manager;
     private String deviceId, profileId, token, userIds;
@@ -126,12 +136,21 @@ public class ImageHolder extends RecyclerView.ViewHolder {
     public static final String COMMENT_KEY = "comment_item_key";
     private String postPermissions;
     private boolean notificationOff;
+    private RecyclerView rvMultiImage;
 
+    //Delete post
+    public PostItemListener listener;
 
-    public ImageHolder(View itemView,Context context) {
+    public interface PostItemListener {
+        void deletePost(PostItem postItem, int position);
+
+    }
+
+    public ImageHolder(View itemView, Context context, PostItemListener listener) {
         super(itemView);
 
-        mContext=context;
+        mContext = context;
+        this.listener = listener;
         callbackManager = CallbackManager.Factory.create();
         shareDialog = new ShareDialog((Activity) context);
         manager = new PrefManager(App.getAppContext());
@@ -142,6 +161,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
         webService = HomeService.mRetrofit.create(HomeService.class);
         imagePostShare = (ImageView) itemView.findViewById(R.id.imagePostShare);
         imagePermission = (ImageView) itemView.findViewById(R.id.imagePermission);
+        rvMultiImage = (RecyclerView) itemView.findViewById(R.id.rvMultiImage);
 
         tvPostUserName = (TextView) itemView.findViewById(R.id.tvPostUserName);
         imagePostUser = (CircleImageView) itemView.findViewById(R.id.imagePostUser);
@@ -154,7 +174,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
         tvLinkScriptText = (ReadMoreTextView) itemView.findViewById(R.id.tvLinkScriptText);
         tvPostEmojiContent = (EmojiTextView) itemView.findViewById(R.id.tvPostEmojiContent);
         postBodyLayer = (LinearLayout) itemView.findViewById(R.id.postBodyLayer);
-        tvCommentCount =  itemView.findViewById(R.id.tvCommentCount);
+        tvCommentCount = itemView.findViewById(R.id.tvCommentCount);
 
 
         star1 = itemView.findViewById(R.id.star1);
@@ -174,7 +194,8 @@ public class ImageHolder extends RecyclerView.ViewHolder {
         star15 = itemView.findViewById(R.id.star15);
         star16 = itemView.findViewById(R.id.star16);
 
-        imageMedia = itemView.findViewById(R.id.imageMedia);
+       // imageMedia = itemView.findViewById(R.id.imageMedia);
+        rvMultiImage.setLayoutManager(new GridLayoutManager(mContext, 3));
         imagePostPermission = itemView.findViewById(R.id.imagePostPermission);
 
         //Comment
@@ -201,9 +222,11 @@ public class ImageHolder extends RecyclerView.ViewHolder {
     }
 
     AppCompatActivity activity;
-    public void setItem(PostItem item) {
-        this.item = item;
+    int position;
 
+    public void setItem(PostItem item, int position) {
+        this.item = item;
+        this.position = position;
         userPostId = item.getPostId();
 
         String postPermission = item.getPermission();
@@ -235,7 +258,6 @@ public class ImageHolder extends RecyclerView.ViewHolder {
                 }
             }
         });
-
 
 
         String contentUrl = FACEBOOK_SHARE + item.getSharedPostId();
@@ -436,17 +458,40 @@ public class ImageHolder extends RecyclerView.ViewHolder {
                 .into(imagePostUser);
 
 
-        String postImages=AppConstants.POST_IMAGES+item.getPostImage();
+        String postImages = AppConstants.POST_IMAGES + item.getPostImage();
 
-        Glide.with(App.getAppContext())
+
+        GalleryAdapter.RecyclerViewClickListener galleryListener = (view, positions) -> {
+
+        };
+
+        GalleryAdapter adapter=new GalleryAdapter(mContext,item.getPostFiles(),galleryListener);
+        rvMultiImage.setAdapter(adapter);
+
+   /*     Glide.with(App.getAppContext())
                 .load(postImages)
                 .centerCrop()
                 .dontAnimate()
-                .into(imageMedia);
+                .into(imageMedia);*/
 
-        if(!isNullOrEmpty(item.getTotalComment())&& !"0".equalsIgnoreCase(item.getTotalComment())){
+        if (!isNullOrEmpty(item.getTotalComment()) && !"0".equalsIgnoreCase(item.getTotalComment())) {
             tvCommentCount.setText(item.getTotalComment());
         }
+
+        tvPostUserName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mContext.startActivity(new Intent(mContext, ProfileActivity.class).putExtra("user_id", item.getPostUserid()).putExtra("user_name", item.getPostUsername()));
+            }
+        });
+
+        imagePostUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mContext.startActivity(new Intent(mContext, ProfileActivity.class).putExtra("user_id", item.getPostUserid()).putExtra("user_name", item.getPostUsername()));
+            }
+        });
+
         imagePostShare.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("RestrictedApi")
             @Override
@@ -456,7 +501,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
                 popup.getMenuInflater().inflate(R.menu.share_menu, popup.getMenu());
 
 //                popup.show();
-                MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popup.getMenu(),v);
+                MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popup.getMenu(), v);
                 menuHelper.setForceShowIcon(true);
                 menuHelper.show();
 
@@ -557,7 +602,6 @@ public class ImageHolder extends RecyclerView.ViewHolder {
                 }
 
 
-
                 if (App.isNotificationStatus()) {
 
                     if (notificationOff) {
@@ -592,7 +636,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
                             if (!((Activity) mContext).isFinishing()) {
                                 App.setItem(item);
                                 showBlockUser(v);
-                            }else {
+                            } else {
                                 dismissDialog();
                             }
                         }
@@ -639,10 +683,14 @@ public class ImageHolder extends RecyclerView.ViewHolder {
                         }
 
                         if (id == R.id.edit) {
-                            Toast.makeText(App.getAppContext(), "edit : ", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(mContext, EditPost.class);
+                            App.setPosition(position);
+                            intent.putExtra(ITEM_KEY,(Parcelable) item);
+                            mContext.startActivity(intent);
+                            ((Activity) mContext ).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
                         }
                         if (id == R.id.delete) {
-                            Toast.makeText(App.getAppContext(), "delete : ", Toast.LENGTH_SHORT).show();
+                            listener.deletePost(item, position);
                         }
                         if (id == R.id.turnOffNotification) {
                             activity = (AppCompatActivity) v.getContext();
@@ -683,12 +731,12 @@ public class ImageHolder extends RecyclerView.ViewHolder {
                 popupCommentMenu = new PopupMenu(mContext, v);
                 popupCommentMenu.getMenuInflater().inflate(R.menu.post_comment_menu, popupCommentMenu.getMenu());
 
-                if(userPostId.equalsIgnoreCase(commentPostId)){
+                if (userPostId.equalsIgnoreCase(commentPostId)) {
                     popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(false);
                     popupCommentMenu.getMenu().findItem(R.id.blockUser).setVisible(false);
                     popupCommentMenu.getMenu().findItem(R.id.editComment).setVisible(true);
                     popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(true);
-                }else {
+                } else {
                     popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(true);
                     popupCommentMenu.getMenu().findItem(R.id.blockUser).setVisible(true);
                     popupCommentMenu.getMenu().findItem(R.id.editComment).setVisible(false);
@@ -803,7 +851,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
             public void onResponse(Call<CommentItem> mCall, Response<CommentItem> response) {
 
 
-                if(response.body()!=null){
+                if (response.body() != null) {
                     CommentItem commentItem = response.body();
                     Intent intent = new Intent(mContext, CommentPost.class);
                     intent.putExtra(COMMENT_KEY, (Parcelable) commentItem);
@@ -823,6 +871,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
         });
 
     }
+
     private void sendShareItemRequest(Call<PostShareItem> call) {
 
 
@@ -843,6 +892,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
                 }
 
             }
+
             @Override
             public void onFailure(Call<PostShareItem> call, Throwable t) {
                 Log.d("MESSAGE: ", t.getMessage());
@@ -860,11 +910,11 @@ public class ImageHolder extends RecyclerView.ViewHolder {
 
                 if (response.body() != null) {
                     ReportReason reportReason = response.body();
-                    boolean isFollowed=reportReason.isFollowed();
+                    boolean isFollowed = reportReason.isFollowed();
                     App.setIsFollow(isFollowed);
-                    List<Reason> reasonList=reportReason.getReason();
-                    PostItem item=new PostItem();
-                    CommentItem commentItems=new CommentItem();
+                    List<Reason> reasonList = reportReason.getReason();
+                    PostItem item = new PostItem();
+                    CommentItem commentItems = new CommentItem();
                     ReportReasonSheet reportReasonSheet = ReportReasonSheet.newInstance(reasonList);
                     reportReasonSheet.show(activity.getSupportFragmentManager(), "ReportReasonSheet");
 

@@ -31,8 +31,12 @@ import com.doodle.Comment.view.fragment.DeletePostDialog;
 import com.doodle.Home.adapter.BreakingPostAdapter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.service.HomeService;
+import com.doodle.Home.service.ImageHolder;
+import com.doodle.Home.service.LinkScriptHolder;
+import com.doodle.Home.service.LinkScriptYoutubeHolder;
 import com.doodle.Home.service.TextHolder;
 import com.doodle.Home.service.TextMimHolder;
+import com.doodle.Home.service.VideoHolder;
 import com.doodle.Home.view.activity.Home;
 import com.doodle.R;
 import com.doodle.utils.AppConstants;
@@ -58,8 +62,7 @@ import static com.doodle.utils.Utils.showDeletePost;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class BreakingPost extends Fragment
-{
+public class BreakingPost extends Fragment {
 
 
     private View v;
@@ -93,6 +96,12 @@ public class BreakingPost extends Fragment
     //Delete post item
     public static TextHolder.PostItemListener mCallback;
     public static TextMimHolder.PostItemListener mimListener;
+    public static VideoHolder.PostItemListener videoListener;
+    public static LinkScriptYoutubeHolder.PostItemListener youtubeListener;
+    public static LinkScriptHolder.PostItemListener linkListener;
+    public static ImageHolder.PostItemListener imageListener;
+
+
     PostItem deletePostItem;
     int deletePosition;
 
@@ -117,7 +126,7 @@ public class BreakingPost extends Fragment
         webService = HomeService.mRetrofit.create(HomeService.class);
         networkOk = NetworkHelper.hasNetworkAccess(getActivity());
         postItemList = new ArrayList<>();
-        deletePostItem=new PostItem();
+        deletePostItem = new PostItem();
     }
 
     @Override
@@ -130,7 +139,7 @@ public class BreakingPost extends Fragment
         shimmerFrameLayout = (ShimmerFrameLayout) root.findViewById(R.id.shimmer_view_post_container);
         recyclerView = (RecyclerView) root.findViewById(R.id.rvBreakingPost);
         recyclerView.setLayoutManager(layoutManager);
-        v=root;
+        v = root;
         getData();
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -162,17 +171,54 @@ public class BreakingPost extends Fragment
         mCallback = new TextHolder.PostItemListener() {
             @Override
             public void deletePost(PostItem postItem, int position) {
-                deletePosition=position;
-                deletePostItem=postItem;
+                deletePosition = position;
+                deletePostItem = postItem;
                 BreakingPost.this.deletePost(deletePostItem, deletePosition);
 
             }
         };
-        mimListener=new TextMimHolder.PostItemListener() {
+        mimListener = new TextMimHolder.PostItemListener() {
             @Override
             public void deletePost(PostItem postItem, int position) {
-                deletePosition=position;
-                deletePostItem=postItem;
+                deletePosition = position;
+                deletePostItem = postItem;
+                BreakingPost.this.deletePost(deletePostItem, deletePosition);
+            }
+        };
+
+
+        videoListener = new VideoHolder.PostItemListener() {
+            @Override
+            public void deletePost(PostItem postItem, int position) {
+                deletePosition = position;
+                deletePostItem = postItem;
+                BreakingPost.this.deletePost(deletePostItem, deletePosition);
+            }
+        };
+
+        youtubeListener =new LinkScriptYoutubeHolder.PostItemListener() {
+            @Override
+            public void deletePost(PostItem postItem, int position) {
+                deletePosition = position;
+                deletePostItem = postItem;
+                BreakingPost.this.deletePost(deletePostItem, deletePosition);
+            }
+        };
+
+        linkListener = new LinkScriptHolder.PostItemListener() {
+            @Override
+            public void deletePost(PostItem postItem, int position) {
+                deletePosition = position;
+                deletePostItem = postItem;
+                BreakingPost.this.deletePost(deletePostItem, deletePosition);
+            }
+        };
+
+        imageListener = new ImageHolder.PostItemListener() {
+            @Override
+            public void deletePost(PostItem postItem, int position) {
+                deletePosition = position;
+                deletePostItem = postItem;
                 BreakingPost.this.deletePost(deletePostItem, deletePosition);
             }
         };
@@ -182,7 +228,7 @@ public class BreakingPost extends Fragment
 
     private void deletePost(PostItem deletePostItem, int deletePosition) {
         new AlertDialog.Builder(getActivity())
-              //  .setTitle("Delete entry")
+                //  .setTitle("Delete entry")
                 .setMessage("Are you sure you want to delete this post? You will permanently lose this post !")
 
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
@@ -199,7 +245,7 @@ public class BreakingPost extends Fragment
                     }
                 })
                 .setNegativeButton(android.R.string.no, null)
-               // .setIcon(android.R.drawable.ic_dialog_alert)
+                // .setIcon(android.R.drawable.ic_dialog_alert)
                 .show();
     }
 
@@ -215,10 +261,12 @@ public class BreakingPost extends Fragment
                         try {
                             JSONObject object = new JSONObject(response.body());
                             boolean status = object.getBoolean("status");
-                           if(status){
-                               postItemList.remove(deletePostItem);
-                               adapter.deleteItem(deletePosition);
-                           }
+                            if (status) {
+                                postItemList.remove(deletePostItem);
+                                adapter.deleteItem(deletePosition);
+                                offset++;
+                                recyclerView.smoothScrollToPosition(0);
+                            }
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -240,6 +288,7 @@ public class BreakingPost extends Fragment
 
 
     }
+
     private void getData() {
         if (networkOk) {
             progressView.setVisibility(View.VISIBLE);
@@ -425,7 +474,7 @@ public class BreakingPost extends Fragment
                 //  comments = commentItem.getComments();
                 Log.d("commentItem", commentItem.toString());
                 if (postItemList != null) {
-                    adapter = new BreakingPostAdapter(getActivity(), postItemList,mCallback,mimListener);
+                    adapter = new BreakingPostAdapter(getActivity(), postItemList, mCallback, mimListener,videoListener,youtubeListener,linkListener,imageListener);
                     offset += 5;
                     new Handler().postDelayed(new Runnable() {
                         @Override
@@ -435,6 +484,7 @@ public class BreakingPost extends Fragment
 
                             recyclerView.setVisibility(View.VISIBLE);
                             recyclerView.setAdapter(adapter);
+
                         }
                     }, 1000);
 
@@ -467,7 +517,6 @@ public class BreakingPost extends Fragment
         shimmerFrameLayout.startShimmer();
 
     }
-
 
 
     @Override

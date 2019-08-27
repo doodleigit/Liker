@@ -133,7 +133,7 @@ public class Home extends AppCompatActivity implements
     private ProgressDialog progressDialog;
     private PrefManager manager;
     private String image_url;
-    private String token, deviceId, userId, selectedCategory = "";
+    private String token, deviceId, userId, userName, selectedCategory = "";
     int categoryPosition = 0;
     private Socket socket, mSocket;
     private HomeService webService;
@@ -256,6 +256,7 @@ public class Home extends AppCompatActivity implements
         image_url = manager.getProfileImage();
         deviceId = manager.getDeviceId();
         userId = manager.getProfileId();
+        userName = manager.getUserName();
         profileId = manager.getProfileId();
         token = manager.getToken();
 
@@ -997,7 +998,7 @@ public class Home extends AppCompatActivity implements
                 break;
 
             case R.id.imageProfile:
-                startActivity(new Intent(this, ProfileActivity.class).putExtra("user_id", userId));
+                startActivity(new Intent(this, ProfileActivity.class).putExtra("user_id", userId).putExtra("user_name", userName));
                 break;
 
             case R.id.imageStarContributor:

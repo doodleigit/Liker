@@ -41,8 +41,10 @@ import com.doodle.Comment.view.fragment.ReportReasonSheet;
 import com.doodle.Home.model.PostFooter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.postshare.PostShareItem;
+import com.doodle.Home.view.activity.EditPost;
 import com.doodle.Home.view.activity.Home;
 import com.doodle.Home.view.activity.PostShare;
+import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.R;
 import com.doodle.utils.AppConstants;
 import com.doodle.utils.NetworkHelper;
@@ -84,7 +86,7 @@ import static java.lang.Integer.parseInt;
 
 public class LinkScriptHolder extends RecyclerView.ViewHolder {
 
-    public TextView tvHeaderInfo, tvPostTime, tvPostUserName, tvImgShareCount, tvPostLikeCount, tvLinkScriptText,tvCommentCount;
+    public TextView tvHeaderInfo, tvPostTime, tvPostUserName, tvImgShareCount, tvPostLikeCount, tvLinkScriptText, tvCommentCount;
     public CircleImageView imagePostUser;
     public ReadMoreTextView tvPostContent;
     public EmojiTextView tvPostEmojiContent;
@@ -94,11 +96,11 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
     public ImageView imagePostPermission;
     public LinearLayout postBodyLayer;
     PostItem item;
-   public TextView tvPostLinkTitle,tvPostLinkDescription,tvPostLinkHost;
+    public TextView tvPostLinkTitle, tvPostLinkDescription, tvPostLinkHost;
 
 
-    public ImageView imagePostShare,imagePermission;
-    private PopupMenu popup,popupMenu;
+    public ImageView imagePostShare, imagePermission;
+    private PopupMenu popup, popupMenu;
     public HomeService webService;
     public PrefManager manager;
     private String deviceId, profileId, token, userIds;
@@ -133,10 +135,20 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
     private boolean notificationOff;
     private String postPermissions;
 
-    public LinkScriptHolder(View itemView,Context context) {
+    //Delete post
+    public LinkScriptHolder.PostItemListener listener;
+
+    public interface PostItemListener {
+        void deletePost(PostItem postItem, int position);
+
+    }
+
+    public LinkScriptHolder(View itemView, Context context, LinkScriptHolder.PostItemListener listener) {
         super(itemView);
 
-        mContext=context;
+        mContext = context;
+        this.listener = listener;
+
         callbackManager = CallbackManager.Factory.create();
         shareDialog = new ShareDialog((Activity) context);
         manager = new PrefManager(App.getAppContext());
@@ -210,10 +222,14 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
 
 
     }
+
     AppCompatActivity activity;
 
-    public void setItem(PostItem item) {
+    int position;
+
+    public void setItem(PostItem item, int position) {
         this.item = item;
+        this.position = position;
 
         String postPermission = item.getPermission();
 
@@ -423,7 +439,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
         String postDate = Operation.getFormattedDateFromTimestamp(myMillis);
         tvPostTime.setText(postDate);
         tvHeaderInfo.setText(builder);
-        if(!isNullOrEmpty(item.getTotalComment())&& !"0".equalsIgnoreCase(item.getTotalComment())){
+        if (!isNullOrEmpty(item.getTotalComment()) && !"0".equalsIgnoreCase(item.getTotalComment())) {
             tvCommentCount.setText(item.getTotalComment());
         }
         PostFooter postFooter = item.getPostFooter();
@@ -453,7 +469,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
         } else {
             imgLinkScript.setVisibility(View.VISIBLE);
             if (item.getPostType().equalsIgnoreCase("3")) {
-                 linkImage= AppConstants.Link_IMAGE_PATH + item.getPostImage();
+                linkImage = AppConstants.Link_IMAGE_PATH + item.getPostImage();
                 Glide.with(App.getAppContext())
                         .load(linkImage)
                         .centerCrop()
@@ -480,7 +496,19 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
             e.printStackTrace();
         }
 
+        tvPostUserName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mContext.startActivity(new Intent(mContext, ProfileActivity.class).putExtra("user_id", item.getPostUserid()).putExtra("user_name", item.getPostUsername()));
+            }
+        });
 
+        imagePostUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mContext.startActivity(new Intent(mContext, ProfileActivity.class).putExtra("user_id", item.getPostUserid()).putExtra("user_name", item.getPostUsername()));
+            }
+        });
 
         imgLinkScript.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -511,7 +539,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
                 popup.getMenuInflater().inflate(R.menu.share_menu, popup.getMenu());
 
 //                popup.show();
-                MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popup.getMenu(),v);
+                MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popup.getMenu(), v);
                 menuHelper.setForceShowIcon(true);
                 menuHelper.show();
 
@@ -647,7 +675,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
                             if (!((Activity) mContext).isFinishing()) {
                                 App.setItem(item);
                                 showBlockUser(v);
-                            }else {
+                            } else {
                                 dismissDialog();
                             }
                         }
@@ -694,10 +722,16 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
                         }
 
                         if (id == R.id.edit) {
-                            Toast.makeText(App.getAppContext(), "edit : ", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(mContext, EditPost.class);
+                            App.setPosition(position);
+                            intent.putExtra(ITEM_KEY,(Parcelable) item);
+                            mContext.startActivity(intent);
+                            ((Activity) mContext ).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
                         }
                         if (id == R.id.delete) {
-                            Toast.makeText(App.getAppContext(), "delete : ", Toast.LENGTH_SHORT).show();
+
+                            listener.deletePost(item,position);
+
                         }
                         if (id == R.id.turnOffNotification) {
                             activity = (AppCompatActivity) v.getContext();
@@ -739,12 +773,12 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
                 popupCommentMenu = new PopupMenu(mContext, v);
                 popupCommentMenu.getMenuInflater().inflate(R.menu.post_comment_menu, popupCommentMenu.getMenu());
 
-                if(userPostId.equalsIgnoreCase(commentPostId)){
+                if (userPostId.equalsIgnoreCase(commentPostId)) {
                     popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(false);
                     popupCommentMenu.getMenu().findItem(R.id.blockUser).setVisible(false);
                     popupCommentMenu.getMenu().findItem(R.id.editComment).setVisible(true);
                     popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(true);
-                }else {
+                } else {
                     popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(true);
                     popupCommentMenu.getMenu().findItem(R.id.blockUser).setVisible(true);
                     popupCommentMenu.getMenu().findItem(R.id.editComment).setVisible(false);
@@ -860,11 +894,11 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
 
                 if (response.body() != null) {
                     ReportReason reportReason = response.body();
-                    boolean isFollowed=reportReason.isFollowed();
+                    boolean isFollowed = reportReason.isFollowed();
                     App.setIsFollow(isFollowed);
-                    List<Reason> reasonList=reportReason.getReason();
-                    PostItem item=new PostItem();
-                    CommentItem commentItems=new CommentItem();
+                    List<Reason> reasonList = reportReason.getReason();
+                    PostItem item = new PostItem();
+                    CommentItem commentItems = new CommentItem();
                     ReportReasonSheet reportReasonSheet = ReportReasonSheet.newInstance(reasonList);
                     reportReasonSheet.show(activity.getSupportFragmentManager(), "ReportReasonSheet");
 
@@ -889,7 +923,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
             public void onResponse(Call<CommentItem> mCall, Response<CommentItem> response) {
 
 
-                if(response.body()!=null){
+                if (response.body() != null) {
                     CommentItem commentItem = response.body();
                     Intent intent = new Intent(mContext, CommentPost.class);
                     intent.putExtra(COMMENT_KEY, (Parcelable) commentItem);
@@ -931,6 +965,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
                 }
 
             }
+
             @Override
             public void onFailure(Call<PostShareItem> call, Throwable t) {
                 Log.d("MESSAGE: ", t.getMessage());

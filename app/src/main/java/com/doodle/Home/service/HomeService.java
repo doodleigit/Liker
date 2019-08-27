@@ -142,7 +142,8 @@ public interface HomeService {
             @Field("permission") String permission,
             @Field("post_id") String postId
     );
-   @POST(AppConstants.POST_NOTIFICATION_TURN_OFF)
+
+    @POST(AppConstants.POST_NOTIFICATION_TURN_OFF)
     @FormUrlEncoded
     Call<String> postNotificationTurnOff(
             @Header("Device-Id") String deviceId,
@@ -152,7 +153,7 @@ public interface HomeService {
             @Field("post_id") String postId
     );
 
-   @POST(AppConstants.POST_NOTIFICATION_TURN_ON)
+    @POST(AppConstants.POST_NOTIFICATION_TURN_ON)
     @FormUrlEncoded
     Call<String> postNotificationTurnOn(
             @Header("Device-Id") String deviceId,
@@ -162,7 +163,7 @@ public interface HomeService {
             @Field("post_id") String postId
     );
 
-   @POST(AppConstants.POST_DELETE)
+    @POST(AppConstants.POST_DELETE)
     @FormUrlEncoded
     Call<String> postDelete(
             @Header("Device-Id") String deviceId,
@@ -171,6 +172,9 @@ public interface HomeService {
             @Field("user_id") String userIds,
             @Field("post_id") String postId
     );
+
+
+
 
 
 }

@@ -49,7 +49,7 @@ public class FollowersFragment extends Fragment {
     private PrefManager manager;
     private FollowersAdapter followersAdapter;
     private ArrayList<FollowersResult> followers;
-    private String deviceId, profileUserId, token, userIds;
+    private String deviceId, profileUserId, token, userId;
     int limit = 10;
     int offset = 0;
     private boolean isScrolling;
@@ -78,7 +78,7 @@ public class FollowersFragment extends Fragment {
         followers = new ArrayList<>();
         deviceId = manager.getDeviceId();
         token = manager.getToken();
-        userIds = manager.getProfileId();
+        userId = manager.getProfileId();
         profileUserId = getArguments().getString("user_id");
 
         progressBar = view.findViewById(R.id.progress_bar);
@@ -138,7 +138,7 @@ public class FollowersFragment extends Fragment {
     }
 
     private void sendFriendListRequest() {
-        Call<Followers> call = profileService.getFollowers(deviceId, token, userIds, userIds, profileUserId, limit, offset, false);
+        Call<Followers> call = profileService.getFollowers(deviceId, token, userId, userId, profileUserId, limit, offset, false);
         call.enqueue(new Callback<Followers>() {
             @Override
             public void onResponse(Call<Followers> call, Response<Followers> response) {
@@ -172,7 +172,7 @@ public class FollowersFragment extends Fragment {
 
     private void sendFriendListPaginationRequest() {
         progressBar.setVisibility(View.VISIBLE);
-        Call<Followers> call = profileService.getFollowers(deviceId, token, userIds, userIds, profileUserId, limit, offset, false);
+        Call<Followers> call = profileService.getFollowers(deviceId, token, userId, userId, profileUserId, limit, offset, false);
         call.enqueue(new Callback<Followers>() {
             @Override
             public void onResponse(Call<Followers> call, Response<Followers> response) {
@@ -199,7 +199,7 @@ public class FollowersFragment extends Fragment {
 
     private void setFollow(String followUserId, int position) {
         progressDialog.show();
-        Call<String> call = profileService.setFollow(deviceId, token, userIds, userIds, followUserId);
+        Call<String> call = profileService.setFollow(deviceId, token, userId, userId, followUserId);
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
@@ -208,7 +208,7 @@ public class FollowersFragment extends Fragment {
                     JSONObject obj = new JSONObject(jsonResponse);
                     boolean status = obj.getBoolean("status");
                     if (status) {
-//                        friends.get(position).getPrivacy().setIsFollowing(true);
+                        followers.get(position).setIsFollowed(true);
                         followersAdapter.notifyItemChanged(position);
                         sendBrowserNotification(followUserId);
                     } else {
@@ -229,7 +229,7 @@ public class FollowersFragment extends Fragment {
 
     private void setUnFollow(String followUserId, int position) {
         progressDialog.show();
-        Call<String> call = profileService.setUnFollow(deviceId, token, userIds, userIds, followUserId);
+        Call<String> call = profileService.setUnFollow(deviceId, token, userId, userId, followUserId);
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
@@ -238,7 +238,7 @@ public class FollowersFragment extends Fragment {
                     JSONObject obj = new JSONObject(jsonResponse);
                     boolean status = obj.getBoolean("status");
                     if (status) {
-//                        friends.get(position).getPrivacy().setIsFollowing(false);
+                        followers.get(position).setIsFollowed(false);
                         followersAdapter.notifyItemChanged(position);
                     } else {
                         Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
@@ -257,7 +257,7 @@ public class FollowersFragment extends Fragment {
     }
 
     private void sendBrowserNotification(String followUserId) {
-        Call<String> call = profileService.sendBrowserNotification(deviceId, token, userIds, userIds, followUserId, "0", "follow");
+        Call<String> call = profileService.sendBrowserNotification(deviceId, token, userId, userId, followUserId, "0", "follow");
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {

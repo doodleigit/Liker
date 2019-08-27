@@ -34,13 +34,28 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     Drawable mDrawable;
     public TextHolder.PostItemListener listener;
     public TextMimHolder.PostItemListener mimListener;
+    public VideoHolder.PostItemListener videoListener;
+    public LinkScriptYoutubeHolder.PostItemListener YoutubeListener;
+    public LinkScriptHolder.PostItemListener LinkListener;
+    public ImageHolder.PostItemListener imageListener;
 
 
-    public BreakingPostAdapter(Context context, List<PostItem> postItems, TextHolder.PostItemListener listener, TextMimHolder.PostItemListener mimListener) {
+    public BreakingPostAdapter(Context context, List<PostItem> postItems,
+                               TextHolder.PostItemListener listener,
+                               TextMimHolder.PostItemListener mimListener,
+                               VideoHolder.PostItemListener videoListener,
+                               LinkScriptYoutubeHolder.PostItemListener YoutubeListener,
+                               LinkScriptHolder.PostItemListener LinkListener,
+                               ImageHolder.PostItemListener imageListener
+    ) {
         this.mContext = context;
         this.postItems = postItems;
         this.listener = listener;
         this.mimListener = mimListener;
+        this.videoListener = videoListener;
+        this.YoutubeListener = YoutubeListener;
+        this.LinkListener = LinkListener;
+        this.imageListener = imageListener;
 
     }
 
@@ -60,23 +75,22 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         if (viewType == VIEW_TYPE_TEXT_IMAGE) {
 
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_post_image, parent, false);
-            return new ImageHolder(view, mContext);
+            return new ImageHolder(view, mContext, imageListener);
         }
         if (viewType == VIEW_TYPE_TEXT_LINK_SCRIPT) {
 
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_post_link_script, parent, false);
-            return new LinkScriptHolder(view, mContext);
+            return new LinkScriptHolder(view, mContext, LinkListener);
         }
 
         if (viewType == VIEW_TYPE_TEXT_LINK_SCRIPT_YOUTUBE) {
 
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_post_link_script_youtube, parent, false);
-            return new LinkScriptYoutubeHolder(view, mContext);
+            return new LinkScriptYoutubeHolder(view, mContext, YoutubeListener);
         }
         if (viewType == VIEW_TYPE_VIDEO) {
-
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_post_video, parent, false);
-            return new VideoHolder(view, mContext);
+            return new VideoHolder(view, mContext, videoListener);
         }
         return null;
     }
@@ -93,20 +107,20 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
         if (viewHolder instanceof LinkScriptHolder) {
             LinkScriptHolder vh = (LinkScriptHolder) viewHolder;
-            vh.setItem(postItems.get(position));
+            vh.setItem(postItems.get(position), position);
         }
         if (viewHolder instanceof LinkScriptYoutubeHolder) {
             LinkScriptYoutubeHolder vh = (LinkScriptYoutubeHolder) viewHolder;
-            vh.setItem(postItems.get(position));
+            vh.setItem(postItems.get(position), position);
         }
         if (viewHolder instanceof ImageHolder) {
             ImageHolder vh = (ImageHolder) viewHolder;
-            vh.setItem(postItems.get(position));
+            vh.setItem(postItems.get(position), position);
 
         }
         if (viewHolder instanceof VideoHolder) {
             VideoHolder vh = (VideoHolder) viewHolder;
-            vh.setItem(postItems.get(position));
+            vh.setItem(postItems.get(position), position);
 
         }
     }
@@ -163,7 +177,7 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         // comment_list.remove(position);
 
         //   postItems.remove(position);
-        //   notifyItemRemoved(position);
+        notifyItemRemoved(position);
         notifyDataSetChanged();
 
     }
