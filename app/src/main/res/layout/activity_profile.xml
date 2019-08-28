@@ -108,7 +108,7 @@
                                 android:layout_marginEnd="10dp"
                                 android:layout_marginBottom="5dp"
                                 android:orientation="horizontal"
-                                android:visibility="invisible">
+                                android:visibility="visible">
 
                                 <!--<LinearLayout-->
                                 <!--android:layout_width="match_parent"-->
@@ -141,7 +141,6 @@
                                     android:id="@+id/follow_layout"
                                     android:layout_width="80dp"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginEnd="10dp"
                                     android:layout_marginBottom="5dp"
                                     android:background="@drawable/rectangle_corner_round_seven"
                                     android:gravity="center"
@@ -154,6 +153,7 @@
                                         android:src="@drawable/friend_requests" />
 
                                     <TextView
+                                        android:id="@+id/follow"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginStart="5dp"
@@ -167,10 +167,12 @@
                                     android:id="@+id/more_layout"
                                     android:layout_width="80dp"
                                     android:layout_height="wrap_content"
+                                    android:layout_marginStart="10dp"
                                     android:background="@drawable/rectangle_corner_round_seven"
                                     android:gravity="center"
                                     android:orientation="horizontal"
-                                    android:padding="5dp">
+                                    android:padding="5dp"
+                                    android:visibility="gone">
 
                                     <ImageView
                                         android:layout_width="12dp"

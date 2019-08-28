@@ -62,6 +62,7 @@ import com.doodle.Home.view.activity.PostShare;
 import com.doodle.Post.model.Mim;
 import com.doodle.Post.service.DataProvider;
 import com.doodle.Post.view.activity.PostPopup;
+import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.R;
 import com.doodle.utils.AppConstants;
 import com.doodle.utils.NetworkHelper;
@@ -228,9 +229,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
         commentService = CommentService.mRetrofit.create(CommentService.class);
         networkOk = NetworkHelper.hasNetworkAccess(mContext);
         mProgressBar = (ProgressBar) itemView.findViewById(R.id.ProgressBar);
-
     }
-
 
     AppCompatActivity activity;
     int position;
@@ -568,6 +567,19 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                 //  .crossFade()
                 .into(imagePostUser);
 
+        tvPostUserName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mContext.startActivity(new Intent(mContext, ProfileActivity.class).putExtra("user_id", item.getPostUserid()).putExtra("user_name", item.getPostUsername()));
+            }
+        });
+
+        imagePostUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mContext.startActivity(new Intent(mContext, ProfileActivity.class).putExtra("user_id", item.getPostUserid()).putExtra("user_name", item.getPostUsername()));
+            }
+        });
 
         imagePostShare.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("RestrictedApi")

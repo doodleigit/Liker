@@ -146,4 +146,5 @@ dependencies {
 //Slide Animation=====================================================
     implementation 'com.r0adkll:slidableactivity:2.0.6'
 
+
 }

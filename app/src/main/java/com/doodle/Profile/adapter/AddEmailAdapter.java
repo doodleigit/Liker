@@ -21,13 +21,11 @@ public class AddEmailAdapter extends RecyclerView.Adapter<AddEmailAdapter.ViewHo
 
     private Context context;
     private ArrayList<Email> arrayList;
-    private List<String> emailTypes;
     private EmailModificationListener emailModificationListener;
 
     public AddEmailAdapter(Context context, ArrayList<Email> arrayList, EmailModificationListener emailModificationListener) {
         this.context = context;
         this.arrayList = arrayList;
-        this.emailTypes = Arrays.asList(context.getResources().getStringArray(R.array.phone_type_list));
         this.emailModificationListener = emailModificationListener;
     }
 
@@ -42,12 +40,33 @@ public class AddEmailAdapter extends RecyclerView.Adapter<AddEmailAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
         viewHolder.tvEmail.setText(arrayList.get(i).getEmail());
-        viewHolder.tvEmailType.setText(emailTypes.get(Integer.valueOf(arrayList.get(i).getType()) - 1));
+
+        if (arrayList.get(i).getIsVerified().equals("1")) {
+            viewHolder.tvResendVerification.setVisibility(View.GONE);
+            if (arrayList.get(i).getType().equals("1")) {
+                viewHolder.tvEmailType.setText(context.getText(R.string.primary));
+                viewHolder.tvRemove.setVisibility(View.GONE);
+            } else {
+                viewHolder.tvEmailType.setText(context.getText(R.string.normal));
+                viewHolder.tvRemove.setVisibility(View.VISIBLE);
+            }
+        } else {
+            viewHolder.tvResendVerification.setVisibility(View.VISIBLE);
+            viewHolder.tvEmailType.setText(context.getText(R.string.unverified));
+            viewHolder.tvRemove.setVisibility(View.VISIBLE);
+        }
 
         viewHolder.tvRemove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 emailModificationListener.onEmailRemove(arrayList.get(i), i);
+            }
+        });
+
+        viewHolder.tvResendVerification.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                emailModificationListener.onEmailResendVerification(arrayList.get(i));
             }
         });
     }
@@ -59,13 +78,14 @@ public class AddEmailAdapter extends RecyclerView.Adapter<AddEmailAdapter.ViewHo
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView tvEmail, tvRemove, tvEmailType;
+        TextView tvEmail, tvResendVerification, tvRemove, tvEmailType;
         Spinner emailPrivacySpinner;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             tvEmail = itemView.findViewById(R.id.email);
+            tvResendVerification = itemView.findViewById(R.id.resend_verification);
             tvRemove = itemView.findViewById(R.id.remove);
             tvEmailType = itemView.findViewById(R.id.email_type);
             emailPrivacySpinner = itemView.findViewById(R.id.email_privacy_spinner);

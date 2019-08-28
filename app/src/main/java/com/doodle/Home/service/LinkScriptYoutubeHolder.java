@@ -46,6 +46,7 @@ import com.doodle.Home.view.activity.EditPost;
 import com.doodle.Home.view.activity.Home;
 import com.doodle.Home.view.activity.PostShare;
 import com.doodle.Post.view.activity.PostPopup;
+import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.R;
 import com.doodle.utils.AppConstants;
 import com.doodle.utils.NetworkHelper;
@@ -139,7 +140,6 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
 
     //Delete post
     public LinkScriptYoutubeHolder.PostItemListener listener;
-
     public interface PostItemListener {
         void deletePost(PostItem postItem, int position);
     }
@@ -219,12 +219,9 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
     }
 
     int position;
-
-
     public void setItem(PostItem item, int position) {
         this.item = item;
         this.position = position;
-
 
         userPostId = item.getPostId();
 
@@ -241,8 +238,6 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
                 imagePostPermission.setBackgroundResource(R.drawable.ic_friends_12dp);
                 break;
         }
-
-
 
 
         tvCommentLike.setOnClickListener(new View.OnClickListener() {
@@ -494,6 +489,19 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
             e.printStackTrace();
         }
 
+        tvPostUserName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mContext.startActivity(new Intent(mContext, ProfileActivity.class).putExtra("user_id", item.getPostUserid()).putExtra("user_name", item.getPostUsername()));
+            }
+        });
+
+        imagePostUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mContext.startActivity(new Intent(mContext, ProfileActivity.class).putExtra("user_id", item.getPostUserid()).putExtra("user_name", item.getPostUsername()));
+            }
+        });
 
         imgLinkScript.setOnClickListener(new View.OnClickListener() {
             @Override

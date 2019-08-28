@@ -110,7 +110,7 @@ public class AboutFragment extends Fragment {
     private ArrayList<Links> links;
     private ArrayList<PhoneCountry> phoneCountries;
 
-    private String deviceId, profileId, profileUserId, token, userIds;
+    private String deviceId, profileUserId, token, userId;
     private boolean isOwnProfile;
 
     private EmailAdapter emailAdapter;
@@ -152,9 +152,8 @@ public class AboutFragment extends Fragment {
 
         profileUserId = getArguments().getString("user_id");
         deviceId = manager.getDeviceId();
-        profileId = manager.getProfileId();
         token = manager.getToken();
-        userIds = manager.getProfileId();
+        userId = manager.getProfileId();
 
         alertDialog = new AlertDialog.Builder(getActivity());
         progressDialog = new ProgressDialog(getActivity());
@@ -294,7 +293,7 @@ public class AboutFragment extends Fragment {
     }
 
     private void ownProfileCheck() {
-        if (profileId.equals(profileUserId)) {
+        if (userId.equals(profileUserId)) {
             isOwnProfile = true;
             ivEditUserInfo.setVisibility(View.VISIBLE);
             ivAddEducation.setVisibility(View.VISIBLE);
@@ -331,7 +330,7 @@ public class AboutFragment extends Fragment {
     }
 
     private void getData() {
-        Call<String> call = profileService.getProfileInfo(deviceId, token, userIds, profileId, userIds);
+        Call<String> call = profileService.getProfileInfo(deviceId, token, userId, profileUserId, userId);
         sendProfileInfoRequest(call);
         sendPhoneCountryListRequest();
     }
@@ -422,7 +421,7 @@ public class AboutFragment extends Fragment {
         Toolbar toolbar = dialog.findViewById(R.id.toolbar);
         LinearLayout addEmailLayout, addPhoneLayout, addLivesInLayout, addHomeStateLayout, addStoryLayout;
         RelativeLayout livesInAddressLayout, homeStateAddressLayout;
-        TextView tvStoryTitle, tvAddEmail, tvAddPhone, tvAddStory, tvLivesInAddress, tvHomeStateAddress;
+        TextView tvStoryTitle, tvAddEmail, tvEmailVerificationMessage, tvAddPhone, tvAddStory, tvLivesInAddress, tvHomeStateAddress;
         ImageView ivLivesInEdit, ivHomeStateEdit;
         EditText etFirstName, etLastName, etHeadline, etAddress, etNewEmail, etNewPhone, etStoryDetails;
         Spinner genderSpinner, birthYearSpinner, birthMonthSpinner, birthDaySpinner, birthYearPrivacySpinner, birthDayPrivacySpinner, emailPrivacySpinner, phoneCountrySpinner, phonePrivacySpinner, phoneTypeSpinner, livesCountrySpinner, livesStateSpinner, homeCountrySpinner,
@@ -442,6 +441,7 @@ public class AboutFragment extends Fragment {
 
         tvStoryTitle = dialog.findViewById(R.id.story_title);
         tvAddEmail = dialog.findViewById(R.id.add_email);
+        tvEmailVerificationMessage = dialog.findViewById(R.id.email_verification_message);
         tvAddPhone = dialog.findViewById(R.id.add_phone);
         tvAddStory = dialog.findViewById(R.id.add_story);
         tvLivesInAddress = dialog.findViewById(R.id.lives_in_address);
@@ -542,8 +542,14 @@ public class AboutFragment extends Fragment {
         EmailModificationListener emailModificationListener = new EmailModificationListener() {
             @Override
             public void onEmailRemove(Email email, int position) {
-                Call<String> call = profileService.removeEmail(deviceId, token, userIds, userIds, email.getEmail());
+                Call<String> call = profileService.removeEmail(deviceId, token, userId, userId, email.getEmail());
                 removeEmail(call, position, emailRecyclerView);
+            }
+
+            @Override
+            public void onEmailResendVerification(Email email) {
+                Call<String> call = profileService.emailVerificationSend(deviceId, token, userId, userId, email.getEmail());
+                emailVerificationSend(call, email, tvEmailVerificationMessage);
             }
         };
 
@@ -555,7 +561,7 @@ public class AboutFragment extends Fragment {
 
             @Override
             public void onPhoneRemove(Phone phone, int position) {
-                Call<String> call = profileService.removePhone(deviceId, token, userIds, userIds, phone.getPhoneNumber());
+                Call<String> call = profileService.removePhone(deviceId, token, userId, userId, phone.getPhoneNumber());
                 removePhone(call, position, phoneRecyclerView);
             }
         };
@@ -968,7 +974,7 @@ public class AboutFragment extends Fragment {
                 headline = etHeadline.getText().toString();
                 address = etAddress.getText().toString();
 
-                Call<String> call = profileService.setIntro(deviceId, token, userIds, userIds, firstName, lastName, headline, gender[0], address, "", year[0], month[0], day[0], yearPermission[0],
+                Call<String> call = profileService.setIntro(deviceId, token, userId, userId, firstName, lastName, headline, gender[0], address, "", year[0], month[0], day[0], yearPermission[0],
                         dayMonthPermission[0], "", "", "", "");
                 sendSetIntroRequest(call, dialog);
             }
@@ -1127,7 +1133,7 @@ public class AboutFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 String message = getString(R.string.are_you_sure) + " " + "education";
-                Call<String> call = profileService.removeEducation(deviceId, token, userIds, userIds, educationId);
+                Call<String> call = profileService.removeEducation(deviceId, token, userId, userId, educationId);
                 showAlert(message, call, dialog);
             }
         });
@@ -1160,11 +1166,11 @@ public class AboutFragment extends Fragment {
                 description = etSummary.getText().toString();
 
                 if (isUpdate) {
-                    Call<String> call = profileService.updateEducation(deviceId, token, userIds, userIds, educationId, instituteName, instituteType, degreeName, fieldStudyName, websiteUrl, locationName, permissionType,
+                    Call<String> call = profileService.updateEducation(deviceId, token, userId, userId, educationId, instituteName, instituteType, degreeName, fieldStudyName, websiteUrl, locationName, permissionType,
                             grade, startYear, endYear, description, locationActualName, locationCountryName, locationLatitude, locationLongitude);
                     addEducationRequest(call, dialog);
                 } else {
-                    Call<String> call = profileService.addEducation(deviceId, token, userIds, userIds, instituteName, instituteType, degreeName, fieldStudyName, websiteUrl, locationName, permissionType,
+                    Call<String> call = profileService.addEducation(deviceId, token, userId, userId, instituteName, instituteType, degreeName, fieldStudyName, websiteUrl, locationName, permissionType,
                             grade, startYear, endYear, description, locationActualName, locationCountryName, locationLatitude, locationLongitude);
                     addEducationRequest(call, dialog);
                 }
@@ -1186,7 +1192,7 @@ public class AboutFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable editable) {
                 if (etInstituteName.getText().toString().length() > 2) {
-                    Call<String> call = profileService.getSuggestion(deviceId, token, userIds, "institute", etInstituteName.getText().toString());
+                    Call<String> call = profileService.getSuggestion(deviceId, token, userId, "institute", etInstituteName.getText().toString());
                     getAdvanceSuggestion(call, advanceSuggestions, institutionNameRecyclerView);
                 } else {
                     advanceSuggestions.clear();
@@ -1443,7 +1449,7 @@ public class AboutFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 String message = getString(R.string.are_you_sure) + " " + "experience";
-                Call<String> call = profileService.removeExperience(deviceId, token, userIds, userIds, experienceId);
+                Call<String> call = profileService.removeExperience(deviceId, token, userId, userId, experienceId);
                 showAlert(message, call, dialog);
             }
         });
@@ -1473,11 +1479,11 @@ public class AboutFragment extends Fragment {
                 locationName = etSearchPlace.getText().toString();
 
                 if (isUpdate) {
-                    Call<String> call = profileService.updateExperience(deviceId, token, userIds, userIds, experienceId, designationName, companyName, websiteUrl, fromDate, toDate, currentlyWorked, permissionType, description,
+                    Call<String> call = profileService.updateExperience(deviceId, token, userId, userId, experienceId, designationName, companyName, websiteUrl, fromDate, toDate, currentlyWorked, permissionType, description,
                             locationName, locationActualName, locationCountryName, locationLatitude, locationLongitude);
                     addExperienceRequest(call, dialog);
                 } else {
-                    Call<String> call = profileService.addExperience(deviceId, token, userIds, userIds, designationName, companyName, websiteUrl, fromDate, toDate, currentlyWorked, permissionType, description,
+                    Call<String> call = profileService.addExperience(deviceId, token, userId, userId, designationName, companyName, websiteUrl, fromDate, toDate, currentlyWorked, permissionType, description,
                             locationName, locationActualName, locationCountryName, locationLatitude, locationLongitude);
                     addExperienceRequest(call, dialog);
                 }
@@ -1521,7 +1527,7 @@ public class AboutFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable editable) {
                 if (etDesignation.getText().toString().length() > 2) {
-                    Call<String> call = profileService.getExperienceSuggestion(deviceId, token, userIds, "designation", etDesignation.getText().toString());
+                    Call<String> call = profileService.getExperienceSuggestion(deviceId, token, userId, "designation", etDesignation.getText().toString());
                     getSuggestion(call, designations, designationRecyclerView);
                 } else {
                     designations.clear();
@@ -1554,7 +1560,7 @@ public class AboutFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable editable) {
                 if (etCompanyName.getText().toString().length() > 2) {
-                    Call<String> call = profileService.getExperienceSuggestion(deviceId, token, userIds, "institute", etCompanyName.getText().toString());
+                    Call<String> call = profileService.getExperienceSuggestion(deviceId, token, userId, "institute", etCompanyName.getText().toString());
                     getAdvanceSuggestion(call, advanceSuggestions, companyNameRecyclerView);
                 } else {
                     advanceSuggestions.clear();
@@ -1798,7 +1804,7 @@ public class AboutFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 String message = getString(R.string.are_you_sure) + " " + "awards";
-                Call<String> call = profileService.removeAwards(deviceId, token, userIds, userIds, awardsId);
+                Call<String> call = profileService.removeAwards(deviceId, token, userId, userId, awardsId);
                 showAlert(message, call, dialog);
             }
         });
@@ -1828,11 +1834,11 @@ public class AboutFragment extends Fragment {
                 locationName = etSearchPlace.getText().toString();
 
                 if (isUpdate) {
-                    Call<String> call = profileService.updateAwards(deviceId, token, userIds, userIds, awardsId, instituteName, instituteType, websiteUrl, awardsName, date, permissionType, description,
+                    Call<String> call = profileService.updateAwards(deviceId, token, userId, userId, awardsId, instituteName, instituteType, websiteUrl, awardsName, date, permissionType, description,
                             locationName, locationActualName, locationCountryName, locationLatitude, locationLongitude);
                     addAwardsRequest(call, dialog);
                 } else {
-                    Call<String> call = profileService.addAwards(deviceId, token, userIds, userIds, instituteName, instituteType, websiteUrl, awardsName, date, permissionType, description,
+                    Call<String> call = profileService.addAwards(deviceId, token, userId, userId, instituteName, instituteType, websiteUrl, awardsName, date, permissionType, description,
                             locationName, locationActualName, locationCountryName, locationLatitude, locationLongitude);
                     addAwardsRequest(call, dialog);
                 }
@@ -1854,7 +1860,7 @@ public class AboutFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable editable) {
                 if (etAwardsName.getText().toString().length() > 2) {
-                    Call<String> call = profileService.getAwardsSuggestion(deviceId, token, userIds, "award", etAwardsName.getText().toString());
+                    Call<String> call = profileService.getAwardsSuggestion(deviceId, token, userId, "award", etAwardsName.getText().toString());
                     getSuggestion(call, awardsNames, awardsNameRecyclerView);
                 } else {
                     awardsNames.clear();
@@ -1887,7 +1893,7 @@ public class AboutFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable editable) {
                 if (etInstituteName.getText().toString().length() > 2) {
-                    Call<String> call = profileService.getExperienceSuggestion(deviceId, token, userIds, "institute", etInstituteName.getText().toString());
+                    Call<String> call = profileService.getExperienceSuggestion(deviceId, token, userId, "institute", etInstituteName.getText().toString());
                     getAdvanceSuggestion(call, advanceSuggestions, instituteNameRecyclerView);
                 } else {
                     advanceSuggestions.clear();
@@ -2109,7 +2115,7 @@ public class AboutFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 String message = getString(R.string.are_you_sure) + " " + "certification";
-                Call<String> call = profileService.removeCertification(deviceId, token, userIds, userIds, certificateId);
+                Call<String> call = profileService.removeCertification(deviceId, token, userId, userId, certificateId);
                 showAlert(message, call, dialog);
             }
         });
@@ -2144,11 +2150,11 @@ public class AboutFragment extends Fragment {
                 toDate = toYear[0] + "-01-01";
 
                 if (isUpdate) {
-                    Call<String> call = profileService.updateCertificate(deviceId, token, userIds, userIds, certificateId, instituteName, instituteType, websiteUrl, certificationName, licenseNumber, certificationUrl,
+                    Call<String> call = profileService.updateCertificate(deviceId, token, userId, userId, certificateId, instituteName, instituteType, websiteUrl, certificationName, licenseNumber, certificationUrl,
                             fromDate, isExpired, toDate, permissionType, media, locationName, locationActualName, locationCountryName, locationLatitude, locationLongitude);
                     addAwardsRequest(call, dialog);
                 } else {
-                    Call<String> call = profileService.addCertificate(deviceId, token, userIds, userIds, instituteName, instituteType, websiteUrl, certificationName, licenseNumber, certificationUrl,
+                    Call<String> call = profileService.addCertificate(deviceId, token, userId, userId, instituteName, instituteType, websiteUrl, certificationName, licenseNumber, certificationUrl,
                             fromDate, isExpired, toDate, permissionType, media, locationName, locationActualName, locationCountryName, locationLatitude, locationLongitude);
                     addAwardsRequest(call, dialog);
                 }
@@ -2170,7 +2176,7 @@ public class AboutFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable editable) {
                 if (etCertificateName.getText().toString().length() > 2) {
-                    Call<String> call = profileService.getCertificateSuggestion(deviceId, token, userIds, "certification", etCertificateName.getText().toString());
+                    Call<String> call = profileService.getCertificateSuggestion(deviceId, token, userId, "certification", etCertificateName.getText().toString());
                     getSuggestion(call, certificateNames, certificationRecyclerView);
                 } else {
                     certificateNames.clear();
@@ -2203,7 +2209,7 @@ public class AboutFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable editable) {
                 if (etInstituteName.getText().toString().length() > 2) {
-                    Call<String> call = profileService.getCertificateSuggestion(deviceId, token, userIds, "institute", etInstituteName.getText().toString());
+                    Call<String> call = profileService.getCertificateSuggestion(deviceId, token, userId, "institute", etInstituteName.getText().toString());
                     getAdvanceSuggestion(call, advanceSuggestions, instituteNameRecyclerView);
                 } else {
                     advanceSuggestions.clear();
@@ -2331,7 +2337,7 @@ public class AboutFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 String message = getString(R.string.are_you_sure) + " " + "link";
-                Call<String> call = profileService.removeSocialLinks(deviceId, token, userIds, userIds, etSiteAddress.getText().toString());
+                Call<String> call = profileService.removeSocialLinks(deviceId, token, userId, userId, etSiteAddress.getText().toString());
                 showAlert(message, call, dialog);
             }
         });
@@ -2342,10 +2348,10 @@ public class AboutFragment extends Fragment {
                 link = etSiteAddress.getText().toString();
 
                 if (isUpdate) {
-                    Call<String> call = profileService.updateLink(deviceId, token, userIds, userIds, oldLink, link, type, permissionType);
+                    Call<String> call = profileService.updateLink(deviceId, token, userId, userId, oldLink, link, type, permissionType);
                     addAwardsRequest(call, dialog);
                 } else {
-                    Call<String> call = profileService.addLink(deviceId, token, userIds, userIds, link, type, permissionType);
+                    Call<String> call = profileService.addLink(deviceId, token, userId, userId, link, type, permissionType);
                     addAwardsRequest(call, dialog);
                 }
             }
@@ -2504,7 +2510,7 @@ public class AboutFragment extends Fragment {
     }
 
     private void addEmailRequest(String emailAddress, String emailPrivacyType, AddEmailAdapter addEmailAdapter, EditText etNewEmail, LinearLayout addEmailLayout) {
-        Call<String> call = profileService.addEmail(deviceId, token, userIds, userIds, emailAddress, emailPrivacyType);
+        Call<String> call = profileService.addEmail(deviceId, token, userId, userId, emailAddress, emailPrivacyType);
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
@@ -2523,7 +2529,7 @@ public class AboutFragment extends Fragment {
     }
 
     private void addPhoneRequest(String phoneNumber, String numberType, String phoneNumberPrivacyType, Phone phone, AddPhoneAdapter addPhoneAdapter, EditText etNewPhone, Spinner phoneCountry, LinearLayout addPhoneLayout) {
-        Call<String> call = profileService.addPhone(deviceId, token, userIds, userIds, phoneNumber, numberType, phoneNumberPrivacyType, phone.getCountryId());
+        Call<String> call = profileService.addPhone(deviceId, token, userId, userId, phoneNumber, numberType, phoneNumberPrivacyType, phone.getCountryId());
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
@@ -2543,7 +2549,7 @@ public class AboutFragment extends Fragment {
     }
 
     private void setStoryRequest(String storyType, String storyPrivacyType, String description, AddStoryAdapter addStoryAdapter, EditText etNewStory, LinearLayout addStoryLayout) {
-        Call<String> call = profileService.setStory(deviceId, token, userIds, userIds, storyType, storyPrivacyType, description);
+        Call<String> call = profileService.setStory(deviceId, token, userId, userId, storyType, storyPrivacyType, description);
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
@@ -2564,7 +2570,7 @@ public class AboutFragment extends Fragment {
     private void setLivePlaceRequest(String type, String privacyType, String countryId, String countryName, String cityId, String cityName, LinearLayout addLivesInLayout, RelativeLayout livesInAddressLayout,
                                      TextView tvLivesIn) {
         progressDialog.show();
-        Call<String> call = profileService.setLivePlace(deviceId, token, userIds, userIds, countryId, cityId, type, privacyType);
+        Call<String> call = profileService.setLivePlace(deviceId, token, userId, userId, countryId, cityId, type, privacyType);
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
@@ -2687,6 +2693,36 @@ public class AboutFragment extends Fragment {
         });
     }
 
+    private void emailVerificationSend(Call<String> call, Email email, TextView tvEmailVerificationMessage) {
+        progressDialog.show();
+        call.enqueue(new Callback<String>() {
+
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                String jsonResponse = response.body();
+                try {
+                    JSONObject obj = new JSONObject(jsonResponse);
+                    boolean status = obj.getBoolean("status");
+                    if (status) {
+                        tvEmailVerificationMessage.setText(getString(R.string.a_verification_email_has_been_resent_to_your_email) + " " + email.getEmail() + ". " + getString(R.string.if_you_need_help_please_contact_with_liker_support));
+                        Utils.toast(getContext(), getString(R.string.a_verification_email_has_been_resent_to_your_email), R.drawable.ic_check_black_24dp);
+                    } else {
+                        Utils.toast(getContext(), getString(R.string.something_went_wrong), R.drawable.ic_info_outline_blue_24dp);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                progressDialog.hide();
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.d("MESSAGE: ", t.getMessage());
+                progressDialog.hide();
+            }
+        });
+    }
+
     private void removePhone(Call<String> call, int position, RecyclerView recyclerView) {
         call.enqueue(new Callback<String>() {
 
@@ -2728,7 +2764,7 @@ public class AboutFragment extends Fragment {
         countryInfo.setCountryPostcodeRequired("");
         countryInfo.setCountryStatus("");
         countries.add(countryInfo);
-        Call<Country> call = profileService.getCountryList(deviceId, token, userIds, userIds);
+        Call<Country> call = profileService.getCountryList(deviceId, token, userId, userId);
         call.enqueue(new Callback<Country>() {
 
             @Override
@@ -2757,7 +2793,7 @@ public class AboutFragment extends Fragment {
         city.setName("Select City");
         city.setInactive("");
         cityList.add(city);
-        Call<Cities> call = profileService.getCityList(deviceId, token, userIds, userIds, countryId);
+        Call<Cities> call = profileService.getCityList(deviceId, token, userId, userId, countryId);
         call.enqueue(new Callback<Cities>() {
 
             @Override
@@ -2790,7 +2826,7 @@ public class AboutFragment extends Fragment {
         phoneCountry.setCountryIsoCode2("");
         phoneCountry.setCountryPhoneCode("");
         phoneCountries.add(phoneCountry);
-        Call<ArrayList<PhoneCountry>> call = profileService.getCountryPhoneCodes(deviceId, token, userIds, userIds);
+        Call<ArrayList<PhoneCountry>> call = profileService.getCountryPhoneCodes(deviceId, token, userId, userId);
         call.enqueue(new Callback<ArrayList<PhoneCountry>>() {
 
             @Override

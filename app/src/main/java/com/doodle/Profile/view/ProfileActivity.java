@@ -17,7 +17,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -66,10 +65,10 @@ public class ProfileActivity extends AppCompatActivity {
     //    private ViewPager viewPager;
     private Toolbar toolbar;
     private ScrollView scrollView;
-    private LinearLayout searchLayout;
+    private LinearLayout searchLayout, followLayout;
     private RelativeLayout coverImageLayout, profileImageLayout;
     private ImageView ivCoverImage, ivProfileImage, ivChangeCoverImage, ivChangeProfileImage;
-    private TextView tvUserName, tvTotalInfoCount;
+    private TextView tvUserName, tvTotalInfoCount, tvFollow;
 
     private ProfileService profileService;
     private ProgressDialog progressDialog;
@@ -81,8 +80,8 @@ public class ProfileActivity extends AppCompatActivity {
     private final int REQUEST_TAKE_CAMERA = 101;
     private final int REQUEST_TAKE_GALLERY_IMAGE = 102;
     private int uploadContentType = 0;
-    private String deviceId, profileId, token, userName, fullName, profileImage, coverImage, allCountInfo;
-
+    private String deviceId, userId, token, profileUserName, fullName, userImage, coverImage, allCountInfo;
+    private boolean isOwnProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,15 +94,16 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void initialComponent() {
         profileUserId = getIntent().getStringExtra("user_id");
+        profileUserName = getIntent().getStringExtra("user_name");
         manager = new PrefManager(this);
         deviceId = manager.getDeviceId();
-        profileId = manager.getProfileId();
+        userId = manager.getProfileId();
         token = manager.getToken();
-        userName = manager.getUserName();
 
         toolbar = findViewById(R.id.toolbar);
         scrollView = findViewById(R.id.scrollView);
         searchLayout = findViewById(R.id.search_layout);
+        followLayout = findViewById(R.id.follow_layout);
         coverImageLayout = findViewById(R.id.cover_image_layout);
         profileImageLayout = findViewById(R.id.profile_image_layout);
         ivCoverImage = findViewById(R.id.cover_image);
@@ -112,6 +112,7 @@ public class ProfileActivity extends AppCompatActivity {
         ivChangeProfileImage = findViewById(R.id.change_profile_image);
         tvUserName = findViewById(R.id.user_name);
         tvTotalInfoCount = findViewById(R.id.total_info_count);
+        tvFollow = findViewById(R.id.follow);
         tabLayout = findViewById(R.id.tabs);
 //        viewPager = findViewById(R.id.viewpager);
 
@@ -121,6 +122,8 @@ public class ProfileActivity extends AppCompatActivity {
         progressDialog.setCancelable(false);
         progressDialog.show();
 
+        ownProfileCheck();
+
         searchLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -128,19 +131,31 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
-        coverImageLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                uploadContentType = 1;
-                selectImageSource(ivChangeCoverImage);
-            }
-        });
-
         profileImageLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                uploadContentType = 0;
-                selectImageSource(ivChangeProfileImage);
+                if (isOwnProfile) {
+                    uploadContentType = 0;
+                    selectImageSource(ivChangeProfileImage);
+                }
+            }
+        });
+
+        coverImageLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (isOwnProfile) {
+                    uploadContentType = 1;
+                    selectImageSource(ivChangeCoverImage);
+                }
+            }
+        });
+
+        followLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                setFollow(profileUserId);
+//                setUnFollow(profileUserId);
             }
         });
 
@@ -166,14 +181,28 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
+    private void ownProfileCheck() {
+        if (userId.equals(profileUserId)) {
+            isOwnProfile = true;
+            ivChangeProfileImage.setVisibility(View.VISIBLE);
+            ivChangeCoverImage.setVisibility(View.VISIBLE);
+            followLayout.setVisibility(View.INVISIBLE);
+        } else {
+            isOwnProfile = false;
+            ivChangeProfileImage.setVisibility(View.INVISIBLE);
+            ivChangeCoverImage.setVisibility(View.INVISIBLE);
+            followLayout.setVisibility(View.VISIBLE);
+        }
+    }
+
     private void getData() {
-        Call<UserAllInfo> call = profileService.getUserInfo(deviceId, profileId, token, profileId, userName, true);
+        Call<UserAllInfo> call = profileService.getUserInfo(deviceId, userId, token, userId, profileUserName, true);
         getUserInfo(call);
     }
 
     private void setData() {
         fullName = userAllInfo.getFirstName() + " " + userAllInfo.getLastName();
-        profileImage = AppConstants.USER_UPLOADED_IMAGES + userAllInfo.getPhoto();
+        userImage = AppConstants.USER_UPLOADED_IMAGES + userAllInfo.getPhoto();
         coverImage = AppConstants.USER_UPLOADED_IMAGES + userAllInfo.getCoverImage();
         allCountInfo = userAllInfo.getTotalLikes() + " Likes " + userAllInfo.getTotalFollowers() + " Followers " + userAllInfo.getGoldStars() + " Stars";
         tvUserName.setText(fullName);
@@ -184,7 +213,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void loadProfileImage() {
         Glide.with(App.getAppContext())
-                .load(profileImage)
+                .load(userImage)
                 .placeholder(R.drawable.profile)
                 .error(R.drawable.profile)
                 .centerCrop()
@@ -203,6 +232,7 @@ public class ProfileActivity extends AppCompatActivity {
     private void initialFragment(Fragment fragment) {
         Bundle bundle = new Bundle();
         bundle.putString("user_id", profileUserId);
+        bundle.putString("user_name", profileUserName);
         android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         fragment.setArguments(bundle);
         transaction.replace(R.id.container, fragment).commit();
@@ -272,9 +302,9 @@ public class ProfileActivity extends AppCompatActivity {
         MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("picture", file.getName(), requestFile);
         Call<String> mediaCall;
         if (uploadContentType == 0) {
-            mediaCall = profileService.uploadProfileImage(deviceId, profileId, token, fileToUpload);
+            mediaCall = profileService.uploadProfileImage(deviceId, userId, token, fileToUpload);
         } else {
-            mediaCall = profileService.uploadCoverImage(deviceId, profileId, token, fileToUpload);
+            mediaCall = profileService.uploadCoverImage(deviceId, userId, token, fileToUpload);
         }
         progressDialog.setMessage(getString(R.string.uploading));
         progressDialog.show();
@@ -451,6 +481,62 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
+    private void setFollow(String followUserId) {
+        progressDialog.show();
+        Call<String> call = profileService.setFollow(deviceId, token, userId, userId, followUserId);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                String jsonResponse = response.body();
+                try {
+                    JSONObject obj = new JSONObject(jsonResponse);
+                    boolean status = obj.getBoolean("status");
+                    if (status) {
+                        tvFollow.setText(getString(R.string.unfollow));
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                progressDialog.hide();
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                progressDialog.hide();
+            }
+        });
+    }
+
+    private void setUnFollow(String followUserId) {
+        progressDialog.show();
+        Call<String> call = profileService.setUnFollow(deviceId, token, userId, userId, followUserId);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                String jsonResponse = response.body();
+                try {
+                    JSONObject obj = new JSONObject(jsonResponse);
+                    boolean status = obj.getBoolean("status");
+                    if (status) {
+                        tvFollow.setText(getString(R.string.follow));
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                progressDialog.hide();
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                progressDialog.hide();
+            }
+        });
+    }
+
     private void sendImageRequest(Call<String> call) {
         call.enqueue(new Callback<String>() {
             @Override
@@ -462,7 +548,7 @@ public class ProfileActivity extends AppCompatActivity {
                     if (status) {
                         String image = object.getString("image");
                         if (uploadContentType == 0) {
-                            profileImage = image;
+                            userImage = image;
                             loadProfileImage();
                         } else {
                             coverImage = image;

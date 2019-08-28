@@ -50,6 +50,7 @@ import com.doodle.Home.view.activity.EditPost;
 import com.doodle.Home.view.activity.Home;
 import com.doodle.Home.view.activity.PostShare;
 import com.doodle.Post.adapter.MimAdapter;
+import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.R;
 import com.doodle.utils.AppConstants;
 import com.doodle.utils.NetworkHelper;
@@ -476,6 +477,21 @@ public class ImageHolder extends RecyclerView.ViewHolder {
         if (!isNullOrEmpty(item.getTotalComment()) && !"0".equalsIgnoreCase(item.getTotalComment())) {
             tvCommentCount.setText(item.getTotalComment());
         }
+
+        tvPostUserName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mContext.startActivity(new Intent(mContext, ProfileActivity.class).putExtra("user_id", item.getPostUserid()).putExtra("user_name", item.getPostUsername()));
+            }
+        });
+
+        imagePostUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mContext.startActivity(new Intent(mContext, ProfileActivity.class).putExtra("user_id", item.getPostUserid()).putExtra("user_name", item.getPostUsername()));
+            }
+        });
+
         imagePostShare.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("RestrictedApi")
             @Override

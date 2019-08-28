@@ -356,6 +356,18 @@
                     android:layout_height="wrap_content"
                     android:visibility="visible" />
 
+                <TextView
+                    android:id="@+id/email_verification_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:padding="10dp"
+                    android:background="@color/light_green"
+                    android:text="@string/a_verification_email_has_been_resent_to_your_email"
+                    android:textColor="@color/deep_green"
+                    android:textSize="14sp"
+                    android:visibility="gone"/>
+
                 <LinearLayout
                     android:id="@+id/add_email_layout"
                     android:layout_width="match_parent"

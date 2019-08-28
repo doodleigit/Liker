@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
@@ -47,7 +46,7 @@ public class PhotosFragment extends Fragment {
     private PhotoAdapter photoAdapter;
     private ArrayList<PhotoAlbum> photoAlbums;
     private ArrayList<RecentPhoto> recentPhotos;
-    private String deviceId, profileId, token, userIds;
+    private String deviceId, profileUserId, token, userId;
     int limit = 10;
     int offset = 0;
 
@@ -72,9 +71,9 @@ public class PhotosFragment extends Fragment {
         photoAlbums = new ArrayList<>();
         recentPhotos = new ArrayList<>();
         deviceId = manager.getDeviceId();
-        profileId = manager.getProfileId();
+        profileUserId = getArguments().getString("user_id");
         token = manager.getToken();
-        userIds = manager.getProfileId();
+        userId = manager.getProfileId();
 
         photoAlbumClickListener = new PhotoAlbumClickListener() {
             @Override
@@ -98,9 +97,9 @@ public class PhotosFragment extends Fragment {
     }
 
     private void getData() {
-        Call<ArrayList<PhotoAlbum>> callAlbums = profileService.getAlbums(deviceId, token, userIds, profileId, userIds);
+        Call<ArrayList<PhotoAlbum>> callAlbums = profileService.getAlbums(deviceId, token, userId, profileUserId, userId);
         sendAlbumListRequest(callAlbums);
-        Call<ArrayList<RecentPhoto>> callPhotos = profileService.getRecentPhotos(deviceId, token, userIds, profileId, userIds, limit, offset);
+        Call<ArrayList<RecentPhoto>> callPhotos = profileService.getRecentPhotos(deviceId, token, userId, profileUserId, userId, limit, offset);
         sendRecentListRequest(callPhotos);
     }
 
@@ -120,7 +119,7 @@ public class PhotosFragment extends Fragment {
 
         tvTitle.setText(photoAlbum.getTitle());
 
-        Call<ArrayList<AlbumPhoto>> callPhotos = profileService.getAlbumPhotos(deviceId, token, userIds, profileId, String.valueOf(photoAlbum.getAlbumType()), userIds, limit, offset);
+        Call<ArrayList<AlbumPhoto>> callPhotos = profileService.getAlbumPhotos(deviceId, token, userId, profileUserId, String.valueOf(photoAlbum.getAlbumType()), userId, limit, offset);
         sendAlbumPhotoListRequest(callPhotos, albumPhotos, albumPhotoAdapter);
 
         toolbar.setOnClickListener(new View.OnClickListener() {

@@ -63,6 +63,7 @@ import com.doodle.Post.service.DataProvider;
 import com.doodle.Post.view.activity.PostCategory;
 import com.doodle.Post.view.activity.PostNew;
 import com.doodle.Post.view.activity.PostPopup;
+import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.R;
 import com.doodle.utils.AppConstants;
 import com.doodle.utils.NetworkHelper;
@@ -276,7 +277,6 @@ public class TextHolder extends RecyclerView.ViewHolder {
     AppCompatActivity activity;
     int position;
 
-
     public void setItem(final PostItem item, int position) {
         this.item = item;
         this.position = position;
@@ -295,8 +295,6 @@ public class TextHolder extends RecyclerView.ViewHolder {
                 imagePostPermission.setBackgroundResource(R.drawable.ic_friends_12dp);
                 break;
         }
-
-
 
 
         tvCommentLike.setOnClickListener(new View.OnClickListener() {
@@ -619,6 +617,19 @@ public class TextHolder extends RecyclerView.ViewHolder {
                 //  .crossFade()
                 .into(imagePostUser);
 
+        tvPostUserName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mContext.startActivity(new Intent(mContext, ProfileActivity.class).putExtra("user_id", item.getPostUserid()).putExtra("user_name", item.getPostUsername()));
+            }
+        });
+
+        imagePostUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mContext.startActivity(new Intent(mContext, ProfileActivity.class).putExtra("user_id", item.getPostUserid()).putExtra("user_name", item.getPostUsername()));
+            }
+        });
 
         imagePostComment.setOnClickListener(new View.OnClickListener() {
             @Override
