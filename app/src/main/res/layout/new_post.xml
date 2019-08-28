@@ -176,6 +176,14 @@
                         </android.support.v7.widget.RecyclerView>
 
                     </LinearLayout>
+
+                    <ProgressBar
+                        android:visibility="gone"
+                        style="@android:style/Widget.ProgressBar.Small.Inverse"
+                        android:id="@+id/mediaProgress"
+                        android:layout_centerInParent="true"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
                 </RelativeLayout>
 
 

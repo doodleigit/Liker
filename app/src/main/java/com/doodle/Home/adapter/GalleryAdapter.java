@@ -79,6 +79,8 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
 
 */
 
+
+
         Glide.with(App.getAppContext())
                 .load(postImages)
                 .centerCrop()

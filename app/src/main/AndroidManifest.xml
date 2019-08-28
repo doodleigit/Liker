@@ -21,11 +21,14 @@
         android:theme="@style/AppTheme"
         android:vmSafeMode="true"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".Home.view.activity.EditPost"
+        <activity android:name=".Post.view.activity.PostPopup"
+          android:theme="@style/AppTheme.SlidrActivityTheme"
+            />
+        <activity
+            android:name=".Home.view.activity.EditPost"
             android:parentActivityName=".Home.view.activity.Home"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustResize"
-            />
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".Setting.view.SettingActivity"
             android:theme="@style/AppTheme.NoActionBar" />

@@ -44,6 +44,7 @@ import com.doodle.Home.model.postshare.PostShareItem;
 import com.doodle.Home.view.activity.EditPost;
 import com.doodle.Home.view.activity.Home;
 import com.doodle.Home.view.activity.PostShare;
+import com.doodle.Post.view.activity.PostPopup;
 import com.doodle.R;
 import com.doodle.utils.AppConstants;
 import com.doodle.utils.NetworkHelper;
@@ -226,9 +227,12 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
 
     int position;
 
+
     public void setItem(PostItem item, int position) {
         this.item = item;
         this.position = position;
+
+
 
         String postPermission = item.getPermission();
 
@@ -243,6 +247,9 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
                 imagePostPermission.setBackgroundResource(R.drawable.ic_friends_12dp);
                 break;
         }
+
+
+
 
         userPostId = item.getPostId();
 

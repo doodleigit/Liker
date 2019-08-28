@@ -949,7 +949,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
             Call<Comment_> call = commentService.addedComment(deviceId, profileId, token, fileToUpload, commentText, commentType, hasMention, linkUrl, mention, postId, userIds);
             sendCommentItemRequest(call);
 
-//            Call<String> mediaCall = webService.postImage(deviceId, profileId, token, fileToUpload);
+//            Call<String> mediaCall = webService.addPhoto(deviceId, profileId, token, fileToUpload);
 //            sendImageRequest(mediaCall);
 
         }

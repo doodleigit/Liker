@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:layout_below="@id/containerHeader"
-
+            android:transitionName="@string/transition_photo"
             >
 
             <com.borjabravo.readmoretextview.ReadMoreTextView

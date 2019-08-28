@@ -144,7 +144,7 @@ post_id	13656
 
     @Multipart
     @POST(AppConstants.ADD_PHOTO)
-    Call<String> postImage(
+    Call<String> addPhoto(
             @Header("Device-Id") String deviceId,
             @Header("User-Id") String userId,
             @Header("Security-Token") String token,

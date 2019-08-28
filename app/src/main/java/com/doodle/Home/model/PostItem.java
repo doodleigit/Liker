@@ -4,15 +4,16 @@ package com.doodle.Home.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.Parcelable.Creator;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 
-public class PostItem implements Serializable, Parcelable
-{
+public class PostItem implements Serializable, Parcelable {
 
     @SerializedName("post_id")
     @Expose
@@ -133,9 +134,22 @@ public class PostItem implements Serializable, Parcelable
     @Expose
     private String postLinkHost;
 
+    @SerializedName("single_file_type")
+    @Expose
+    private String singleFileType;
+
     @SerializedName("post_files")
     @Expose
     private List<PostFile> postFiles = new ArrayList<PostFile>();
+
+
+    public String getSingleFileType() {
+        return singleFileType;
+    }
+
+    public void setSingleFileType(String singleFileType) {
+        this.singleFileType = singleFileType;
+    }
 
     public List<PostFile> getPostFiles() {
         return postFiles;
@@ -165,7 +179,7 @@ public class PostItem implements Serializable, Parcelable
 
 
         @SuppressWarnings({
-            "unchecked"
+                "unchecked"
         })
         public PostItem createFromParcel(Parcel in) {
             return new PostItem(in);
@@ -175,8 +189,7 @@ public class PostItem implements Serializable, Parcelable
             return (new PostItem[size]);
         }
 
-    }
-    ;
+    };
     private final static long serialVersionUID = 6776697018148002004L;
 
     protected PostItem(Parcel in) {
@@ -219,6 +232,7 @@ public class PostItem implements Serializable, Parcelable
         this.isNotificationOff = ((boolean) in.readValue((boolean.class.getClassLoader())));
         in.readList(this.mentionedUserIds, (java.lang.String.class.getClassLoader()));
         this.postLinkHost = ((String) in.readValue((String.class.getClassLoader())));
+        this.singleFileType = ((String) in.readValue((String.class.getClassLoader())));
         in.readList(this.postFiles, (PostFile.class.getClassLoader()));
     }
 
@@ -522,7 +536,6 @@ public class PostItem implements Serializable, Parcelable
     }
 
 
-
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeValue(postId);
         dest.writeValue(postType);
@@ -564,10 +577,11 @@ public class PostItem implements Serializable, Parcelable
         dest.writeList(mentionedUserIds);
         dest.writeValue(postLinkHost);
         dest.writeList(postFiles);
+        dest.writeValue(singleFileType);
     }
 
     public int describeContents() {
-        return  0;
+        return 0;
     }
 
 }

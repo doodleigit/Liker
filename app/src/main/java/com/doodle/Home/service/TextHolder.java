@@ -62,6 +62,7 @@ import com.doodle.Post.model.Mim;
 import com.doodle.Post.service.DataProvider;
 import com.doodle.Post.view.activity.PostCategory;
 import com.doodle.Post.view.activity.PostNew;
+import com.doodle.Post.view.activity.PostPopup;
 import com.doodle.R;
 import com.doodle.utils.AppConstants;
 import com.doodle.utils.NetworkHelper;
@@ -173,16 +174,18 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
 
     //Delete post
-   public PostItemListener postTextListener;
+    public PostItemListener postTextListener;
+
     public interface PostItemListener {
         void deletePost(PostItem postItem, int position);
 
     }
+
     public TextHolder(View itemView, Context context, PostItemListener postTextListener) {
         super(itemView);
 
         mContext = context;
-        this.postTextListener=postTextListener;
+        this.postTextListener = postTextListener;
 
         callbackManager = CallbackManager.Factory.create();
         shareDialog = new ShareDialog((Activity) context);
@@ -273,6 +276,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
     AppCompatActivity activity;
     int position;
 
+
     public void setItem(final PostItem item, int position) {
         this.item = item;
         this.position = position;
@@ -291,6 +295,8 @@ public class TextHolder extends RecyclerView.ViewHolder {
                 imagePostPermission.setBackgroundResource(R.drawable.ic_friends_12dp);
                 break;
         }
+
+
 
 
         tvCommentLike.setOnClickListener(new View.OnClickListener() {
@@ -838,15 +844,15 @@ public class TextHolder extends RecyclerView.ViewHolder {
                         if (id == R.id.edit) {
                             Intent intent = new Intent(mContext, EditPost.class);
                             App.setPosition(position);
-                            intent.putExtra(ITEM_KEY,(Parcelable) item);
+                            intent.putExtra(ITEM_KEY, (Parcelable) item);
                             mContext.startActivity(intent);
-                            ((Activity) mContext ).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
+                            ((Activity) mContext).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
                         }
                         if (id == R.id.delete) {
                             if (!((Activity) mContext).isFinishing()) {
                                 App.setItem(item);
                                 App.setPosition(position);
-                                postTextListener.deletePost(item,position);
+                                postTextListener.deletePost(item, position);
                             } else {
                                 dismissDialog();
                             }

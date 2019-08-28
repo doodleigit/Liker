@@ -45,6 +45,7 @@ import com.doodle.Home.model.postshare.PostShareItem;
 import com.doodle.Home.view.activity.EditPost;
 import com.doodle.Home.view.activity.Home;
 import com.doodle.Home.view.activity.PostShare;
+import com.doodle.Post.view.activity.PostPopup;
 import com.doodle.R;
 import com.doodle.utils.AppConstants;
 import com.doodle.utils.NetworkHelper;
@@ -85,7 +86,7 @@ import static com.doodle.utils.Utils.showBlockUser;
 import static java.lang.Integer.parseInt;
 
 public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
-    public TextView tvHeaderInfo, tvPostTime, tvPostUserName, tvImgShareCount, tvPostLikeCount, tvLinkScriptText,tvCommentCount;
+    public TextView tvHeaderInfo, tvPostTime, tvPostUserName, tvImgShareCount, tvPostLikeCount, tvLinkScriptText, tvCommentCount;
     public CircleImageView imagePostUser;
     public ReadMoreTextView tvPostContent;
     public EmojiTextView tvPostEmojiContent;
@@ -95,12 +96,11 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
     public ImageView imagePostPermission;
     public LinearLayout postBodyLayer;
     PostItem item;
-    public TextView tvPostLinkTitle,tvPostLinkDescription,tvPostLinkHost;
+    public TextView tvPostLinkTitle, tvPostLinkDescription, tvPostLinkHost;
 
 
-
-    public ImageView imagePostShare,imagePermission;
-    private PopupMenu popup,popupMenu;
+    public ImageView imagePostShare, imagePermission;
+    private PopupMenu popup, popupMenu;
     public HomeService webService;
     public PrefManager manager;
     private String deviceId, profileId, token, userIds;
@@ -139,14 +139,15 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
 
     //Delete post
     public LinkScriptYoutubeHolder.PostItemListener listener;
+
     public interface PostItemListener {
         void deletePost(PostItem postItem, int position);
     }
 
-    public LinkScriptYoutubeHolder(View itemView,Context context,LinkScriptYoutubeHolder.PostItemListener listener) {
+    public LinkScriptYoutubeHolder(View itemView, Context context, LinkScriptYoutubeHolder.PostItemListener listener) {
         super(itemView);
-        mContext=context;
-        this.listener=listener;
+        mContext = context;
+        this.listener = listener;
         callbackManager = CallbackManager.Factory.create();
         shareDialog = new ShareDialog((Activity) context);
         manager = new PrefManager(App.getAppContext());
@@ -218,9 +219,12 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
     }
 
     int position;
+
+
     public void setItem(PostItem item, int position) {
         this.item = item;
-         this.position=position;
+        this.position = position;
+
 
         userPostId = item.getPostId();
 
@@ -237,6 +241,8 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
                 imagePostPermission.setBackgroundResource(R.drawable.ic_friends_12dp);
                 break;
         }
+
+
 
 
         tvCommentLike.setOnClickListener(new View.OnClickListener() {
@@ -478,7 +484,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
 
         tvPostLinkTitle.setText(item.getPostLinkTitle());
         tvPostLinkDescription.setText(item.getPostLinkDesc());
-        if(!isNullOrEmpty(item.getTotalComment())&& !"0".equalsIgnoreCase(item.getTotalComment())){
+        if (!isNullOrEmpty(item.getTotalComment()) && !"0".equalsIgnoreCase(item.getTotalComment())) {
             tvCommentCount.setText(item.getTotalComment());
         }
         try {
@@ -487,7 +493,6 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-
 
 
         imgLinkScript.setOnClickListener(new View.OnClickListener() {
@@ -518,7 +523,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
                 popup.getMenuInflater().inflate(R.menu.share_menu, popup.getMenu());
 
 //                popup.show();
-                MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popup.getMenu(),v);
+                MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popup.getMenu(), v);
                 menuHelper.setForceShowIcon(true);
                 menuHelper.show();
 
@@ -606,7 +611,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
                     popupMenu.getMenu().findItem(R.id.onlyMe).setVisible(true);
                     popupMenu.getMenu().findItem(R.id.edit).setVisible(true);
                     popupMenu.getMenu().findItem(R.id.delete).setVisible(true);
-                   // popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(true);
+                    // popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(true);
                 } else {
                     popupMenu.getMenu().findItem(R.id.blockedUser).setVisible(true);
                     popupMenu.getMenu().findItem(R.id.reportedPost).setVisible(true);
@@ -615,7 +620,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
                     popupMenu.getMenu().findItem(R.id.onlyMe).setVisible(false);
                     popupMenu.getMenu().findItem(R.id.edit).setVisible(false);
                     popupMenu.getMenu().findItem(R.id.delete).setVisible(false);
-                   // popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(true);
+                    // popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(true);
                 }
 
 
@@ -640,7 +645,6 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
                 }
 
 
-
 //                popup.show();
                 MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popupMenu.getMenu(), v);
                 menuHelper.setForceShowIcon(true);
@@ -655,7 +659,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
                             if (!((Activity) mContext).isFinishing()) {
                                 App.setItem(item);
                                 showBlockUser(v);
-                            }else {
+                            } else {
                                 dismissDialog();
                             }
                         }
@@ -704,12 +708,12 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
                         if (id == R.id.edit) {
                             Intent intent = new Intent(mContext, EditPost.class);
                             App.setPosition(position);
-                            intent.putExtra(ITEM_KEY,(Parcelable) item);
+                            intent.putExtra(ITEM_KEY, (Parcelable) item);
                             mContext.startActivity(intent);
-                            ((Activity) mContext ).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
+                            ((Activity) mContext).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
                         }
                         if (id == R.id.delete) {
-                            listener.deletePost(item,position);
+                            listener.deletePost(item, position);
                         }
                         if (id == R.id.turnOffNotification) {
                             activity = (AppCompatActivity) v.getContext();
@@ -748,12 +752,12 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
                 popupCommentMenu = new PopupMenu(mContext, v);
                 popupCommentMenu.getMenuInflater().inflate(R.menu.post_comment_menu, popupCommentMenu.getMenu());
 
-                if(userPostId.equalsIgnoreCase(commentPostId)){
+                if (userPostId.equalsIgnoreCase(commentPostId)) {
                     popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(false);
                     popupCommentMenu.getMenu().findItem(R.id.blockUser).setVisible(false);
                     popupCommentMenu.getMenu().findItem(R.id.editComment).setVisible(true);
                     popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(true);
-                }else {
+                } else {
                     popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(true);
                     popupCommentMenu.getMenu().findItem(R.id.blockUser).setVisible(true);
                     popupCommentMenu.getMenu().findItem(R.id.editComment).setVisible(false);
@@ -869,7 +873,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
             public void onResponse(Call<CommentItem> mCall, Response<CommentItem> response) {
 
 
-                if(response.body()!=null){
+                if (response.body() != null) {
                     CommentItem commentItem = response.body();
                     Intent intent = new Intent(mContext, CommentPost.class);
                     intent.putExtra(COMMENT_KEY, (Parcelable) commentItem);
@@ -891,6 +895,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
         });
 
     }
+
     private void sendShareItemRequest(Call<PostShareItem> call) {
 
 
@@ -911,6 +916,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
                 }
 
             }
+
             @Override
             public void onFailure(Call<PostShareItem> call, Throwable t) {
                 Log.d("MESSAGE: ", t.getMessage());
@@ -918,6 +924,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
             }
         });
     }
+
     private void sendReportReason(Call<ReportReason> call) {
         call.enqueue(new Callback<ReportReason>() {
 
@@ -927,11 +934,11 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
 
                 if (response.body() != null) {
                     ReportReason reportReason = response.body();
-                    boolean isFollowed=reportReason.isFollowed();
+                    boolean isFollowed = reportReason.isFollowed();
                     App.setIsFollow(isFollowed);
-                    List<Reason> reasonList=reportReason.getReason();
-                    PostItem item=new PostItem();
-                    CommentItem commentItems=new CommentItem();
+                    List<Reason> reasonList = reportReason.getReason();
+                    PostItem item = new PostItem();
+                    CommentItem commentItems = new CommentItem();
                     ReportReasonSheet reportReasonSheet = ReportReasonSheet.newInstance(reasonList);
                     reportReasonSheet.show(activity.getSupportFragmentManager(), "ReportReasonSheet");
 

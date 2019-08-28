@@ -54,13 +54,6 @@
                 android:layout_height="220dp"
                 android:visibility="gone" />
 
-            <ImageView
-                android:id="@+id/videoView_thumbnail"
-                android:layout_width="match_parent"
-                android:layout_height="220dp"
-                android:scaleType="centerCrop"
-                android:visibility="gone" />
-
             <cn.jzvd.JZVideoPlayerStandard
                 android:id="@+id/videoplayer"
                 android:layout_width="match_parent"
