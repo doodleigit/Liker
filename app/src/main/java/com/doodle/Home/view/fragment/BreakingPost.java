@@ -264,7 +264,7 @@ public class BreakingPost extends Fragment {
                             if (status) {
                                 postItemList.remove(deletePostItem);
                                 adapter.deleteItem(deletePosition);
-                                offset++;
+                                offset--;
                                 recyclerView.smoothScrollToPosition(0);
                             }
 
@@ -353,7 +353,7 @@ public class BreakingPost extends Fragment {
 
                     totalPostIDs = sb.substring(separator.length()).replaceAll("\\s+", "");
                     Log.d("friends", totalPostIDs);
-                    Call<CommentItem> mCall = webService.getPostComments(deviceId, profileId, token, "false", 1, 0, "DESC", totalPostIDs, userIds);
+                    Call<CommentItem> mCall = webService.getPostComments(deviceId, profileId, token, "false", limit, offset, "DESC", totalPostIDs, userIds);
                     sendCommentItemPagingRequest(mCall);
 
 
@@ -427,7 +427,7 @@ public class BreakingPost extends Fragment {
 
                     totalPostIDs = sb.substring(separator.length()).replaceAll("\\s+", "");
                     Log.d("friends", totalPostIDs);
-                    Call<CommentItem> mCall = webService.getPostComments(deviceId, profileId, token, "false", 1, 0, "DESC", totalPostIDs, userIds);
+                    Call<CommentItem> mCall = webService.getPostComments(deviceId, profileId, token, "false", limit, offset, "DESC", totalPostIDs, userIds);
                     sendCommentItemRequest(mCall);
 
 //             adapter = new BreakingPostAdapter(getActivity(), postItemList);

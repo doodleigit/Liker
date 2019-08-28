@@ -21,9 +21,12 @@ import android.text.style.UnderlineSpan;
 import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewStub;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -43,6 +46,7 @@ import com.doodle.Comment.model.Comment_;
 import com.doodle.Comment.service.CommentService;
 import com.doodle.Comment.view.fragment.ReportReasonSheet;
 import com.doodle.Home.adapter.GalleryAdapter;
+import com.doodle.Home.model.MediaFrame;
 import com.doodle.Home.model.PostFooter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.postshare.PostShareItem;
@@ -96,7 +100,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
     public EmojiTextView tvPostEmojiContent;
     public ImageView star1, star2, star3, star4, star5, star6, star7, star8,
             star9, star10, star11, star12, star13, star14, star15, star16;
-   // public ImageView imageMedia;
+    // public ImageView imageMedia;
     public ImageView imagePostPermission;
     public LinearLayout postBodyLayer;
     PostItem item;
@@ -116,14 +120,18 @@ public class ImageHolder extends RecyclerView.ViewHolder {
     private List<Comment_> comments = new ArrayList<Comment_>();
     private String commentPostId;
     RelativeLayout commentHold;
+    private FrameLayout dynamicMediaFrame;
     private String commentText, commentUserName, commentUserImage, commentImage, commentTime;
     public EmojiTextView tvCommentMessage;
-    public ImageView imagePostCommenting, imageCommentLikeThumb, imageCommentSettings;
+    public ImageView imagePostCommenting, imageCommentLikeThumb, imageCommentSettings, imageMediaOne, imageMediaTwo, imageMediaThree, imageMediaFour;
     public CircleImageView imageCommentUser;
-    public TextView tvCommentUserName, tvCommentTime, tvCommentLike, tvCommentReply, tvCountCommentLike;
+    public TextView tvCommentUserName, tvCommentTime, tvCommentLike, tvCommentReply, tvCountCommentLike, tvMediaCount;
     private String userPostId;
     private PopupMenu popupCommentMenu;
 
+    private ImageView[] imageMediaHolder;
+    private ArrayList<MediaFrame> mediaFrames;
+    private int[] videoMediaHolder;
 
     //SHOW ALL COMMENTS
     private CommentService commentService;
@@ -136,7 +144,6 @@ public class ImageHolder extends RecyclerView.ViewHolder {
     public static final String COMMENT_KEY = "comment_item_key";
     private String postPermissions;
     private boolean notificationOff;
-    private RecyclerView rvMultiImage;
 
     //Delete post
     public PostItemListener listener;
@@ -161,7 +168,6 @@ public class ImageHolder extends RecyclerView.ViewHolder {
         webService = HomeService.mRetrofit.create(HomeService.class);
         imagePostShare = (ImageView) itemView.findViewById(R.id.imagePostShare);
         imagePermission = (ImageView) itemView.findViewById(R.id.imagePermission);
-        rvMultiImage = (RecyclerView) itemView.findViewById(R.id.rvMultiImage);
 
         tvPostUserName = (TextView) itemView.findViewById(R.id.tvPostUserName);
         imagePostUser = (CircleImageView) itemView.findViewById(R.id.imagePostUser);
@@ -175,6 +181,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
         tvPostEmojiContent = (EmojiTextView) itemView.findViewById(R.id.tvPostEmojiContent);
         postBodyLayer = (LinearLayout) itemView.findViewById(R.id.postBodyLayer);
         tvCommentCount = itemView.findViewById(R.id.tvCommentCount);
+        dynamicMediaFrame = itemView.findViewById(R.id.dynamic_media_frame);
 
 
         star1 = itemView.findViewById(R.id.star1);
@@ -194,8 +201,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
         star15 = itemView.findViewById(R.id.star15);
         star16 = itemView.findViewById(R.id.star16);
 
-       // imageMedia = itemView.findViewById(R.id.imageMedia);
-        rvMultiImage.setLayoutManager(new GridLayoutManager(mContext, 3));
+        // imageMedia = itemView.findViewById(R.id.imageMedia);
         imagePostPermission = itemView.findViewById(R.id.imagePostPermission);
 
         //Comment
@@ -205,6 +211,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
         imageCommentLikeThumb = itemView.findViewById(R.id.imageCommentLikeThumb);
         imageCommentSettings = itemView.findViewById(R.id.imageCommentSettings);
         imageCommentUser = itemView.findViewById(R.id.imageCommentUser);
+
         tvCommentUserName = itemView.findViewById(R.id.tvCommentUserName);
         tvCommentTime = itemView.findViewById(R.id.tvCommentTime);
         tvCommentLike = itemView.findViewById(R.id.tvCommentLike);
@@ -219,6 +226,15 @@ public class ImageHolder extends RecyclerView.ViewHolder {
         networkOk = NetworkHelper.hasNetworkAccess(mContext);
         mProgressBar = (ProgressBar) itemView.findViewById(R.id.ProgressBar);
         imagePostComment = (ImageView) itemView.findViewById(R.id.imagePostComment);
+
+        mediaFrames = new ArrayList<>();
+        mediaFrames.add(new MediaFrame(R.layout.item_media_frame_zero, 0));
+        mediaFrames.add(new MediaFrame(R.layout.item_media_frame_one, 1));
+        mediaFrames.add(new MediaFrame(R.layout.item_media_frame_two, 2));
+        mediaFrames.add(new MediaFrame(R.layout.item_media_frame_three, 3));
+        mediaFrames.add(new MediaFrame(R.layout.item_media_frame_four, 4));
+        mediaFrames.add(new MediaFrame(R.layout.item_media_frame_five, 3));
+        mediaFrames.add(new MediaFrame(R.layout.item_media_frame_six, 4));
     }
 
     AppCompatActivity activity;
@@ -228,6 +244,19 @@ public class ImageHolder extends RecyclerView.ViewHolder {
         this.item = item;
         this.position = position;
         userPostId = item.getPostId();
+
+        LayoutInflater inflater = LayoutInflater.from(mContext);
+        dynamicMediaFrame.removeAllViews();
+        View wizardView = inflater
+                .inflate(mediaFrames.get(item.getFrameNumber()).getLayout(), dynamicMediaFrame, false);
+        dynamicMediaFrame.addView(wizardView);
+
+        imageMediaOne = itemView.findViewById(R.id.media_image_one);
+        imageMediaTwo = itemView.findViewById(R.id.media_image_two);
+        imageMediaThree = itemView.findViewById(R.id.media_image_three);
+        imageMediaFour = itemView.findViewById(R.id.media_image_four);
+        tvMediaCount = itemView.findViewById(R.id.media_count);
+        imageMediaHolder = new ImageView[]{imageMediaOne, imageMediaTwo, imageMediaThree, imageMediaFour};
 
         String postPermission = item.getPermission();
 
@@ -279,7 +308,6 @@ public class ImageHolder extends RecyclerView.ViewHolder {
             Utils.stripUnderlines(tvPostContent);
 
         }
-
 
         String likes = item.getUserProfileLikes();
         String followers = item.getUserTotalFollowers();
@@ -425,10 +453,8 @@ public class ImageHolder extends RecyclerView.ViewHolder {
 
         int totalStars = silverStar + goldStar;
         String categoryName = item.getCatName();
-//
 
         SpannableStringBuilder builder = getSpannableStringBuilder(likes, followers, totalStars, categoryName);
-
 
         tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
         long myMillis = Long.parseLong(item.getDateTime()) * 1000;
@@ -449,7 +475,6 @@ public class ImageHolder extends RecyclerView.ViewHolder {
             tvPostLikeCount.setText(content);
         }
 
-
         String userImageUrl = AppConstants.PROFILE_IMAGE + item.getUesrProfileImg();
         Glide.with(App.getAppContext())
                 .load(userImageUrl)
@@ -457,25 +482,26 @@ public class ImageHolder extends RecyclerView.ViewHolder {
                 .dontAnimate()
                 .into(imagePostUser);
 
-
-        String postImages = AppConstants.POST_IMAGES + item.getPostImage();
-
-
-        GalleryAdapter.RecyclerViewClickListener galleryListener = (view, positions) -> {
-
-        };
-
-        GalleryAdapter adapter=new GalleryAdapter(mContext,item.getPostFiles(),galleryListener);
-        rvMultiImage.setAdapter(adapter);
-
-   /*     Glide.with(App.getAppContext())
-                .load(postImages)
-                .centerCrop()
-                .dontAnimate()
-                .into(imageMedia);*/
-
         if (!isNullOrEmpty(item.getTotalComment()) && !"0".equalsIgnoreCase(item.getTotalComment())) {
             tvCommentCount.setText(item.getTotalComment());
+        }
+
+        if (item.getPostFiles().size() <= 4) {
+            tvMediaCount.setVisibility(View.GONE);
+        } else {
+            tvMediaCount.setVisibility(View.VISIBLE);
+            tvMediaCount.setText(getCountText(item.getPostFiles().size()));
+        }
+
+        for (int i = 0; i < mediaFrames.get(item.getFrameNumber()).getItemCount(); i++) {
+            String imageUrl = AppConstants.POST_IMAGES + item.getPostFiles().get(i).getImageName();
+            Glide.with(App.getAppContext())
+                    .load(imageUrl)
+                    .placeholder(R.drawable.post_image_background)
+                    .error(R.drawable.post_image_background)
+                    .centerCrop()
+                    .dontAnimate()
+                    .into(imageMediaHolder[i]);
         }
 
         tvPostUserName.setOnClickListener(new View.OnClickListener() {
@@ -685,9 +711,9 @@ public class ImageHolder extends RecyclerView.ViewHolder {
                         if (id == R.id.edit) {
                             Intent intent = new Intent(mContext, EditPost.class);
                             App.setPosition(position);
-                            intent.putExtra(ITEM_KEY,(Parcelable) item);
+                            intent.putExtra(ITEM_KEY, (Parcelable) item);
                             mContext.startActivity(intent);
-                            ((Activity) mContext ).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
+                            ((Activity) mContext).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
                         }
                         if (id == R.id.delete) {
                             listener.deletePost(item, position);
@@ -799,6 +825,14 @@ public class ImageHolder extends RecyclerView.ViewHolder {
 
             }
         });
+    }
+
+    private String getCountText(int count) {
+        String countText = "";
+        if (count > 4) {
+            countText = "+" + (count - 4);
+        }
+        return countText;
     }
 
     private void sendPostPermissionRequest(Call<String> call) {

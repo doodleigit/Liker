@@ -73,7 +73,6 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             return new TextMimHolder(view, mContext, mimListener);
         }
         if (viewType == VIEW_TYPE_TEXT_IMAGE) {
-
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_post_image, parent, false);
             return new ImageHolder(view, mContext, imageListener);
         }
@@ -116,7 +115,6 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         if (viewHolder instanceof ImageHolder) {
             ImageHolder vh = (ImageHolder) viewHolder;
             vh.setItem(postItems.get(position), position);
-
         }
         if (viewHolder instanceof VideoHolder) {
             VideoHolder vh = (VideoHolder) viewHolder;

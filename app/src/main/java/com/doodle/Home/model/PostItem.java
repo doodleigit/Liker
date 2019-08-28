@@ -77,9 +77,9 @@ public class PostItem implements Serializable, Parcelable
     @SerializedName("post_link_url")
     @Expose
     private String postLinkUrl;
-    @SerializedName("video_name")
+    @SerializedName("frame_number")
     @Expose
-    private String videoName;
+    private int frameNumber;
     @SerializedName("shared_post_id")
     @Expose
     private String sharedPostId;
@@ -116,12 +116,6 @@ public class PostItem implements Serializable, Parcelable
     @SerializedName("input_add_class_name")
     @Expose
     private String inputAddClassName;
-    @SerializedName("video_upload_status")
-    @Expose
-    private String videoUploadStatus;
-    @SerializedName("video_duration")
-    @Expose
-    private int videoDuration;
     @SerializedName("is_notification_off")
     @Expose
     private boolean isNotificationOff;
@@ -201,7 +195,7 @@ public class PostItem implements Serializable, Parcelable
         this.postLinkTitle = ((String) in.readValue((String.class.getClassLoader())));
         this.postLinkDesc = ((String) in.readValue((String.class.getClassLoader())));
         this.postLinkUrl = ((String) in.readValue((String.class.getClassLoader())));
-        this.videoName = ((String) in.readValue((String.class.getClassLoader())));
+        this.frameNumber = ((int) in.readValue((String.class.getClassLoader())));
         this.sharedPostId = ((String) in.readValue((String.class.getClassLoader())));
         this.catName = ((String) in.readValue((String.class.getClassLoader())));
         this.catId = ((String) in.readValue((String.class.getClassLoader())));
@@ -214,8 +208,6 @@ public class PostItem implements Serializable, Parcelable
         this.memePreview = ((String) in.readValue((String.class.getClassLoader())));
         this.listClassName = ((String) in.readValue((String.class.getClassLoader())));
         this.inputAddClassName = ((String) in.readValue((String.class.getClassLoader())));
-        this.videoUploadStatus = ((String) in.readValue((String.class.getClassLoader())));
-        this.videoDuration = ((int) in.readValue((int.class.getClassLoader())));
         this.isNotificationOff = ((boolean) in.readValue((boolean.class.getClassLoader())));
         in.readList(this.mentionedUserIds, (java.lang.String.class.getClassLoader()));
         this.postLinkHost = ((String) in.readValue((String.class.getClassLoader())));
@@ -393,12 +385,12 @@ public class PostItem implements Serializable, Parcelable
         this.postLinkUrl = postLinkUrl;
     }
 
-    public String getVideoName() {
-        return videoName;
+    public int getFrameNumber() {
+        return frameNumber;
     }
 
-    public void setVideoName(String videoName) {
-        this.videoName = videoName;
+    public void setFrameNumber(int frameNumber) {
+        this.frameNumber = frameNumber;
     }
 
     public String getSharedPostId() {
@@ -497,22 +489,6 @@ public class PostItem implements Serializable, Parcelable
         this.inputAddClassName = inputAddClassName;
     }
 
-    public String getVideoUploadStatus() {
-        return videoUploadStatus;
-    }
-
-    public void setVideoUploadStatus(String videoUploadStatus) {
-        this.videoUploadStatus = videoUploadStatus;
-    }
-
-    public int getVideoDuration() {
-        return videoDuration;
-    }
-
-    public void setVideoDuration(int videoDuration) {
-        this.videoDuration = videoDuration;
-    }
-
     public boolean isIsNotificationOff() {
         return isNotificationOff;
     }
@@ -520,8 +496,6 @@ public class PostItem implements Serializable, Parcelable
     public void setIsNotificationOff(boolean isNotificationOff) {
         this.isNotificationOff = isNotificationOff;
     }
-
-
 
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeValue(postId);
@@ -545,7 +519,7 @@ public class PostItem implements Serializable, Parcelable
         dest.writeValue(postLinkTitle);
         dest.writeValue(postLinkDesc);
         dest.writeValue(postLinkUrl);
-        dest.writeValue(videoName);
+        dest.writeValue(frameNumber);
         dest.writeValue(sharedPostId);
         dest.writeValue(catName);
         dest.writeValue(catId);
@@ -558,8 +532,6 @@ public class PostItem implements Serializable, Parcelable
         dest.writeValue(memePreview);
         dest.writeValue(listClassName);
         dest.writeValue(inputAddClassName);
-        dest.writeValue(videoUploadStatus);
-        dest.writeValue(videoDuration);
         dest.writeValue(isNotificationOff);
         dest.writeList(mentionedUserIds);
         dest.writeValue(postLinkHost);

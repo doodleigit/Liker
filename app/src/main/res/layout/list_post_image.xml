@@ -29,12 +29,12 @@
                 android:id="@+id/tvPostContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="@dimen/_5sdp"
                 android:textColor="#333"
                 android:textSize="14sp"
                 app:colorClickableText="@android:color/holo_blue_light"
                 app:trimCollapsedText="Show less"
                 app:trimExpandedText="Show more"
-                android:layout_margin="@dimen/_5sdp"
                 app:trimLength="200"
                 app:trimMode="trimModeLength"
                 tools:text="Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.vHere is my first post.Here is my first post.Here is my first post. " />
@@ -49,14 +49,10 @@
                 android:imeOptions="actionSend"
                 android:inputType="textCapSentences|textMultiLine" />
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/rvMultiImage"
-                app:layoutManager="android.support.v7.widget.GridLayoutManager"
+            <FrameLayout
+                android:id="@+id/dynamic_media_frame"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/_200sdp">
-
-            </android.support.v7.widget.RecyclerView>
-
+                android:layout_height="wrap_content" />
 
         </LinearLayout>
 

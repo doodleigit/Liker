@@ -480,7 +480,8 @@ public class VideoHolder extends RecyclerView.ViewHolder {
 //                .into(videoImage);
 
 
-        String videoPath = AppConstants.POST_VIDEOS + item.getVideoName();
+//        String videoPath = AppConstants.POST_VIDEOS + item.getVideoName();
+        String videoPath = AppConstants.POST_VIDEOS;
 
    /*      Bitmap bitmap;
         try {
