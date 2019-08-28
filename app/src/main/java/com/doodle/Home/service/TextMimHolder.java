@@ -2,6 +2,7 @@ package com.doodle.Home.service;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -11,6 +12,7 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.MenuBuilder;
@@ -20,11 +22,18 @@ import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.style.UnderlineSpan;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
+import android.view.animation.AnimationUtils;
+import android.view.animation.ScaleAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -52,6 +61,7 @@ import com.doodle.Home.view.activity.Home;
 import com.doodle.Home.view.activity.PostShare;
 import com.doodle.Post.model.Mim;
 import com.doodle.Post.service.DataProvider;
+import com.doodle.Post.view.activity.PostPopup;
 import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.R;
 import com.doodle.utils.AppConstants;
@@ -223,10 +233,12 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
 
     AppCompatActivity activity;
     int position;
+    RecyclerView.ViewHolder viewHolder;
 
-    public void setItem(PostItem item, int position) {
+    public void setItem(PostItem item, int position, RecyclerView.ViewHolder viewHolder) {
         this.item = item;
         this.position = position;
+        this.viewHolder = viewHolder;
         userPostId = item.getPostId();
 
         String postPermission = item.getPermission();
@@ -242,6 +254,42 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                 imagePostPermission.setBackgroundResource(R.drawable.ic_friends_12dp);
                 break;
         }
+
+
+        if (!App.isIsMimPopup()) {
+
+        /*    viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    Intent intent = new Intent(mContext, PostPopup.class);
+                    intent.putExtra(ITEM_KEY, (Parcelable) item);
+                    App.setIsMimPopup(true);
+                    mContext.startActivity(intent);
+                    ((Activity) mContext).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
+
+                }
+            });*/
+            viewHolder.itemView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+
+
+                    Intent intent = new Intent(mContext, PostPopup.class);
+                    intent.setAction(Intent.ACTION_VIEW);
+                    intent.putExtra(ITEM_KEY, (Parcelable) item);
+                    App.setIsMimPopup(true);
+//                    @SuppressLint({"NewApi", "LocalSuppress"}) Bundle bundle = ActivityOptions.makeSceneTransitionAnimation((Activity) mContext, v,
+//                            v.getTransitionName()).toBundle();
+
+                    //   mContext.startActivity(intent);
+
+                    ((Activity) mContext).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
+                    return false;
+                }
+            });
+        }
+
 
         tvCommentLike.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -281,7 +329,20 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                 if (mimColor.startsWith("#")) {
                     postBodyLayer.setBackgroundColor(Color.parseColor(mimColor));
                     ViewGroup.LayoutParams params = postBodyLayer.getLayoutParams();
-                    params.height = 350;
+                    if (App.isIsMimPopup()) {
+
+
+                        DisplayMetrics displayMetrics = mContext.getResources().getDisplayMetrics();
+                        float dpHeight = displayMetrics.heightPixels / displayMetrics.density;
+                        int myMimHeight = (displayMetrics.heightPixels) * 75 / 100;
+                        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+
+                        // params.height= (int) dpHeight;
+                        params.height = myMimHeight;
+                    } else {
+                        params.height = 350;
+                    }
+
                     postBodyLayer.setLayoutParams(params);
                     postBodyLayer.setGravity(Gravity.CENTER);
                     tvPostContent.setGravity(Gravity.CENTER);

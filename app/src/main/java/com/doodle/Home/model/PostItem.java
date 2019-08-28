@@ -4,15 +4,16 @@ package com.doodle.Home.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.Parcelable.Creator;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 
-public class PostItem implements Serializable, Parcelable
-{
+public class PostItem implements Serializable, Parcelable {
 
     @SerializedName("post_id")
     @Expose
@@ -169,8 +170,7 @@ public class PostItem implements Serializable, Parcelable
             return (new PostItem[size]);
         }
 
-    }
-    ;
+    };
     private final static long serialVersionUID = 6776697018148002004L;
 
     protected PostItem(Parcel in) {
@@ -539,7 +539,7 @@ public class PostItem implements Serializable, Parcelable
     }
 
     public int describeContents() {
-        return  0;
+        return 0;
     }
 
 }

@@ -46,6 +46,7 @@ import com.doodle.Comment.model.CommentItem;
 import com.doodle.Comment.model.Comment_;
 import com.doodle.Comment.service.CommentService;
 import com.doodle.Comment.view.fragment.ReportReasonSheet;
+import com.doodle.Home.model.PostFile;
 import com.doodle.Home.model.PostFooter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.postshare.PostShareItem;
@@ -104,8 +105,8 @@ public class VideoHolder extends RecyclerView.ViewHolder {
     public EmojiTextView tvPostEmojiContent;
     public ImageView star1, star2, star3, star4, star5, star6, star7, star8,
             star9, star10, star11, star12, star13, star14, star15, star16;
-    public ImageView thumbnailView;
-    public VideoView videoView;
+   // public ImageView thumbnailView;
+   // public VideoView videoView;
     public LinearLayout postBodyLayer;
     PostItem item;
     public ImageView imagePostPermission;
@@ -150,6 +151,7 @@ public class VideoHolder extends RecyclerView.ViewHolder {
 
     //Delete post
     public VideoHolder.PostItemListener listener;
+    private String videoName;
 
     public interface PostItemListener {
         void deletePost(PostItem postItem, int position);
@@ -207,8 +209,8 @@ public class VideoHolder extends RecyclerView.ViewHolder {
         star15 = itemView.findViewById(R.id.star15);
         star16 = itemView.findViewById(R.id.star16);
 
-        thumbnailView = itemView.findViewById(R.id.videoView_thumbnail);
-        videoView = itemView.findViewById(R.id.video_view);
+        //thumbnailView = itemView.findViewById(R.id.videoView_thumbnail);
+    //    videoView = itemView.findViewById(R.id.video_view);
         jzVideoPlayerStandard = itemView.findViewById(R.id.videoplayer);
 
         //Comment
@@ -479,9 +481,12 @@ public class VideoHolder extends RecyclerView.ViewHolder {
 //                .dontAnimate()
 //                .into(videoImage);
 
+     List<PostFile> postFiles=item.getPostFiles();
+        for (PostFile temp:postFiles) {
+            videoName=temp.getVideoName();
+        }
 
-//        String videoPath = AppConstants.POST_VIDEOS + item.getVideoName();
-        String videoPath = AppConstants.POST_VIDEOS;
+        String videoPath = AppConstants.POST_VIDEOS + videoName;
 
    /*      Bitmap bitmap;
         try {
@@ -504,32 +509,10 @@ public class VideoHolder extends RecyclerView.ViewHolder {
         }*/
 
 
-        Glide.with(getApplicationContext()).load(videoPath).into(thumbnailView);
+        //Glide.with(getApplicationContext()).load(videoPath).into(thumbnailView);
         //you can add progress dialog here until video is start playing;
 
-        MediaController mediaController = new MediaController(App.getAppContext());
-        mediaController.setAnchorView(videoView);
-        videoView.setMediaController(mediaController);
-        videoView.setKeepScreenOn(true);
-        videoView.setVideoPath(videoPath);
-        videoView.start();         //call this method for auto playing video
 
-        videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mediaPlayer) {
-                thumbnailView.setVisibility(View.GONE);
-                //you can Hide progress dialog here when video is start playing;
-
-            }
-        });
-        videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mediaPlayer) {
-                videoView.stopPlayback();
-                thumbnailView.setVisibility(View.VISIBLE);
-
-            }
-        });
 
         // String videoFile = "/sdcard/blonde.mp4";
 //        Bitmap thumbnail = ThumbnailUtils.createVideoThumbnail(videoPath,

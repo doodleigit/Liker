@@ -3,6 +3,7 @@ package com.doodle.Home.view.activity;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ContentUris;
 import android.content.Context;
@@ -30,10 +31,8 @@ import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableString;
-import android.text.TextPaint;
 import android.text.TextWatcher;
 import android.text.style.BackgroundColorSpan;
-import android.text.style.ClickableSpan;
 import android.text.style.StyleSpan;
 import android.transition.Fade;
 import android.transition.Transition;
@@ -58,7 +57,6 @@ import android.widget.Toast;
 import com.doodle.App;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.PostTextIndex;
-import com.doodle.Home.model.postshare.PostShareItem;
 import com.doodle.Home.service.TextHolder;
 import com.doodle.Post.adapter.ChatAdapter;
 import com.doodle.Post.adapter.ImageAdapter;
@@ -69,12 +67,12 @@ import com.doodle.Post.model.Category;
 import com.doodle.Post.model.CategoryItem;
 import com.doodle.Post.model.MentionUser;
 import com.doodle.Post.model.Mim;
+import com.doodle.Post.model.MultipleMediaFile;
 import com.doodle.Post.model.PostImage;
 import com.doodle.Post.model.PostVideo;
 import com.doodle.Post.model.Subcatg;
 import com.doodle.Post.service.DataProvider;
 import com.doodle.Post.service.PostService;
-import com.doodle.Post.view.activity.PostCategory;
 import com.doodle.Post.view.activity.PostNew;
 import com.doodle.Post.view.fragment.Audience;
 import com.doodle.Post.view.fragment.ContributorStatus;
@@ -86,6 +84,7 @@ import com.doodle.utils.PageTransformer;
 import com.doodle.utils.PrefManager;
 import com.doodle.utils.Utils;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
+import com.google.gson.Gson;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewCallback;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewHelper;
 import com.leocardz.link.preview.library.LinkPreviewCallback;
@@ -127,7 +126,6 @@ import static android.widget.Toast.makeText;
 import static com.doodle.utils.Utils.containsIllegalCharacters;
 import static com.doodle.utils.Utils.extractMentionText;
 import static com.doodle.utils.Utils.extractMentionUser;
-import static com.doodle.utils.Utils.extractUrls;
 import static com.doodle.utils.Utils.getMD5EncryptedString;
 import static com.doodle.utils.Utils.isNullOrEmpty;
 
@@ -266,6 +264,10 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
     String editPostId;
     private String text;
 
+    //Multiple Media File
+    List<String> mediaFiles;
+    ProgressDialog progressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -285,6 +287,11 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
         networkOk = NetworkHelper.hasNetworkAccess(this);
         progressView = (CircularProgressView) findViewById(R.id.progress_view);
         mView = new View(this);
+
+        mediaFiles = new ArrayList<>();
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage(getString(R.string.checking));
+
 
         mediaRecyclerView = findViewById(R.id.rvPostMedia);
         mimRecyclerView = (RecyclerView) findViewById(R.id.rvMim);
@@ -804,12 +811,15 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
             }
         }
 
-        postImages.add(new PostImage(contentLinkImage));
-        if (postImages.size() > 0)
-            rvMediaShow = true;
-        mediaRecyclerViewToggle();
-        MediaAdapter mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos);
-        mediaRecyclerView.setAdapter(mediaAdapter);
+        if(!isNullOrEmpty(contentLinkImage)){
+            postImages.add(new PostImage(contentLinkImage));
+            if (postImages.size() > 0)
+                rvMediaShow = true;
+            mediaRecyclerViewToggle();
+            MediaAdapter mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos);
+            mediaRecyclerView.setAdapter(mediaAdapter);
+
+        }
 
     }
 
@@ -1637,15 +1647,17 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                 //Parsing any Media type file
                 RequestBody requestFile = RequestBody.create(MediaType.parse("image"), file);
                 MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("picture", file.getName(), requestFile);
-                Call<String> mediaCall = webService.postImage(deviceId, profileId, token, fileToUpload);
-                sendImageRequest(mediaCall);
+                Call<String> mediaCall = webService.addPhoto(deviceId, profileId, token, fileToUpload);
+                addPhotoRequest(mediaCall);
 
+                progressDialog.show();
                 postImages.add(new PostImage(imagePath));
                 if (postImages.size() > 0)
                     rvMediaShow = true;
                 mediaRecyclerViewToggle();
                 MediaAdapter mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos);
                 mediaRecyclerView.setAdapter(mediaAdapter);
+                progressDialog.dismiss();
 
 
             } else {
@@ -1665,6 +1677,50 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
             }
         }
 
+
+    }
+
+    private void addPhotoRequest(Call<String> call) {
+
+
+        call.enqueue(new Callback<String>() {
+
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                Log.i("Response", response.body().toString());
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        try {
+                            JSONObject object = new JSONObject(response.body());
+                            boolean mediaStatus = object.getBoolean("status");
+                            imageFile = object.getString("filename");
+                            uploadImageName.add(imageFile);
+                            MultipleMediaFile mediaFile = new MultipleMediaFile();
+                            mediaFile.setBase64Md5(fileEncoded);
+                            mediaFile.setFileType("image");
+                            mediaFile.setName(imageFile);
+                            Gson gson = new Gson();
+                            String gsonString = gson.toJson(mediaFile);
+                            mediaFiles.add(gsonString);
+                            progressDialog.dismiss();
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        Log.i("onEmptyResponse", "Returned empty response");
+                    }
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.d(TAG, t.getMessage());
+                progressView.setVisibility(View.GONE);
+                progressView.stopAnimation();
+            }
+        });
 
     }
 
@@ -1725,15 +1781,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                                 progressView.setVisibility(View.GONE);
                                 progressView.stopAnimation();
                             }
-                          /*  if (!isNullOrEmpty(videoFilePath)) {
-                                String videoPath = "file://" + videoFilePath;
-                                postVideos.add(new PostVideo(videoPath));
-                                if (postVideos.size() > 0)
-                                    rvMediaShow = true;
-                                mediaRecyclerViewToggle();
-                                MediaAdapter mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos);
-                                mediaRecyclerView.setAdapter(mediaAdapter);
-                            }*/
+
 
 
                         } catch (JSONException e) {
@@ -1832,7 +1880,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                 String strMD5 = getMD5EncryptedString(videoPath);
                 fileEncoded = strMD5;
                 Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "2", strMD5);
-                sendIsDuplicateRequest(call);
+                sendIsDuplicateVideoRequest(call);
 
                 //   result.add(new PostVideo(videoPath));
 
@@ -1856,7 +1904,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
             String strMD5 = getMD5EncryptedString(videoPath);
             fileEncoded = strMD5;
             Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "2", strMD5);
-            sendIsDuplicateRequest(call);
+            sendIsDuplicateVideoRequest(call);
 
 
             File file = new File(videoFilePath);
@@ -1867,6 +1915,120 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
         }
 
         return result;
+    }
+
+    private void sendIsDuplicateVideoRequest(Call<String> call) {
+
+        call.enqueue(new Callback<String>() {
+
+
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                Log.i("Response", response.body().toString());
+                //Toast.makeText()
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        Log.i("onSuccess", response.body().toString());
+                        try {
+                            JSONObject object = new JSONObject(response.body());
+                            boolean status = object.getBoolean("status");
+                            if (status) {
+                                String message = "You have already posted it .";
+                                Utils.showCustomToast(EditPost.this, mView, message, Gravity.CENTER);
+                            } else {
+
+                                if (!isNullOrEmpty(videoFilePath)) {
+                                    File file = new File(videoFilePath);
+                                    //Parsing any Media type file
+                                    RequestBody requestFile = RequestBody.create(MediaType.parse("video/*"), file);
+                                    MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("video", file.getName(), requestFile);
+                                    Call<String> mediaCall = videoServices.uploadVideo(deviceId, profileId, token, fileToUpload, postId, true);
+                                    sendUploadVideoRequest(mediaCall);
+
+                                    progressDialog.show();
+
+                                    String videoPath = "file://" + videoFilePath;
+                                    postVideos.add(new PostVideo(videoPath));
+                                    if (postVideos.size() > 0)
+                                        rvMediaShow = true;
+                                    mediaRecyclerViewToggle();
+                                    MediaAdapter mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos);
+                                    mediaRecyclerView.setAdapter(mediaAdapter);
+
+
+
+                                }
+
+
+                                String message = "Add gallery successfully!";
+                                Utils.showCustomToast(EditPost.this, mView, message, Gravity.CENTER);
+
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.d(TAG, t.getMessage());
+                progressView.setVisibility(View.GONE);
+                progressView.stopAnimation();
+            }
+        });
+
+    }
+
+    private void sendUploadVideoRequest(Call<String> mediaCall) {
+
+        mediaCall.enqueue(new Callback<String>() {
+
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                Log.i("Response", response.body().toString());
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        try {
+                            JSONObject object = new JSONObject(response.body());
+                            String video_name = object.getString("video_name");
+                            String duration = object.getString("duration");
+                            String image_name = object.getString("image_name");
+                            String large_image_name = object.getString("large_image_name");
+
+                            MultipleMediaFile mediaFile = new MultipleMediaFile();
+                            mediaFile.setBase64Md5(fileEncoded);
+                            mediaFile.setDuration(duration);
+                            mediaFile.setFileType("video");
+                            mediaFile.setImageName(image_name);
+                            mediaFile.setLargeImageName(large_image_name);
+                            mediaFile.setName(video_name);
+                            Gson gson = new Gson();
+                            String gsonString = gson.toJson(mediaFile);
+                            mediaFiles.add(gsonString);
+
+                            progressDialog.dismiss();
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        Log.i("onEmptyResponse", "Returned empty response");
+                    }
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.d(TAG, t.getMessage());
+                progressView.setVisibility(View.GONE);
+                progressView.stopAnimation();
+            }
+        });
     }
 
     private List<PostImage> getSelectedImagesPath(int requestCode, Intent data) throws FileNotFoundException {
@@ -1884,7 +2046,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                 String strMD5 = getMD5EncryptedString(imagePath);
                 fileEncoded = strMD5;
                 Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "1", strMD5);
-                sendIsDuplicateRequest(call);
+                sendIsDuplicateImageRequest(call);
 
             }
         } else {
@@ -1895,12 +2057,76 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
             fileEncoded = strMD5;
             //   String strBase64 = getBase64(imageFilePath);
             Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "1", strMD5);
-            sendIsDuplicateRequest(call);
+            sendIsDuplicateImageRequest(call);
 
 
         }
 
         return result;
+    }
+
+    private void sendIsDuplicateImageRequest(Call<String> call) {
+        call.enqueue(new Callback<String>() {
+
+
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                Log.i("Response", response.body().toString());
+                //Toast.makeText()
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        Log.i("onSuccess", response.body().toString());
+                        try {
+                            JSONObject object = new JSONObject(response.body());
+                            boolean status = object.getBoolean("status");
+                            if (status) {
+                                String message = "You have already posted it .";
+                                Utils.showCustomToast(EditPost.this, mView, message, Gravity.CENTER);
+                            } else {
+                                if (!isNullOrEmpty(imageFilePath)) {
+                                    File file = new File(imageFilePath);
+                                    //Parsing any Media type file
+                                    RequestBody requestFile = RequestBody.create(MediaType.parse("image"), file);
+                                    MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("picture", file.getName(), requestFile);
+                                    Call<String> mediaCall = webService.addPhoto(deviceId, profileId, token, fileToUpload);
+                                    addPhotoRequest(mediaCall);
+
+                                    progressDialog.show();
+                                    String imagePath = "file://" + imageFilePath;
+                                    postImages.add(new PostImage(imagePath));
+                                    if (postImages.size() > 0)
+                                        rvMediaShow = true;
+                                    mediaRecyclerViewToggle();
+                                    MediaAdapter mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos);
+                                    mediaRecyclerView.setAdapter(mediaAdapter);
+                                    progressView.setVisibility(View.GONE);
+                                    progressView.stopAnimation();
+
+                                }
+
+
+
+                                String message = "Add gallery successfully!";
+                                Utils.showCustomToast(EditPost.this, mView, message, Gravity.CENTER);
+
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.d(TAG, t.getMessage());
+                progressView.setVisibility(View.GONE);
+                progressView.stopAnimation();
+            }
+        });
+
     }
 
 
@@ -1957,7 +2183,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                                     //Parsing any Media type file
                                     RequestBody requestFile = RequestBody.create(MediaType.parse("image"), file);
                                     MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("picture", file.getName(), requestFile);
-                                    Call<String> mediaCall = webService.postImage(deviceId, profileId, token, fileToUpload);
+                                    Call<String> mediaCall = webService.addPhoto(deviceId, profileId, token, fileToUpload);
                                     sendImageRequest(mediaCall);
                                 }
 

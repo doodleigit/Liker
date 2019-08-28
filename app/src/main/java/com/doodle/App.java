@@ -58,6 +58,15 @@ public class App extends Application {
     private static boolean notificationStatus;
     private static boolean deleteStatus;
     private static int position;
+    private static boolean isMimPopup;
+
+    public static boolean isIsMimPopup() {
+        return isMimPopup;
+    }
+
+    public static void setIsMimPopup(boolean isMimPopup) {
+        App.isMimPopup = isMimPopup;
+    }
 
     public static boolean isDeleteStatus() {
         return deleteStatus;

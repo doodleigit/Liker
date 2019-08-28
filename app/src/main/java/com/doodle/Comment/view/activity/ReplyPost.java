@@ -941,7 +941,7 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
 //            sendCommentItemRequest(call);
 
 
-//            Call<String> mediaCall = webService.postImage(deviceId, profileId, token, fileToUpload);
+//            Call<String> mediaCall = webService.addPhoto(deviceId, profileId, token, fileToUpload);
 //            sendImageRequest(mediaCall);
 
         }

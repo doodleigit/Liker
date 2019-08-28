@@ -301,5 +301,7 @@
     <string name="followers">Followers</string>
     <string name="followings">Followings</string>
     <string name="posts">Posts</string>
+    <string name="checking">Checking...</string>
+    <string name="transition_photo">transition photo</string>
 
 </resources>

@@ -9,6 +9,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
@@ -133,6 +134,7 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         public ImageView imageVideo, imagePlayVideo, imageDeleteVideo;
         RelativeLayout selectLayout;
 
+
         public VideoViewHolder(View itemView) {
             super(itemView);
 
@@ -142,12 +144,14 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             selectLayout = (RelativeLayout) itemView.findViewById(R.id.selectLayout);
 
 
+
         }
 
         @SuppressLint("ClickableViewAccessibility")
         public void populate(PostVideo postVideo) {
 
             String videoPhoto = postVideo.getVideoPath();
+
             Glide.with(context).load(videoPhoto)
                     .skipMemoryCache(false)
                     .into(imageVideo);
@@ -163,9 +167,8 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             imageDeleteVideo.setOnTouchListener(new View.OnTouchListener() {
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
-                    postVideos.remove(getPosition());
+                    postVideos.remove(getAdapterPosition());
                     notifyDataSetChanged();
-
                     return false;
                 }
             });
