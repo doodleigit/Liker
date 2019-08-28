@@ -276,14 +276,9 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
 
 
                     Intent intent = new Intent(mContext, PostPopup.class);
-                    intent.setAction(Intent.ACTION_VIEW);
                     intent.putExtra(ITEM_KEY, (Parcelable) item);
                     App.setIsMimPopup(true);
-//                    @SuppressLint({"NewApi", "LocalSuppress"}) Bundle bundle = ActivityOptions.makeSceneTransitionAnimation((Activity) mContext, v,
-//                            v.getTransitionName()).toBundle();
-
-                    //   mContext.startActivity(intent);
-
+                     mContext.startActivity(intent);
                     ((Activity) mContext).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
                     return false;
                 }

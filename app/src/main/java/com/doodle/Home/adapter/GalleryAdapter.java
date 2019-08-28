@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
 import com.doodle.App;
@@ -32,6 +33,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
     Drawable bitmapDrawable;
     private RecyclerViewClickListener mListener;
 
+
     public GalleryAdapter(Context context, List<PostFile> postFiles, RecyclerViewClickListener listener) {
         this.mContext = context;
         this.postFiles = postFiles;
@@ -43,6 +45,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
 
         void onClick(View view, int position);
     }
+
 
 
     @Override
@@ -58,27 +61,6 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         PostFile item = postFiles.get(position);
 
         String postImages = AppConstants.POST_IMAGES + item.getImageName();
-
-
-
-/*
-        String mimColor = item.getMimColor();
-        if (mimColor.startsWith("#")) {
-            int mColor = Color.parseColor(mimColor);
-            ColorDrawable cd = new ColorDrawable(mColor);
-            holder.mimContent.setBackground(cd);
-        } else {
-            String imgUrl = AppConstants.MIM_IMAGE + mimColor;
-//            Picasso.with(App.getAppContext())
-//                    .load(imgUrl)
-//                    .placeholder(R.drawable.profile)
-//                    .into((Target) holder.mimContent);
-            Picasso.with(App.getAppContext()).load(imgUrl).into(target);
-            holder.imageMedia.setBackground(bitmapDrawable);
-        }
-
-*/
-
 
 
         Glide.with(App.getAppContext())
@@ -97,13 +79,14 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public View mView;
-        public ImageView imageMedia;
+
         private RecyclerViewClickListener mListener;
 
+        public ImageView imageMedia;
 
         public ViewHolder(View itemView, RecyclerViewClickListener listener) {
             super(itemView);
-            imageMedia = (ImageView) itemView.findViewById(R.id.imageMedia);
+            imageMedia = itemView.findViewById(R.id.imageMedia);
             mListener = listener;
             itemView.setOnClickListener(this);
         }

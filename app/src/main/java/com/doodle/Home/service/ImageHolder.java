@@ -23,6 +23,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
@@ -54,6 +55,7 @@ import com.doodle.Home.view.activity.EditPost;
 import com.doodle.Home.view.activity.Home;
 import com.doodle.Home.view.activity.PostShare;
 import com.doodle.Post.adapter.MimAdapter;
+import com.doodle.Post.view.activity.PostPopup;
 import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.R;
 import com.doodle.utils.AppConstants;
@@ -144,7 +146,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
     public static final String COMMENT_KEY = "comment_item_key";
     private String postPermissions;
     private boolean notificationOff;
-
+    private RecyclerView singleImgRecyclerView;
     //Delete post
     public PostItemListener listener;
 
@@ -226,6 +228,8 @@ public class ImageHolder extends RecyclerView.ViewHolder {
         networkOk = NetworkHelper.hasNetworkAccess(mContext);
         mProgressBar = (ProgressBar) itemView.findViewById(R.id.ProgressBar);
         imagePostComment = (ImageView) itemView.findViewById(R.id.imagePostComment);
+        singleImgRecyclerView = itemView.findViewById(R.id.singleImgRecyclerView);
+
 
         mediaFrames = new ArrayList<>();
         mediaFrames.add(new MediaFrame(R.layout.item_media_frame_zero, 0));
@@ -239,17 +243,36 @@ public class ImageHolder extends RecyclerView.ViewHolder {
 
     AppCompatActivity activity;
     int position;
+    RecyclerView.ViewHolder viewHolder;
 
-    public void setItem(PostItem item, int position) {
+    public void setItem(PostItem item, int position, RecyclerView.ViewHolder viewHolder) {
         this.item = item;
         this.position = position;
+        this.viewHolder = viewHolder;
         userPostId = item.getPostId();
 
         LayoutInflater inflater = LayoutInflater.from(mContext);
         dynamicMediaFrame.removeAllViews();
-        View wizardView = inflater
-                .inflate(mediaFrames.get(item.getFrameNumber()).getLayout(), dynamicMediaFrame, false);
-        dynamicMediaFrame.addView(wizardView);
+
+        if (App.isIsImagePopup()) {
+
+            GalleryAdapter.RecyclerViewClickListener listener = (view, posit) -> {
+
+            };
+
+            View wizardView = inflater
+                    .inflate(mediaFrames.get(0).getLayout(), dynamicMediaFrame, false);
+            dynamicMediaFrame.addView(wizardView);
+            GalleryAdapter galleryAdapter = new GalleryAdapter(mContext,item.getPostFiles(),listener);
+            singleImgRecyclerView.setVisibility(View.VISIBLE);
+            singleImgRecyclerView.setAdapter(galleryAdapter);
+
+        } else {
+            View wizardView = inflater
+                    .inflate(mediaFrames.get(item.getFrameNumber()).getLayout(), dynamicMediaFrame, false);
+            dynamicMediaFrame.addView(wizardView);
+        }
+
 
         imageMediaOne = itemView.findViewById(R.id.media_image_one);
         imageMediaTwo = itemView.findViewById(R.id.media_image_two);
@@ -271,6 +294,26 @@ public class ImageHolder extends RecyclerView.ViewHolder {
                 imagePostPermission.setBackgroundResource(R.drawable.ic_friends_12dp);
                 break;
         }
+
+
+        if (!App.isIsImagePopup()) {
+
+
+            viewHolder.itemView.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+
+
+                    Intent intent = new Intent(mContext, PostPopup.class);
+                    intent.putExtra(ITEM_KEY, (Parcelable) item);
+                    App.setIsImagePopup(true);
+                    mContext.startActivity(intent);
+                    ((Activity) mContext).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
+                    return false;
+                }
+            });
+        }
+
 
         tvCommentLike.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -497,7 +540,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
             String imageUrl = AppConstants.POST_IMAGES + item.getPostFiles().get(i).getImageName();
             Glide.with(App.getAppContext())
                     .load(imageUrl)
-                    .placeholder(R.drawable.post_image_background)
+
                     .error(R.drawable.post_image_background)
                     .centerCrop()
                     .dontAnimate()

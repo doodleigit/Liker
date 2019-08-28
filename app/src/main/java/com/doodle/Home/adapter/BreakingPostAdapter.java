@@ -115,12 +115,11 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
         if (viewHolder instanceof ImageHolder) {
             ImageHolder vh = (ImageHolder) viewHolder;
-            vh.setItem(postItems.get(position), position);
+            vh.setItem(postItems.get(position), position,viewHolder);
         }
         if (viewHolder instanceof VideoHolder) {
             VideoHolder vh = (VideoHolder) viewHolder;
             vh.setItem(postItems.get(position), position);
-
         }
     }
 
@@ -150,8 +149,8 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 return VIEW_TYPE_TEXT_LINK_SCRIPT;
             case 4:
                 return VIEW_TYPE_TEXT_LINK_SCRIPT_YOUTUBE;
-         /*   case 5:
-                return VIEW_TYPE_VIDEO;*/
+            case 5:
+                return VIEW_TYPE_VIDEO;
             default:
                 return -1;
         }

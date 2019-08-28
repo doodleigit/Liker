@@ -111,8 +111,7 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 String postImages = AppConstants.POST_IMAGES + imagePhoto;
                 Glide.with(App.getAppContext())
                         .load(postImages)
-                        .centerCrop()
-                        .dontAnimate()
+                        .skipMemoryCache(false)
                         .into(imgPost);
             }
 
