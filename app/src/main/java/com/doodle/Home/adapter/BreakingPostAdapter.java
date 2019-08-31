@@ -115,12 +115,11 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
         if (viewHolder instanceof ImageHolder) {
             ImageHolder vh = (ImageHolder) viewHolder;
-            vh.setItem(postItems.get(position), position);
+            vh.setItem(postItems.get(position), position,viewHolder);
         }
         if (viewHolder instanceof VideoHolder) {
             VideoHolder vh = (VideoHolder) viewHolder;
             vh.setItem(postItems.get(position), position);
-
         }
     }
 

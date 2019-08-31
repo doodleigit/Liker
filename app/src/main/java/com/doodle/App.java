@@ -59,6 +59,15 @@ public class App extends Application {
     private static boolean deleteStatus;
     private static int position;
     private static boolean isMimPopup;
+    private static boolean isImagePopup;
+
+    public static boolean isIsImagePopup() {
+        return isImagePopup;
+    }
+
+    public static void setIsImagePopup(boolean isImagePopup) {
+        App.isImagePopup = isImagePopup;
+    }
 
     public static boolean isIsMimPopup() {
         return isMimPopup;

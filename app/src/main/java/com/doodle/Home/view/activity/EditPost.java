@@ -55,6 +55,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.doodle.App;
+import com.doodle.Home.model.PostFile;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.PostTextIndex;
 import com.doodle.Home.service.TextHolder;
@@ -221,7 +222,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
     private String postType = "status";
     private int status;
     private int postPermission;
-    private String imageFile;
+    private String imageFile, imageString, videoString;
     private List<String> uploadImageName = new ArrayList<>();
     private int contentType;
     private int categoryId, subCategoryId;
@@ -231,7 +232,8 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
     private String contentLinkTitle;
     private String contentLinkDesc;
     private String contentLinkImage;
-
+    private List<String> imageList;
+    private List<String> videoList;
     private String myUrl = "";
     private boolean isYoutubeURL;
     private int hasMim;
@@ -288,6 +290,8 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
         progressView = (CircularProgressView) findViewById(R.id.progress_view);
         mView = new View(this);
 
+        imageList = new ArrayList<>();
+        videoList = new ArrayList<>();
         mediaFiles = new ArrayList<>();
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage(getString(R.string.checking));
@@ -584,6 +588,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 
 
         //UPDATE POST DATA
+
         String postMessage = editPostItem.getPostText();
         editPostMessage.append(postMessage);
         tvAudience.setText(editPostItem.getCatName());
@@ -592,21 +597,21 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
         subCategoryId = Integer.parseInt(editPostItem.getCatId());
         editPostId = editPostItem.getPostId();
         hasMim = Integer.parseInt(editPostItem.getHasMeme());
-        contentLinkImage = editPostItem.getPostImage();
+        List<PostFile> postFiles = editPostItem.getPostFiles();
         contentLinkDesc = editPostItem.getPostLinkDesc();
         contentLinkTitle = editPostItem.getPostLinkTitle();
         contentLinkUrl = editPostItem.getPostLinkUrl();
         postPermission = Integer.parseInt(editPostItem.getPermission());
-        status=Integer.parseInt(editPostItem.getPostType());
-        contentType=Integer.parseInt(editPostItem.getPostType());
+        status = Integer.parseInt(editPostItem.getPostType());
+        contentType = Integer.parseInt(editPostItem.getPostType());
 
         //  contentHost=editPostItem.g
         //friends=editPostItem.get
 
-        for (Mim temp:viewColors) {
-            int id=temp.getId();
-            if(id==hasMim){
-                String mimColor=temp.getMimColor();
+        for (Mim temp : viewColors) {
+            int id = temp.getId();
+            if (id == hasMim) {
+                String mimColor = temp.getMimColor();
                 if (mimColor.startsWith("#")) {
                     if (mimColor.contentEquals("#FFFFFF")) {
                         int mColor = Color.parseColor(mimColor);
@@ -663,9 +668,9 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 
         StringBuilder nameBuilder = new StringBuilder();
         List<String> mentionUrl = extractUrls(editPostItem.getPostText());
-        List<String> mentionIds=editPostItem.getMentionedUserIds();
+        List<String> mentionIds = editPostItem.getMentionedUserIds();
 
-        if(mentionIds.size()>0){
+        if (mentionIds.size() > 0) {
 
             for (PostTextIndex temp : editPostItem.getPostTextIndex()) {
                 String postType = temp.getType();
@@ -682,7 +687,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
             }
 
 
-            for (String temp:mentionIds) {
+            for (String temp : mentionIds) {
                 idList.add(temp);
                 friendSet.add(temp);
             }
@@ -719,7 +724,6 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
             friends = sb.substring(separator.length()).replaceAll("\\s+", "");
 
 
-
             if (mentionUrl.size() > 0 && extractMentionText(editPostItem).trim().length() > 0) {
 
                 String full_text = extractMentionText(editPostItem).trim();
@@ -752,7 +756,6 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                             str.setSpan(new BackgroundColorSpan(Color.parseColor("#D8DFEA")), val, val + mList.get(k).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                         }
                     }
-
 
 
                     editPostMessage.setText("");
@@ -795,7 +798,6 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                     }
 
 
-
                     editPostMessage.setText("");
                     editPostMessage.append(str);
 
@@ -811,14 +813,22 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
             }
         }
 
-        if(!isNullOrEmpty(contentLinkImage)){
-            postImages.add(new PostImage(contentLinkImage));
-            if (postImages.size() > 0)
-                rvMediaShow = true;
+
+        if (postFiles.size() > 0) {
+            for (PostFile temp : postFiles) {
+                imageString = temp.getImageName();
+                videoString = temp.getVideoName();
+                if (!isNullOrEmpty(imageString)) {
+                    postImages.add(new PostImage(imageString));
+                }
+                if (!isNullOrEmpty(videoString)) {
+                    postVideos.add(new PostVideo(videoString));
+                }
+            }
+            rvMediaShow = true;
             mediaRecyclerViewToggle();
             MediaAdapter mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos);
             mediaRecyclerView.setAdapter(mediaAdapter);
-
         }
 
     }
@@ -836,7 +846,6 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
             Utils.showNetworkDialog(getSupportFragmentManager());
             progressView.setVisibility(View.GONE);
             progressView.stopAnimation();
-
         }
     }
 
@@ -1381,10 +1390,9 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                         try {
                             JSONObject object = new JSONObject(response.body());
                             JSONObject successObject = object.getJSONObject("success");
-                            boolean status=successObject.getBoolean("status");
-                          //  boolean topContributorStatus = successObject.getBoolean("top_contributor_status");
+                            boolean status = successObject.getBoolean("status");
+                            //  boolean topContributorStatus = successObject.getBoolean("top_contributor_status");
                             //postId = successObject.getInt("post_id");
-
 
 
                             if (status) {
@@ -1783,7 +1791,6 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                             }
 
 
-
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -1956,7 +1963,6 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                                     mediaRecyclerView.setAdapter(mediaAdapter);
 
 
-
                                 }
 
 
@@ -2103,7 +2109,6 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                                     progressView.stopAnimation();
 
                                 }
-
 
 
                                 String message = "Add gallery successfully!";

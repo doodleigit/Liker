@@ -157,6 +157,7 @@ public class BreakingPost extends Fragment {
                 currentItems = layoutManager.getChildCount();
                 scrollOutItems = layoutManager.findFirstVisibleItemPosition();
                 totalItems = layoutManager.getItemCount();
+                Log.d("findFirstComplete", layoutManager.findFirstCompletelyVisibleItemPosition() + "");
 
                 if (isScrolling && (currentItems + scrollOutItems == totalItems)) {
                     isScrolling = false;
