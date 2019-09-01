@@ -18,6 +18,7 @@ import com.doodle.Post.model.Mim;
 import com.doodle.Post.service.DataProvider;
 import com.doodle.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -56,7 +57,6 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         this.YoutubeListener = YoutubeListener;
         this.LinkListener = LinkListener;
         this.imageListener = imageListener;
-
     }
 
 
@@ -103,7 +103,7 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
         if (viewHolder instanceof TextMimHolder) {
             TextMimHolder vh = (TextMimHolder) viewHolder;
-            vh.setItem(postItems.get(position), position,viewHolder);
+            vh.setItem(postItems.get(position), position, viewHolder);
         }
         if (viewHolder instanceof LinkScriptHolder) {
             LinkScriptHolder vh = (LinkScriptHolder) viewHolder;
@@ -144,7 +144,7 @@ public class BreakingPostAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     return VIEW_TYPE_TEXT;
                 }
             case 2:
-                    return VIEW_TYPE_TEXT_IMAGE;
+                return VIEW_TYPE_TEXT_IMAGE;
             case 3:
                 return VIEW_TYPE_TEXT_LINK_SCRIPT;
             case 4:

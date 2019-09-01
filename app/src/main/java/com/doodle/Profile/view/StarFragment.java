@@ -29,6 +29,7 @@ import com.doodle.Home.service.LinkScriptYoutubeHolder;
 import com.doodle.Home.service.TextHolder;
 import com.doodle.Home.service.TextMimHolder;
 import com.doodle.Home.service.VideoHolder;
+import com.doodle.Home.service.VideoPlayerRecyclerView;
 import com.doodle.Profile.adapter.StarAdapter;
 import com.doodle.Profile.model.Star;
 import com.doodle.Profile.service.ProfileService;
@@ -52,7 +53,8 @@ public class StarFragment extends Fragment {
 
     View view;
     private TextView tvUserName;
-    private RecyclerView recyclerView, feedRecyclerView;
+    private RecyclerView recyclerView;
+    private VideoPlayerRecyclerView feedRecyclerView;
     private LinearLayoutManager layoutManager;
 
     private ProgressDialog progressDialog;
@@ -77,6 +79,7 @@ public class StarFragment extends Fragment {
     public static LinkScriptYoutubeHolder.PostItemListener youtubeListener;
     public static LinkScriptHolder.PostItemListener linkListener;
     public static ImageHolder.PostItemListener imageListener;
+
     PostItem deletePostItem;
     int deletePosition;
 
@@ -409,6 +412,7 @@ public class StarFragment extends Fragment {
                     progressDialog.hide();
 
                     feedRecyclerView.setVisibility(View.VISIBLE);
+                    feedRecyclerView.setMediaObjects(postItemList);
                     feedRecyclerView.setAdapter(adapter);
                     //  Log.d("PostItem: ", categoryItem.toString() + "");
 //                    progressView.setVisibility(View.GONE);

@@ -55,6 +55,7 @@ public class AppConstants {
 
     //MEDIA
     public static final String POST_VIDEOS = BASE_URL_MEDIA + "uploads/post_videos/";
+    public static final String POST_VIDEOS_THUMBNAIL = BASE_URL_MEDIA + "uploads/post_videos/thumb/";
     public static final String PROFILE_IMAGE = BASE_URL_MEDIA + "uploads/thumb/";
     public static final String POST_IMAGES = BASE_URL_MEDIA + "uploads/post_images/";
     public static final String USER_UPLOADED_IMAGES = BASE_URL_IMAGES + "uploads/post_images/";

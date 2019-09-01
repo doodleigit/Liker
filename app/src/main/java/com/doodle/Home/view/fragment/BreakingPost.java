@@ -37,6 +37,7 @@ import com.doodle.Home.service.LinkScriptYoutubeHolder;
 import com.doodle.Home.service.TextHolder;
 import com.doodle.Home.service.TextMimHolder;
 import com.doodle.Home.service.VideoHolder;
+import com.doodle.Home.service.VideoPlayerRecyclerView;
 import com.doodle.Home.view.activity.Home;
 import com.doodle.R;
 import com.doodle.utils.AppConstants;
@@ -82,7 +83,7 @@ public class BreakingPost extends Fragment {
     private CircularProgressView progressView;
     //  private PostAdapter adapter;
     private BreakingPostAdapter adapter;
-    private RecyclerView recyclerView;
+    private VideoPlayerRecyclerView recyclerView;
     private LinearLayoutManager layoutManager;
     private int totalItems;
     private int scrollOutItems;
@@ -101,6 +102,9 @@ public class BreakingPost extends Fragment {
     public static LinkScriptHolder.PostItemListener linkListener;
     public static ImageHolder.PostItemListener imageListener;
 
+    private Handler handler;
+    private int previousPosition, currentPosition;
+    private boolean videoPauseNotify = false;
 
     PostItem deletePostItem;
     int deletePosition;
@@ -127,6 +131,7 @@ public class BreakingPost extends Fragment {
         networkOk = NetworkHelper.hasNetworkAccess(getActivity());
         postItemList = new ArrayList<>();
         deletePostItem = new PostItem();
+        handler = new Handler();
     }
 
     @Override
@@ -137,7 +142,7 @@ public class BreakingPost extends Fragment {
         layoutManager = new LinearLayoutManager(getActivity());
         progressView = (CircularProgressView) root.findViewById(R.id.progress_view);
         shimmerFrameLayout = (ShimmerFrameLayout) root.findViewById(R.id.shimmer_view_post_container);
-        recyclerView = (RecyclerView) root.findViewById(R.id.rvBreakingPost);
+        recyclerView = root.findViewById(R.id.rvBreakingPost);
         recyclerView.setLayoutManager(layoutManager);
         v = root;
         getData();
@@ -157,6 +162,32 @@ public class BreakingPost extends Fragment {
                 currentItems = layoutManager.getChildCount();
                 scrollOutItems = layoutManager.findFirstVisibleItemPosition();
                 totalItems = layoutManager.getItemCount();
+                Log.d("findFirstComplete", layoutManager.findFirstCompletelyVisibleItemPosition() + "");
+//                if (layoutManager.findFirstCompletelyVisibleItemPosition() >= 0) {
+//                    if (layoutManager.findFirstCompletelyVisibleItemPosition() != currentPosition) {
+//                        if (videoPauseNotify) {
+//                            videoPauseNotify = false;
+//                            autoPlayListeners.get(previousPosition).onItemInVisible();
+//                        }
+//                        previousPosition = currentPosition;
+//                        currentPosition = layoutManager.findFirstCompletelyVisibleItemPosition();
+//                        handler.removeCallbacksAndMessages(null);
+//                        handler.postDelayed(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                videoPauseNotify = true;
+//                                autoPlayListeners.get(currentPosition).onItemVisible();
+//                            }
+//                        }, 500);
+//                    }
+//                } else {
+//                    if (videoPauseNotify) {
+//                        handler.removeCallbacksAndMessages(null);
+//                        videoPauseNotify = false;
+//                        currentPosition = -1;
+//                        autoPlayListeners.get(previousPosition).onItemInVisible();
+//                    }
+//                }
 
                 if (isScrolling && (currentItems + scrollOutItems == totalItems)) {
                     isScrolling = false;
@@ -196,7 +227,7 @@ public class BreakingPost extends Fragment {
             }
         };
 
-        youtubeListener =new LinkScriptYoutubeHolder.PostItemListener() {
+        youtubeListener = new LinkScriptYoutubeHolder.PostItemListener() {
             @Override
             public void deletePost(PostItem postItem, int position) {
                 deletePosition = position;
@@ -474,7 +505,7 @@ public class BreakingPost extends Fragment {
                 //  comments = commentItem.getComments();
                 Log.d("commentItem", commentItem.toString());
                 if (postItemList != null) {
-                    adapter = new BreakingPostAdapter(getActivity(), postItemList, mCallback, mimListener,videoListener,youtubeListener,linkListener,imageListener);
+                    adapter = new BreakingPostAdapter(getActivity(), postItemList, mCallback, mimListener, videoListener, youtubeListener, linkListener, imageListener);
                     offset += 5;
                     new Handler().postDelayed(new Runnable() {
                         @Override
@@ -483,6 +514,7 @@ public class BreakingPost extends Fragment {
                             shimmerFrameLayout.setVisibility(View.GONE);
 
                             recyclerView.setVisibility(View.VISIBLE);
+                            recyclerView.setMediaObjects(postItemList);
                             recyclerView.setAdapter(adapter);
 
                         }

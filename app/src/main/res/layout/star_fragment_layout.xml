@@ -29,7 +29,7 @@
             android:layout_height="wrap_content"
             android:background="@color/colorWhite"/>
 
-        <android.support.v7.widget.RecyclerView
+        <com.doodle.Home.service.VideoPlayerRecyclerView
             android:id="@+id/feed_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
