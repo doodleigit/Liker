@@ -32,7 +32,9 @@ import com.doodle.Home.service.LinkScriptHolder;
 import com.doodle.Home.service.LinkScriptYoutubeHolder;
 import com.doodle.Home.service.TextHolder;
 import com.doodle.Home.service.TextMimHolder;
+import com.doodle.Home.service.VideoAutoPlayListener;
 import com.doodle.Home.service.VideoHolder;
+import com.doodle.Home.service.VideoPlayerRecyclerView;
 import com.doodle.Home.view.activity.Home;
 import com.doodle.R;
 import com.doodle.utils.AppConstants;
@@ -72,7 +74,7 @@ public class FollowingPost extends Fragment   {
     private CircularProgressView progressView;
     //  private PostAdapter adapter;
     private BreakingPostAdapter adapter;
-    private RecyclerView recyclerView;
+    private VideoPlayerRecyclerView recyclerView;
     private LinearLayoutManager layoutManager;
     private int totalItems;
     private int scrollOutItems;
@@ -94,6 +96,7 @@ public class FollowingPost extends Fragment   {
     public static LinkScriptYoutubeHolder.PostItemListener youtubeListener;
     public static LinkScriptHolder.PostItemListener linkListener;
     public static ImageHolder.PostItemListener imageListener;
+
     PostItem deletePostItem;
     int deletePosition;
 
@@ -120,7 +123,6 @@ public class FollowingPost extends Fragment   {
         networkOk = NetworkHelper.hasNetworkAccess(getActivity());
         deletePostItem=new PostItem();
 
-
     }
 
     @Override
@@ -131,7 +133,7 @@ public class FollowingPost extends Fragment   {
         layoutManager = new LinearLayoutManager(getActivity());
         progressView = (CircularProgressView) root.findViewById(R.id.progress_view);
         shimmerFrameLayout = (ShimmerFrameLayout) root.findViewById(R.id.shimmer_view_post_container);
-        recyclerView = (RecyclerView) root.findViewById(R.id.rvBreakingPost);
+        recyclerView = root.findViewById(R.id.rvBreakingPost);
         recyclerView.setLayoutManager(layoutManager);
 
         getData();
@@ -470,6 +472,7 @@ public class FollowingPost extends Fragment   {
                             shimmerFrameLayout.setVisibility(View.GONE);
 
                             recyclerView.setVisibility(View.VISIBLE);
+                            recyclerView.setMediaObjects(postItemList);
                             recyclerView.setAdapter(adapter);
                         }
                     }, 1000);

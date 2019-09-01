@@ -20,11 +20,49 @@
                 android:scaleType="centerCrop"
                 android:src="@drawable/photo" />
 
-            <VideoView
-                android:id="@+id/media_video_one"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:visibility="invisible" />
+                android:scaleType="center"
+                android:id="@+id/media_video_one"
+                android:background="@color/colorIconText"
+                android:visibility="invisible">
+
+                <ImageView
+                    android:id="@+id/media_video_one_thumbnail"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:src="@drawable/post_image_background" />
+
+                <ImageView
+                    android:id="@+id/media_video_one_play"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:padding="10dp"
+                    android:src="@drawable/video_play"
+                    android:layout_gravity="center"/>
+
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:scaleType="centerCrop"
+                    android:layout_gravity="end|bottom"
+                    android:id="@+id/media_video_one_volume_control"
+                    android:alpha="0"
+                    android:animateLayoutChanges="true"
+                    android:layout_marginEnd="15dp"
+                    android:layout_marginBottom="15dp"/>
+
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/media_video_one_progressBar"
+                    style="?android:attr/progressBarStyle"
+                    android:visibility="gone"
+                    android:layout_gravity="center" />
+
+            </FrameLayout>
 
         </RelativeLayout>
 
@@ -46,11 +84,49 @@
                     android:scaleType="centerCrop"
                     android:src="@drawable/photo" />
 
-                <VideoView
-                    android:id="@+id/media_video_two"
+                <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:visibility="invisible" />
+                    android:scaleType="center"
+                    android:id="@+id/media_video_two"
+                    android:background="@color/colorIconText"
+                    android:visibility="invisible">
+
+                    <ImageView
+                        android:id="@+id/media_video_two_thumbnail"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:src="@drawable/post_image_background" />
+
+                    <ImageView
+                        android:id="@+id/media_video_two_play"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:padding="10dp"
+                        android:src="@drawable/video_play"
+                        android:layout_gravity="center"/>
+
+                    <ImageView
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:scaleType="centerCrop"
+                        android:layout_gravity="end|bottom"
+                        android:id="@+id/media_video_two_volume_control"
+                        android:alpha="0"
+                        android:animateLayoutChanges="true"
+                        android:layout_marginEnd="15dp"
+                        android:layout_marginBottom="15dp"/>
+
+                    <ProgressBar
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/media_video_two_progressBar"
+                        style="?android:attr/progressBarStyle"
+                        android:visibility="gone"
+                        android:layout_gravity="center" />
+
+                </FrameLayout>
 
             </RelativeLayout>
 
@@ -67,11 +143,49 @@
                     android:scaleType="centerCrop"
                     android:src="@drawable/photo" />
 
-                <VideoView
-                    android:id="@+id/media_video_three"
+                <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:visibility="invisible" />
+                    android:scaleType="center"
+                    android:id="@+id/media_video_three"
+                    android:background="@color/colorIconText"
+                    android:visibility="invisible">
+
+                    <ImageView
+                        android:id="@+id/media_video_three_thumbnail"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:src="@drawable/post_image_background" />
+
+                    <ImageView
+                        android:id="@+id/media_video_three_play"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:padding="10dp"
+                        android:src="@drawable/video_play"
+                        android:layout_gravity="center"/>
+
+                    <ImageView
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:scaleType="centerCrop"
+                        android:layout_gravity="end|bottom"
+                        android:id="@+id/media_video_three_volume_control"
+                        android:alpha="0"
+                        android:animateLayoutChanges="true"
+                        android:layout_marginEnd="15dp"
+                        android:layout_marginBottom="15dp"/>
+
+                    <ProgressBar
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/media_video_three_progressBar"
+                        style="?android:attr/progressBarStyle"
+                        android:visibility="gone"
+                        android:layout_gravity="center" />
+
+                </FrameLayout>
 
             </RelativeLayout>
 
@@ -87,11 +201,49 @@
                     android:scaleType="centerCrop"
                     android:src="@drawable/photo" />
 
-                <VideoView
-                    android:id="@+id/media_video_four"
+                <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:visibility="invisible" />
+                    android:scaleType="center"
+                    android:id="@+id/media_video_four"
+                    android:background="@color/colorIconText"
+                    android:visibility="invisible">
+
+                    <ImageView
+                        android:id="@+id/media_video_four_thumbnail"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="center"
+                        android:src="@drawable/post_image_background" />
+
+                    <ImageView
+                        android:id="@+id/media_video_four_play"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:padding="10dp"
+                        android:src="@drawable/video_play"
+                        android:layout_gravity="center"/>
+
+                    <ImageView
+                        android:layout_width="25dp"
+                        android:layout_height="25dp"
+                        android:scaleType="centerCrop"
+                        android:layout_gravity="end|bottom"
+                        android:id="@+id/media_video_four_volume_control"
+                        android:alpha="0"
+                        android:animateLayoutChanges="true"
+                        android:layout_marginEnd="15dp"
+                        android:layout_marginBottom="15dp"/>
+
+                    <ProgressBar
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/media_video_four_progressBar"
+                        style="?android:attr/progressBarStyle"
+                        android:visibility="gone"
+                        android:layout_gravity="center" />
+
+                </FrameLayout>
 
                 <TextView
                     android:id="@+id/media_count"

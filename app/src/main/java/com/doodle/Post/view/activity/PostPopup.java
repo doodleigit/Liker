@@ -12,6 +12,7 @@ import com.doodle.Home.service.LinkScriptHolder;
 import com.doodle.Home.service.LinkScriptYoutubeHolder;
 import com.doodle.Home.service.TextHolder;
 import com.doodle.Home.service.TextMimHolder;
+import com.doodle.Home.service.VideoAutoPlayListener;
 import com.doodle.Home.service.VideoHolder;
 import com.doodle.Home.view.fragment.BreakingPost;
 import com.doodle.R;
@@ -32,7 +33,7 @@ public class PostPopup extends AppCompatActivity
     private SlidrInterface slidr;
     private PostItem popupPostItem;
     public List<PostItem> postItemList;
- private RecyclerView rvPopupPost;
+    private RecyclerView rvPopupPost;
 
 
     private BreakingPostAdapter adapter;
@@ -42,7 +43,7 @@ public class PostPopup extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.post_popup);
         postItemList = new ArrayList<>();
-        rvPopupPost=findViewById(R.id.rvPopupPost);
+        rvPopupPost = findViewById(R.id.rvPopupPost);
         slidr = Slidr.attach(this);
         popupPostItem = new PostItem();
         popupPostItem = getIntent().getExtras().getParcelable(TextHolder.ITEM_KEY);

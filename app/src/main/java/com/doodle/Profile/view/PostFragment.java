@@ -26,7 +26,9 @@ import com.doodle.Home.service.LinkScriptHolder;
 import com.doodle.Home.service.LinkScriptYoutubeHolder;
 import com.doodle.Home.service.TextHolder;
 import com.doodle.Home.service.TextMimHolder;
+import com.doodle.Home.service.VideoAutoPlayListener;
 import com.doodle.Home.service.VideoHolder;
+import com.doodle.Home.service.VideoPlayerRecyclerView;
 import com.doodle.Profile.service.ProfileService;
 import com.doodle.R;
 import com.doodle.utils.AppConstants;
@@ -59,7 +61,7 @@ public class PostFragment extends Fragment {
     private ProgressDialog progressDialog;
     //  private PostAdapter adapter;
     private BreakingPostAdapter adapter;
-    private RecyclerView recyclerView;
+    private VideoPlayerRecyclerView recyclerView;
     private LinearLayoutManager layoutManager;
     private int totalItems;
     private int scrollOutItems;
@@ -76,6 +78,7 @@ public class PostFragment extends Fragment {
     public static LinkScriptYoutubeHolder.PostItemListener youtubeListener;
     public static LinkScriptHolder.PostItemListener linkListener;
     public static ImageHolder.PostItemListener imageListener;
+
     PostItem deletePostItem;
     int deletePosition;
 
@@ -433,6 +436,7 @@ public class PostFragment extends Fragment {
                     offset += 5;
 
                     recyclerView.setVisibility(View.VISIBLE);
+                    recyclerView.setMediaObjects(postItemList);
                     recyclerView.setAdapter(adapter);
                     //  Log.d("PostItem: ", categoryItem.toString() + "");
                     progressView.setVisibility(View.GONE);

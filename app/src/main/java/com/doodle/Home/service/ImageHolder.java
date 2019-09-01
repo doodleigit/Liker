@@ -6,13 +6,11 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.view.menu.MenuPopupHelper;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
@@ -20,13 +18,10 @@ import android.text.SpannableStringBuilder;
 import android.text.style.UnderlineSpan;
 import android.text.util.Linkify;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewStub;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -48,13 +43,12 @@ import com.doodle.Comment.service.CommentService;
 import com.doodle.Comment.view.fragment.ReportReasonSheet;
 import com.doodle.Home.adapter.GalleryAdapter;
 import com.doodle.Home.model.MediaFrame;
+import com.doodle.Home.model.MediaViewHolder;
 import com.doodle.Home.model.PostFooter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.postshare.PostShareItem;
 import com.doodle.Home.view.activity.EditPost;
-import com.doodle.Home.view.activity.Home;
 import com.doodle.Home.view.activity.PostShare;
-import com.doodle.Post.adapter.MimAdapter;
 import com.doodle.Post.view.activity.PostPopup;
 import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.R;
@@ -69,8 +63,6 @@ import com.facebook.FacebookException;
 import com.facebook.share.Sharer;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
-import com.github.rahatarmanahmed.cpv.CircularProgressView;
-import com.squareup.picasso.Picasso;
 import com.vanniktech.emoji.EmojiTextView;
 
 import org.json.JSONException;
@@ -78,7 +70,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
@@ -122,16 +113,20 @@ public class ImageHolder extends RecyclerView.ViewHolder {
     private List<Comment_> comments = new ArrayList<Comment_>();
     private String commentPostId;
     RelativeLayout commentHold;
-    private FrameLayout dynamicMediaFrame;
+    public FrameLayout dynamicMediaFrame, mediaVideoOne, mediaVideoTwo, mediaVideoThree, mediaVideoFour;
     private String commentText, commentUserName, commentUserImage, commentImage, commentTime;
     public EmojiTextView tvCommentMessage;
     public ImageView imagePostCommenting, imageCommentLikeThumb, imageCommentSettings, imageMediaOne, imageMediaTwo, imageMediaThree, imageMediaFour;
+    public ImageView mediaVideoOneThumbnail, mediaVideoTwoThumbnail, mediaVideoThreeThumbnail, mediaVideoFourThumbnail, mediaVideoOneVolumeControl,
+            mediaVideoTwoVolumeControl, mediaVideoThreeVolumeControl, mediaVideoFourVolumeControl, mediaVideoOnePlay, mediaVideoTwoPlay, mediaVideoThreePlay, mediaVideoFourPlay;
+    public ProgressBar mediaVideoOneProgressBar, mediaVideoTwoProgressBar, mediaVideoThreeProgressBar, mediaVideoFourProgressBar;
+
     public CircleImageView imageCommentUser;
     public TextView tvCommentUserName, tvCommentTime, tvCommentLike, tvCommentReply, tvCountCommentLike, tvMediaCount;
     private String userPostId;
     private PopupMenu popupCommentMenu;
 
-    private ImageView[] imageMediaHolder;
+    private ArrayList<MediaViewHolder> mediaViewHolders;
     private ArrayList<MediaFrame> mediaFrames;
     private int[] videoMediaHolder;
 
@@ -231,6 +226,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
         singleImgRecyclerView = itemView.findViewById(R.id.singleImgRecyclerView);
 
 
+        mediaViewHolders = new ArrayList<>();
         mediaFrames = new ArrayList<>();
         mediaFrames.add(new MediaFrame(R.layout.item_media_frame_zero, 0));
         mediaFrames.add(new MediaFrame(R.layout.item_media_frame_one, 1));
@@ -278,8 +274,38 @@ public class ImageHolder extends RecyclerView.ViewHolder {
         imageMediaTwo = itemView.findViewById(R.id.media_image_two);
         imageMediaThree = itemView.findViewById(R.id.media_image_three);
         imageMediaFour = itemView.findViewById(R.id.media_image_four);
+
+        mediaVideoOne = itemView.findViewById(R.id.media_video_one);
+        mediaVideoTwo = itemView.findViewById(R.id.media_video_two);
+        mediaVideoThree = itemView.findViewById(R.id.media_video_three);
+        mediaVideoFour = itemView.findViewById(R.id.media_video_four);
+
+        mediaVideoOneThumbnail = itemView.findViewById(R.id.media_video_one_thumbnail);
+        mediaVideoTwoThumbnail = itemView.findViewById(R.id.media_video_two_thumbnail);
+        mediaVideoThreeThumbnail = itemView.findViewById(R.id.media_video_three_thumbnail);
+        mediaVideoFourThumbnail = itemView.findViewById(R.id.media_video_four_thumbnail);
+
+        mediaVideoOneVolumeControl = itemView.findViewById(R.id.media_video_one_volume_control);
+        mediaVideoTwoVolumeControl = itemView.findViewById(R.id.media_video_two_volume_control);
+        mediaVideoThreeVolumeControl = itemView.findViewById(R.id.media_video_three_volume_control);
+        mediaVideoFourVolumeControl = itemView.findViewById(R.id.media_video_four_volume_control);
+
+        mediaVideoOnePlay = itemView.findViewById(R.id.media_video_one_play);
+        mediaVideoTwoPlay = itemView.findViewById(R.id.media_video_two_play);
+        mediaVideoThreePlay = itemView.findViewById(R.id.media_video_three_play);
+        mediaVideoFourPlay = itemView.findViewById(R.id.media_video_four_play);
+
+        mediaVideoOneProgressBar = itemView.findViewById(R.id.media_video_one_progressBar);
+        mediaVideoTwoProgressBar = itemView.findViewById(R.id.media_video_two_progressBar);
+        mediaVideoThreeProgressBar = itemView.findViewById(R.id.media_video_three_progressBar);
+        mediaVideoFourProgressBar = itemView.findViewById(R.id.media_video_four_progressBar);
+
         tvMediaCount = itemView.findViewById(R.id.media_count);
-        imageMediaHolder = new ImageView[]{imageMediaOne, imageMediaTwo, imageMediaThree, imageMediaFour};
+        mediaViewHolders.clear();
+        mediaViewHolders.add(new MediaViewHolder(mediaVideoOne, imageMediaOne, mediaVideoOneThumbnail));
+        mediaViewHolders.add(new MediaViewHolder(mediaVideoTwo, imageMediaTwo, mediaVideoTwoThumbnail));
+        mediaViewHolders.add(new MediaViewHolder(mediaVideoThree, imageMediaThree, mediaVideoThreeThumbnail));
+        mediaViewHolders.add(new MediaViewHolder(mediaVideoFour, imageMediaFour, mediaVideoFourThumbnail));
 
         String postPermission = item.getPermission();
 
@@ -296,23 +322,23 @@ public class ImageHolder extends RecyclerView.ViewHolder {
         }
 
 
-        if (!App.isIsImagePopup()) {
-
-
-            viewHolder.itemView.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-
-
-                    Intent intent = new Intent(mContext, PostPopup.class);
-                    intent.putExtra(ITEM_KEY, (Parcelable) item);
-                    App.setIsImagePopup(true);
-                    mContext.startActivity(intent);
-                    ((Activity) mContext).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
-                    return false;
-                }
-            });
-        }
+//        if (!App.isIsImagePopup()) {
+//
+//
+//            viewHolder.itemView.setOnTouchListener(new View.OnTouchListener() {
+//                @Override
+//                public boolean onTouch(View v, MotionEvent event) {
+//
+//
+//                    Intent intent = new Intent(mContext, PostPopup.class);
+//                    intent.putExtra(ITEM_KEY, (Parcelable) item);
+//                    App.setIsImagePopup(true);
+//                    mContext.startActivity(intent);
+//                    ((Activity) mContext).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
+//                    return false;
+//                }
+//            });
+//        }
 
 
         tvCommentLike.setOnClickListener(new View.OnClickListener() {
@@ -537,14 +563,37 @@ public class ImageHolder extends RecyclerView.ViewHolder {
         }
 
         for (int i = 0; i < mediaFrames.get(item.getFrameNumber()).getItemCount(); i++) {
-            String imageUrl = AppConstants.POST_IMAGES + item.getPostFiles().get(i).getImageName();
-            Glide.with(App.getAppContext())
-                    .load(imageUrl)
-
-                    .error(R.drawable.post_image_background)
-                    .centerCrop()
-                    .dontAnimate()
-                    .into(imageMediaHolder[i]);
+            if (item.getPostFiles().get(i).getPostType().equals("2")) {
+                String imageUrl = AppConstants.POST_VIDEOS_THUMBNAIL + item.getPostFiles().get(i).getImageName();
+                mediaViewHolders.get(i).getMediaVideoLayout().setVisibility(View.VISIBLE);
+                mediaViewHolders.get(i).getMediaImage().setVisibility(View.GONE);
+                Glide.with(App.getAppContext())
+                        .load(imageUrl)
+                        .error(R.drawable.post_image_background)
+                        .dontAnimate()
+                        .into(mediaViewHolders.get(i).getMediaThumbnail());
+                Glide.with(App.getAppContext())
+                        .load(imageUrl)
+                        .error(R.drawable.post_image_background)
+                        .centerCrop()
+                        .dontAnimate()
+                        .into(mediaViewHolders.get(i).getMediaImage());
+            } else {
+                String imageUrl = AppConstants.POST_IMAGES + item.getPostFiles().get(i).getImageName();
+                mediaViewHolders.get(i).getMediaVideoLayout().setVisibility(View.GONE);
+                mediaViewHolders.get(i).getMediaImage().setVisibility(View.VISIBLE);
+                Glide.with(App.getAppContext())
+                        .load(imageUrl)
+                        .error(R.drawable.post_image_background)
+                        .centerCrop()
+                        .dontAnimate()
+                        .into(mediaViewHolders.get(i).getMediaImage());
+                Glide.with(App.getAppContext())
+                        .load(imageUrl)
+                        .error(R.drawable.post_image_background)
+                        .dontAnimate()
+                        .into(mediaViewHolders.get(i).getMediaThumbnail());
+            }
         }
 
         tvPostUserName.setOnClickListener(new View.OnClickListener() {

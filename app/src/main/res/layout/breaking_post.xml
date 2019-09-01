@@ -28,7 +28,7 @@
 
     </com.facebook.shimmer.ShimmerFrameLayout>
 
-        <android.support.v7.widget.RecyclerView
+        <com.doodle.Home.service.VideoPlayerRecyclerView
             android:visibility="gone"
             android:id="@+id/rvBreakingPost"
             android:layout_width="match_parent"
