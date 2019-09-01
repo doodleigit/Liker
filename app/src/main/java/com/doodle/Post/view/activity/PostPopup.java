@@ -12,7 +12,6 @@ import com.doodle.Home.service.LinkScriptHolder;
 import com.doodle.Home.service.LinkScriptYoutubeHolder;
 import com.doodle.Home.service.TextHolder;
 import com.doodle.Home.service.TextMimHolder;
-import com.doodle.Home.service.VideoAutoPlayListener;
 import com.doodle.Home.service.VideoHolder;
 import com.doodle.Home.view.fragment.BreakingPost;
 import com.doodle.R;
