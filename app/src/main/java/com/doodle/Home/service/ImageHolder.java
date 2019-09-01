@@ -658,7 +658,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
                     popupMenu.getMenu().findItem(R.id.onlyMe).setVisible(true);
                     popupMenu.getMenu().findItem(R.id.edit).setVisible(true);
                     popupMenu.getMenu().findItem(R.id.delete).setVisible(true);
-                    popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(true);
+                  //  popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(true);
                 } else {
                     popupMenu.getMenu().findItem(R.id.blockedUser).setVisible(true);
                     popupMenu.getMenu().findItem(R.id.reportedPost).setVisible(true);
@@ -667,7 +667,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
                     popupMenu.getMenu().findItem(R.id.onlyMe).setVisible(false);
                     popupMenu.getMenu().findItem(R.id.edit).setVisible(false);
                     popupMenu.getMenu().findItem(R.id.delete).setVisible(false);
-                    popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(true);
+                  // v  popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(true);
                 }
 
 

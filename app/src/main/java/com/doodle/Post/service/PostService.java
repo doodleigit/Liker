@@ -128,7 +128,10 @@ public interface PostService {
             @Field("schedule_time") int scheduleTime,
             @Field("has_meme") int hasMeme,
             @Field("content_new_scrap") int contentNewScrap,
-            @Field("post_id") String postId
+            @Field("post_id") String postId,
+            @Field("files") String mediaFiles,
+            @Field("delete_post_media_ids") String deleteMediaIds
+
     );
 
 /*

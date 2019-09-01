@@ -26,6 +26,8 @@ import com.twitter.sdk.android.core.TwitterConfig;
 import com.vanniktech.emoji.EmojiManager;
 import com.vanniktech.emoji.twitter.TwitterEmojiProvider;
 
+import java.util.List;
+
 import static android.support.v7.app.AppCompatDelegate.MODE_NIGHT_AUTO;
 
 public class App extends Application {
@@ -60,6 +62,15 @@ public class App extends Application {
     private static int position;
     private static boolean isMimPopup;
     private static boolean isImagePopup;
+    private static List<String> deleteMediaIds;
+
+    public static List<String> getDeleteMediaIds() {
+        return deleteMediaIds;
+    }
+
+    public static void setDeleteMediaIds(List<String> deleteMediaIds) {
+        App.deleteMediaIds = deleteMediaIds;
+    }
 
     public static boolean isIsImagePopup() {
         return isImagePopup;

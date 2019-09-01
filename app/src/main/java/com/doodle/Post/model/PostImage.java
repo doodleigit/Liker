@@ -6,6 +6,9 @@ import android.os.Parcelable;
 public class PostImage implements Parcelable {
 
     public String imagePath;
+    public String imageId;
+
+
 
     public PostImage() {
     }
@@ -14,8 +17,23 @@ public class PostImage implements Parcelable {
         this.imagePath = imagePath;
     }
 
+    public PostImage(String imagePath, String imageId) {
+        this.imagePath = imagePath;
+        this.imageId = imageId;
+    }
+
+    public String getImageId() {
+        return imageId;
+    }
+
+    public void setImageId(String imageId) {
+        this.imageId = imageId;
+    }
+
+
     protected PostImage(Parcel in) {
         imagePath = in.readString();
+        imageId = in.readString();
     }
 
     public static final Creator<PostImage> CREATOR = new Creator<PostImage>() {
@@ -46,5 +64,6 @@ public class PostImage implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(imagePath);
+        dest.writeString(imageId);
     }
 }

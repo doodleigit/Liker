@@ -20,7 +20,10 @@ import com.doodle.Post.view.activity.GalleryView;
 import com.doodle.R;
 import com.doodle.utils.AppConstants;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.doodle.utils.Utils.isNullOrEmpty;
 
 public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     final int VIEW_TYPE_IMAGE = 0;
@@ -29,11 +32,14 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     Context context;
     List<PostImage> postImages;
     List<PostVideo> postVideos;
+    List<String> deleteMediaFiles;
 
     public MediaAdapter(Context context, List<PostImage> postImages, List<PostVideo> postVideos) {
         this.context = context;
         this.postImages = postImages;
         this.postVideos = postVideos;
+        deleteMediaFiles=new ArrayList<>();
+
     }
 
     @Override
@@ -120,6 +126,12 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 @Override
                 public boolean onTouch(View v, MotionEvent event) {
                     postImages.remove(getPosition());
+                    String mediaId=postImage.getImageId();
+                    if(!isNullOrEmpty(mediaId)){
+
+                        deleteMediaFiles.add(mediaId);
+                        App.setDeleteMediaIds(deleteMediaFiles);
+                    }
                     notifyDataSetChanged();
                     return false;
                 }

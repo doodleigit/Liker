@@ -269,6 +269,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
     //Multiple Media File
     List<String> mediaFiles;
     ProgressDialog progressDialog;
+    private String deleteMediaIds;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -819,7 +820,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                 imageString = temp.getImageName();
                 videoString = temp.getVideoName();
                 if (!isNullOrEmpty(imageString)) {
-                    postImages.add(new PostImage(imageString));
+                    postImages.add(new PostImage(imageString,temp.getId()));
                 }
                 if (!isNullOrEmpty(videoString)) {
                     postVideos.add(new PostVideo(videoString));
@@ -830,6 +831,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
             MediaAdapter mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos);
             mediaRecyclerView.setAdapter(mediaAdapter);
         }
+
 
     }
 
@@ -1213,6 +1215,24 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                 } else if (!isAddContentTitle) {
                     Utils.showCustomToast(EditPost.this, mView, " You must add description to your post !", Gravity.TOP);
                 } else {
+
+
+                    //  friendSet.add(id);
+                    String separator = ", ";
+                    List<String> idSet = new ArrayList<>();
+                    idSet=App.getDeleteMediaIds();
+                    int total = idSet.size() * separator.length();
+                    for (String s : idSet) {
+                        total += s.length();
+                    }
+
+                    StringBuilder sb = new StringBuilder(total);
+                    for (String s : idSet) {
+                        sb.append(separator).append(s);
+                    }
+
+                    deleteMediaIds= sb.substring(separator.length()).replaceAll("\\s+", "");
+
                     createNewPost();
                 }
 
@@ -1291,7 +1311,9 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                     scheduleTime,//0,
                     hasMim,
                     0,
-                    editPostId//0
+                    editPostId,//0
+                    mediaFiles.toString(),
+                    deleteMediaIds
             );
             sendNewPostRequest(call);
         } else {
