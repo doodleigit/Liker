@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.doodle.R;
+import com.doodle.Setting.view.SettingActivity;
 
 public class About extends AppCompatActivity implements View.OnClickListener {
 
@@ -27,13 +28,22 @@ public class About extends AppCompatActivity implements View.OnClickListener {
                 finish();
                 break;
             case R.id.containerTerms:
-                startActivity(new Intent(About.this, TermService.class));
+                Intent termsIntent = new Intent(this, SettingActivity.class);
+                termsIntent.putExtra("type", getString(R.string.terms_of_services));
+                termsIntent.putExtra("link", getString(R.string.terms_of_services_link));
+                startActivity(termsIntent);
                 break;
             case R.id.privacyContainer:
-                startActivity(new Intent(About.this, Privacy.class));
+                Intent privacyIntent = new Intent(this, SettingActivity.class);
+                privacyIntent.putExtra("type", getString(R.string.privacy_policy));
+                privacyIntent.putExtra("link", getString(R.string.privacy_policy_link));
+                startActivity(privacyIntent);
                 break;
             case R.id.contactContainer:
-             //   startActivity(new Intent(About.this, Contact.class));
+                Intent contactIntent = new Intent(this, SettingActivity.class);
+                contactIntent.putExtra("type", getString(R.string.contact));
+                contactIntent.putExtra("link", getString(R.string.contact_link));
+                startActivity(contactIntent);
                 break;
 
         }

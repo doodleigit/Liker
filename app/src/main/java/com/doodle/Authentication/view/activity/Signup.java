@@ -802,7 +802,9 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
 
                     if (otpStatus) {
                        // startActivity(new Intent(Signup.this, Liker.class));
-                        startActivity(new Intent(Signup.this, Home.class));
+                        Intent intent = new Intent(Signup.this, Home.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
                     } else {
 
                         if (otpBounceData == 1) {

@@ -695,6 +695,7 @@ public class Welcome extends AppCompatActivity implements View.OnClickListener, 
 //                    startActivity(intent);
 
                     startActivity(new Intent(Welcome.this, Home.class));
+                    finish();
                 } else {
                     String msg = "Username and password miss match";
                     showStatus(msg);

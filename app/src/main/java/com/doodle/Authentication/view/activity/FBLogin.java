@@ -241,9 +241,9 @@ public class FBLogin extends AppCompatActivity {
                     boolean status = object.getBoolean("status");
                     if (status) {
                         Log.d("LoginUser:", loginUser);
-                     //   startActivity(new Intent(FBLogin.this, Liker.class));
-                        startActivity(new Intent(FBLogin.this, Home.class));
-                        finish();
+                        Intent intent = new Intent(FBLogin.this, Home.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
                     } else {
                         App.setIsFBLogin(status);
                         App.setIsTwitterLogin(true);

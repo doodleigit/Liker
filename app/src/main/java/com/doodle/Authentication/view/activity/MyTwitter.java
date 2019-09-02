@@ -344,9 +344,9 @@ public class MyTwitter extends AppCompatActivity implements View.OnClickListener
                     boolean status = object.getBoolean("status");
                     if (status) {
                         Log.d("LoginUser:", loginUser);
-                     //   startActivity(new Intent(MyTwitter.this, Liker.class));
-                        startActivity(new Intent(MyTwitter.this, Home.class));
-                        finish();
+                        Intent intent = new Intent(MyTwitter.this, Home.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
                     } else {
                         App.setIsTwitterLogin(status);
                         App.setIsFBLogin(true);
