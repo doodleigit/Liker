@@ -15,8 +15,8 @@ import com.doodle.App;
 import com.doodle.Message.model.Messages;
 import com.doodle.Message.model.User;
 import com.doodle.R;
-import com.doodle.utils.AppConstants;
-import com.doodle.utils.Utils;
+import com.doodle.Tool.AppConstants;
+import com.doodle.Tool.Tools;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -69,7 +69,7 @@ public class MessagingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             LeftChatViewHolder viewHolder = (LeftChatViewHolder) holder;
 
             viewHolder.tvMessage.setText(message);
-            viewHolder.tvMessageTime.setText(Utils.chatDateCompare(context, Long.valueOf(messageTime)));
+            viewHolder.tvMessageTime.setText(Tools.chatDateCompare(context, Long.valueOf(messageTime)));
 
             Glide.with(App.getAppContext())
                     .load(AppConstants.PROFILE_IMAGE + userImage)
@@ -89,7 +89,7 @@ public class MessagingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             RightChatViewHolder viewHolder = (RightChatViewHolder) holder;
 
             viewHolder.tvMessage.setText(message);
-            viewHolder.tvMessageTime.setText(Utils.chatDateCompare(context, Long.valueOf(messageTime)));
+            viewHolder.tvMessageTime.setText(Tools.chatDateCompare(context, Long.valueOf(messageTime)));
 
             Glide.with(App.getAppContext())
                     .load(AppConstants.PROFILE_IMAGE + userImage)

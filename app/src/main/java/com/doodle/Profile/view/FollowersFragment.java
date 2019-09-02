@@ -23,7 +23,7 @@ import com.doodle.Profile.model.FollowersResult;
 import com.doodle.Profile.service.FollowUnfollowClickListener;
 import com.doodle.Profile.service.ProfileService;
 import com.doodle.R;
-import com.doodle.utils.PrefManager;
+import com.doodle.Tool.PrefManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;

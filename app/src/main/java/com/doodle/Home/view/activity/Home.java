@@ -1,6 +1,5 @@
 package com.doodle.Home.view.activity;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -10,14 +9,12 @@ import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Parcelable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.MenuCompat;
 import android.support.v4.view.ViewPager;
@@ -29,7 +26,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -42,13 +38,9 @@ import android.widget.Toast;
 import com.doodle.App;
 import com.doodle.Authentication.model.UserInfo;
 import com.doodle.Authentication.view.activity.LoginAgain;
-import com.doodle.Comment.adapter.AllCommentAdapter;
-import com.doodle.Comment.model.CommentItem;
 import com.doodle.Comment.model.Comment_;
-import com.doodle.Comment.model.ReportReason;
 import com.doodle.Comment.service.CommentService;
 import com.doodle.Comment.view.fragment.BlockUserDialog;
-import com.doodle.Comment.view.fragment.DeletePostDialog;
 import com.doodle.Comment.view.fragment.FollowSheet;
 import com.doodle.Comment.view.fragment.ReportLikerMessageSheet;
 import com.doodle.Comment.view.fragment.ReportPersonMessageSheet;
@@ -56,7 +48,6 @@ import com.doodle.Comment.view.fragment.ReportReasonSheet;
 import com.doodle.Comment.view.fragment.ReportSendCategorySheet;
 import com.doodle.Home.adapter.CategoryTitleAdapter;
 import com.doodle.Home.adapter.SubCategoryAdapter;
-import com.doodle.Authentication.view.fragment.ResendEmail;
 import com.doodle.Home.adapter.ViewPagerAdapter;
 import com.doodle.Home.model.CommonCategory;
 import com.doodle.Home.model.PostFilterCategory;
@@ -71,7 +62,6 @@ import com.doodle.Home.service.LoadCompleteListener;
 import com.doodle.Home.service.SocketIOManager;
 import com.doodle.Home.view.fragment.BreakingPost;
 import com.doodle.Home.view.fragment.FollowingPost;
-import com.doodle.Home.view.fragment.TabFragment;
 import com.doodle.Home.model.Headers;
 import com.doodle.Home.model.SetUser;
 import com.doodle.Home.view.fragment.TrendingPost;
@@ -84,11 +74,11 @@ import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.R;
 import com.doodle.Search.LikerSearch;
 import com.doodle.Setting.view.SettingActivity;
-import com.doodle.utils.AppConstants;
-import com.doodle.utils.NetworkHelper;
-import com.doodle.utils.PrefManager;
-import com.doodle.utils.ScreenOnOffBroadcast;
-import com.doodle.utils.Utils;
+import com.doodle.Tool.AppConstants;
+import com.doodle.Tool.NetworkHelper;
+import com.doodle.Tool.PrefManager;
+import com.doodle.Tool.ScreenOnOffBroadcast;
+import com.doodle.Tool.Tools;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
@@ -97,7 +87,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import cn.jzvd.JZVideoPlayer;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -108,12 +97,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static com.doodle.Authentication.view.activity.Welcome.USER_INFO_ITEM_KEY;
-import static com.doodle.Home.service.TextHolder.ITEM_KEY;
-import static com.doodle.utils.AppConstants.IN_CHAT_MODE;
-import static com.doodle.utils.Utils.isEmpty;
-import static com.doodle.utils.Utils.sendNotificationRequest;
-import static java.security.AccessController.getContext;
+import static com.doodle.Tool.AppConstants.IN_CHAT_MODE;
+import static com.doodle.Tool.Tools.isEmpty;
 
 public class Home extends AppCompatActivity implements
         View.OnClickListener,
@@ -487,14 +472,14 @@ public class Home extends AppCompatActivity implements
                         commonCategories.add(new CommonCategory(postFilterItem.getItemId(), postFilterItem.getItemName()));
                     }
                 }
-                sendBroadcast((new Intent().putExtra("category_ids", Utils.setCategoryIds(arrayList))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
+                sendBroadcast((new Intent().putExtra("category_ids", Tools.setCategoryIds(arrayList))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
             }
 
             @Override
             public void onCategorySelect(CommonCategory commonCategory) {
                 ArrayList<String> arrayList = new ArrayList<>();
                 arrayList.add(commonCategory.getCatId());
-                sendBroadcast((new Intent().putExtra("category_ids", Utils.setCategoryIds(arrayList))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
+                sendBroadcast((new Intent().putExtra("category_ids", Tools.setCategoryIds(arrayList))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
             }
 
             @Override
@@ -503,7 +488,7 @@ public class Home extends AppCompatActivity implements
                 for (CommonCategory commonCategory : commonCategories) {
                     arrayList.add(commonCategory.getCatId());
                 }
-                sendBroadcast((new Intent().putExtra("category_ids", Utils.setCategoryIds(arrayList))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
+                sendBroadcast((new Intent().putExtra("category_ids", Tools.setCategoryIds(arrayList))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
             }
 
             @Override
@@ -572,7 +557,7 @@ public class Home extends AppCompatActivity implements
                 categoryTitleAdapter.notifyDataSetChanged();
                 selectedCategory = filterSubCategory.getSubCatName();
                 filterItem.setText(selectedCategory);
-                sendBroadcast((new Intent().putExtra("category_ids", Utils.setCategoryIds(arrayList))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
+                sendBroadcast((new Intent().putExtra("category_ids", Tools.setCategoryIds(arrayList))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
 
             }
 
@@ -606,7 +591,7 @@ public class Home extends AppCompatActivity implements
                 categoryTitleAdapter.notifyDataSetChanged();
                 selectedCategory = filterSubCategory.getSubCatName();
                 filterItem.setText(selectedCategory);
-                sendBroadcast((new Intent().putExtra("category_ids", Utils.setCategoryIds(arrayList))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
+                sendBroadcast((new Intent().putExtra("category_ids", Tools.setCategoryIds(arrayList))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
                 //Api Request
                 //Progress Dialog
 
@@ -770,7 +755,7 @@ public class Home extends AppCompatActivity implements
                 dialog.dismiss();
                 categoryTitleAdapter.notifyDataSetChanged();
                 filterItem.setText(getString(R.string.personalize_your_feed));
-                sendBroadcast((new Intent().putExtra("category_ids", Utils.setCategoryIds(arrayList))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
+                sendBroadcast((new Intent().putExtra("category_ids", Tools.setCategoryIds(arrayList))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
             }
         });
 
@@ -1061,7 +1046,7 @@ public class Home extends AppCompatActivity implements
         unregisterReceiver(broadcastReceiver);
         unregisterReceiver(mReceiver);
         socket.off("web_notification");
-        Utils.dismissDialog();
+        Tools.dismissDialog();
 
     }
 
@@ -1100,7 +1085,7 @@ public class Home extends AppCompatActivity implements
             }
         }
         categoryTitleAdapter.notifyDataSetChanged();
-        sendBroadcast((new Intent().putExtra("category_ids", Utils.setCategoryIds(arrayList))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
+        sendBroadcast((new Intent().putExtra("category_ids", Tools.setCategoryIds(arrayList))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
     }
 
     @Override
@@ -1181,7 +1166,7 @@ public class Home extends AppCompatActivity implements
             Call<String> call = commentService.blockedUser(deviceId, profileId, token, blockUserId, userId);
             sendBlockUserRequest(call);
         } else {
-            Utils.showNetworkDialog(getSupportFragmentManager());
+            Tools.showNetworkDialog(getSupportFragmentManager());
         }
 
     }
@@ -1198,7 +1183,7 @@ public class Home extends AppCompatActivity implements
                             boolean status = object.getBoolean("status");
 
                             if (status) {
-                                // Utils.toast(Home.this, "your message was successfully sent", R.drawable.icon_checked);
+                                // Tools.toast(Home.this, "your message was successfully sent", R.drawable.icon_checked);
                                 startActivity(getIntent());
                                 finish();
 

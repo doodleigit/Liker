@@ -1,20 +1,11 @@
 package com.doodle.Authentication.view.activity;
 
 import android.content.Intent;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.Window;
-import android.view.WindowManager;
 
 import com.doodle.Home.view.activity.Home;
-import com.doodle.Profile.view.ProfileActivity;
-import com.doodle.R;
-import com.doodle.utils.PrefManager;
-import com.onesignal.OneSignal;
-
-import static com.doodle.utils.Utils.isNullOrEmpty;
+import com.doodle.Tool.PrefManager;
 
 public class Splash extends AppCompatActivity {
 

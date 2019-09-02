@@ -1,10 +1,9 @@
 package com.doodle.Notification.service;
 
 import com.doodle.Notification.model.NotificationItem;
-import com.doodle.utils.AppConstants;
+import com.doodle.Tool.AppConstants;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Retrofit;

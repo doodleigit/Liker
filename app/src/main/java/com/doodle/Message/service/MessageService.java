@@ -4,7 +4,7 @@ import com.doodle.Message.model.AllFriends;
 import com.doodle.Message.model.Chats;
 import com.doodle.Message.model.Friend;
 import com.doodle.Message.model.Message;
-import com.doodle.utils.AppConstants;
+import com.doodle.Tool.AppConstants;
 
 import java.util.ArrayList;
 

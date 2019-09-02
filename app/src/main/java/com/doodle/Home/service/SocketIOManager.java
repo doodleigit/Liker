@@ -5,14 +5,13 @@ import android.util.Log;
 import com.doodle.App;
 import com.doodle.Home.model.Headers;
 import com.doodle.Home.model.SetUser;
-import com.doodle.utils.AppConstants;
-import com.doodle.utils.PrefManager;
+import com.doodle.Tool.AppConstants;
+import com.doodle.Tool.PrefManager;
 import com.google.gson.Gson;
 
 import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Map;
 
 
 import javax.net.ssl.HostnameVerifier;
@@ -24,10 +23,8 @@ import javax.net.ssl.X509TrustManager;
 
 import io.socket.client.Ack;
 import io.socket.client.IO;
-import io.socket.client.Manager;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
-import io.socket.engineio.client.Transport;
 import okhttp3.OkHttpClient;
 
 

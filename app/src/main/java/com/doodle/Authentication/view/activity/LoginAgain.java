@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.doodle.R;
-import com.doodle.utils.PrefManager;
+import com.doodle.Tool.PrefManager;
 import com.squareup.picasso.Picasso;
 
 public class LoginAgain extends AppCompatActivity implements View.OnClickListener {

@@ -24,7 +24,7 @@ import com.doodle.Profile.model.RecentPhoto;
 import com.doodle.Profile.service.PhotoAlbumClickListener;
 import com.doodle.Profile.service.ProfileService;
 import com.doodle.R;
-import com.doodle.utils.PrefManager;
+import com.doodle.Tool.PrefManager;
 
 import java.util.ArrayList;
 

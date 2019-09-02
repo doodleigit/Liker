@@ -16,8 +16,8 @@ import com.doodle.App;
 import com.doodle.Message.model.ChatUser;
 import com.doodle.Message.service.ListClickResponseService;
 import com.doodle.R;
-import com.doodle.utils.AppConstants;
-import com.doodle.utils.Utils;
+import com.doodle.Tool.AppConstants;
+import com.doodle.Tool.Tools;
 
 import java.util.ArrayList;
 
@@ -47,7 +47,7 @@ public class MessageListAdapter extends RecyclerView.Adapter<MessageListAdapter.
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
         viewHolder.tvUserName.setText(arrayList.get(i).getUserData().getFirstName() + " " + arrayList.get(i).getUserData().getLastName());
         viewHolder.tvMessage.setText(arrayList.get(i).getMessageData().getContent());
-        viewHolder.tvMessageTime.setText(Utils.chatDateCompare(context, Long.valueOf(arrayList.get(i).getMessageData().getTimePosted())));
+        viewHolder.tvMessageTime.setText(Tools.chatDateCompare(context, Long.valueOf(arrayList.get(i).getMessageData().getTimePosted())));
 
         Glide.with(App.getAppContext())
                 .load(AppConstants.PROFILE_IMAGE + arrayList.get(i).getUserData().getPhoto())

@@ -10,7 +10,7 @@ import android.widget.TextView;
 
 import com.doodle.Profile.model.Story;
 import com.doodle.R;
-import com.doodle.utils.Utils;
+import com.doodle.Tool.Tools;
 
 import java.util.ArrayList;
 
@@ -38,7 +38,7 @@ public class StoryAdapter extends RecyclerView.Adapter<StoryAdapter.ViewHolder> 
         title = arrayList.get(i).getType();
         summary = arrayList.get(i).getDescription();
 
-        viewHolder.tvTitle.setText(Utils.getStoryType(title));
+        viewHolder.tvTitle.setText(Tools.getStoryType(title));
         viewHolder.tvSummary.setText(summary);
     }
 

@@ -1,22 +1,13 @@
 package com.doodle.Home.service;
 
 import android.util.Log;
-import android.view.View;
 
 import com.doodle.App;
 import com.doodle.Home.model.PostItem;
-import com.doodle.Post.adapter.CategoryListAdapter;
-import com.doodle.Post.model.Category;
-import com.doodle.Post.model.CategoryItem;
-import com.doodle.Post.model.Mim;
-import com.doodle.Post.service.PostService;
-import com.doodle.Post.view.activity.PostCategory;
-import com.doodle.utils.PrefManager;
+import com.doodle.Tool.PrefManager;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;

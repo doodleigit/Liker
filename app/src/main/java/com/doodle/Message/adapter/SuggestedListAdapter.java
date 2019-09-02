@@ -15,7 +15,7 @@ import com.doodle.App;
 import com.doodle.Message.model.Friend;
 import com.doodle.Message.service.SuggestedListClickResponseService;
 import com.doodle.R;
-import com.doodle.utils.AppConstants;
+import com.doodle.Tool.AppConstants;
 
 import java.util.ArrayList;
 

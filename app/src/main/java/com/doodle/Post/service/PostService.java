@@ -2,15 +2,8 @@ package com.doodle.Post.service;
 
 import com.doodle.Post.model.CategoryItem;
 import com.doodle.Post.model.MentionUser;
-import com.doodle.Post.model.MultipleMediaFile;
-import com.doodle.utils.AppConstants;
+import com.doodle.Tool.AppConstants;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.List;
 
 import okhttp3.MultipartBody;
@@ -25,7 +18,7 @@ import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
 
-import static com.doodle.utils.RestAdapter.getUnsafeOkHttpClient;
+import static com.doodle.Tool.RestAdapter.getUnsafeOkHttpClient;
 
 public interface PostService {
 

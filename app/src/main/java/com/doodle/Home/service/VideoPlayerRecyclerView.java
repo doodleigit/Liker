@@ -18,10 +18,11 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.bumptech.glide.RequestManager;
+import com.doodle.Home.holder.ImageHolder;
 import com.doodle.Home.model.MediaTrackingList;
 import com.doodle.Home.model.MediaViewObject;
 import com.doodle.Home.model.PostItem;
-import com.doodle.utils.AppConstants;
+import com.doodle.Tool.AppConstants;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.PlaybackParameters;

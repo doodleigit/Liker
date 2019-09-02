@@ -23,7 +23,7 @@ import com.doodle.Setting.adapter.SocialFriendsAdapter;
 import com.doodle.Setting.model.Social;
 import com.doodle.Setting.model.SocialFriend;
 import com.doodle.Setting.service.SettingService;
-import com.doodle.utils.PrefManager;
+import com.doodle.Tool.PrefManager;
 
 import java.util.ArrayList;
 

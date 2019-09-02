@@ -9,9 +9,8 @@ import com.doodle.Setting.model.PeopleMayKnow;
 import com.doodle.Setting.model.PrivacyInfo;
 import com.doodle.Setting.model.PrivacyOnOff;
 import com.doodle.Setting.model.Social;
-import com.doodle.Setting.model.SocialFriend;
 import com.doodle.Setting.model.SocialLink;
-import com.doodle.utils.AppConstants;
+import com.doodle.Tool.AppConstants;
 
 import java.util.ArrayList;
 

@@ -19,27 +19,26 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.Toast;
 
 import com.doodle.App;
 import com.doodle.Comment.model.Comment;
 import com.doodle.Comment.model.CommentItem;
-import com.doodle.Home.adapter.BreakingPostAdapter;
+import com.doodle.Home.adapter.PostAdapter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.service.HomeService;
-import com.doodle.Home.service.ImageHolder;
-import com.doodle.Home.service.LinkScriptHolder;
-import com.doodle.Home.service.LinkScriptYoutubeHolder;
-import com.doodle.Home.service.TextHolder;
-import com.doodle.Home.service.TextMimHolder;
-import com.doodle.Home.service.VideoHolder;
+import com.doodle.Home.holder.ImageHolder;
+import com.doodle.Home.holder.LinkScriptHolder;
+import com.doodle.Home.holder.LinkScriptYoutubeHolder;
+import com.doodle.Home.holder.TextHolder;
+import com.doodle.Home.holder.TextMimHolder;
+import com.doodle.Home.holder.VideoHolder;
 import com.doodle.Home.service.VideoPlayerRecyclerView;
 import com.doodle.Home.view.activity.Home;
 import com.doodle.R;
-import com.doodle.utils.AppConstants;
-import com.doodle.utils.NetworkHelper;
-import com.doodle.utils.PrefManager;
-import com.doodle.utils.Utils;
+import com.doodle.Tool.AppConstants;
+import com.doodle.Tool.NetworkHelper;
+import com.doodle.Tool.PrefManager;
+import com.doodle.Tool.Tools;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 
@@ -73,7 +72,7 @@ public class TrendingPost extends Fragment   {
     private boolean networkOk;
     private CircularProgressView progressView;
     //  private PostAdapter adapter;
-    private BreakingPostAdapter adapter;
+    private PostAdapter adapter;
     private VideoPlayerRecyclerView recyclerView;
     private LinearLayoutManager layoutManager;
     private int totalItems;
@@ -233,7 +232,7 @@ public class TrendingPost extends Fragment   {
                             Call<String> call = webService.postDelete(deviceId, profileId, token, userIds, deletePostItem.getPostId());
                             sendDeletePostRequest(call);
                         } else {
-                            Utils.showNetworkDialog(getActivity().getSupportFragmentManager());
+                            Tools.showNetworkDialog(getActivity().getSupportFragmentManager());
                         }
 
 
@@ -288,7 +287,7 @@ public class TrendingPost extends Fragment   {
             Call<List<PostItem>> call = webService.feed(deviceId, profileId, token, userIds, limit, offset, "trending", catIds, 1, false);
             sendPostItemRequest(call);
         } else {
-            Utils.showNetworkDialog(getActivity().getSupportFragmentManager());
+            Tools.showNetworkDialog(getActivity().getSupportFragmentManager());
             progressView.setVisibility(View.GONE);
             progressView.stopAnimation();
 
@@ -307,7 +306,7 @@ public class TrendingPost extends Fragment   {
                     PostItemPagingRequest(call);
 
                 } else {
-                    Utils.showNetworkDialog(getActivity().getSupportFragmentManager());
+                    Tools.showNetworkDialog(getActivity().getSupportFragmentManager());
                     progressView.setVisibility(View.GONE);
                     progressView.stopAnimation();
                 }
@@ -418,7 +417,7 @@ public class TrendingPost extends Fragment   {
                     Call<CommentItem> mCall = webService.getPostComments(deviceId, profileId, token, "false", 3, 0, "DESC", totalPostIDs, userIds);
                     sendCommentItemRequest(mCall);
 
-                /*    adapter = new BreakingPostAdapter(getActivity(), postItemList);
+                /*    adapter = new PostAdapter(getActivity(), postItemList);
 
                     new Handler().postDelayed(new Runnable() {
                         @Override
@@ -461,7 +460,7 @@ public class TrendingPost extends Fragment   {
                 comments = commentItem.getComments();
                 Log.d("commentItem", commentItem.toString());
                 if (postItemList != null && comments != null) {
-                    adapter = new BreakingPostAdapter(getActivity(), postItemList, mCallback, mimListener,videoListener,youtubeListener,linkListener,imageListener);
+                    adapter = new PostAdapter(getActivity(), postItemList, mCallback, mimListener,videoListener,youtubeListener,linkListener,imageListener);
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {

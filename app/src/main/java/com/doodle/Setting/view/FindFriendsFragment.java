@@ -15,7 +15,7 @@ import com.doodle.R;
 import com.doodle.Setting.adapter.ViewPagerAdapter;
 import com.doodle.Setting.model.SocialLink;
 import com.doodle.Setting.service.SettingService;
-import com.doodle.utils.PrefManager;
+import com.doodle.Tool.PrefManager;
 
 import retrofit2.Call;
 import retrofit2.Callback;

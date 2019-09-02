@@ -9,24 +9,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.method.LinkMovementMethod;
-import android.text.style.ForegroundColorSpan;
-import android.text.style.URLSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.doodle.Authentication.view.fragment.ResendEmail;
 import com.doodle.R;
-import com.doodle.utils.Utils;
+import com.doodle.Tool.Tools;
 
-import static android.content.ContentValues.TAG;
 import static android.graphics.Typeface.BOLD;
 
 
@@ -93,7 +83,7 @@ public class ContributorStatus extends DialogFragment {
         String originalText = "We will keep track of your likes and add you to the rankings" +
                 "(" + "You can always change your mind in the Contributors Settings" + ")";
         TextView tvContributorStatus = view.findViewById(R.id.tvContributorStatus);
-        Utils.textLinkup(originalText,"https://www.liker.com/trending", tvContributorStatus);
+        Tools.textLinkup(originalText,"https://www.liker.com/trending", tvContributorStatus);
 
 
         TextView textView = new TextView(getActivity());

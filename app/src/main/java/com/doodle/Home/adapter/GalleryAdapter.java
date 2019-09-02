@@ -2,24 +2,19 @@ package com.doodle.Home.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
 import com.doodle.App;
 import com.doodle.Home.model.PostFile;
-import com.doodle.Post.model.Mim;
 import com.doodle.R;
-import com.doodle.utils.AppConstants;
+import com.doodle.Tool.AppConstants;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 

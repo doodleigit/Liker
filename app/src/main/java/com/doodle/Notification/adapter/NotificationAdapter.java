@@ -14,14 +14,14 @@ import com.bumptech.glide.Glide;
 import com.doodle.App;
 import com.doodle.Notification.model.NotificationItem;
 import com.doodle.R;
-import com.doodle.utils.AppConstants;
-import com.doodle.utils.Utils;
+import com.doodle.Tool.AppConstants;
+import com.doodle.Tool.Tools;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Locale;
 
-import static com.doodle.utils.Utils.isNullOrEmpty;
+import static com.doodle.Tool.Tools.isNullOrEmpty;
 
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder> {
 
@@ -50,7 +50,7 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
         photo = AppConstants.PROFILE_IMAGE + arrayList.get(i).getData().getPhoto();
         time = Long.valueOf(arrayList.get(i).getData().getTimeSent());
 
-        viewHolder.notificationDetails.setText(Utils.colorBackground(details));
+        viewHolder.notificationDetails.setText(Tools.colorBackground(details));
         viewHolder.notificationTime.setText(getDate(time));
         if (!isNullOrEmpty(photo)) {
             Glide.with(App.getAppContext())

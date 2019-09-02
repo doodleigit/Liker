@@ -15,7 +15,7 @@ import android.widget.LinearLayout;
 import com.doodle.App;
 import com.doodle.Post.model.Mim;
 import com.doodle.R;
-import com.doodle.utils.AppConstants;
+import com.doodle.Tool.AppConstants;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 

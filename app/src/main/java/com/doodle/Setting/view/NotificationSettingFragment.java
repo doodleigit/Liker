@@ -18,7 +18,7 @@ import com.doodle.Setting.adapter.NotificationOnOffAdapter;
 import com.doodle.Setting.model.PrivacyOnOff;
 import com.doodle.Setting.model.Status;
 import com.doodle.Setting.service.SettingService;
-import com.doodle.utils.PrefManager;
+import com.doodle.Tool.PrefManager;
 
 import java.util.ArrayList;
 

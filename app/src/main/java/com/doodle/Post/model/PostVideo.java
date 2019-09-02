@@ -5,7 +5,21 @@ import android.os.Parcelable;
 
 public class PostVideo implements Parcelable {
     public String videoPath;
+    public String videoId;
 
+
+    public PostVideo(String videoPath, String videoId) {
+        this.videoPath = videoPath;
+        this.videoId = videoId;
+    }
+
+    public String getVideoId() {
+        return videoId;
+    }
+
+    public void setVideoId(String videoId) {
+        this.videoId = videoId;
+    }
 
     public PostVideo(String videoPath) {
         this.videoPath = videoPath;

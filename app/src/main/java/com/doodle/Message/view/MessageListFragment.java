@@ -28,24 +28,19 @@ import com.doodle.Message.model.FriendInfo;
 import com.doodle.Message.model.Message;
 import com.doodle.Message.model.MessageData;
 import com.doodle.Message.model.NewMessage;
-import com.doodle.Message.model.SenderData;
 import com.doodle.Message.model.UserData;
 import com.doodle.Message.service.ListClickResponseService;
 import com.doodle.Message.service.MessageService;
 import com.doodle.R;
-import com.doodle.utils.AppConstants;
-import com.doodle.utils.NetworkHelper;
-import com.doodle.utils.PrefManager;
-import com.doodle.utils.Utils;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.doodle.Tool.AppConstants;
+import com.doodle.Tool.NetworkHelper;
+import com.doodle.Tool.PrefManager;
+import com.doodle.Tool.Tools;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
 import io.socket.client.Socket;
-import io.socket.emitter.Emitter;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -171,7 +166,7 @@ public class MessageListFragment extends Fragment {
             Call<Message> call = messageService.getMessageList(deviceId, profileId, token, userIds, limit, offset);
             sendMessageListRequest(call);
         } else {
-            Utils.showNetworkDialog(getChildFragmentManager());
+            Tools.showNetworkDialog(getChildFragmentManager());
         }
     }
 

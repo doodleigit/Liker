@@ -3,7 +3,6 @@ package com.doodle.Search;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
@@ -19,7 +18,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.doodle.App;
-import com.doodle.Home.view.activity.Home;
 import com.doodle.Search.adapter.SearchHistoryAd;
 import com.doodle.Search.adapter.SearchUsersAd;
 import com.doodle.Search.model.AdvanceSearches;
@@ -27,13 +25,11 @@ import com.doodle.Search.model.Message;
 import com.doodle.Search.model.SearchHistory;
 import com.doodle.Search.model.SearchUser;
 import com.doodle.Search.service.SearchService;
-import com.doodle.Home.Liker;
 import com.doodle.Search.view.SearchActivity;
 import com.doodle.R;
-import com.doodle.utils.NetworkHelper;
-import com.doodle.utils.PrefManager;
-import com.doodle.utils.Utils;
-import com.doodle.utils.fragment.Network;
+import com.doodle.Tool.NetworkHelper;
+import com.doodle.Tool.PrefManager;
+import com.doodle.Tool.Tools;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 
 import java.util.ArrayList;
@@ -108,7 +104,7 @@ public class LikerSearch extends AppCompatActivity implements View.OnClickListen
             Call<List<SearchHistory>> call = webService.searchHistory(deviceId, profileId, token, mProfileId);
             sendHistoryRequest(call);
         } else {
-            Utils.showNetworkDialog(getSupportFragmentManager());
+            Tools.showNetworkDialog(getSupportFragmentManager());
             progressView.setVisibility(View.GONE);
             progressView.stopAnimation();
 
@@ -142,7 +138,7 @@ public class LikerSearch extends AppCompatActivity implements View.OnClickListen
                         sendAdvanceSearchRequest(call);
 
                     } else {
-                        Utils.showNetworkDialog(getSupportFragmentManager());
+                        Tools.showNetworkDialog(getSupportFragmentManager());
                         progressView.setVisibility(View.GONE);
                         progressView.stopAnimation();
                     }
@@ -166,7 +162,7 @@ public class LikerSearch extends AppCompatActivity implements View.OnClickListen
                             sendRequest(call);
 
                         } else {
-                            Utils.showNetworkDialog(getSupportFragmentManager());
+                            Tools.showNetworkDialog(getSupportFragmentManager());
                             progressView.setVisibility(View.GONE);
                             progressView.stopAnimation();
                         }
@@ -177,7 +173,7 @@ public class LikerSearch extends AppCompatActivity implements View.OnClickListen
                         listView.setVisibility(View.GONE);
                         tvShowSearchResult.setVisibility(View.GONE);
 
-                        Utils.showCustomToast(LikerSearch.this, mView, " Write Minimum Three Characters !", Gravity.TOP);
+                        Tools.showCustomToast(LikerSearch.this, mView, " Write Minimum Three Characters !", Gravity.TOP);
 
                     }
 
@@ -236,7 +232,7 @@ public class LikerSearch extends AppCompatActivity implements View.OnClickListen
                                 sendAdvanceSearchRequest(call);
 
                             } else {
-                                Utils.showNetworkDialog(getSupportFragmentManager());
+                                Tools.showNetworkDialog(getSupportFragmentManager());
                                 progressView.setVisibility(View.GONE);
                                 progressView.stopAnimation();
                             }
@@ -245,7 +241,7 @@ public class LikerSearch extends AppCompatActivity implements View.OnClickListen
                     tvShowSearchResult.setVisibility(View.GONE);
 
                 } else {
-                    Utils.toast(LikerSearch.this, "There is no history", R.drawable.ic_info_outline_blue_24dp);
+                    Tools.toast(LikerSearch.this, "There is no history", R.drawable.ic_info_outline_blue_24dp);
                     findViewById(R.id.containerRecent).setVisibility(View.GONE);
                     progressView.stopAnimation();
                     progressView.setVisibility(View.GONE);
@@ -297,7 +293,7 @@ public class LikerSearch extends AppCompatActivity implements View.OnClickListen
                 } else {
                     progressView.stopAnimation();
                     progressView.setVisibility(View.GONE);
-                    Utils.toast(LikerSearch.this, "We could not find anything for " + queryText, R.drawable.ic_info_outline_blue_24dp);
+                    Tools.toast(LikerSearch.this, "We could not find anything for " + queryText, R.drawable.ic_info_outline_blue_24dp);
 
                 }
 
@@ -363,7 +359,7 @@ public class LikerSearch extends AppCompatActivity implements View.OnClickListen
                     sendClearRequest(call);
 
                 } else {
-                    Utils.showNetworkDialog(getSupportFragmentManager());
+                    Tools.showNetworkDialog(getSupportFragmentManager());
                     progressView.setVisibility(View.GONE);
                     progressView.stopAnimation();
                 }
@@ -378,7 +374,7 @@ public class LikerSearch extends AppCompatActivity implements View.OnClickListen
                     sendAdvanceSearchRequest(call);
 
                 } else {
-                    Utils.showNetworkDialog(getSupportFragmentManager());
+                    Tools.showNetworkDialog(getSupportFragmentManager());
                     progressView.setVisibility(View.GONE);
                     progressView.stopAnimation();
                 }
@@ -432,9 +428,9 @@ public class LikerSearch extends AppCompatActivity implements View.OnClickListen
                     listView.setVisibility(View.GONE);
                     findViewById(R.id.containerRecent).setVisibility(View.GONE);
 
-                    Utils.toast(LikerSearch.this, "History clear!", R.drawable.ic_check_black_24dp);
+                    Tools.toast(LikerSearch.this, "History clear!", R.drawable.ic_check_black_24dp);
                 } else {
-                    Utils.toast(LikerSearch.this, "Please wait.!", R.drawable.ic_info_outline_blue_24dp);
+                    Tools.toast(LikerSearch.this, "Please wait.!", R.drawable.ic_info_outline_blue_24dp);
 
                 }
                 progressView.setVisibility(View.GONE);

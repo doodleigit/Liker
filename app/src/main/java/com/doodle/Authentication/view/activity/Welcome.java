@@ -6,7 +6,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.graphics.Color;
-import android.os.Parcelable;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -37,13 +36,12 @@ import com.doodle.Authentication.model.UserInfo;
 import com.doodle.Authentication.view.fragment.ResendEmail;
 import com.doodle.Authentication.viewmodel.LoginViewModel;
 import com.doodle.Home.view.activity.Home;
-import com.doodle.Post.adapter.MimAdapter;
 import com.doodle.R;
-import com.doodle.utils.ClearableEditText;
+import com.doodle.Tool.ClearableEditText;
 import com.doodle.Authentication.service.AuthService;
-import com.doodle.utils.NetworkHelper;
-import com.doodle.utils.PrefManager;
-import com.doodle.utils.Utils;
+import com.doodle.Tool.NetworkHelper;
+import com.doodle.Tool.PrefManager;
+import com.doodle.Tool.Tools;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.google.gson.Gson;
 import com.onesignal.OneSignal;
@@ -58,8 +56,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static com.doodle.utils.AppConstants.POST_IMAGES;
-import static com.doodle.utils.Utils.isNullOrEmpty;
+import static com.doodle.Tool.AppConstants.POST_IMAGES;
 
 public class Welcome extends AppCompatActivity implements View.OnClickListener, ResendEmail.BottomSheetListener {
 
@@ -511,7 +508,7 @@ public class Welcome extends AppCompatActivity implements View.OnClickListener, 
                     requestData(email, password, mDeviceId);
 
                 } else {
-                    Utils.showNetworkDialog(getSupportFragmentManager());
+                    Tools.showNetworkDialog(getSupportFragmentManager());
                     progressView.setVisibility(View.GONE);
                     progressView.stopAnimation();
 

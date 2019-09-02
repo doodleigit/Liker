@@ -1,13 +1,11 @@
 package com.doodle.Search.adapter;
 
 import android.content.Context;
-import android.support.v4.widget.CircularProgressDrawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Priority;
@@ -16,15 +14,13 @@ import com.doodle.App;
 import com.doodle.R;
 import com.doodle.Search.model.Post;
 import com.doodle.Search.model.User;
-import com.doodle.utils.GlideApp;
-import com.doodle.utils.GlideImageLoader;
-import com.doodle.utils.Operation;
+import com.doodle.Tool.Operation;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-import static com.doodle.utils.AppConstants.POST_IMAGES;
-import static com.doodle.utils.AppConstants.PROFILE_IMAGE;
+import static com.doodle.Tool.AppConstants.POST_IMAGES;
+import static com.doodle.Tool.AppConstants.PROFILE_IMAGE;
 
 public class AdvanceSearchAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     final int VIEW_TYPE_USER = 0;

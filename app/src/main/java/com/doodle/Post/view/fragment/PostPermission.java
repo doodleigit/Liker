@@ -15,7 +15,7 @@ import android.widget.TextView;
 
 import com.doodle.App;
 import com.doodle.R;
-import com.doodle.utils.PrefManager;
+import com.doodle.Tool.PrefManager;
 
 public class PostPermission extends BottomSheetDialogFragment implements View.OnClickListener {
     private BottomSheetListener mListener;

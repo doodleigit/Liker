@@ -1,6 +1,5 @@
 package com.doodle.Setting.view;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,8 +23,8 @@ import com.doodle.Setting.adapter.SocialFriendsAdapter;
 import com.doodle.Setting.model.Social;
 import com.doodle.Setting.model.SocialFriend;
 import com.doodle.Setting.service.SettingService;
-import com.doodle.utils.AppConstants;
-import com.doodle.utils.PrefManager;
+import com.doodle.Tool.AppConstants;
+import com.doodle.Tool.PrefManager;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -39,8 +38,6 @@ import java.util.Random;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import static com.doodle.utils.Utils.isNullOrEmpty;
 
 public class FacebookFriendsFragment extends Fragment {
 

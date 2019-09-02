@@ -24,7 +24,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.doodle.R;
-import com.doodle.Search.LikerSearch;
 import com.doodle.Setting.adapter.EmailAdapter;
 import com.doodle.Setting.model.AccountSetting;
 import com.doodle.Setting.model.AllEmail;
@@ -32,8 +31,8 @@ import com.doodle.Setting.model.Email;
 import com.doodle.Setting.model.Question;
 import com.doodle.Setting.service.EmailModificationListener;
 import com.doodle.Setting.service.SettingService;
-import com.doodle.utils.PrefManager;
-import com.doodle.utils.Utils;
+import com.doodle.Tool.PrefManager;
+import com.doodle.Tool.Tools;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -380,9 +379,9 @@ public class AccountSettingFragment extends Fragment {
                         tvSecurityQuestion.setText(question);
                         securityQuestionViewLayout.setVisibility(View.VISIBLE);
                         securityQuestionEditLayout.setVisibility(View.GONE);
-                        Utils.toast(getContext(), getString(R.string.security_question_has_been_updated), R.drawable.ic_check_black_24dp);
+                        Tools.toast(getContext(), getString(R.string.security_question_has_been_updated), R.drawable.ic_check_black_24dp);
                     } else {
-                        Utils.toast(getContext(), getString(R.string.something_went_wrong), R.drawable.ic_info_outline_blue_24dp);
+                        Tools.toast(getContext(), getString(R.string.something_went_wrong), R.drawable.ic_info_outline_blue_24dp);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -413,9 +412,9 @@ public class AccountSettingFragment extends Fragment {
                         etNewPassword.setText("");
                         etRetypeNewPassword.setText("");
                         passwordEditLayout.setVisibility(View.GONE);
-                        Utils.toast(getContext(), getString(R.string.password_has_been_updated), R.drawable.ic_check_black_24dp);
+                        Tools.toast(getContext(), getString(R.string.password_has_been_updated), R.drawable.ic_check_black_24dp);
                     } else {
-                        Utils.toast(getContext(), getString(R.string.something_went_wrong), R.drawable.ic_info_outline_blue_24dp);
+                        Tools.toast(getContext(), getString(R.string.something_went_wrong), R.drawable.ic_info_outline_blue_24dp);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -443,9 +442,9 @@ public class AccountSettingFragment extends Fragment {
                     boolean status = obj.getBoolean("status");
                     if (status) {
                         tvEmailVerificationMessage.setText(getString(R.string.a_verification_email_has_been_resent_to_your_email) + " " + email.getEmail() + ". " + getString(R.string.if_you_need_help_please_contact_with_liker_support));
-                        Utils.toast(getContext(), getString(R.string.a_verification_email_has_been_resent_to_your_email), R.drawable.ic_check_black_24dp);
+                        Tools.toast(getContext(), getString(R.string.a_verification_email_has_been_resent_to_your_email), R.drawable.ic_check_black_24dp);
                     } else {
-                        Utils.toast(getContext(), getString(R.string.something_went_wrong), R.drawable.ic_info_outline_blue_24dp);
+                        Tools.toast(getContext(), getString(R.string.something_went_wrong), R.drawable.ic_info_outline_blue_24dp);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -494,9 +493,9 @@ public class AccountSettingFragment extends Fragment {
                     JSONObject obj = new JSONObject(jsonResponse);
                     boolean status = obj.getBoolean("status");
                     if (status) {
-                        Utils.toast(getContext(), getString(R.string.account_has_been_deactivated), R.drawable.ic_check_black_24dp);
+                        Tools.toast(getContext(), getString(R.string.account_has_been_deactivated), R.drawable.ic_check_black_24dp);
                     } else {
-                        Utils.toast(getContext(), getString(R.string.something_went_wrong), R.drawable.ic_info_outline_blue_24dp);
+                        Tools.toast(getContext(), getString(R.string.something_went_wrong), R.drawable.ic_info_outline_blue_24dp);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

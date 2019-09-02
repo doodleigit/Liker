@@ -33,19 +33,17 @@ import com.doodle.Home.model.postshare.PostShares;
 import com.doodle.Home.model.postshare.PostTextIndex;
 import com.doodle.Home.service.HomeService;
 import com.doodle.Home.service.SocketIOManager;
-import com.doodle.Home.service.TextHolder;
+import com.doodle.Home.holder.TextHolder;
 import com.doodle.Post.adapter.ChatAdapter;
 import com.doodle.Post.model.Mim;
 import com.doodle.Post.service.DataProvider;
-import com.doodle.Post.view.activity.PostNew;
-import com.doodle.Post.view.fragment.ContributorStatus;
 import com.doodle.Post.view.fragment.PostPermission;
 import com.doodle.R;
-import com.doodle.utils.AppConstants;
-import com.doodle.utils.NetworkHelper;
-import com.doodle.utils.PageTransformer;
-import com.doodle.utils.PrefManager;
-import com.doodle.utils.Utils;
+import com.doodle.Tool.AppConstants;
+import com.doodle.Tool.NetworkHelper;
+import com.doodle.Tool.PageTransformer;
+import com.doodle.Tool.PrefManager;
+import com.doodle.Tool.Tools;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
@@ -69,11 +67,11 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.doodle.App.getProxy;
-import static com.doodle.utils.Utils.containsIllegalCharacters;
-import static com.doodle.utils.Utils.extractMentionText;
-import static com.doodle.utils.Utils.extractMentionUser;
-import static com.doodle.utils.Utils.extractUrls;
-import static com.doodle.utils.Utils.getDomainName;
+import static com.doodle.Tool.Tools.containsIllegalCharacters;
+import static com.doodle.Tool.Tools.extractMentionText;
+import static com.doodle.Tool.Tools.extractMentionUser;
+import static com.doodle.Tool.Tools.extractUrls;
+import static com.doodle.Tool.Tools.getDomainName;
 
 public class PostShare extends AppCompatActivity implements
         View.OnClickListener,
@@ -261,7 +259,7 @@ public class PostShare extends AppCompatActivity implements
             tvPostEmojiContentVideo.setText(item.getPostText());
             Linkify.addLinks(tvPostEmojiContentVideo, Linkify.ALL);
             //set user name in blue color and remove underline from the textview
-            Utils.stripUnderlines(tvPostEmojiContentVideo);
+            Tools.stripUnderlines(tvPostEmojiContentVideo);
 
         } else {
             tvPostEmojiContentVideo.setVisibility(View.GONE);
@@ -269,7 +267,7 @@ public class PostShare extends AppCompatActivity implements
             tvPostContentVideo.setText(item.getPostText());
             Linkify.addLinks(tvPostContentVideo, Linkify.ALL);
             //set user name in blue color and remove underline from the textview
-            Utils.stripUnderlines(tvPostContentVideo);
+            Tools.stripUnderlines(tvPostContentVideo);
 
         }
 
@@ -293,7 +291,7 @@ public class PostShare extends AppCompatActivity implements
             tvPostEmojiContentLinkYoutube.setText(item.getPostText());
             Linkify.addLinks(tvPostEmojiContentLinkYoutube, Linkify.ALL);
             //set user name in blue color and remove underline from the textview
-            Utils.stripUnderlines(tvPostEmojiContentLinkYoutube);
+            Tools.stripUnderlines(tvPostEmojiContentLinkYoutube);
 
         } else {
             tvPostEmojiContentLinkYoutube.setVisibility(View.GONE);
@@ -301,7 +299,7 @@ public class PostShare extends AppCompatActivity implements
             tvPostContentLinkYoutube.setText(item.getPostText());
             Linkify.addLinks(tvPostContentLinkYoutube, Linkify.ALL);
             //set user name in blue color and remove underline from the textview
-            Utils.stripUnderlines(tvPostContentLinkYoutube);
+            Tools.stripUnderlines(tvPostContentLinkYoutube);
 
         }
 
@@ -348,7 +346,7 @@ public class PostShare extends AppCompatActivity implements
             tvPostEmojiContentLink.setText(item.getPostText());
             Linkify.addLinks(tvPostEmojiContentLink, Linkify.ALL);
             //set user name in blue color and remove underline from the textview
-            Utils.stripUnderlines(tvPostEmojiContentLink);
+            Tools.stripUnderlines(tvPostEmojiContentLink);
 
         } else {
             tvPostEmojiContentLink.setVisibility(View.GONE);
@@ -356,7 +354,7 @@ public class PostShare extends AppCompatActivity implements
             tvPostContentLink.setText(item.getPostText());
             Linkify.addLinks(tvPostContentLink, Linkify.ALL);
             //set user name in blue color and remove underline from the textview
-            Utils.stripUnderlines(tvPostContentLink);
+            Tools.stripUnderlines(tvPostContentLink);
 
         }
 
@@ -402,7 +400,7 @@ public class PostShare extends AppCompatActivity implements
             tvPostEmojiContentImage.setText(item.getPostText());
             Linkify.addLinks(tvPostEmojiContentImage, Linkify.ALL);
             //set user name in blue color and remove underline from the textview
-            Utils.stripUnderlines(tvPostEmojiContentImage);
+            Tools.stripUnderlines(tvPostEmojiContentImage);
 
         } else {
             tvPostEmojiContentImage.setVisibility(View.GONE);
@@ -410,7 +408,7 @@ public class PostShare extends AppCompatActivity implements
             tvPostContentImage.setText(item.getPostText());
             Linkify.addLinks(tvPostContentImage, Linkify.ALL);
             //set user name in blue color and remove underline from the textview
-            Utils.stripUnderlines(tvPostContentImage);
+            Tools.stripUnderlines(tvPostContentImage);
 
         }
 
@@ -664,7 +662,7 @@ public class PostShare extends AppCompatActivity implements
             );
             sendSharedPostRequest(call);
         } else {
-            Utils.showNetworkDialog(getSupportFragmentManager());
+            Tools.showNetworkDialog(getSupportFragmentManager());
             progressView.setVisibility(View.GONE);
             progressView.stopAnimation();
 

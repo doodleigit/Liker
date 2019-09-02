@@ -2,7 +2,6 @@ package com.doodle.Home.view.activity;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.support.annotation.NonNull;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,9 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.AbsListView;
 import android.widget.ProgressBar;
-import android.widget.ScrollView;
 import android.widget.SearchView;
 import android.widget.TextView;
 
@@ -25,16 +22,13 @@ import com.doodle.Home.model.PostFilterSubCategory;
 import com.doodle.Home.model.StarContributor;
 import com.doodle.Home.service.HomeService;
 import com.doodle.Home.service.StarContributorCategoryListener;
-import com.doodle.Home.service.StarContributorPaginationListener;
 import com.doodle.R;
-import com.doodle.utils.PrefManager;
-import com.doodle.utils.TouchDetectableScrollView;
+import com.doodle.Tool.PrefManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import retrofit2.Call;

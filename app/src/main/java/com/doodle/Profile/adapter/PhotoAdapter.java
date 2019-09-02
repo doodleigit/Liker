@@ -14,7 +14,7 @@ import com.bumptech.glide.Glide;
 import com.doodle.App;
 import com.doodle.Profile.model.RecentPhoto;
 import com.doodle.R;
-import com.doodle.utils.AppConstants;
+import com.doodle.Tool.AppConstants;
 import com.github.chrisbanes.photoview.PhotoView;
 
 import java.util.ArrayList;

@@ -25,13 +25,12 @@ import android.widget.Toast;
 
 import com.doodle.App;
 import com.doodle.Authentication.service.AuthService;
-import com.doodle.Home.Liker;
 import com.doodle.Home.view.activity.Home;
 import com.doodle.R;
-import com.doodle.utils.AppConstants;
-import com.doodle.utils.NetworkHelper;
-import com.doodle.utils.PrefManager;
-import com.doodle.utils.Utils;
+import com.doodle.Tool.AppConstants;
+import com.doodle.Tool.NetworkHelper;
+import com.doodle.Tool.PrefManager;
+import com.doodle.Tool.Tools;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -111,11 +110,11 @@ public class MyTwitter extends AppCompatActivity implements View.OnClickListener
 
     @Override
     public void onClick(View v) {
-        Utils utils = new Utils();
+        Tools tools = new Tools();
         switch (v.getId()) {
             case R.id.tweet_btn:
 
-                if (utils.isNetworkConnected(MyTwitter.this) == false) {
+                if (tools.isNetworkConnected(MyTwitter.this) == false) {
                     showAlertBox();
                 } else {
                     String tweetText = mEditText.getText().toString();
@@ -123,7 +122,7 @@ public class MyTwitter extends AppCompatActivity implements View.OnClickListener
                 }
                 break;
             case R.id.twitter_login_btn:
-                if (utils.isNetworkConnected(MyTwitter.this) == false) {
+                if (tools.isNetworkConnected(MyTwitter.this) == false) {
                     showAlertBox();
                 } else {
                     mSharedPreferences = getSharedPreferences(PREF_NAME, 0);
