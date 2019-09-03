@@ -6,7 +6,7 @@ import android.widget.TextView;
 
 import com.doodle.Home.adapter.MyCategory;
 import com.doodle.R;
-import com.doodle.utils.ConstantManager;
+import com.doodle.Tool.ConstantManager;
 
 public class CheckedActivity extends AppCompatActivity {
     private TextView tvParent, tvChild;

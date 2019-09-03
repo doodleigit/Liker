@@ -1,12 +1,9 @@
 package com.doodle.Post.view.activity;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -20,13 +17,12 @@ import com.doodle.Post.model.CategoryItem;
 import com.doodle.Post.model.Subcatg;
 import com.doodle.Post.service.PostService;
 import com.doodle.R;
-import com.doodle.utils.NetworkHelper;
-import com.doodle.utils.PrefManager;
-import com.doodle.utils.Utils;
-import com.doodle.utils.fragment.Network;
+import com.doodle.Tool.NetworkHelper;
+import com.doodle.Tool.PrefManager;
+import com.doodle.Tool.Tools;
+import com.doodle.Tool.fragment.Network;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -97,7 +93,7 @@ public class PostCategory extends AppCompatActivity {
             Call<CategoryItem> call = webService.getCategories(deviceId, profileId, token);
             sendCategoryRequest(call);
         } else {
-            Utils.showNetworkDialog(getSupportFragmentManager());
+            Tools.showNetworkDialog(getSupportFragmentManager());
             progressView.setVisibility(View.GONE);
             progressView.stopAnimation();
 

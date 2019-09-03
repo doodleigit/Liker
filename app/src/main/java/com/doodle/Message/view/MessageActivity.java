@@ -5,7 +5,7 @@ import android.os.Bundle;
 
 import com.doodle.R;
 
-import static com.doodle.utils.AppConstants.IN_CHAT_MODE;
+import static com.doodle.Tool.AppConstants.IN_CHAT_MODE;
 
 public class MessageActivity extends AppCompatActivity {
 

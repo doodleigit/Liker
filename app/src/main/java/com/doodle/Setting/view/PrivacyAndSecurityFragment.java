@@ -14,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -24,7 +23,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.doodle.Profile.model.Star;
 import com.doodle.R;
 import com.doodle.Setting.adapter.BlockUserAdapter;
 import com.doodle.Setting.adapter.CustomPrivacySpinnerAdapter;
@@ -36,7 +34,7 @@ import com.doodle.Setting.model.PrivacyInfo;
 import com.doodle.Setting.model.PrivacyType;
 import com.doodle.Setting.service.SettingService;
 import com.doodle.Setting.service.UserBlockClickListener;
-import com.doodle.utils.PrefManager;
+import com.doodle.Tool.PrefManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;

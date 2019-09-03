@@ -12,19 +12,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.doodle.App;
 import com.doodle.Comment.model.Comment_;
 import com.doodle.Comment.service.CommentService;
 import com.doodle.Home.model.PostItem;
 import com.doodle.R;
-import com.doodle.utils.NetworkHelper;
-import com.doodle.utils.PrefManager;
-import com.doodle.utils.Utils;
+import com.doodle.Tool.NetworkHelper;
+import com.doodle.Tool.PrefManager;
+import com.doodle.Tool.Tools;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,10 +30,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static com.doodle.utils.Utils.isEmpty;
-import static com.doodle.utils.Utils.isNullOrEmpty;
-import static com.doodle.utils.Utils.isNullOrWhiteSpace;
-import static com.facebook.FacebookSdk.getApplicationContext;
+import static com.doodle.Tool.Tools.isEmpty;
+import static com.doodle.Tool.Tools.isNullOrWhiteSpace;
 
 public class ReportPersonMessageSheet extends BottomSheetDialogFragment implements View.OnClickListener {
     private BottomSheetListener mListener;
@@ -163,13 +158,13 @@ public class ReportPersonMessageSheet extends BottomSheetDialogFragment implemen
                         Call<String> call = commentService.reportUser(deviceId, profileId, token, commentId, message, postId, reasonId, reportType, "1", toId, userIds);
                         sendReportUserRequest(call);
                     }else {
-                        Utils.toast(getActivity(),"Message Required!",R.drawable.icon_checked);
+                        Tools.toast(getActivity(),"Message Required!",R.drawable.icon_checked);
                     }
 
 
                     // delayLoadComment(mProgressBar);
                 } else {
-                    Utils.showNetworkDialog(getActivity().getSupportFragmentManager());
+                    Tools.showNetworkDialog(getActivity().getSupportFragmentManager());
 
                 }
                 break;
@@ -194,7 +189,7 @@ public class ReportPersonMessageSheet extends BottomSheetDialogFragment implemen
 
                             if (status) {
                                 // adapter.notifyDataSetChanged();
-                                Utils.toast(getActivity(),"your message was successfully sent",R.drawable.icon_checked);
+                                Tools.toast(getActivity(),"your message was successfully sent",R.drawable.icon_checked);
                                 dismiss();
 
                             }

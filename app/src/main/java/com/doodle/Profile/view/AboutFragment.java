@@ -66,8 +66,8 @@ import com.doodle.Profile.service.ProfileService;
 import com.doodle.Profile.service.StoryModificationListener;
 import com.doodle.Profile.service.SuggestionClickListener;
 import com.doodle.R;
-import com.doodle.utils.PrefManager;
-import com.doodle.utils.Utils;
+import com.doodle.Tool.PrefManager;
+import com.doodle.Tool.Tools;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -322,7 +322,7 @@ public class AboutFragment extends Fragment {
 //        }
         tvIntro.setVisibility(View.GONE);
         tvGender.setText(profileInfo.getSex().equals("1") ? "Male" : "Female");
-        tvBirthDay.setText(profileInfo.getBirthDate() + " " + Utils.getMonth(profileInfo.getBirthMonth()));
+        tvBirthDay.setText(profileInfo.getBirthDate() + " " + Tools.getMonth(profileInfo.getBirthMonth()));
         tvBirthYear.setText(profileInfo.getBirthYear());
         tvAddress.setText(profileInfo.getAddress().isEmpty() ? "Not yet" : profileInfo.getAddress());
         tvCity.setText(profileInfo.getCurrentCityCity().isEmpty() ? "Not yet" : profileInfo.getCurrentCityCity());
@@ -2705,9 +2705,9 @@ public class AboutFragment extends Fragment {
                     boolean status = obj.getBoolean("status");
                     if (status) {
                         tvEmailVerificationMessage.setText(getString(R.string.a_verification_email_has_been_resent_to_your_email) + " " + email.getEmail() + ". " + getString(R.string.if_you_need_help_please_contact_with_liker_support));
-                        Utils.toast(getContext(), getString(R.string.a_verification_email_has_been_resent_to_your_email), R.drawable.ic_check_black_24dp);
+                        Tools.toast(getContext(), getString(R.string.a_verification_email_has_been_resent_to_your_email), R.drawable.ic_check_black_24dp);
                     } else {
-                        Utils.toast(getContext(), getString(R.string.something_went_wrong), R.drawable.ic_info_outline_blue_24dp);
+                        Tools.toast(getContext(), getString(R.string.something_went_wrong), R.drawable.ic_info_outline_blue_24dp);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

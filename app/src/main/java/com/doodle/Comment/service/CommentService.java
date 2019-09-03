@@ -1,15 +1,10 @@
 package com.doodle.Comment.service;
 
 import com.doodle.Comment.model.CommentItem;
-import com.doodle.Comment.model.CommentTextIndex_;
 import com.doodle.Comment.model.Comment_;
 import com.doodle.Comment.model.Reply;
 import com.doodle.Comment.model.ReportReason;
-import com.doodle.Home.model.PostItem;
-import com.doodle.Home.model.postshare.PostShareItem;
-import com.doodle.utils.AppConstants;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.doodle.Tool.AppConstants;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;

@@ -48,13 +48,12 @@ import com.doodle.Authentication.model.User;
 import com.doodle.Authentication.service.MyService;
 import com.doodle.Authentication.view.fragment.ResendEmail;
 import com.doodle.Authentication.viewmodel.SignupViewModel;
-import com.doodle.Home.Liker;
 import com.doodle.Home.view.activity.Home;
 import com.doodle.R;
-import com.doodle.utils.ClearableEditText;
+import com.doodle.Tool.ClearableEditText;
 import com.doodle.Authentication.service.AuthService;
-import com.doodle.utils.NetworkHelper;
-import com.doodle.utils.PrefManager;
+import com.doodle.Tool.NetworkHelper;
+import com.doodle.Tool.PrefManager;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -85,9 +84,9 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
     private Button btnSignUp, btnFinish, btnOTPContinue;
     private Spinner spinnerDay, spinnerMonth, spinnerYear, spinnerCountry, spinnerState;
 
-    private String[] dayArr = {"Select", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30"};
+    private String[] dayArr = {"Select", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31"};
     private String[] monthArr = {"Month", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
-    private String[] yearArr = {"Select Year", "2020", "2021", "2022", "2023", "2024", "2025", "2019", "2018", "2017", "2016", "2015", "2014", "2013", "2012", "2011", "2010"};
+    private String[] yearArr = {"Select Year", "2020", "2021", "2022", "2023", "2024", "2025", "2019", "2018", "2017", "2016", "2015", "2014", "2013", "2012", "2011", "2010", "2009", "2008", "2007", "2006", "2005", "2004", "2003", "2002", "2001", "2000", "1999", "1998", "1997", "1996", "1995", "1994", "1993", "1992", "1991", "1990", "1989", "1988", "1987", "1986", "1985", "1984", "1983", "1982", "1981", "1980", "1979", "1978", "1977", "1976", "1975", "1974", "1973", "1972", "1971", "1970"};
     private String[] countryArr = {"Select Country", "Bangladesh", "Nepal", "Bhutan", "China"};
     private String[] stateArr = {"Select State", "Dhaka", "Kathmandu", "Thimphu", "Beijing"};
 
@@ -575,7 +574,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
 
         String twitterAuthId = manager.getTwitterOauthId();
         String oauthId = manager.getOauthId();
-        String profileId=manager.getProfileId();
+        String profileId = manager.getProfileId();
         if (profileId != null && App.isIsFBSignup()) {
             //   findViewById(R.id.socialContainer).setVisibility(View.GONE);
             tvHeader.setText("YOU'RE ALMOST DONE " + "\n" + "WE NEED A FEW MORE DETAILS...");
@@ -608,11 +607,11 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
             etEmail.setText(manager.getFbEmail());
             App.setFbProvider("facebook");
             String imageUrl = manager.getFbImageUrl();
-           if(!imageUrl.isEmpty())
-            Picasso.with(Signup.this)
-                    .load(imageUrl)
-                    .placeholder(R.drawable.ic_facebook)
-                    .into(fbSignUp);
+            if (!imageUrl.isEmpty())
+                Picasso.with(Signup.this)
+                        .load(imageUrl)
+                        .placeholder(R.drawable.ic_facebook)
+                        .into(fbSignUp);
 
         } else if (profileId != null && !App.isIsTwitterLogin()) {
             //   findViewById(R.id.socialContainer).setVisibility(View.GONE);
@@ -801,7 +800,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
                     }
 
                     if (otpStatus) {
-                       // startActivity(new Intent(Signup.this, Liker.class));
+                        // startActivity(new Intent(Signup.this, Liker.class));
                         Intent intent = new Intent(Signup.this, Home.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(intent);

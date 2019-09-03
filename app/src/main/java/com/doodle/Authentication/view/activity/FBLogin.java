@@ -1,23 +1,27 @@
 package com.doodle.Authentication.view.activity;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.request.RequestOptions;
 import com.doodle.App;
+import com.doodle.Authentication.model.LoginUser;
+import com.doodle.Authentication.model.UserInfo;
 import com.doodle.Authentication.service.AuthService;
-import com.doodle.Home.Liker;
 import com.doodle.Home.view.activity.Home;
 import com.doodle.R;
-import com.doodle.utils.AppConstants;
-import com.doodle.utils.NetworkHelper;
-import com.doodle.utils.PrefManager;
+import com.doodle.Tool.AppConstants;
+import com.doodle.Tool.NetworkHelper;
+import com.doodle.Tool.PrefManager;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
@@ -27,6 +31,7 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -38,6 +43,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
+import static com.doodle.Tool.AppConstants.POST_IMAGES;
 
 public class FBLogin extends AppCompatActivity {
 
@@ -225,40 +232,47 @@ public class FBLogin extends AppCompatActivity {
         AuthService webService =
                 AuthService.retrofitBase.create(AuthService.class);
 
-        Call<String> call = webService.socialLogin(appSocialAccessCode, oauthProvider, oauthId, deviceId);
+        Call<LoginUser> call = webService.socialLogin(appSocialAccessCode, oauthProvider, oauthId, deviceId);
         sendRequest(call);
 
     }
 
-    private void sendRequest(Call<String> call) {
-        call.enqueue(new Callback<String>() {
+    private void sendRequest(Call<LoginUser> call) {
+        call.enqueue(new Callback<LoginUser>() {
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
+            public void onResponse(Call<LoginUser> call, Response<LoginUser> response) {
+                LoginUser loginUser = response.body();
+                boolean status = loginUser.isStatus();
+                if (status) {
+                    String mToken = loginUser.getToken();
+                    manager.setToken(mToken);
+                    UserInfo userInfo = loginUser.getUserInfo();
+                    Gson gson = new Gson();
+                    String json = gson.toJson(userInfo);
+                    manager.setUserInfo(json);
+                    String profileName = userInfo.getFirstName() + " " + userInfo.getLastName();
+                    String userName = userInfo.getUserName();
+                    String photo = userInfo.getPhoto();
+                    App.setProfilePhoto(photo);
+                    String profileId = userInfo.getUserId();
+                    manager.setProfileName(profileName);
+                    manager.setProfileImage(POST_IMAGES + photo);
+                    manager.setProfileId(profileId);
+                    manager.setUserName(userName);
+                    Intent intent = new Intent(FBLogin.this, Home.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                } else {
+                    App.setIsFBLogin(status);
+                    App.setIsTwitterLogin(true);
+                    startActivity(new Intent(FBLogin.this, Signup.class));
+                    finish();
 
-                String loginUser = response.body();
-                try {
-                    JSONObject object = new JSONObject(loginUser);
-                    boolean status = object.getBoolean("status");
-                    if (status) {
-                        Log.d("LoginUser:", loginUser);
-                        Intent intent = new Intent(FBLogin.this, Home.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        startActivity(intent);
-                    } else {
-                        App.setIsFBLogin(status);
-                        App.setIsTwitterLogin(true);
-                        startActivity(new Intent(FBLogin.this, Signup.class));
-                        finish();
-
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
-
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
+            public void onFailure(Call<LoginUser> call, Throwable t) {
 
             }
         });

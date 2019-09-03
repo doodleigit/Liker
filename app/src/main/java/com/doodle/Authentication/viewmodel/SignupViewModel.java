@@ -10,7 +10,7 @@ import android.widget.Toast;
 import com.doodle.App;
 import com.doodle.Authentication.model.City;
 import com.doodle.Authentication.service.AuthService;
-import com.doodle.utils.PrefManager;
+import com.doodle.Tool.PrefManager;
 import com.raywenderlich.android.validatetor.ValidateTor;
 
 import retrofit2.Call;

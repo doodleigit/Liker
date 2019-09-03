@@ -14,7 +14,7 @@ import com.doodle.App;
 import com.doodle.Profile.model.FollowingResult;
 import com.doodle.Profile.service.FollowUnfollowClickListener;
 import com.doodle.R;
-import com.doodle.utils.AppConstants;
+import com.doodle.Tool.AppConstants;
 
 import java.util.ArrayList;
 

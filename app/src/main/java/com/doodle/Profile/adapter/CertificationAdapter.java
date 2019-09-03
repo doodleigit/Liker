@@ -14,7 +14,7 @@ import android.widget.TextView;
 import com.doodle.Profile.model.Certification;
 import com.doodle.Profile.service.AboutComponentUpdateListener;
 import com.doodle.R;
-import com.doodle.utils.Utils;
+import com.doodle.Tool.Tools;
 
 import java.util.ArrayList;
 
@@ -48,7 +48,7 @@ public class CertificationAdapter extends RecyclerView.Adapter<CertificationAdap
         certificateName = arrayList.get(i).getCertificationName();
         instituteName = arrayList.get(i).getInstituteName();
         instituteSite = arrayList.get(i).getCertificationUrl();
-        duration = Utils.getMonth(arrayList.get(i).getFromMonth()) + " " + arrayList.get(i).getFromYear() + " Licence " + arrayList.get(i).getLicenseNumber();
+        duration = Tools.getMonth(arrayList.get(i).getFromMonth()) + " " + arrayList.get(i).getFromYear() + " Licence " + arrayList.get(i).getLicenseNumber();
 
         viewHolder.tvCertificateName.setText(certificateName);
         viewHolder.tvInstituteName.setText(instituteName);

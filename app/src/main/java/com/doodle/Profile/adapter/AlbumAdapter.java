@@ -15,7 +15,7 @@ import com.doodle.App;
 import com.doodle.Profile.model.PhotoAlbum;
 import com.doodle.Profile.service.PhotoAlbumClickListener;
 import com.doodle.R;
-import com.doodle.utils.AppConstants;
+import com.doodle.Tool.AppConstants;
 
 import java.util.ArrayList;
 

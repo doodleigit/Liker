@@ -38,8 +38,8 @@ import com.doodle.Home.adapter.MyCategory;
 import com.doodle.Home.model.DataItem;
 import com.doodle.Home.model.SubCategoryItem;
 import com.doodle.R;
-import com.doodle.utils.ConstantManager;
-import com.doodle.utils.PrefManager;
+import com.doodle.Tool.ConstantManager;
+import com.doodle.Tool.PrefManager;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;

@@ -16,7 +16,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.EditText;
@@ -27,10 +26,8 @@ import android.widget.TextView;
 import com.doodle.Home.model.Headers;
 import com.doodle.Home.service.SocketIOManager;
 import com.doodle.Message.adapter.MessagingAdapter;
-import com.doodle.Message.model.ChatUser;
 import com.doodle.Message.model.Chats;
 import com.doodle.Message.model.FriendInfo;
-import com.doodle.Message.model.Message;
 import com.doodle.Message.model.MessageSeenParam;
 import com.doodle.Message.model.MessageSendParam;
 import com.doodle.Message.model.Messages;
@@ -38,19 +35,17 @@ import com.doodle.Message.model.NewMessage;
 import com.doodle.Message.model.User;
 import com.doodle.Message.service.MessageService;
 import com.doodle.R;
-import com.doodle.utils.AppConstants;
-import com.doodle.utils.NetworkHelper;
-import com.doodle.utils.PrefManager;
-import com.doodle.utils.Utils;
+import com.doodle.Tool.AppConstants;
+import com.doodle.Tool.NetworkHelper;
+import com.doodle.Tool.PrefManager;
+import com.doodle.Tool.Tools;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Objects;
 
 import io.socket.client.Ack;
 import io.socket.client.Socket;
-import io.socket.emitter.Emitter;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -189,7 +184,7 @@ public class MessagingFragment extends Fragment {
             sendAllMessageRequest(call);
             progressDialog.show();
         } else {
-            Utils.showNetworkDialog(getChildFragmentManager());
+            Tools.showNetworkDialog(getChildFragmentManager());
         }
     }
 

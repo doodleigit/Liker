@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,27 +20,26 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.Toast;
 
 import com.doodle.App;
 import com.doodle.Comment.model.Comment;
 import com.doodle.Comment.model.CommentItem;
-import com.doodle.Home.adapter.BreakingPostAdapter;
+import com.doodle.Home.adapter.PostAdapter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.service.HomeService;
-import com.doodle.Home.service.ImageHolder;
-import com.doodle.Home.service.LinkScriptHolder;
-import com.doodle.Home.service.LinkScriptYoutubeHolder;
-import com.doodle.Home.service.TextHolder;
-import com.doodle.Home.service.TextMimHolder;
-import com.doodle.Home.service.VideoHolder;
+import com.doodle.Home.holder.ImageHolder;
+import com.doodle.Home.holder.LinkScriptHolder;
+import com.doodle.Home.holder.LinkScriptYoutubeHolder;
+import com.doodle.Home.holder.TextHolder;
+import com.doodle.Home.holder.TextMimHolder;
+import com.doodle.Home.holder.VideoHolder;
 import com.doodle.Home.service.VideoPlayerRecyclerView;
 import com.doodle.Home.view.activity.Home;
 import com.doodle.R;
-import com.doodle.utils.AppConstants;
-import com.doodle.utils.NetworkHelper;
-import com.doodle.utils.PrefManager;
-import com.doodle.utils.Utils;
+import com.doodle.Tool.AppConstants;
+import com.doodle.Tool.NetworkHelper;
+import com.doodle.Tool.PrefManager;
+import com.doodle.Tool.Tools;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 
@@ -72,13 +72,14 @@ public class FollowingPost extends Fragment   {
     private boolean networkOk;
     private CircularProgressView progressView;
     //  private PostAdapter adapter;
-    private BreakingPostAdapter adapter;
+    private PostAdapter adapter;
+    private SwipeRefreshLayout refreshLayout;
     private VideoPlayerRecyclerView recyclerView;
     private LinearLayoutManager layoutManager;
     private int totalItems;
     private int scrollOutItems;
     private int currentItems;
-    private boolean isScrolling;
+    private boolean isScrolling, isPaginationDone = true;
     int limit = 5;
     int offset = 0;
     private String catIds = "";
@@ -132,10 +133,19 @@ public class FollowingPost extends Fragment   {
         layoutManager = new LinearLayoutManager(getActivity());
         progressView = (CircularProgressView) root.findViewById(R.id.progress_view);
         shimmerFrameLayout = (ShimmerFrameLayout) root.findViewById(R.id.shimmer_view_post_container);
+        refreshLayout = root.findViewById(R.id.refreshLayout);
         recyclerView = root.findViewById(R.id.rvBreakingPost);
         recyclerView.setLayoutManager(layoutManager);
 
         getData();
+
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                offset = 0;
+                getData();
+            }
+        });
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -153,8 +163,9 @@ public class FollowingPost extends Fragment   {
                 scrollOutItems = layoutManager.findFirstVisibleItemPosition();
                 totalItems = layoutManager.getItemCount();
 
-                if (isScrolling && (currentItems + scrollOutItems == totalItems)) {
+                if (isScrolling && isPaginationDone && (currentItems + scrollOutItems == totalItems)) {
                     isScrolling = false;
+                    isPaginationDone = false;
                     PerformPagination();
                 }
 
@@ -231,7 +242,7 @@ public class FollowingPost extends Fragment   {
                             Call<String> call = webService.postDelete(deviceId, profileId, token, userIds, deletePostItem.getPostId());
                             sendDeletePostRequest(call);
                         } else {
-                            Utils.showNetworkDialog(getActivity().getSupportFragmentManager());
+                            Tools.showNetworkDialog(getActivity().getSupportFragmentManager());
                         }
 
 
@@ -286,7 +297,7 @@ public class FollowingPost extends Fragment   {
             Call<List<PostItem>> call = webService.feed(deviceId, profileId, token, userIds, limit, offset, "following", "", 1, false);
             sendPostItemRequest(call);
         } else {
-            Utils.showNetworkDialog(getActivity().getSupportFragmentManager());
+            Tools.showNetworkDialog(getActivity().getSupportFragmentManager());
             progressView.setVisibility(View.GONE);
             progressView.stopAnimation();
 
@@ -305,7 +316,7 @@ public class FollowingPost extends Fragment   {
                     PostItemPagingRequest(call);
 
                 } else {
-                    Utils.showNetworkDialog(getActivity().getSupportFragmentManager());
+                    Tools.showNetworkDialog(getActivity().getSupportFragmentManager());
                     progressView.setVisibility(View.GONE);
                     progressView.stopAnimation();
                 }
@@ -355,6 +366,7 @@ public class FollowingPost extends Fragment   {
                 Log.d("MESSAGE: ", t.getMessage());
                 progressView.setVisibility(View.GONE);
                 progressView.stopAnimation();
+                isPaginationDone = true;
             }
         });
     }
@@ -376,7 +388,7 @@ public class FollowingPost extends Fragment   {
                     progressView.setVisibility(View.GONE);
                     progressView.stopAnimation();
                 }
-
+                isPaginationDone = true;
             }
 
             @Override
@@ -384,6 +396,7 @@ public class FollowingPost extends Fragment   {
                 Log.d("MESSAGE: ", t.getMessage());
                 progressView.setVisibility(View.GONE);
                 progressView.stopAnimation();
+                isPaginationDone = true;
             }
         });
     }
@@ -420,7 +433,7 @@ public class FollowingPost extends Fragment   {
                     sendCommentItemRequest(mCall);
 
 
-             /*        adapter = new BreakingPostAdapter(getActivity(), postItemList);
+             /*        adapter = new PostAdapter(getActivity(), postItemList);
 
                    new Handler().postDelayed(new Runnable() {
                         @Override
@@ -437,6 +450,8 @@ public class FollowingPost extends Fragment   {
                     //  Log.d("PostItem: ", categoryItem.toString() + "");
                     progressView.setVisibility(View.GONE);
                     progressView.stopAnimation();
+                } else {
+                    refreshLayout.setRefreshing(false);
                 }
 
             }
@@ -446,6 +461,7 @@ public class FollowingPost extends Fragment   {
                 Log.d("MESSAGE: ", t.getMessage());
                 progressView.setVisibility(View.GONE);
                 progressView.stopAnimation();
+                refreshLayout.setRefreshing(false);
                 ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(2);
             }
         });
@@ -463,7 +479,8 @@ public class FollowingPost extends Fragment   {
                 comments = commentItem.getComments();
                 Log.d("commentItem", commentItem.toString());
                 if (postItemList != null && comments != null) {
-                    adapter = new BreakingPostAdapter(getActivity(), postItemList, mCallback, mimListener,videoListener,youtubeListener,linkListener,imageListener);
+                    adapter = new PostAdapter(getActivity(), postItemList, mCallback, mimListener,videoListener,youtubeListener,linkListener,imageListener, true);
+                    offset = limit;
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
@@ -486,7 +503,7 @@ public class FollowingPost extends Fragment   {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
+                refreshLayout.setRefreshing(false);
             }
 
             @Override
@@ -494,6 +511,7 @@ public class FollowingPost extends Fragment   {
                 Log.d("MESSAGE: ", t.getMessage());
                 progressView.setVisibility(View.GONE);
                 progressView.stopAnimation();
+                refreshLayout.setRefreshing(false);
                 ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(2);
             }
         });

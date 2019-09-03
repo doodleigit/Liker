@@ -126,7 +126,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:textColor="#57A9DD"
-
         android:text="I did not receive the email"
         />
 

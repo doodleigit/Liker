@@ -35,9 +35,9 @@ import com.doodle.Profile.model.UserAllInfo;
 import com.doodle.Profile.service.ProfileService;
 import com.doodle.R;
 import com.doodle.Search.LikerSearch;
-import com.doodle.utils.AppConstants;
-import com.doodle.utils.PrefManager;
-import com.doodle.utils.Utils;
+import com.doodle.Tool.AppConstants;
+import com.doodle.Tool.PrefManager;
+import com.doodle.Tool.Tools;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import org.json.JSONException;
@@ -296,7 +296,7 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void uploadImage() {
-        String path = Utils.getPath(this, imageUri);
+        String path = Tools.getPath(this, imageUri);
         File file = new File(path);
         RequestBody requestFile = RequestBody.create(MediaType.parse("image"), file);
         MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("picture", file.getName(), requestFile);

@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -27,7 +26,7 @@ import com.doodle.Setting.model.ContributionItem;
 import com.doodle.Setting.model.SubCategory;
 import com.doodle.Setting.service.ContributionAddListener;
 import com.doodle.Setting.service.SettingService;
-import com.doodle.utils.PrefManager;
+import com.doodle.Tool.PrefManager;
 import com.google.android.flexbox.FlexDirection;
 import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.flexbox.JustifyContent;
@@ -38,8 +37,6 @@ import java.util.Objects;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-
-import static com.facebook.FacebookSdk.getApplicationContext;
 
 public class ContributorSettingFragment extends Fragment {
 

@@ -14,7 +14,7 @@ import android.widget.TextView;
 import com.doodle.Profile.model.Links;
 import com.doodle.Profile.service.AboutComponentUpdateListener;
 import com.doodle.R;
-import com.doodle.utils.Utils;
+import com.doodle.Tool.Tools;
 
 import java.util.ArrayList;
 
@@ -47,7 +47,7 @@ public class SocialAdapter extends RecyclerView.Adapter<SocialAdapter.ViewHolder
         socialLinkType = arrayList.get(i).getType();
         link = arrayList.get(i).getLink();
 
-        viewHolder.tvSocialLinkType.setText(Utils.getProfileType(socialLinkType));
+        viewHolder.tvSocialLinkType.setText(Tools.getProfileType(socialLinkType));
 
         if (!link.isEmpty()) {
             if (!link.startsWith("http://") && !link.startsWith("https://")) {

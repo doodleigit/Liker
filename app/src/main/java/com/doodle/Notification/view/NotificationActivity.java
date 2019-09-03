@@ -16,9 +16,9 @@ import com.doodle.Notification.adapter.NotificationAdapter;
 import com.doodle.Notification.model.NotificationItem;
 import com.doodle.Notification.service.NotificationService;
 import com.doodle.R;
-import com.doodle.utils.NetworkHelper;
-import com.doodle.utils.PrefManager;
-import com.doodle.utils.Utils;
+import com.doodle.Tool.NetworkHelper;
+import com.doodle.Tool.PrefManager;
+import com.doodle.Tool.Tools;
 
 import java.util.ArrayList;
 
@@ -113,7 +113,7 @@ public class NotificationActivity extends AppCompatActivity {
             Call<ArrayList<NotificationItem>> call = webService.getNotificationList(deviceId, profileId, token, true, userIds, limit, offset);
             sendNotificationItemRequest(call);
         } else {
-            Utils.showNetworkDialog(getSupportFragmentManager());
+            Tools.showNetworkDialog(getSupportFragmentManager());
         }
     }
 

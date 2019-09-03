@@ -15,7 +15,7 @@ import com.doodle.App;
 import com.doodle.R;
 import com.doodle.Setting.model.Friend;
 import com.doodle.Setting.service.UserBlockClickListener;
-import com.doodle.utils.AppConstants;
+import com.doodle.Tool.AppConstants;
 
 import java.util.ArrayList;
 

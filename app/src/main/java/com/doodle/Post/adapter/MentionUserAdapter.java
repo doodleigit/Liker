@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.doodle.Post.model.MentionUser;
 import com.doodle.R;
-import com.doodle.utils.AppConstants;
+import com.doodle.Tool.AppConstants;
 
 import java.util.List;
 

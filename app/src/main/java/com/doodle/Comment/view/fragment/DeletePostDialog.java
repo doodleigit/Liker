@@ -9,10 +9,7 @@ import android.support.v4.app.DialogFragment;
 import android.util.Log;
 
 import com.doodle.App;
-import com.doodle.Comment.model.Comment_;
 import com.doodle.Home.model.PostItem;
-
-import static com.doodle.utils.Utils.isEmpty;
 
 public class DeletePostDialog extends DialogFragment {
     private final String TAG = "DELETE_POST";

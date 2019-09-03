@@ -50,18 +50,18 @@ import android.widget.Toast;
 
 import com.doodle.App;
 import com.doodle.Authentication.model.UserInfo;
-import com.doodle.Comment.adapter.AllCommentAdapter;
+import com.doodle.Comment.adapter.CommentAdapter;
 import com.doodle.Comment.model.Comment;
 import com.doodle.Comment.model.CommentItem;
 import com.doodle.Comment.model.Comment_;
 import com.doodle.Comment.model.Reason;
 import com.doodle.Comment.model.Reply;
 import com.doodle.Comment.model.ReportReason;
-import com.doodle.Comment.service.CommentImageHolder;
-import com.doodle.Comment.service.CommentLinkScriptHolder;
+import com.doodle.Comment.holder.CommentImageHolder;
+import com.doodle.Comment.holder.CommentLinkScriptHolder;
 import com.doodle.Comment.service.CommentService;
-import com.doodle.Comment.service.CommentTextHolder;
-import com.doodle.Comment.service.CommentYoutubeHolder;
+import com.doodle.Comment.holder.CommentTextHolder;
+import com.doodle.Comment.holder.CommentYoutubeHolder;
 import com.doodle.Comment.view.fragment.BlockUserDialog;
 import com.doodle.Comment.view.fragment.FollowSheet;
 import com.doodle.Comment.view.fragment.ReportLikerMessageSheet;
@@ -73,12 +73,11 @@ import com.doodle.Post.adapter.MentionUserAdapter;
 import com.doodle.Post.model.MentionUser;
 import com.doodle.Post.model.PostImage;
 import com.doodle.Post.service.PostService;
-import com.doodle.Post.view.fragment.PostPermission;
 import com.doodle.R;
-import com.doodle.utils.NetworkHelper;
-import com.doodle.utils.PageTransformer;
-import com.doodle.utils.PrefManager;
-import com.doodle.utils.Utils;
+import com.doodle.Tool.NetworkHelper;
+import com.doodle.Tool.PageTransformer;
+import com.doodle.Tool.PrefManager;
+import com.doodle.Tool.Tools;
 import com.google.gson.Gson;
 import com.leocardz.link.preview.library.TextCrawler;
 import com.squareup.picasso.Picasso;
@@ -107,19 +106,15 @@ import retrofit2.Response;
 import static android.widget.Toast.LENGTH_SHORT;
 import static android.widget.Toast.makeText;
 
-import static com.doodle.Comment.service.CommentTextHolder.REASON_KEY;
-import static com.doodle.Comment.service.CommentTextHolder.REPLY_KEY;
-import static com.doodle.Home.service.TextHolder.COMMENT_KEY;
-import static com.doodle.Home.service.TextHolder.ITEM_KEY;
+import static com.doodle.Home.holder.TextHolder.COMMENT_KEY;
+import static com.doodle.Home.holder.TextHolder.ITEM_KEY;
 import static com.doodle.Post.view.activity.PostNew.isExternalStorageDocument;
-import static com.doodle.utils.MediaUtil.getDataColumn;
-import static com.doodle.utils.MediaUtil.isDownloadsDocument;
-import static com.doodle.utils.MediaUtil.isGooglePhotosUri;
-import static com.doodle.utils.MediaUtil.isMediaDocument;
-import static com.doodle.utils.Utils.delayLoadComment;
-import static com.doodle.utils.Utils.getMD5EncryptedString;
-import static com.doodle.utils.Utils.isEmpty;
-import static com.doodle.utils.Utils.isNullOrEmpty;
+import static com.doodle.Tool.MediaUtil.getDataColumn;
+import static com.doodle.Tool.MediaUtil.isDownloadsDocument;
+import static com.doodle.Tool.MediaUtil.isGooglePhotosUri;
+import static com.doodle.Tool.MediaUtil.isMediaDocument;
+import static com.doodle.Tool.Tools.getMD5EncryptedString;
+import static com.doodle.Tool.Tools.isNullOrEmpty;
 
 public class CommentPost extends AppCompatActivity implements View.OnClickListener,
         CommentTextHolder.CommentListener,
@@ -182,7 +177,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
     boolean networkOk;
     ProgressBar progressView;
     PostItem postItem;
-    AllCommentAdapter adapter;
+    CommentAdapter adapter;
     private String fileEncoded;
     MultipartBody.Part fileToUpload;
     private ProgressDialog progressDialog;
@@ -305,7 +300,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
         commentService = CommentService.mRetrofit.create(CommentService.class);
         webService = PostService.mRetrofit.create(PostService.class);
         //  Picasso.with(App.getInstance()).load(imageUrl).into(target);
-        adapter = new AllCommentAdapter(this, comment_list, postItem, this, this, this, this);
+        adapter = new CommentAdapter(this, comment_list, postItem, this, this, this, this);
         recyclerView.setAdapter(adapter);
         postId = postItem.getSharedPostId();
         userName.setText(String.format("%s %s", userInfo.getFirstName(), userInfo.getLastName()));
@@ -321,7 +316,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
                 //   makeText(PostNew.this, "onTextChanged " + s, LENGTH_SHORT).show();
-                extractedUrls = Utils.extractUrls(s.toString());
+                extractedUrls = Tools.extractUrls(s.toString());
                 /// if(uploadImageName.)
                 commentText = s.toString().trim();
 
@@ -454,7 +449,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
 
 
         } else {
-            Utils.showNetworkDialog(getSupportFragmentManager());
+            Tools.showNetworkDialog(getSupportFragmentManager());
             progressView.setVisibility(View.GONE);
 
 
@@ -611,7 +606,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
                     Call<CommentItem> call = commentService.getAllPostComments(deviceId, profileId, token, "false", limit, offset, "DESC", postItem.getPostId(), userIds);
                     sendAllCommentItemRequest(call);
                 } else {
-                    Utils.showNetworkDialog(getSupportFragmentManager());
+                    Tools.showNetworkDialog(getSupportFragmentManager());
                     progressView.setVisibility(View.GONE);
                 }
             }
@@ -1080,7 +1075,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
                     // App.setCommentCount(1);
                 }
 
-//                adapter = new AllCommentAdapter(CommentPost.this, comment_list, postItem);
+//                adapter = new CommentAdapter(CommentPost.this, comment_list, postItem);
 //                recyclerView.setAdapter(adapter);
 
             }
@@ -1130,7 +1125,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
             sendDeleteCommentRequest(call);
             // delayLoadComment(mProgressBar);
         } else {
-            Utils.showNetworkDialog(getSupportFragmentManager());
+            Tools.showNetworkDialog(getSupportFragmentManager());
 
         }
     }
@@ -1230,7 +1225,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
             Call<String> call = commentService.blockedUser(deviceId, profileId, token, blockUserId, userIds);
             sendBlockUserRequest(call);
         } else {
-            Utils.showNetworkDialog(getSupportFragmentManager());
+            Tools.showNetworkDialog(getSupportFragmentManager());
         }
     }
 
@@ -1302,6 +1297,6 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Utils.dismissDialog();
+        Tools.dismissDialog();
     }
 }

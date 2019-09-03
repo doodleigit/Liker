@@ -21,7 +21,7 @@ import com.doodle.Setting.adapter.PeopleMayKnowAdapter;
 import com.doodle.Setting.model.PeopleMayKnow;
 import com.doodle.Setting.service.FollowUnfollowClickListener;
 import com.doodle.Setting.service.SettingService;
-import com.doodle.utils.PrefManager;
+import com.doodle.Tool.PrefManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;

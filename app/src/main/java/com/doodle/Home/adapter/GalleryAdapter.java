@@ -2,24 +2,21 @@ package com.doodle.Home.adapter;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.VideoView;
+import android.widget.ProgressBar;
 
 import com.bumptech.glide.Glide;
 import com.doodle.App;
 import com.doodle.Home.model.PostFile;
-import com.doodle.Post.model.Mim;
 import com.doodle.R;
-import com.doodle.utils.AppConstants;
+import com.doodle.Tool.AppConstants;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -60,14 +57,27 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
     public void onBindViewHolder(ViewHolder holder, int position) {
         PostFile item = postFiles.get(position);
 
-        String postImages = AppConstants.POST_IMAGES + item.getImageName();
+        if (item.getPostType().equals("2")) {
+            holder.mediaVideoLayout.setVisibility(View.VISIBLE);
+            holder.imageMedia.setVisibility(View.GONE);
+            String postVideoThumbnail = AppConstants.POST_VIDEOS_THUMBNAIL + item.getImageName();
 
+            Glide.with(App.getAppContext())
+                    .load(postVideoThumbnail)
+                    .centerCrop()
+                    .dontAnimate()
+                    .into(holder.mediaVideoThumbnail);
+        } else {
+            holder.mediaVideoLayout.setVisibility(View.GONE);
+            holder.imageMedia.setVisibility(View.VISIBLE);
+            String postImages = AppConstants.POST_IMAGES + item.getImageName();
 
-        Glide.with(App.getAppContext())
-                .load(postImages)
-                .centerCrop()
-                .dontAnimate()
-                .into( holder.imageMedia);
+            Glide.with(App.getAppContext())
+                    .load(postImages)
+                    .centerCrop()
+                    .dontAnimate()
+                    .into(holder.imageMedia);
+        }
 
     }
 
@@ -82,11 +92,17 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
 
         private RecyclerViewClickListener mListener;
 
-        public ImageView imageMedia;
+        public FrameLayout mediaVideoLayout;
+        public ImageView imageMedia, mediaVideoThumbnail, mediaVideoVolumeControl;
+        public ProgressBar mediaVideoProgressBar;
 
         public ViewHolder(View itemView, RecyclerViewClickListener listener) {
             super(itemView);
-            imageMedia = itemView.findViewById(R.id.imageMedia);
+            mediaVideoLayout = itemView.findViewById(R.id.media_video);
+            imageMedia = itemView.findViewById(R.id.media_image);
+            mediaVideoThumbnail = itemView.findViewById(R.id.media_video_thumbnail);
+            mediaVideoVolumeControl = itemView.findViewById(R.id.media_video_volume_control);
+            mediaVideoProgressBar = itemView.findViewById(R.id.media_video_progressBar);
             mListener = listener;
             itemView.setOnClickListener(this);
         }

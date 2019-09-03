@@ -21,22 +21,22 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.doodle.Comment.model.CommentItem;
-import com.doodle.Home.adapter.BreakingPostAdapter;
+import com.doodle.Home.adapter.PostAdapter;
 import com.doodle.Home.model.PostItem;
-import com.doodle.Home.service.ImageHolder;
-import com.doodle.Home.service.LinkScriptHolder;
-import com.doodle.Home.service.LinkScriptYoutubeHolder;
-import com.doodle.Home.service.TextHolder;
-import com.doodle.Home.service.TextMimHolder;
-import com.doodle.Home.service.VideoHolder;
+import com.doodle.Home.holder.ImageHolder;
+import com.doodle.Home.holder.LinkScriptHolder;
+import com.doodle.Home.holder.LinkScriptYoutubeHolder;
+import com.doodle.Home.holder.TextHolder;
+import com.doodle.Home.holder.TextMimHolder;
+import com.doodle.Home.holder.VideoHolder;
 import com.doodle.Home.service.VideoPlayerRecyclerView;
 import com.doodle.Profile.adapter.StarAdapter;
 import com.doodle.Profile.model.Star;
 import com.doodle.Profile.service.ProfileService;
 import com.doodle.Profile.service.StarClickListener;
 import com.doodle.R;
-import com.doodle.utils.AppConstants;
-import com.doodle.utils.PrefManager;
+import com.doodle.Tool.AppConstants;
+import com.doodle.Tool.PrefManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -64,7 +64,7 @@ public class StarFragment extends Fragment {
     private String deviceId, profileUserName, token, userId;
     private ArrayList<Star> arrayList;
     private StarAdapter starAdapter;
-    private BreakingPostAdapter adapter;
+    private PostAdapter adapter;
 
     public List<PostItem> postItemList;
     private boolean isScrolling;
@@ -407,7 +407,7 @@ public class StarFragment extends Fragment {
                 //  comments = commentItem.getComments();
                 Log.d("commentItem", commentItem.toString());
                 if (postItemList != null) {
-                    adapter = new BreakingPostAdapter(getActivity(), postItemList, mCallback, mimListener, videoListener, youtubeListener, linkListener, imageListener);
+                    adapter = new PostAdapter(getActivity(), postItemList, mCallback, mimListener, videoListener, youtubeListener, linkListener, imageListener, true);
                     offset += 5;
                     progressDialog.hide();
 

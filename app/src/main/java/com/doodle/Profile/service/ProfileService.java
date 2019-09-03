@@ -13,7 +13,7 @@ import com.doodle.Profile.model.PhotoAlbum;
 import com.doodle.Profile.model.RecentPhoto;
 import com.doodle.Profile.model.Star;
 import com.doodle.Profile.model.UserAllInfo;
-import com.doodle.utils.AppConstants;
+import com.doodle.Tool.AppConstants;
 
 import java.util.ArrayList;
 import java.util.List;

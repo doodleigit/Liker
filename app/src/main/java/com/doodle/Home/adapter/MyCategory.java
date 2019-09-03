@@ -2,7 +2,6 @@ package com.doodle.Home.adapter;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,12 +9,9 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.doodle.Authentication.service.MyService;
-import com.doodle.Home.view.CheckedActivity;
 import com.doodle.R;
-import com.doodle.utils.ConstantManager;
+import com.doodle.Tool.ConstantManager;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

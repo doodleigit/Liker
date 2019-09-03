@@ -4,7 +4,7 @@ import com.doodle.Comment.model.CommentItem;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.StarContributor;
 import com.doodle.Home.model.postshare.PostShareItem;
-import com.doodle.utils.AppConstants;
+import com.doodle.Tool.AppConstants;
 
 import java.util.ArrayList;
 import java.util.List;

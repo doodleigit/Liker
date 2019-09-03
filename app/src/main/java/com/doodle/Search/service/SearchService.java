@@ -4,7 +4,7 @@ import com.doodle.Search.model.AdvanceSearches;
 import com.doodle.Search.model.Message;
 import com.doodle.Search.model.SearchHistory;
 import com.doodle.Search.model.SearchUser;
-import com.doodle.utils.AppConstants;
+import com.doodle.Tool.AppConstants;
 
 import java.util.List;
 

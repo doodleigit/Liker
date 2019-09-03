@@ -58,7 +58,7 @@ import com.doodle.App;
 import com.doodle.Home.model.PostFile;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.PostTextIndex;
-import com.doodle.Home.service.TextHolder;
+import com.doodle.Home.holder.TextHolder;
 import com.doodle.Post.adapter.ChatAdapter;
 import com.doodle.Post.adapter.ImageAdapter;
 import com.doodle.Post.adapter.MediaAdapter;
@@ -74,16 +74,15 @@ import com.doodle.Post.model.PostVideo;
 import com.doodle.Post.model.Subcatg;
 import com.doodle.Post.service.DataProvider;
 import com.doodle.Post.service.PostService;
-import com.doodle.Post.view.activity.PostNew;
 import com.doodle.Post.view.fragment.Audience;
 import com.doodle.Post.view.fragment.ContributorStatus;
 import com.doodle.Post.view.fragment.PostPermission;
 import com.doodle.R;
-import com.doodle.utils.AppConstants;
-import com.doodle.utils.NetworkHelper;
-import com.doodle.utils.PageTransformer;
-import com.doodle.utils.PrefManager;
-import com.doodle.utils.Utils;
+import com.doodle.Tool.AppConstants;
+import com.doodle.Tool.NetworkHelper;
+import com.doodle.Tool.PageTransformer;
+import com.doodle.Tool.PrefManager;
+import com.doodle.Tool.Tools;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.google.gson.Gson;
 import com.koushikdutta.urlimageviewhelper.UrlImageViewCallback;
@@ -124,11 +123,11 @@ import retrofit2.Response;
 
 import static android.widget.Toast.LENGTH_SHORT;
 import static android.widget.Toast.makeText;
-import static com.doodle.utils.Utils.containsIllegalCharacters;
-import static com.doodle.utils.Utils.extractMentionText;
-import static com.doodle.utils.Utils.extractMentionUser;
-import static com.doodle.utils.Utils.getMD5EncryptedString;
-import static com.doodle.utils.Utils.isNullOrEmpty;
+import static com.doodle.Tool.Tools.containsIllegalCharacters;
+import static com.doodle.Tool.Tools.extractMentionText;
+import static com.doodle.Tool.Tools.extractMentionUser;
+import static com.doodle.Tool.Tools.getMD5EncryptedString;
+import static com.doodle.Tool.Tools.isNullOrEmpty;
 
 public class EditPost extends AppCompatActivity implements View.OnClickListener,
         PostPermission.BottomSheetListener,
@@ -492,7 +491,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
                 //   makeText(PostNew.this, "onTextChanged " + s, LENGTH_SHORT).show();
-                extractedUrls = Utils.extractUrls(s.toString());
+                extractedUrls = Tools.extractUrls(s.toString());
                 /// if(uploadImageName.)
                 contentTitle = s.toString().trim();
 
@@ -817,19 +816,26 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 
         if (postFiles.size() > 0) {
             for (PostFile temp : postFiles) {
-                imageString = temp.getImageName();
+
                 videoString = temp.getVideoName();
-                if (!isNullOrEmpty(imageString)) {
-                    postImages.add(new PostImage(imageString,temp.getId()));
+                String postType=temp.getPostType();
+                if(!isNullOrEmpty(postType)){
+                    if("1".equalsIgnoreCase(postType)){
+                        imageString = temp.getImageName();
+                        postImages.add(new PostImage(imageString,temp.getId()));
+                    }else if("2".equalsIgnoreCase(postType)){
+                        videoString = temp.getVideoName();
+                        postVideos.add(new PostVideo(videoString,temp.getId()));
+                    }
                 }
-                if (!isNullOrEmpty(videoString)) {
-                    postVideos.add(new PostVideo(videoString));
-                }
+
             }
+
             rvMediaShow = true;
             mediaRecyclerViewToggle();
             MediaAdapter mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos);
             mediaRecyclerView.setAdapter(mediaAdapter);
+
         }
 
 
@@ -845,7 +851,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 
 
         } else {
-            Utils.showNetworkDialog(getSupportFragmentManager());
+            Tools.showNetworkDialog(getSupportFragmentManager());
             progressView.setVisibility(View.GONE);
             progressView.stopAnimation();
         }
@@ -1211,9 +1217,9 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 
                 checkContentType();
                 if (categoryId == 0 && subCategoryId == 0) {
-                    Utils.showCustomToast(EditPost.this, mView, " Choose Audience !", Gravity.TOP);
+                    Tools.showCustomToast(EditPost.this, mView, " Choose Audience !", Gravity.TOP);
                 } else if (!isAddContentTitle) {
-                    Utils.showCustomToast(EditPost.this, mView, " You must add description to your post !", Gravity.TOP);
+                    Tools.showCustomToast(EditPost.this, mView, " You must add description to your post !", Gravity.TOP);
                 } else {
 
 
@@ -1236,7 +1242,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                     createNewPost();
                 }
 
-                // Utils.showCustomToast(LikerSearch.this, mView, " Write Minimum Three Characters !", Gravity.TOP);
+                // Tools.showCustomToast(LikerSearch.this, mView, " Write Minimum Three Characters !", Gravity.TOP);
 
 
 //                String linkText = editPostMessage.getText().toString();
@@ -1317,7 +1323,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
             );
             sendNewPostRequest(call);
         } else {
-            Utils.showNetworkDialog(getSupportFragmentManager());
+            Tools.showNetworkDialog(getSupportFragmentManager());
             progressView.setVisibility(View.GONE);
             progressView.stopAnimation();
 
@@ -1340,8 +1346,8 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                 contentType = 4;
                 status = 4;
             } else if (contentTitle.length() > 0 && postVideos.size() > 0) {
-                contentType = 5;
-                status = 5;
+                contentType = 2;
+                status = 2;
             } else {
                 contentType = 1;
                 status = 1;
@@ -1404,7 +1410,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                Log.i("Response", response.body().toString());
+                 Log.i("Response", response.body().toString());
                 //Toast.makeText()
                 if (response.isSuccessful()) {
                     if (response.body() != null) {
@@ -1557,6 +1563,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
             makeText(this, R.string.grant, LENGTH_SHORT).show();
             isGrantGallery = true;
         }
+
     }
 
     private void checkVideoPermission() {
@@ -1963,7 +1970,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                             boolean status = object.getBoolean("status");
                             if (status) {
                                 String message = "You have already posted it .";
-                                Utils.showCustomToast(EditPost.this, mView, message, Gravity.CENTER);
+                                Tools.showCustomToast(EditPost.this, mView, message, Gravity.CENTER);
                             } else {
 
                                 if (!isNullOrEmpty(videoFilePath)) {
@@ -1989,7 +1996,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 
 
                                 String message = "Add gallery successfully!";
-                                Utils.showCustomToast(EditPost.this, mView, message, Gravity.CENTER);
+                                Tools.showCustomToast(EditPost.this, mView, message, Gravity.CENTER);
 
                             }
 
@@ -2109,7 +2116,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                             boolean status = object.getBoolean("status");
                             if (status) {
                                 String message = "You have already posted it .";
-                                Utils.showCustomToast(EditPost.this, mView, message, Gravity.CENTER);
+                                Tools.showCustomToast(EditPost.this, mView, message, Gravity.CENTER);
                             } else {
                                 if (!isNullOrEmpty(imageFilePath)) {
                                     File file = new File(imageFilePath);
@@ -2134,7 +2141,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 
 
                                 String message = "Add gallery successfully!";
-                                Utils.showCustomToast(EditPost.this, mView, message, Gravity.CENTER);
+                                Tools.showCustomToast(EditPost.this, mView, message, Gravity.CENTER);
 
                             }
 
@@ -2203,7 +2210,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                             boolean status = object.getBoolean("status");
                             if (status) {
                                 String message = "You have already posted it .";
-                                Utils.showCustomToast(EditPost.this, mView, message, Gravity.CENTER);
+                                Tools.showCustomToast(EditPost.this, mView, message, Gravity.CENTER);
                             } else {
                                 if (!isNullOrEmpty(imageFilePath)) {
                                     File file = new File(imageFilePath);
@@ -2235,7 +2242,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                                 }
 
                                 String message = "Add gallery successfully!";
-                                Utils.showCustomToast(EditPost.this, mView, message, Gravity.CENTER);
+                                Tools.showCustomToast(EditPost.this, mView, message, Gravity.CENTER);
 
                             }
 
@@ -2750,7 +2757,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
             Call<String> call = webService.addedPostContributor(deviceId, profileId, token, categoryId, subCategoryId, 5, userIds);
             addedPostContributorRequest(call);
         } else {
-            Utils.showNetworkDialog(getSupportFragmentManager());
+            Tools.showNetworkDialog(getSupportFragmentManager());
             progressView.setVisibility(View.GONE);
             progressView.stopAnimation();
 
@@ -2781,11 +2788,11 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                                     intent.putExtra("STATUS", status);
                                     startActivity(intent);
                                     String message = "You are now a contributor to the Hobby & Leisure - Airplanes category and your post has been added to your profile.";
-                                    Utils.showCustomToast(EditPost.this, mView, message, Gravity.CENTER);
+                                    Tools.showCustomToast(EditPost.this, mView, message, Gravity.CENTER);
                                 }
 
                             } else {
-                                Utils.showCustomToast(EditPost.this, mView, status, Gravity.CENTER);
+                                Tools.showCustomToast(EditPost.this, mView, status, Gravity.CENTER);
                             }
 
 
@@ -2816,7 +2823,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
             Call<String> call = webService.addedPostContributor(deviceId, profileId, token, categoryId, subCategoryId, 6, userIds);
             addedPostContributorRequest(call);
         } else {
-            Utils.showNetworkDialog(getSupportFragmentManager());
+            Tools.showNetworkDialog(getSupportFragmentManager());
             progressView.setVisibility(View.GONE);
             progressView.stopAnimation();
 

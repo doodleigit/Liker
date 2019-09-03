@@ -18,7 +18,7 @@ import com.doodle.Post.model.Category;
 import com.doodle.Post.model.CategoryItem;
 import com.doodle.Post.model.Subcatg;
 import com.doodle.R;
-import com.doodle.utils.PrefManager;
+import com.doodle.Tool.PrefManager;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 
 import java.util.ArrayList;

@@ -9,8 +9,6 @@ import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +16,6 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
-import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 
@@ -29,9 +26,9 @@ import com.doodle.Message.model.FriendInfo;
 import com.doodle.Message.service.MessageService;
 import com.doodle.Message.service.SuggestedListClickResponseService;
 import com.doodle.R;
-import com.doodle.utils.NetworkHelper;
-import com.doodle.utils.PrefManager;
-import com.doodle.utils.Utils;
+import com.doodle.Tool.NetworkHelper;
+import com.doodle.Tool.PrefManager;
+import com.doodle.Tool.Tools;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -169,7 +166,7 @@ public class NewMessageFragment extends Fragment {
             sendSuggestedListRequest(call);
             progressDialog.show();
         } else {
-            Utils.showNetworkDialog(getChildFragmentManager());
+            Tools.showNetworkDialog(getChildFragmentManager());
         }
     }
 

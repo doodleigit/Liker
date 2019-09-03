@@ -7,25 +7,22 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.design.widget.BottomSheetDialogFragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Toast;
 
 import com.doodle.App;
 import com.doodle.Comment.model.Comment_;
 import com.doodle.Home.model.PostItem;
 import com.doodle.R;
-import com.doodle.utils.PrefManager;
+import com.doodle.Tool.PrefManager;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.doodle.utils.Utils.isEmpty;
-import static com.facebook.FacebookSdk.getApplicationContext;
+import static com.doodle.Tool.Tools.isEmpty;
 
 public class ReportSendCategorySheet extends BottomSheetDialogFragment implements View.OnClickListener {
     private BottomSheetListener mListener;

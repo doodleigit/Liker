@@ -16,7 +16,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-import static com.doodle.utils.AppConstants.POST_IMAGES;
+import static com.doodle.Tool.AppConstants.POST_IMAGES;
 
 public class SearchUsersAd extends ArrayAdapter<SearchUser> {
 

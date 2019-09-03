@@ -33,7 +33,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <com.doodle.utils.SingleLineTextView
+                <com.doodle.Tool.SingleLineTextView
                     android:id="@+id/tvPostUserName"
                     android:layout_width="@dimen/_100sdp"
                     android:layout_height="wrap_content"
@@ -51,7 +51,7 @@
                     android:layout_marginLeft="5dp"
                     android:background="@color/colorPlaceholderBg"/>
 
-                <com.doodle.utils.SingleLineTextView
+                <com.doodle.Tool.SingleLineTextView
                     android:id="@+id/tvPostTime"
                     android:layout_width="@dimen/_100sdp"
                     android:layout_height="wrap_content"

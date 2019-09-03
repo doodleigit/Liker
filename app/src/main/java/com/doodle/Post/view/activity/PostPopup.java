@@ -5,15 +5,14 @@ import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 
 import com.doodle.App;
-import com.doodle.Home.adapter.BreakingPostAdapter;
+import com.doodle.Home.adapter.PostAdapter;
 import com.doodle.Home.model.PostItem;
-import com.doodle.Home.service.ImageHolder;
-import com.doodle.Home.service.LinkScriptHolder;
-import com.doodle.Home.service.LinkScriptYoutubeHolder;
-import com.doodle.Home.service.TextHolder;
-import com.doodle.Home.service.TextMimHolder;
-import com.doodle.Home.service.VideoHolder;
-import com.doodle.Home.view.fragment.BreakingPost;
+import com.doodle.Home.holder.ImageHolder;
+import com.doodle.Home.holder.LinkScriptHolder;
+import com.doodle.Home.holder.LinkScriptYoutubeHolder;
+import com.doodle.Home.holder.TextHolder;
+import com.doodle.Home.holder.TextMimHolder;
+import com.doodle.Home.holder.VideoHolder;
 import com.doodle.R;
 import com.r0adkll.slidr.Slidr;
 import com.r0adkll.slidr.model.SlidrInterface;
@@ -35,7 +34,7 @@ public class PostPopup extends AppCompatActivity
     private RecyclerView rvPopupPost;
 
 
-    private BreakingPostAdapter adapter;
+    private PostAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +52,7 @@ public class PostPopup extends AppCompatActivity
             throw new AssertionError("Null data item received!");
         }
 
-        adapter = new BreakingPostAdapter(this, postItemList, this, this, this, this, this, this);
+        adapter = new PostAdapter(this, postItemList, this, this, this, this, this, this, false);
         rvPopupPost.setAdapter(adapter);
 
     }

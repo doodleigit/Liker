@@ -17,10 +17,9 @@ import com.doodle.Search.model.User;
 import com.doodle.Search.model.AdvanceSearches;
 import com.doodle.Search.service.SearchService;
 import com.doodle.R;
-import com.doodle.utils.NetworkHelper;
-import com.doodle.utils.PrefManager;
-import com.doodle.utils.Utils;
-import com.doodle.utils.fragment.Network;
+import com.doodle.Tool.NetworkHelper;
+import com.doodle.Tool.PrefManager;
+import com.doodle.Tool.Tools;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 
@@ -140,7 +139,7 @@ public class SearchActivity extends AppCompatActivity {
                     sendAdvanceSearchRequest(call);
 
                 } else {
-                    Utils.showNetworkDialog(getSupportFragmentManager());
+                    Tools.showNetworkDialog(getSupportFragmentManager());
                     progressView.setVisibility(View.GONE);
                     progressView.stopAnimation();
                 }

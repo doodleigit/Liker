@@ -6,11 +6,8 @@ import com.doodle.Authentication.model.Country;
 import com.doodle.Authentication.model.ForgotPassword;
 import com.doodle.Authentication.model.LoginUser;
 import com.doodle.Authentication.model.ResendStatus;
-import com.doodle.utils.AppConstants;
+import com.doodle.Tool.AppConstants;
 
-import java.util.concurrent.TimeUnit;
-
-import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -18,7 +15,6 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
-import retrofit2.http.Headers;
 import retrofit2.http.POST;
 import retrofit2.http.Path;
 
@@ -129,7 +125,7 @@ public interface AuthService {
 
     @POST(AppConstants.SOCIAL_LOGIN_APPS)
     @FormUrlEncoded
-    Call<String> socialLogin(
+    Call<LoginUser> socialLogin(
             @Field("app_social_access_code") String appSocialAccessCode,
             @Field("oauth_provider") String oauthProvider,
             @Field("oauth_id") String oauthId,
