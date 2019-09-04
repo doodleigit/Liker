@@ -76,15 +76,14 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
         Dialog dialog = new Dialog(context, R.style.Theme_Dialog);
         dialog.setContentView(R.layout.image_full_view);
 
-        Toolbar toolbar = dialog.findViewById(R.id.toolbar);
-
+        ImageView close = dialog.findViewById(R.id.close);
         PhotoView photoView = dialog.findViewById(R.id.photo_view);
         Glide.with(App.getAppContext())
                 .load(url)
                 .dontAnimate()
                 .into(photoView);
 
-        toolbar.setOnClickListener(new View.OnClickListener() {
+        close.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 dialog.dismiss();

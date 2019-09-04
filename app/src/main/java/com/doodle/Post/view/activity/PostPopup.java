@@ -1,5 +1,6 @@
 package com.doodle.Post.view.activity;
 
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
@@ -13,52 +14,34 @@ import com.doodle.Home.holder.LinkScriptYoutubeHolder;
 import com.doodle.Home.holder.TextHolder;
 import com.doodle.Home.holder.TextMimHolder;
 import com.doodle.Home.holder.VideoHolder;
+import com.doodle.Post.view.fragment.MultipleMediaPopUpFragment;
 import com.doodle.R;
+import com.doodle.Tool.AppConstants;
 import com.r0adkll.slidr.Slidr;
 import com.r0adkll.slidr.model.SlidrInterface;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class PostPopup extends AppCompatActivity
-        implements TextHolder.PostItemListener,
-        TextMimHolder.PostItemListener,
-        VideoHolder.PostItemListener,
-        LinkScriptYoutubeHolder.PostItemListener,
-        LinkScriptHolder.PostItemListener,
-        ImageHolder.PostItemListener {
+public class PostPopup extends AppCompatActivity {
 
-    private SlidrInterface slidr;
-    private PostItem popupPostItem;
-    public List<PostItem> postItemList;
-    private RecyclerView rvPopupPost;
-
-
-    private PostAdapter adapter;
+    PostItem postItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.post_popup);
-        postItemList = new ArrayList<>();
-        rvPopupPost = findViewById(R.id.rvPopupPost);
-        slidr = Slidr.attach(this);
-        popupPostItem = new PostItem();
-        popupPostItem = getIntent().getExtras().getParcelable(TextHolder.ITEM_KEY);
-        postItemList.add(popupPostItem);
-        int pos = App.getPosition();
 
-        if (popupPostItem == null) {
-            throw new AssertionError("Null data item received!");
-        }
+        postItem = getIntent().getExtras().getParcelable(AppConstants.ITEM_KEY);
 
-        adapter = new PostAdapter(this, postItemList, this, this, this, this, this, this, false);
-        rvPopupPost.setAdapter(adapter);
-
+        initialFragment(new MultipleMediaPopUpFragment());
     }
 
-    @Override
-    public void deletePost(PostItem postItem, int position) {
-
+    private void initialFragment(Fragment fragment) {
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(AppConstants.ITEM_KEY, postItem);
+        fragment.setArguments(bundle);
+        android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(R.id.container, fragment).commit();
     }
 }

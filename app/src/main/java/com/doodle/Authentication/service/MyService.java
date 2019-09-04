@@ -29,28 +29,28 @@ public class MyService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
 
-//        AuthService webService =
-//                AuthService.retrofitForCountry.create(AuthService.class);
-//
-//        Call<Country> call = webService.getCountry();
-//        ArrayList<CountryInfo> countryInfos = null;
-//        Country country;
-//        try {
-//            country = call.execute().body();
-//            Log.d("Country", country.toString());
-//            countryInfos = (ArrayList<CountryInfo>) country.getCountry();
-//            Log.i(TAG, "onHandleIntent: " + countryInfos);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            Log.i(TAG, "onHandleIntent: " + e.getMessage());
-//        }
-//
-////        Return the data to MainActivity
-//        Intent messageIntent = new Intent(MY_SERVICE_MESSAGE);
-//        messageIntent.putExtra(MY_SERVICE_PAYLOAD, countryInfos);
-//        LocalBroadcastManager manager1 =
-//                LocalBroadcastManager.getInstance(getApplicationContext());
-//        manager1.sendBroadcast(messageIntent);
+        AuthService webService =
+                AuthService.retrofitForCountry.create(AuthService.class);
+
+        Call<Country> call = webService.getCountry();
+        ArrayList<CountryInfo> countryInfos = null;
+        Country country;
+        try {
+            country = call.execute().body();
+            Log.d("Country", country.toString());
+            countryInfos = (ArrayList<CountryInfo>) country.getCountry();
+            Log.i(TAG, "onHandleIntent: " + countryInfos);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.i(TAG, "onHandleIntent: " + e.getMessage());
+        }
+
+//        Return the data to MainActivity
+        Intent messageIntent = new Intent(MY_SERVICE_MESSAGE);
+        messageIntent.putExtra(MY_SERVICE_PAYLOAD, countryInfos);
+        LocalBroadcastManager manager1 =
+                LocalBroadcastManager.getInstance(getApplicationContext());
+        manager1.sendBroadcast(messageIntent);
 
     }
 }

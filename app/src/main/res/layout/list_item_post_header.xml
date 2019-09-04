@@ -9,16 +9,14 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        >
+        android:layout_margin="5dp">
 
         <include
 
             android:id="@+id/imagePostContainer"
             layout="@layout/post_star_user_header_image"
             android:layout_width="50dp"
-            android:layout_height="50dp"
-          />
+            android:layout_height="50dp" />
 
         <LinearLayout
             android:id="@+id/content"
@@ -39,10 +37,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:textColor="@color/colorPrimary"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small"
-                    android:textStyle="bold"
-                    />
+                    android:textColor="@color/colorPrimary"
+                    android:textStyle="bold" />
 
                 <ImageView
                     android:id="@+id/imagePostPermission"
@@ -56,8 +53,8 @@
                     android:id="@+id/tvPostTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="@dimen/_5sdp"
                     android:layout_gravity="center"
+                    android:layout_marginLeft="@dimen/_5sdp"
                     android:text="7 minutes ago" />
             </LinearLayout>
 

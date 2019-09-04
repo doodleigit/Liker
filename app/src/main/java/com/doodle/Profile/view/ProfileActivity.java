@@ -119,7 +119,6 @@ public class ProfileActivity extends AppCompatActivity {
         profileService = ProfileService.mRetrofit.create(ProfileService.class);
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage(getString(R.string.loading));
-        progressDialog.setCancelable(false);
         progressDialog.show();
 
         ownProfileCheck();

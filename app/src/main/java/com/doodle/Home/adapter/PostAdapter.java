@@ -117,7 +117,7 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         }
         if (viewHolder instanceof ImageHolder) {
             ImageHolder vh = (ImageHolder) viewHolder;
-            vh.setItem(postItems.get(position), position,viewHolder);
+            vh.setItem(postItems.get(position), position, viewHolder);
         }
         if (viewHolder instanceof VideoHolder) {
             VideoHolder vh = (VideoHolder) viewHolder;

@@ -161,6 +161,8 @@ public class AppConstants {
     public static final String SET_INTRO = "set_intro";
     public static final String EMAIL_REMOVE = "email_remove";
     public static final String PHONE_REMOVE = "phone_remove";
+    public static final String ITEM_KEY = "item_key";
+    public static final String COMMENT_KEY = "comment_item_key";
 
     public static final String PRIVACY_VIEW = "privacy_view";
     public static final String PRIVACY_UPDATE_PERMISSION = "privacy_update_permission";
