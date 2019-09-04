@@ -111,6 +111,9 @@ public class AppConstants {
     public static final String POST_NOTIFICATION_TURN_OFF = "post_notification_turn_off";
     public static final String POST_NOTIFICATION_TURN_ON = "post_notification_turn_on";
     public static final String POST_DELETE = "post_delete";
+    public static final String POST_LIKE = "post_like";
+    public static final String POST_UNLIKE = "post_unlike";
+
 
     public static final String NEW_MESSAGE_BROADCAST = "new_message_broadcast";
     public static final String NEW_MESSAGE_BROADCAST_FROM_HOME = "new_message_broadcast_from_home";
