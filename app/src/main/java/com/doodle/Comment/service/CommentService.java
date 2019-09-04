@@ -234,4 +234,24 @@ user_id	28827
             @Field("post_id") String postId,
             @Field("user_id") String userIds
     );
+
+    @POST(AppConstants.COMMENT_LIKE)
+    @FormUrlEncoded
+    Call<String> commentLike(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("commented_id") String commentId,
+            @Field("user_id") String userIds
+    );
+
+    @POST(AppConstants.COMMENT_UNLIKE)
+    @FormUrlEncoded
+    Call<String> commentUnLike(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("commented_id") String commentId,
+            @Field("user_id") String userIds
+    );
 }

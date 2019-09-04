@@ -1,5 +1,6 @@
 package com.doodle.Home.adapter;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -17,6 +18,7 @@ import com.doodle.App;
 import com.doodle.Home.model.PostFile;
 import com.doodle.R;
 import com.doodle.Tool.AppConstants;
+import com.github.chrisbanes.photoview.PhotoView;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -29,7 +31,6 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
     public static final String ITEM_KEY = "item_key";
     Drawable bitmapDrawable;
     private RecyclerViewClickListener mListener;
-
 
     public GalleryAdapter(Context context, List<PostFile> postFiles, RecyclerViewClickListener listener) {
         this.mContext = context;
@@ -56,21 +57,22 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         PostFile item = postFiles.get(position);
+        String postImages;
 
         if (item.getPostType().equals("2")) {
             holder.mediaVideoLayout.setVisibility(View.VISIBLE);
             holder.imageMedia.setVisibility(View.GONE);
-            String postVideoThumbnail = AppConstants.POST_VIDEOS_THUMBNAIL + item.getImageName();
+            postImages = AppConstants.POST_VIDEOS_THUMBNAIL + item.getImageName();
 
             Glide.with(App.getAppContext())
-                    .load(postVideoThumbnail)
+                    .load(postImages)
                     .centerCrop()
                     .dontAnimate()
                     .into(holder.mediaVideoThumbnail);
         } else {
             holder.mediaVideoLayout.setVisibility(View.GONE);
             holder.imageMedia.setVisibility(View.VISIBLE);
-            String postImages = AppConstants.POST_IMAGES + item.getImageName();
+            postImages = AppConstants.POST_IMAGES + item.getImageName();
 
             Glide.with(App.getAppContext())
                     .load(postImages)
@@ -78,6 +80,20 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
                     .dontAnimate()
                     .into(holder.imageMedia);
         }
+
+        holder.imageMedia.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                viewFullImage(postImages);
+            }
+        });
+
+        holder.mediaVideoLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                viewFullImage(postImages);
+            }
+        });
 
     }
 
@@ -129,4 +145,26 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         public void onPrepareLoad(Drawable placeHolderDrawable) {
         }
     };
+
+    private void viewFullImage(String url) {
+        Dialog dialog = new Dialog(mContext, R.style.Theme_Dialog);
+        dialog.setContentView(R.layout.image_full_view);
+
+        ImageView close = dialog.findViewById(R.id.close);
+        PhotoView photoView = dialog.findViewById(R.id.photo_view);
+        Glide.with(App.getAppContext())
+                .load(url)
+                .dontAnimate()
+                .into(photoView);
+
+        close.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
 }

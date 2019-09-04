@@ -97,6 +97,8 @@ public class AppConstants {
     public static final String EDIT_COMMENT_REPLY = "edit_comment_reply";
     public static final String DELETE_POST_COMMENT = "delete_postcomment";
     public static final String DELETE_COMMENT_REPLY = "delete_comment_reply";
+    public static final String COMMENT_LIKE= "comment_like";
+    public static final String COMMENT_UNLIKE= "comment_unlike";
     public static final String GET_REPORT_REASON = "get_report_reason";
     public static final String REPORT_USER = "reportUser";
     public static final String UN_FOLLOW = "unfollow";
@@ -164,6 +166,8 @@ public class AppConstants {
     public static final String SET_INTRO = "set_intro";
     public static final String EMAIL_REMOVE = "email_remove";
     public static final String PHONE_REMOVE = "phone_remove";
+    public static final String ITEM_KEY = "item_key";
+    public static final String COMMENT_KEY = "comment_item_key";
 
     public static final String PRIVACY_VIEW = "privacy_view";
     public static final String PRIVACY_UPDATE_PERMISSION = "privacy_update_permission";

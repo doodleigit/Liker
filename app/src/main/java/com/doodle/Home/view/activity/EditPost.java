@@ -277,7 +277,6 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 
         editPostItem = new PostItem();
         editPostItem = getIntent().getExtras().getParcelable(TextHolder.ITEM_KEY);
-        int pos = App.getPosition();
 
         if (editPostItem == null) {
             throw new AssertionError("Null data item received!");

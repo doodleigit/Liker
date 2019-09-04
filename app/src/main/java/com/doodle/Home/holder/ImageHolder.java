@@ -258,27 +258,9 @@ public class ImageHolder extends RecyclerView.ViewHolder {
 
         LayoutInflater inflater = LayoutInflater.from(mContext);
         dynamicMediaFrame.removeAllViews();
-
-        if (!isPopup) {
-
-            GalleryAdapter.RecyclerViewClickListener listener = (view, posit) -> {
-
-            };
-
-            View wizardView = inflater
-                    .inflate(mediaFrames.get(0).getLayout(), dynamicMediaFrame, false);
-            dynamicMediaFrame.addView(wizardView);
-            GalleryAdapter galleryAdapter = new GalleryAdapter(mContext,item.getPostFiles(),listener);
-            singleImgRecyclerView.setVisibility(View.VISIBLE);
-            singleImgRecyclerView.setAdapter(galleryAdapter);
-
-        } else {
-            singleImgRecyclerView.setVisibility(View.GONE);
-            View wizardView = inflater
-                    .inflate(mediaFrames.get(item.getFrameNumber()).getLayout(), dynamicMediaFrame, false);
-            dynamicMediaFrame.addView(wizardView);
-        }
-
+        View wizardView = inflater
+                .inflate(mediaFrames.get(item.getFrameNumber()).getLayout(), dynamicMediaFrame, false);
+        dynamicMediaFrame.addView(wizardView);
 
         imageMediaOne = itemView.findViewById(R.id.media_image_one);
         imageMediaTwo = itemView.findViewById(R.id.media_image_two);
@@ -331,20 +313,16 @@ public class ImageHolder extends RecyclerView.ViewHolder {
                 break;
         }
 
-
-        if (isPopup) {
-            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent intent = new Intent(mContext, PostPopup.class);
-                    intent.putExtra(ITEM_KEY, (Parcelable) item);
-                    App.setIsImagePopup(true);
-                    mContext.startActivity(intent);
-                    ((Activity) mContext).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
-                }
-            });
-        }
-
+        dynamicMediaFrame.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(mContext, PostPopup.class);
+                intent.putExtra(ITEM_KEY, (Parcelable) item);
+                App.setIsImagePopup(true);
+                mContext.startActivity(intent);
+//                ((Activity) mContext).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
+            }
+        });
 
         imgLike.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -732,7 +710,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
                     popupMenu.getMenu().findItem(R.id.onlyMe).setVisible(true);
                     popupMenu.getMenu().findItem(R.id.edit).setVisible(true);
                     popupMenu.getMenu().findItem(R.id.delete).setVisible(true);
-                  //  popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(true);
+                    //  popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(true);
                 } else {
                     popupMenu.getMenu().findItem(R.id.blockedUser).setVisible(true);
                     popupMenu.getMenu().findItem(R.id.reportedPost).setVisible(true);
@@ -741,7 +719,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
                     popupMenu.getMenu().findItem(R.id.onlyMe).setVisible(false);
                     popupMenu.getMenu().findItem(R.id.edit).setVisible(false);
                     popupMenu.getMenu().findItem(R.id.delete).setVisible(false);
-                  // v  popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(true);
+                    // v  popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(true);
                 }
 
 
