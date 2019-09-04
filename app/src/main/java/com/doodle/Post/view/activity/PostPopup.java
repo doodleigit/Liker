@@ -52,7 +52,7 @@ public class PostPopup extends AppCompatActivity
             throw new AssertionError("Null data item received!");
         }
 
-        adapter = new PostAdapter(this, postItemList, this, this, this, this, this, this);
+        adapter = new PostAdapter(this, postItemList, this, this, this, this, this, this, false);
         rvPopupPost.setAdapter(adapter);
 
     }

@@ -4,9 +4,11 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.StrictMode;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -24,6 +26,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.doodle.App;
+import com.doodle.Authentication.model.LoginUser;
+import com.doodle.Authentication.model.UserInfo;
 import com.doodle.Authentication.service.AuthService;
 import com.doodle.Home.view.activity.Home;
 import com.doodle.R;
@@ -31,6 +35,7 @@ import com.doodle.Tool.AppConstants;
 import com.doodle.Tool.NetworkHelper;
 import com.doodle.Tool.PrefManager;
 import com.doodle.Tool.Tools;
+import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -47,6 +52,8 @@ import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
 import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
+
+import static com.doodle.Tool.AppConstants.POST_IMAGES;
 
 public class MyTwitter extends AppCompatActivity implements View.OnClickListener {
 
@@ -326,41 +333,48 @@ public class MyTwitter extends AppCompatActivity implements View.OnClickListener
         AuthService webService =
                 AuthService.retrofitBase.create(AuthService.class);
 
-        Call<String> call = webService.socialLogin(appSocialAccessCode, oauthProvider, oauthId, deviceId);
+        Call<LoginUser> call = webService.socialLogin(appSocialAccessCode, oauthProvider, oauthId, deviceId);
         sendRequest(call);
 
     }
 
-    private void sendRequest(Call<String> call) {
-        call.enqueue(new Callback<String>() {
+    private void sendRequest(Call<LoginUser> call) {
+        call.enqueue(new Callback<LoginUser>() {
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
+            public void onResponse(Call<LoginUser> call, Response<LoginUser> response) {
+                LoginUser loginUser = response.body();
+                boolean status = loginUser.isStatus();
+                if (status) {
+                    String mToken = loginUser.getToken();
+                    manager.setToken(mToken);
+                    UserInfo userInfo = loginUser.getUserInfo();
+                    Gson gson = new Gson();
+                    String json = gson.toJson(userInfo);
+                    manager.setUserInfo(json);
+                    String profileName = userInfo.getFirstName() + " " + userInfo.getLastName();
+                    String userName = userInfo.getUserName();
+                    String photo = userInfo.getPhoto();
+                    App.setProfilePhoto(photo);
+                    String profileId = userInfo.getUserId();
+                    manager.setProfileName(profileName);
+                    manager.setProfileImage(POST_IMAGES + photo);
+                    manager.setProfileId(profileId);
+                    manager.setUserName(userName);
+                    Intent intent = new Intent(MyTwitter.this, Home.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                } else {
+                    App.setIsTwitterLogin(status);
+                    App.setIsFBLogin(true);
+                    startActivity(new Intent(MyTwitter.this, Signup.class));
+                    finish();
 
-
-                String loginUser = response.body();
-                try {
-                    JSONObject object = new JSONObject(loginUser);
-                    boolean status = object.getBoolean("status");
-                    if (status) {
-                        Log.d("LoginUser:", loginUser);
-                     //   startActivity(new Intent(MyTwitter.this, Liker.class));
-                        startActivity(new Intent(MyTwitter.this, Home.class));
-                        finish();
-                    } else {
-                        App.setIsTwitterLogin(status);
-                        App.setIsFBLogin(true);
-                        startActivity(new Intent(MyTwitter.this, Signup.class));
-                        finish();
-
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
                 }
 
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
+            public void onFailure(Call<LoginUser> call, Throwable t) {
 
             }
         });

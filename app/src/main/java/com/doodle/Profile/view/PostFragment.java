@@ -430,8 +430,8 @@ public class PostFragment extends Fragment {
                 //  comments = commentItem.getComments();
                 Log.d("commentItem", commentItem.toString());
                 if (postItemList != null) {
-                    adapter = new PostAdapter(getActivity(), postItemList, mCallback, mimListener, videoListener, youtubeListener, linkListener, imageListener);
-                    offset += 5;
+                    adapter = new PostAdapter(getActivity(), postItemList, mCallback, mimListener, videoListener, youtubeListener, linkListener, imageListener, true);
+                    offset = limit;
 
                     recyclerView.setVisibility(View.VISIBLE);
                     recyclerView.setMediaObjects(postItemList);

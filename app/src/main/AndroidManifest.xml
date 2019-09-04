@@ -110,18 +110,6 @@
             android:parentActivityName=".Authentication.view.activity.Signup"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".Authentication.view.activity.Contact"
-            android:parentActivityName=".Authentication.view.activity.About"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".Authentication.view.activity.Privacy"
-            android:parentActivityName=".Authentication.view.activity.About"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".Authentication.view.activity.TermService"
-            android:parentActivityName=".Authentication.view.activity.About"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity
             android:name=".Authentication.view.activity.About"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity

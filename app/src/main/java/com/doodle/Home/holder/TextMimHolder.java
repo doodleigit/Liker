@@ -144,6 +144,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
     private boolean notificationOff;
     private String postPermissions;
     private boolean notificationStatus;
+    private boolean isPopup;
 
 
     //Delete post
@@ -155,10 +156,11 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
     }
 
 
-    public TextMimHolder(View itemView, Context context, PostItemListener mimListener) {
+    public TextMimHolder(View itemView, Context context, PostItemListener mimListener, boolean isPopup) {
         super(itemView);
         mContext = context;
         this.listener = mimListener;
+        this.isPopup = isPopup;
         callbackManager = CallbackManager.Factory.create();
         shareDialog = new ShareDialog((Activity) context);
         manager = new PrefManager(App.getAppContext());

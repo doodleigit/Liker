@@ -125,7 +125,7 @@ public interface AuthService {
 
     @POST(AppConstants.SOCIAL_LOGIN_APPS)
     @FormUrlEncoded
-    Call<String> socialLogin(
+    Call<LoginUser> socialLogin(
             @Field("app_social_access_code") String appSocialAccessCode,
             @Field("oauth_provider") String oauthProvider,
             @Field("oauth_id") String oauthId,

@@ -407,7 +407,7 @@ public class StarFragment extends Fragment {
                 //  comments = commentItem.getComments();
                 Log.d("commentItem", commentItem.toString());
                 if (postItemList != null) {
-                    adapter = new PostAdapter(getActivity(), postItemList, mCallback, mimListener, videoListener, youtubeListener, linkListener, imageListener);
+                    adapter = new PostAdapter(getActivity(), postItemList, mCallback, mimListener, videoListener, youtubeListener, linkListener, imageListener, true);
                     offset += 5;
                     progressDialog.hide();
 

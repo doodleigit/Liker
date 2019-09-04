@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -73,12 +74,13 @@ public class TrendingPost extends Fragment   {
     private CircularProgressView progressView;
     //  private PostAdapter adapter;
     private PostAdapter adapter;
+    private SwipeRefreshLayout refreshLayout;
     private VideoPlayerRecyclerView recyclerView;
     private LinearLayoutManager layoutManager;
     private int totalItems;
     private int scrollOutItems;
     private int currentItems;
-    private boolean isScrolling;
+    private boolean isScrolling, isPaginationDone = true;
     int limit = 5;
     int offset = 0;
     private String catIds = "";
@@ -132,10 +134,19 @@ public class TrendingPost extends Fragment   {
         layoutManager = new LinearLayoutManager(getActivity());
         progressView = (CircularProgressView) root.findViewById(R.id.progress_view);
         shimmerFrameLayout = (ShimmerFrameLayout) root.findViewById(R.id.shimmer_view_post_container);
+        refreshLayout = root.findViewById(R.id.refreshLayout);
         recyclerView = root.findViewById(R.id.rvBreakingPost);
         recyclerView.setLayoutManager(layoutManager);
 
         getData();
+
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                offset = 0;
+                getData();
+            }
+        });
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -153,8 +164,9 @@ public class TrendingPost extends Fragment   {
                 scrollOutItems = layoutManager.findFirstVisibleItemPosition();
                 totalItems = layoutManager.getItemCount();
 
-                if (isScrolling && (currentItems + scrollOutItems == totalItems)) {
+                if (isScrolling && isPaginationDone && (currentItems + scrollOutItems == totalItems)) {
                     isScrolling = false;
+                    isPaginationDone = false;
                     PerformPagination();
                 }
 
@@ -354,6 +366,7 @@ public class TrendingPost extends Fragment   {
                 Log.d("MESSAGE: ", t.getMessage());
                 progressView.setVisibility(View.GONE);
                 progressView.stopAnimation();
+                isPaginationDone = true;
             }
         });
     }
@@ -375,6 +388,7 @@ public class TrendingPost extends Fragment   {
                     progressView.setVisibility(View.GONE);
                     progressView.stopAnimation();
                 }
+                isPaginationDone = true;
 
             }
 
@@ -383,6 +397,7 @@ public class TrendingPost extends Fragment   {
                 Log.d("MESSAGE: ", t.getMessage());
                 progressView.setVisibility(View.GONE);
                 progressView.stopAnimation();
+                isPaginationDone = true;
             }
         });
     }
@@ -434,6 +449,8 @@ public class TrendingPost extends Fragment   {
                     //  Log.d("PostItem: ", categoryItem.toString() + "");
                     progressView.setVisibility(View.GONE);
                     progressView.stopAnimation();
+                } else {
+                    refreshLayout.setRefreshing(false);
                 }
 
             }
@@ -443,6 +460,7 @@ public class TrendingPost extends Fragment   {
                 Log.d("MESSAGE: ", t.getMessage());
                 progressView.setVisibility(View.GONE);
                 progressView.stopAnimation();
+                refreshLayout.setRefreshing(false);
                 ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(0);
             }
         });
@@ -460,7 +478,8 @@ public class TrendingPost extends Fragment   {
                 comments = commentItem.getComments();
                 Log.d("commentItem", commentItem.toString());
                 if (postItemList != null && comments != null) {
-                    adapter = new PostAdapter(getActivity(), postItemList, mCallback, mimListener,videoListener,youtubeListener,linkListener,imageListener);
+                    adapter = new PostAdapter(getActivity(), postItemList, mCallback, mimListener,videoListener,youtubeListener,linkListener,imageListener, true);
+                    offset = limit;
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
@@ -483,7 +502,7 @@ public class TrendingPost extends Fragment   {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
+                refreshLayout.setRefreshing(false);
             }
 
             @Override
@@ -491,6 +510,7 @@ public class TrendingPost extends Fragment   {
                 Log.d("MESSAGE: ", t.getMessage());
                 progressView.setVisibility(View.GONE);
                 progressView.stopAnimation();
+                refreshLayout.setRefreshing(false);
                 ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(0);
             }
         });

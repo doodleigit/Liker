@@ -20,6 +20,7 @@ import android.text.util.Linkify;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -49,6 +50,7 @@ import com.doodle.Home.model.postshare.PostShareItem;
 import com.doodle.Home.service.HomeService;
 import com.doodle.Home.view.activity.EditPost;
 import com.doodle.Home.view.activity.PostShare;
+import com.doodle.Post.view.activity.PostPopup;
 import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.R;
 import com.doodle.Tool.AppConstants;
@@ -143,17 +145,18 @@ public class ImageHolder extends RecyclerView.ViewHolder {
     private RecyclerView singleImgRecyclerView;
     //Delete post
     public PostItemListener listener;
+    private boolean isPopup;
 
     public interface PostItemListener {
         void deletePost(PostItem postItem, int position);
-
     }
 
-    public ImageHolder(View itemView, Context context, PostItemListener listener) {
+    public ImageHolder(View itemView, Context context, PostItemListener listener, boolean isPopup) {
         super(itemView);
 
         mContext = context;
         this.listener = listener;
+        this.isPopup = isPopup;
         callbackManager = CallbackManager.Factory.create();
         shareDialog = new ShareDialog((Activity) context);
         manager = new PrefManager(App.getAppContext());
@@ -249,7 +252,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
         LayoutInflater inflater = LayoutInflater.from(mContext);
         dynamicMediaFrame.removeAllViews();
 
-        if (App.isIsImagePopup()) {
+        if (!isPopup) {
 
             GalleryAdapter.RecyclerViewClickListener listener = (view, posit) -> {
 
@@ -263,6 +266,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
             singleImgRecyclerView.setAdapter(galleryAdapter);
 
         } else {
+            singleImgRecyclerView.setVisibility(View.GONE);
             View wizardView = inflater
                     .inflate(mediaFrames.get(item.getFrameNumber()).getLayout(), dynamicMediaFrame, false);
             dynamicMediaFrame.addView(wizardView);
@@ -321,23 +325,18 @@ public class ImageHolder extends RecyclerView.ViewHolder {
         }
 
 
-//        if (!App.isIsImagePopup()) {
-//
-//
-//            viewHolder.itemView.setOnTouchListener(new View.OnTouchListener() {
-//                @Override
-//                public boolean onTouch(View v, MotionEvent event) {
-//
-//
-//                    Intent intent = new Intent(mContext, PostPopup.class);
-//                    intent.putExtra(ITEM_KEY, (Parcelable) item);
-//                    App.setIsImagePopup(true);
-//                    mContext.startActivity(intent);
-//                    ((Activity) mContext).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
-//                    return false;
-//                }
-//            });
-//        }
+        if (isPopup) {
+            viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent intent = new Intent(mContext, PostPopup.class);
+                    intent.putExtra(ITEM_KEY, (Parcelable) item);
+                    App.setIsImagePopup(true);
+                    mContext.startActivity(intent);
+                    ((Activity) mContext).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
+                }
+            });
+        }
 
 
         tvCommentLike.setOnClickListener(new View.OnClickListener() {

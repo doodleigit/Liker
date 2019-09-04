@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
@@ -13,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.doodle.Profile.adapter.AlbumAdapter;
@@ -128,6 +130,19 @@ public class PhotosFragment extends Fragment {
                 dialog.dismiss();
             }
         });
+
+        dialog.show();
+    }
+
+    private void showSingleMedia(PhotoAlbum photoAlbum) {
+        Dialog dialog = new Dialog(getActivity(), R.style.Theme_Dialog);
+        dialog.setContentView(R.layout.popup_single_media_layout);
+
+        ViewPager viewpager = dialog.findViewById(R.id.viewpager);
+        ImageView close, leftSlide, rightSlide;
+        close = dialog.findViewById(R.id.close);
+        leftSlide = dialog.findViewById(R.id.left_slide);
+        rightSlide = dialog.findViewById(R.id.right_slide);
 
         dialog.show();
     }

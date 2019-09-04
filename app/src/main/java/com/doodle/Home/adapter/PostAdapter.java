@@ -38,6 +38,7 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public LinkScriptYoutubeHolder.PostItemListener YoutubeListener;
     public LinkScriptHolder.PostItemListener LinkListener;
     public ImageHolder.PostItemListener imageListener;
+    private boolean isPopup;
 
 
     public PostAdapter(Context context, List<PostItem> postItems,
@@ -46,7 +47,8 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                        VideoHolder.PostItemListener videoListener,
                        LinkScriptYoutubeHolder.PostItemListener YoutubeListener,
                        LinkScriptHolder.PostItemListener LinkListener,
-                       ImageHolder.PostItemListener imageListener
+                       ImageHolder.PostItemListener imageListener,
+                       boolean isPopup
     ) {
         this.mContext = context;
         this.postItems = postItems;
@@ -56,6 +58,7 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         this.YoutubeListener = YoutubeListener;
         this.LinkListener = LinkListener;
         this.imageListener = imageListener;
+        this.isPopup = isPopup;
     }
 
 
@@ -64,16 +67,16 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         View view;
         if (viewType == VIEW_TYPE_TEXT) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_post_text, parent, false);
-            return new TextHolder(view, mContext, listener);
+            return new TextHolder(view, mContext, listener, isPopup);
         }
 
         if (viewType == VIEW_TYPE_TEX_MIM) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_post_text_mim, parent, false);
-            return new TextMimHolder(view, mContext, mimListener);
+            return new TextMimHolder(view, mContext, mimListener, isPopup);
         }
         if (viewType == VIEW_TYPE_TEXT_IMAGE) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_post_image, parent, false);
-            return new ImageHolder(view, mContext, imageListener);
+            return new ImageHolder(view, mContext, imageListener, isPopup);
         }
         if (viewType == VIEW_TYPE_TEXT_LINK_SCRIPT) {
 

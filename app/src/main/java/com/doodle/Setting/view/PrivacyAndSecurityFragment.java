@@ -179,6 +179,7 @@ public class PrivacyAndSecurityFragment extends Fragment {
         friendRequestPrivacyLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                isFirstTime = false;
                 friendRequestSpinner.performClick();
             }
         });
@@ -186,6 +187,7 @@ public class PrivacyAndSecurityFragment extends Fragment {
         postOnWallPrivacyLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                isFirstTime = false;
                 postOnWallSpinner.performClick();
             }
         });
@@ -193,6 +195,7 @@ public class PrivacyAndSecurityFragment extends Fragment {
         friendListPrivacyLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                isFirstTime = false;
                 friendListSpinner.performClick();
             }
         });
@@ -200,6 +203,7 @@ public class PrivacyAndSecurityFragment extends Fragment {
         photosPrivacyLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                isFirstTime = false;
                 photosSpinner.performClick();
             }
         });
@@ -207,6 +211,7 @@ public class PrivacyAndSecurityFragment extends Fragment {
         messagePrivacyLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                isFirstTime = false;
                 messageSpinner.performClick();
             }
         });
@@ -266,6 +271,12 @@ public class PrivacyAndSecurityFragment extends Fragment {
     }
 
     private void setData() {
+        friendRequestSpinner.setSelection(Integer.valueOf(privacyInfo.getPermissions().getFriendSendPermission()));
+        postOnWallSpinner.setSelection(Integer.valueOf(privacyInfo.getPermissions().getWallPermission()));
+        friendListSpinner.setSelection(Integer.valueOf(privacyInfo.getPermissions().getFriendSeePermission()));
+        photosSpinner.setSelection(Integer.valueOf(privacyInfo.getPermissions().getPhotosSeePermission()));
+        messageSpinner.setSelection(Integer.valueOf(privacyInfo.getPermissions().getMessageSendPermission()));
+
         ivFriendRequestPrivacyIcon.setImageResource(getTwoTypePrivacyDrawable(privacyInfo.getPermissions().getFriendSendPermission()));
         ivPostOnWallPrivacyIcon.setImageResource(getThreeTypePrivacyDrawable(privacyInfo.getPermissions().getWallPermission()));
         ivFriendListPrivacyIcon.setImageResource(getThreeTypePrivacyDrawable(privacyInfo.getPermissions().getFriendSeePermission()));
@@ -333,8 +344,6 @@ public class PrivacyAndSecurityFragment extends Fragment {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 if (!isFirstTime)
                     sendPrivacyAndSecuritySettingRequest("message_send_permission", String.valueOf(i), ivMessagePrivacyIcon, getThreeTypePrivacyDrawable(String.valueOf(i)));
-                else
-                    isFirstTime = false;
             }
 
             @Override
