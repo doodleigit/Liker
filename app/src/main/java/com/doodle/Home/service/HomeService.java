@@ -174,7 +174,27 @@ public interface HomeService {
     );
 
 
+    @POST(AppConstants.POST_LIKE)
+    @FormUrlEncoded
+    Call<String> postLike(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("user_id") String userIds,
+            @Field("post_userid") String postUserId,
+            @Field("post_id") String postId
+    );
 
+    @POST(AppConstants.POST_UNLIKE)
+    @FormUrlEncoded
+    Call<String> postUnlike(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("user_id") String userIds,
+            @Field("post_userid") String postUserId,
+            @Field("post_id") String postId
+    );
 
 
 }

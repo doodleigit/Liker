@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.MenuBuilder;
@@ -45,7 +46,12 @@ import com.doodle.Comment.model.Reason;
 import com.doodle.Comment.model.ReportReason;
 import com.doodle.Comment.service.CommentService;
 import com.doodle.Comment.view.activity.CommentPost;
+import com.doodle.Comment.view.fragment.BlockUserDialog;
+import com.doodle.Comment.view.fragment.FollowSheet;
+import com.doodle.Comment.view.fragment.ReportLikerMessageSheet;
+import com.doodle.Comment.view.fragment.ReportPersonMessageSheet;
 import com.doodle.Comment.view.fragment.ReportReasonSheet;
+import com.doodle.Comment.view.fragment.ReportSendCategorySheet;
 import com.doodle.Home.adapter.GalleryAdapter;
 import com.doodle.Home.holder.ImageHolder;
 import com.doodle.Home.model.MediaFrame;
@@ -56,6 +62,7 @@ import com.doodle.Home.model.postshare.PostShareItem;
 import com.doodle.Home.service.HomeService;
 import com.doodle.Home.service.SingleVideoPlayerRecyclerView;
 import com.doodle.Home.view.activity.EditPost;
+import com.doodle.Home.view.activity.Home;
 import com.doodle.Home.view.activity.PostShare;
 import com.doodle.Post.view.activity.PostPopup;
 import com.doodle.Profile.view.ProfileActivity;
@@ -91,6 +98,7 @@ import static com.doodle.Tool.Tools.containsIllegalCharacters;
 import static com.doodle.Tool.Tools.delayLoadComment;
 import static com.doodle.Tool.Tools.dismissDialog;
 import static com.doodle.Tool.Tools.getSpannableStringBuilder;
+import static com.doodle.Tool.Tools.isEmpty;
 import static com.doodle.Tool.Tools.isNullOrEmpty;
 import static com.doodle.Tool.Tools.sendNotificationRequest;
 import static com.doodle.Tool.Tools.showBlockUser;
@@ -129,6 +137,7 @@ public class MultipleMediaPopUpFragment extends Fragment {
 
     //Delete post
     public ImageHolder.PostItemListener listener;
+    private String blockUserId;
 
     @Nullable
     @Override
@@ -215,6 +224,7 @@ public class MultipleMediaPopUpFragment extends Fragment {
         };
 
         galleryAdapter = new GalleryAdapter(getActivity(), item.getPostFiles(), listener);
+        singleImgRecyclerView.setMediaObjects(item.getPostFiles());
         singleImgRecyclerView.setAdapter(galleryAdapter);
     }
 
@@ -793,5 +803,8 @@ public class MultipleMediaPopUpFragment extends Fragment {
             }
         });
     }
+
+    String reportId;
+
 
 }

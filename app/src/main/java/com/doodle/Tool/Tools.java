@@ -910,6 +910,9 @@ public class Tools {
 
     }
 
+    public static boolean isContain(JSONObject jsonObject,String key){
 
+        return jsonObject != null&& jsonObject.has(key) && !jsonObject.isNull(key) ? true:false;
+    }
 
 }

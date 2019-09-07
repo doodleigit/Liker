@@ -97,6 +97,8 @@ public class AppConstants {
     public static final String EDIT_COMMENT_REPLY = "edit_comment_reply";
     public static final String DELETE_POST_COMMENT = "delete_postcomment";
     public static final String DELETE_COMMENT_REPLY = "delete_comment_reply";
+    public static final String COMMENT_LIKE= "comment_like";
+    public static final String COMMENT_UNLIKE= "comment_unlike";
     public static final String GET_REPORT_REASON = "get_report_reason";
     public static final String REPORT_USER = "reportUser";
     public static final String UN_FOLLOW = "unfollow";
@@ -111,6 +113,9 @@ public class AppConstants {
     public static final String POST_NOTIFICATION_TURN_OFF = "post_notification_turn_off";
     public static final String POST_NOTIFICATION_TURN_ON = "post_notification_turn_on";
     public static final String POST_DELETE = "post_delete";
+    public static final String POST_LIKE = "post_like";
+    public static final String POST_UNLIKE = "post_unlike";
+
 
     public static final String NEW_MESSAGE_BROADCAST = "new_message_broadcast";
     public static final String NEW_MESSAGE_BROADCAST_FROM_HOME = "new_message_broadcast_from_home";

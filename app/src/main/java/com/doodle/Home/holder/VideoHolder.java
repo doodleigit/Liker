@@ -123,7 +123,7 @@ public class VideoHolder extends RecyclerView.ViewHolder {
     RelativeLayout commentHold;
     private String commentText, commentUserName, commentUserImage, commentImage, commentTime;
     public EmojiTextView tvCommentMessage;
-    public ImageView imagePostCommenting, imageCommentLikeThumb, imageCommentSettings, imagePostComment;
+    public ImageView imagePostCommenting, imageCommentLikeThumb, imagePostComment;
     public CircleImageView imageCommentUser;
     public TextView tvCommentUserName, tvCommentTime, tvCommentLike, tvCommentReply, tvCountCommentLike;
     private String userPostId;
@@ -212,7 +212,6 @@ public class VideoHolder extends RecyclerView.ViewHolder {
         commentHold = (RelativeLayout) itemView.findViewById(R.id.commentHold);
         imagePostCommenting = itemView.findViewById(R.id.imagePostCommenting);
         imageCommentLikeThumb = itemView.findViewById(R.id.imageCommentLikeThumb);
-        imageCommentSettings = itemView.findViewById(R.id.imageCommentSettings);
         imageCommentUser = itemView.findViewById(R.id.imageCommentUser);
         tvCommentUserName = itemView.findViewById(R.id.tvCommentUserName);
         tvCommentTime = itemView.findViewById(R.id.tvCommentTime);
@@ -768,60 +767,7 @@ public class VideoHolder extends RecyclerView.ViewHolder {
 
             }
         });
-        imageCommentSettings.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("RestrictedApi")
-            @Override
-            public void onClick(View v) {
 
-                popupCommentMenu = new PopupMenu(mContext, v);
-                popupCommentMenu.getMenuInflater().inflate(R.menu.post_comment_menu, popupCommentMenu.getMenu());
-
-                if (userPostId.equalsIgnoreCase(commentPostId)) {
-                    popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(false);
-                    popupCommentMenu.getMenu().findItem(R.id.blockUser).setVisible(false);
-                    popupCommentMenu.getMenu().findItem(R.id.editComment).setVisible(true);
-                    popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(true);
-                } else {
-                    popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(true);
-                    popupCommentMenu.getMenu().findItem(R.id.blockUser).setVisible(true);
-                    popupCommentMenu.getMenu().findItem(R.id.editComment).setVisible(false);
-                    popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(false);
-                }
-
-
-//                popup.show();
-                MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popupCommentMenu.getMenu(), v);
-                menuHelper.setForceShowIcon(true);
-                menuHelper.show();
-
-                popupCommentMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem menuItem) {
-                        int id = menuItem.getItemId();
-
-                        if (id == R.id.reportComment) {
-
-                            Toast.makeText(App.getAppContext(), "reportComment : ", Toast.LENGTH_SHORT).show();
-                        }
-
-                        if (id == R.id.blockUser) {
-                            Toast.makeText(App.getAppContext(), "blockUser : ", Toast.LENGTH_SHORT).show();
-                        }
-                        if (id == R.id.editComment) {
-                            Toast.makeText(App.getAppContext(), "editComment : ", Toast.LENGTH_SHORT).show();
-
-                        }
-
-                        if (id == R.id.deleteComment) {
-                            Toast.makeText(App.getAppContext(), "deleteComment : ", Toast.LENGTH_SHORT).show();
-                        }
-
-                        return true;
-                    }
-                });
-
-            }
-        });
 
         imagePostComment.setOnClickListener(new View.OnClickListener() {
             @Override
