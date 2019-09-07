@@ -18,6 +18,19 @@ public class Comment_ implements Serializable, Parcelable {
     @SerializedName("id")
     @Expose
     private String id;
+
+    @SerializedName("replyId")
+    @Expose
+    private String replyId;
+
+    @SerializedName("commentId")
+    @Expose
+    private String commentId;
+
+    @SerializedName("totalReplyLike")
+    @Expose
+    private String totalReplyLike;
+
     @SerializedName("insert_id")
     @Expose
     private int insertId;
@@ -96,7 +109,29 @@ public class Comment_ implements Serializable, Parcelable {
     @Expose
     private boolean status;
 
+    public String getCommentId() {
+        return commentId;
+    }
 
+    public void setCommentId(String commentId) {
+        this.commentId = commentId;
+    }
+
+    public String getTotalReplyLike() {
+        return totalReplyLike;
+    }
+
+    public void setTotalReplyLike(String totalReplyLike) {
+        this.totalReplyLike = totalReplyLike;
+    }
+
+    public String getReplyId() {
+        return replyId;
+    }
+
+    public void setReplyId(String replyId) {
+        this.replyId = replyId;
+    }
 
     public final static Creator<Comment_> CREATOR = new Creator<Comment_>() {
 
@@ -381,6 +416,7 @@ public class Comment_ implements Serializable, Parcelable {
         dest.writeList(replies);
         dest.writeList(mentionInsertData);
         dest.writeValue(status);
+
 
     }
 

@@ -12,6 +12,8 @@ import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.view.menu.MenuPopupHelper;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.text.SpannableString;
+import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -39,6 +41,9 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.vanniktech.emoji.EmojiTextView;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +54,7 @@ import retrofit2.Response;
 
 import static com.doodle.Tool.AppConstants.PROFILE_IMAGE;
 import static com.doodle.Tool.Tools.delayLoadComment;
+import static com.doodle.Tool.Tools.isContain;
 import static com.doodle.Tool.Tools.isNullOrEmpty;
 import static java.lang.Integer.parseInt;
 
@@ -102,6 +108,8 @@ public class CommentLinkScriptHolder extends RecyclerView.ViewHolder {
     Reply itemReply;
     List<Reply> replyItem;
 
+    private String commentLike;
+    private int commentLikeNumeric;
 
     //EDIT COMMENT
     CommentListener listener;
@@ -189,6 +197,7 @@ public class CommentLinkScriptHolder extends RecyclerView.ViewHolder {
 
     int goldStar;
     int silverStar;
+    AppCompatActivity activity;
 
     public void setItem(Comment_ commentItem, PostItem postItem, int position) {
 
@@ -229,22 +238,77 @@ public class CommentLinkScriptHolder extends RecyclerView.ViewHolder {
                     .into(imagePostCommenting);
         }
 
+        if ("0".equalsIgnoreCase(commentLike)) {
+            tvCountCommentLike.setText("");
+            imageCommentLikeThumb.setVisibility(View.GONE);
+            tvCountCommentLike.setVisibility(View.GONE);
+        } else {
+            imageCommentLikeThumb.setVisibility(View.VISIBLE);
+            tvCountCommentLike.setVisibility(View.VISIBLE);
+            tvCountCommentLike.setText(commentLike);
+        }
+
+
 
         tvCommentLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if (tvCountCommentLike.getText().toString().isEmpty()) {
-                    imageCommentLikeThumb.setVisibility(View.VISIBLE);
-                    tvCountCommentLike.setVisibility(View.VISIBLE);
-                    tvCountCommentLike.setText("1");
+
+                if (!isNullOrEmpty(commentItem.getReplyId())) {
+
+                    if (commentItem.isLikeUserStatus()) {
+
+                        if (networkOk) {
+                            Call<String> call = commentService.unLikeCommentReply(deviceId, profileId, token, commentItem.getCommentId(), commentItem.getReplyId(), commentItem.getPostId(), profileId);
+                            sendUnLikeCommentReplyRequest(call);
+                        } else {
+                            Tools.showNetworkDialog(activity.getSupportFragmentManager());
+                        }
+
+                    } else {
+                        if (networkOk) {
+                            Call<String> call = commentService.likeCommentReply(deviceId, profileId, token, commentItem.getCommentId(), commentItem.getReplyId(), commentItem.getPostId(), profileId);
+                            sendLikeCommentReplyRequest(call);
+                        } else {
+                            Tools.showNetworkDialog(activity.getSupportFragmentManager());
+
+                        }
+                    }
+
+
                 } else {
-                    tvCountCommentLike.setText("");
-                    imageCommentLikeThumb.setVisibility(View.GONE);
-                    tvCountCommentLike.setVisibility(View.GONE);
+
+                    if (commentItem.isLikeUserStatus()) {
+
+                        if (networkOk) {
+
+                            Call<String> call = commentService.commentUnLike(deviceId, profileId, token, commentItem.getId(), profileId);
+                            sendCommentUnLikeRequest(call);
+
+                        } else {
+                            Tools.showNetworkDialog(activity.getSupportFragmentManager());
+                        }
+
+                    } else {
+                        if (networkOk) {
+
+                            Call<String> call = commentService.commentLike(deviceId, profileId, token, commentItem.getId(), userIds);
+                            sendCommentLikeRequest(call);
+
+                        } else {
+                            Tools.showNetworkDialog(activity.getSupportFragmentManager());
+                        }
+                    }
+
                 }
+
+
+                //commentLike
+
             }
         });
+
 
 
         if (silverStar > 8) {
@@ -492,6 +556,276 @@ public class CommentLinkScriptHolder extends RecyclerView.ViewHolder {
 
     }
 
+    private void sendLikeCommentReplyRequest(Call<String> call) {
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        try {
+                            JSONObject object = new JSONObject(response.body());
+                            if (isContain(object, "status")) {
+                                String status = object.getString("status");
+                                if ("true".equalsIgnoreCase(status)) {
+
+                                    Call<String> mCall = webService.sendBrowserNotification(
+                                            deviceId,//"8b64708fa409da20341b1a555d1ddee526444",
+                                            profileId,//"26444",
+                                            token,// "5d199fc8529c2$2y$10$C9mvDyOEhJ2Nc/e4Ji4gVOivCvaO4OBobPW2ky4oftvVniCZ8hKzuJhxEGIHYSCprmWSJ1rd4hGHDEqUNRAwAR4fxMWwEyV6VSZEU",
+                                            commentItem.getUserId(),//"26444",
+                                            userIds,//"26444",
+                                            commentItem.getPostId(),
+                                            "like_comment"
+                                    );
+                                    sendBrowserNotificationRequest(mCall);
+
+                                    commentLikeNumeric = Integer.parseInt(commentLike);
+                                    commentLikeNumeric++;
+                                    commentLike = String.valueOf(commentLikeNumeric);
+
+
+                                    SpannableString content = new SpannableString(String.valueOf(commentLikeNumeric));
+                                    content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+                                    imageCommentLikeThumb.setVisibility(View.VISIBLE);
+                                    tvCountCommentLike.setVisibility(View.VISIBLE);
+                                    tvCountCommentLike.setText(content);
+
+                                }
+                            }
+
+                            if (isContain(object, "error")) {
+                                if ("You could not liked your own post".equalsIgnoreCase(object.getString("error"))) {
+                                    Tools.toast(mContext, "You could not liked your own post", R.drawable.ic_info_outline_blue_24dp);
+                                } else {
+                                    Call<String> mCall = commentService.commentUnLike(deviceId, profileId, token, commentItem.getId(), profileId);
+                                    sendCommentUnLikeRequest(mCall);
+                                }
+
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Log.i("onSuccess", response.body().toString());
+                    } else {
+                        Log.i("onEmptyResponse", "Returned empty response");
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private void sendUnLikeCommentReplyRequest(Call<String> call) {
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        try {
+                            JSONObject object = new JSONObject(response.body());
+
+                            if (isContain(object, "status")) {
+                                String status = object.getString("status");
+                                if ("true".equalsIgnoreCase(status)) {
+                                    commentLikeNumeric = Integer.parseInt(commentLike);
+                                    commentLikeNumeric--;
+                                    commentLike = String.valueOf(commentLikeNumeric);
+
+                                    if (0 == commentLikeNumeric) {
+                                        tvCountCommentLike.setText("");
+                                        imageCommentLikeThumb.setVisibility(View.GONE);
+                                        tvCountCommentLike.setVisibility(View.GONE);
+                                    } else {
+                                        SpannableString content = new SpannableString(String.valueOf(commentLikeNumeric));
+                                        content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+                                        imageCommentLikeThumb.setVisibility(View.VISIBLE);
+                                        tvCountCommentLike.setVisibility(View.VISIBLE);
+                                        tvCountCommentLike.setText(content);
+                                    }
+                                }
+
+
+                            }
+
+                            if (isContain(object, "error")) {
+                                Call<String> mCall = commentService.commentLike(deviceId, profileId, token, commentItem.getId(), userIds);
+                                sendCommentLikeRequest(mCall);
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Log.i("onSuccess", response.body().toString());
+                    } else {
+                        Log.i("onEmptyResponse", "Returned empty response");
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private void sendCommentUnLikeRequest(Call<String> call) {
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        try {
+                            JSONObject object = new JSONObject(response.body());
+
+                            if (isContain(object, "status")) {
+                                String status = object.getString("status");
+                                if ("true".equalsIgnoreCase(status)) {
+                                    commentLikeNumeric = Integer.parseInt(commentLike);
+                                    commentLikeNumeric--;
+                                    commentLike = String.valueOf(commentLikeNumeric);
+
+                                    if (0 == commentLikeNumeric) {
+                                        tvCountCommentLike.setText("");
+                                        imageCommentLikeThumb.setVisibility(View.GONE);
+                                        tvCountCommentLike.setVisibility(View.GONE);
+                                    } else {
+                                        SpannableString content = new SpannableString(String.valueOf(commentLikeNumeric));
+                                        content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+                                        imageCommentLikeThumb.setVisibility(View.VISIBLE);
+                                        tvCountCommentLike.setVisibility(View.VISIBLE);
+                                        tvCountCommentLike.setText(content);
+                                    }
+                                }
+
+
+                            }
+
+                            if (isContain(object, "error")) {
+                                Call<String> mCall = commentService.commentLike(deviceId, profileId, token, commentItem.getId(), userIds);
+                                sendCommentLikeRequest(mCall);
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Log.i("onSuccess", response.body().toString());
+                    } else {
+                        Log.i("onEmptyResponse", "Returned empty response");
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private void sendCommentLikeRequest(Call<String> call) {
+
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        try {
+                            JSONObject object = new JSONObject(response.body());
+                            if (isContain(object, "status")) {
+                                String status = object.getString("status");
+                                if ("true".equalsIgnoreCase(status)) {
+
+                                    Call<String> mCall = webService.sendBrowserNotification(
+                                            deviceId,//"8b64708fa409da20341b1a555d1ddee526444",
+                                            profileId,//"26444",
+                                            token,// "5d199fc8529c2$2y$10$C9mvDyOEhJ2Nc/e4Ji4gVOivCvaO4OBobPW2ky4oftvVniCZ8hKzuJhxEGIHYSCprmWSJ1rd4hGHDEqUNRAwAR4fxMWwEyV6VSZEU",
+                                            commentItem.getUserId(),//"26444",
+                                            userIds,//"26444",
+                                            commentItem.getPostId(),
+                                            "like_comment"
+                                    );
+                                    sendBrowserNotificationRequest(mCall);
+
+                                    commentLikeNumeric = Integer.parseInt(commentLike);
+                                    commentLikeNumeric++;
+                                    commentLike = String.valueOf(commentLikeNumeric);
+
+
+                                    SpannableString content = new SpannableString(String.valueOf(commentLikeNumeric));
+                                    content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+                                    imageCommentLikeThumb.setVisibility(View.VISIBLE);
+                                    tvCountCommentLike.setVisibility(View.VISIBLE);
+                                    tvCountCommentLike.setText(content);
+
+                                }
+                            }
+
+                            if (isContain(object, "error")) {
+                                if("You could not liked your own post".equalsIgnoreCase(object.getString("error"))){
+                                    Tools.toast(mContext,"You could not liked your own post",R.drawable.ic_info_outline_blue_24dp);
+                                }else {
+                                    Call<String> mCall = commentService.commentUnLike(deviceId, profileId, token, commentItem.getId(), profileId);
+                                    sendCommentUnLikeRequest(mCall);
+                                }
+
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Log.i("onSuccess", response.body().toString());
+                    } else {
+                        Log.i("onEmptyResponse", "Returned empty response");
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
+
+    }
+
+    private void sendBrowserNotificationRequest(Call<String> mCall) {
+
+
+        mCall.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        try {
+                            JSONObject object = new JSONObject(response.body());
+                            boolean status = object.getBoolean("status");
+                            if (status) {
+
+
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Log.i("onSuccess", response.body().toString());
+                    } else {
+                        Log.i("onEmptyResponse", "Returned empty response");
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
+
+    }
     private void sendAllCommentReplyListRequest(Call<List<Reply>> call) {
 
         call.enqueue(new Callback<List<Reply>>() {

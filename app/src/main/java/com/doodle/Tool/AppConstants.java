@@ -98,7 +98,9 @@ public class AppConstants {
     public static final String DELETE_POST_COMMENT = "delete_postcomment";
     public static final String DELETE_COMMENT_REPLY = "delete_comment_reply";
     public static final String COMMENT_LIKE= "comment_like";
+    public static final String LIKE_COMMENT_REPLY= "like_comment_reply";
     public static final String COMMENT_UNLIKE= "comment_unlike";
+    public static final String UNLIKE_COMMENT_REPLY= "unlike_comment_reply";
     public static final String GET_REPORT_REASON = "get_report_reason";
     public static final String REPORT_USER = "reportUser";
     public static final String UN_FOLLOW = "unfollow";

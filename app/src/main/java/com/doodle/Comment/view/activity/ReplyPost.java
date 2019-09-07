@@ -302,7 +302,10 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
             replies.add(reply);
             mComment.setReplies(replies);
 
-
+            mComment.setReplyId(temp.getId());
+            mComment.setLikeUserStatus(temp.isIsLikeReplied());
+            mComment.setTotalReplyLike(temp.getTotalLike());
+            mComment.setCommentId(temp.getCommentId());
             mComment.setCommentImage(temp.getCommentImage());
             mComment.setUserPhoto(temp.getUserPhoto());
             mComment.setCommentType(String.valueOf(temp.getCommentType()));
@@ -766,6 +769,7 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
                     Comment_ commentItem = new Comment_();
                     commentItem.setCommentImage(commentItems.getCommentImage());
                     commentItem.setId(commentId);
+
                     commentItem.setUserPhoto(userInfo.getPhoto());
                     commentItem.setCommentType(String.valueOf(commentType));
                     commentItem.setCommentText(commentItems.getCommentText());
@@ -1048,10 +1052,17 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
                     replies.add(reply);
 
 
+
                     Comment_ commentItem = new Comment_();
                     commentItem.setCommentImage(commentItems.getCommentImage());
                     // commentItem.setId(String.valueOf(commentItems.getInsertId()));
                     commentItem.setId(commentId);
+
+                    commentItem.setReplyId(String.valueOf(insertId));
+                    commentItem.setLikeUserStatus(false);
+                    commentItem.setTotalReplyLike("0");
+                    commentItem.setCommentId(commentId);
+
                     commentItem.setUserPhoto(userInfo.getPhoto());
                     commentItem.setCommentType(String.valueOf(commentType));
                     commentItem.setCommentText(commentItems.getCommentText());
