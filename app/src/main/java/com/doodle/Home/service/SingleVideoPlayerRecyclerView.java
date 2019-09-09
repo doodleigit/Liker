@@ -57,10 +57,10 @@ public class SingleVideoPlayerRecyclerView extends RecyclerView {
     ;
 
     // ui
-    private ImageView thumbnail, volumeControl;
+    private ImageView thumbnail, volumeControl, videoPlay;
     private ProgressBar progressBar;
     private View viewHolderParent;
-    private FrameLayout frameLayout;
+    private FrameLayout frameLayout, mediaController;
     private PlayerView videoSurfaceView;
     private SimpleExoPlayer videoPlayer;
 
@@ -298,13 +298,17 @@ public class SingleVideoPlayerRecyclerView extends RecyclerView {
             thumbnail = holder.mediaVideoThumbnail;
             progressBar = holder.mediaVideoProgressBar;
             volumeControl = holder.mediaVideoVolumeControl;
+            videoPlay = holder.mediaVideoPlay;
             viewHolderParent = holder.itemView;
 //        requestManager = holder.requestManager;
             frameLayout = holder.mediaVideoLayout;
+            mediaController = holder.mediaControllerLayout;
 
             videoSurfaceView.setPlayer(videoPlayer);
 
             viewHolderParent.setOnClickListener(videoViewClickListener);
+//            frameLayout.setOnClickListener(videoViewClickListener);
+//            videoPlay.setOnClickListener(videoViewClickListener);
 
             DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(
                     context, Util.getUserAgent(context, "RecyclerView VideoPlayer"));
@@ -323,7 +327,23 @@ public class SingleVideoPlayerRecyclerView extends RecyclerView {
     private OnClickListener videoViewClickListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
-            toggleVolume();
+            if (v == videoPlay) {
+                if (videoPlayer != null) {
+                    if (videoPlay.getDrawable() == getResources().getDrawable(R.drawable.video_play)) {
+                        videoPlayer.setPlayWhenReady(true);
+                    } else {
+                        videoPlayer.setPlayWhenReady(false);
+                    }
+                }
+            } else if (v == frameLayout) {
+                if (mediaController.getVisibility() == View.VISIBLE) {
+                    mediaController.setVisibility(INVISIBLE);
+                } else {
+                    mediaController.setVisibility(VISIBLE);
+                }
+            } else {
+                toggleVolume();
+            }
         }
     };
 
@@ -376,7 +396,9 @@ public class SingleVideoPlayerRecyclerView extends RecyclerView {
         videoSurfaceView.requestFocus();
         videoSurfaceView.setVisibility(VISIBLE);
         videoSurfaceView.setAlpha(1);
+        videoPlay.setImageResource(R.drawable.video_pause);
         thumbnail.setVisibility(GONE);
+        mediaController.setVisibility(GONE);
     }
 
     private void resetVideoView() {
@@ -427,11 +449,11 @@ public class SingleVideoPlayerRecyclerView extends RecyclerView {
         if (volumeControl != null) {
             volumeControl.bringToFront();
             if (volumeState == VolumeState.OFF) {
-//                requestManager.load(R.drawable.ic_volume_off_grey_24dp)
-//                        .into(volumeControl);
+                requestManager.load(R.drawable.volume_off)
+                        .into(volumeControl);
             } else if (volumeState == VolumeState.ON) {
-//                requestManager.load(R.drawable.ic_volume_up_grey_24dp)
-//                        .into(volumeControl);
+                requestManager.load(R.drawable.volume_on)
+                        .into(volumeControl);
             }
             volumeControl.animate().cancel();
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
@@ -8,19 +8,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/media_image"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:src="@drawable/photo" />
-
         <FrameLayout
+            android:id="@+id/media_video"
             android:layout_width="match_parent"
             android:layout_height="220dp"
-            android:scaleType="center"
-            android:id="@+id/media_video"
             android:background="@color/colorIconText"
-            android:visibility="invisible">
+            android:scaleType="center"
+            android:visibility="visible"/>
+
+        <FrameLayout
+            android:id="@+id/media_controller"
+            android:layout_width="match_parent"
+            android:layout_height="220dp"
+            android:visibility="visible">
 
             <ImageView
                 android:id="@+id/media_video_thumbnail"
@@ -29,46 +29,48 @@
                 android:src="@drawable/post_image_background" />
 
             <ImageView
+                android:id="@+id/media_video_one_play"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:padding="10dp"
+                android:src="@drawable/video_play"
+                android:visibility="gone"/>
+
+            <ImageView
+                android:id="@+id/media_video_volume_control"
                 android:layout_width="25dp"
                 android:layout_height="25dp"
-                android:scaleType="centerCrop"
                 android:layout_gravity="end|bottom"
-                android:id="@+id/media_video_volume_control"
-                android:alpha="0"
-                android:animateLayoutChanges="true"
                 android:layout_marginEnd="15dp"
-                android:layout_marginBottom="15dp"/>
+                android:layout_marginBottom="15dp"
+                android:animateLayoutChanges="true"
+                android:scaleType="centerCrop"
+                android:src="@drawable/volume_on"
+                android:visibility="gone"/>
 
             <ProgressBar
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:id="@+id/media_video_progressBar"
                 style="?android:attr/progressBarStyle"
-                android:visibility="gone"
-                android:layout_gravity="center" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone" />
 
         </FrameLayout>
+
+        <ImageView
+            android:id="@+id/media_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/photo"
+            android:visibility="gone" />
 
     </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/_1sdp"
-            android:background="#EDF0F1" />
-
-        <TextView
-            android:id="@+id/tvLike"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_centerInParent="true"
-            android:layout_margin="@dimen/_5sdp"
-            android:text="Like"
-            android:textColor="#788B9A" />
 
         <ImageView
             android:id="@+id/imgLike"
@@ -79,6 +81,18 @@
             android:layout_marginRight="@dimen/_5sdp"
             android:layout_toEndOf="@id/tvLike"
             android:src="@drawable/like_normal" />
+
+        <ImageView
+            android:id="@+id/imagePostComment"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:layout_marginEnd="@dimen/_10sdp"
+            android:layout_marginBottom="@dimen/_5sdp"
+            android:src="@drawable/ic_comment_black_24dp"
+            android:tint="#C4C9D4" />
 
         <TextView
             android:id="@+id/tvPostLikeCount"
@@ -101,17 +115,20 @@
             android:layout_marginBottom="@dimen/_5sdp"
             android:layout_toStartOf="@id/imagePostComment" />
 
-        <ImageView
-            android:id="@+id/imagePostComment"
+        <TextView
+            android:id="@+id/tvLike"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
             android:layout_centerInParent="true"
-            android:layout_marginTop="@dimen/_5sdp"
-            android:layout_marginEnd="@dimen/_10sdp"
-            android:layout_marginBottom="@dimen/_5sdp"
-            android:layout_alignParentEnd="true"
-            android:src="@drawable/ic_comment_black_24dp"
-            android:tint="#C4C9D4" />
+            android:layout_margin="@dimen/_5sdp"
+            android:text="Like"
+            android:textColor="#788B9A" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_1sdp"
+            android:background="#EDF0F1" />
 
         <!-- TODO: Update blank fragment layout -->
         <com.github.rahatarmanahmed.cpv.CircularProgressView xmlns:app="http://schemas.android.com/apk/res-auto"
