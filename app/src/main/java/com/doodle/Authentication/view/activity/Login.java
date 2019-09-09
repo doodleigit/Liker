@@ -9,10 +9,13 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,35 +42,37 @@ import static com.doodle.Tool.AppConstants.POST_IMAGES;
 
 public class Login extends AppCompatActivity implements View.OnClickListener {
 
-    private ClearableEditText etEmail;
+    private EditText etEmail;
     private EditText etPassword;
     private String email, password;
     private TextView tvForgot;
-    private Button btnSignIn;
+    private TextView tvSignIn;
     private PrefManager manager;
     private String mDeviceId;
     private boolean networkOk;
-    private CircularProgressView progressView;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_login);
+        setContentView(R.layout.new_login);
 
         manager = new PrefManager(this);
         networkOk = NetworkHelper.hasNetworkAccess(this);
         findViewById(R.id.fbLogin).setOnClickListener(this);
         findViewById(R.id.twitterLogin).setOnClickListener(this);
-        etEmail = (ClearableEditText) findViewById(R.id.etEmail);
+        etEmail = (EditText) findViewById(R.id.etEmail);
         findViewById(R.id.etEmail).setOnClickListener(this);
         etPassword = (EditText) findViewById(R.id.etPassword);
+        etEmail.setOnEditorActionListener(editorListener);
+        etPassword.setOnEditorActionListener(editorListener);
         tvForgot = (TextView) findViewById(R.id.tvForgot);
-        btnSignIn = (Button) findViewById(R.id.btnSignIn);
-        btnSignIn.setOnClickListener(this);
-        progressView = (CircularProgressView) findViewById(R.id.progress_view);
+        tvSignIn = (TextView) findViewById(R.id.tvSignIn);
+        tvSignIn.setOnClickListener(this);
+        progressBar = findViewById(R.id.progress_bar);
         findViewById(R.id.tvForgot).setOnClickListener(this);
         findViewById(R.id.imgAbout).setOnClickListener(this);
-        findViewById(R.id.tvCancel).setOnClickListener(this);
+        findViewById(R.id.ivCancel).setOnClickListener(this);
 
         OneSignal.startInit(this)
                 .inFocusDisplaying(OneSignal.OSInFocusDisplayOption.Notification)
@@ -86,12 +91,13 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         });
 
 
-        etEmail.setDrawableClickListener(new ClearableEditText.DrawableClickListener() {
+     /*   etEmail.setDrawableClickListener(new ClearableEditText.DrawableClickListener() {
             @Override
             public void onClick() {
                 etEmail.setText(null);
             }
-        });
+        });*/
+
 
         etEmail.addTextChangedListener(new TextWatcher() {
             @Override
@@ -105,13 +111,13 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
                 if (!TextUtils.isEmpty(password) & !TextUtils.isEmpty(email)) {
                     tvForgot.setTextColor(Color.parseColor("#1485CC"));
-                    btnSignIn.setBackgroundResource(R.drawable.btn_round_outline);
-                    btnSignIn.setEnabled(true);
+                    tvSignIn.setBackgroundResource(R.drawable.btn_round_outline);
+                    tvSignIn.setEnabled(true);
 
                 } else {
-                    btnSignIn.setBackgroundResource(R.drawable.btn_round_outline_disable);
+                    tvSignIn.setBackgroundResource(R.drawable.btn_round_outline_disable);
                     tvForgot.setTextColor(Color.parseColor("#89C3E7"));
-                    btnSignIn.setEnabled(false);
+                    tvSignIn.setEnabled(false);
                 }
             }
 
@@ -132,13 +138,13 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                 password = etPassword.getText().toString();
                 if (!TextUtils.isEmpty(password) & !TextUtils.isEmpty(email)) {
                     tvForgot.setTextColor(Color.parseColor("#1485CC"));
-                    btnSignIn.setBackgroundResource(R.drawable.btn_round_outline);
-                    btnSignIn.setEnabled(true);
+                    tvSignIn.setBackgroundResource(R.drawable.btn_round_outline);
+                    tvSignIn.setEnabled(true);
 
                 } else {
-                    btnSignIn.setBackgroundResource(R.drawable.btn_round_outline_disable);
+                    tvSignIn.setBackgroundResource(R.drawable.btn_round_outline_disable);
                     tvForgot.setTextColor(Color.parseColor("#89C3E7"));
-                    btnSignIn.setEnabled(false);
+                    tvSignIn.setEnabled(false);
                 }
 
             }
@@ -152,6 +158,16 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             }
         });
 
+    }
+
+    private void loginDisable(boolean disable) {
+        if (disable) {
+            tvSignIn.setBackgroundResource(R.drawable.btn_round_outline_disable);
+            tvSignIn.setEnabled(false);
+        } else {
+            tvSignIn.setBackgroundResource(R.drawable.btn_round_outline);
+            tvSignIn.setEnabled(true);
+        }
     }
 
     @Override
@@ -172,17 +188,16 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             case R.id.etPassword:
                 getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
                 break;
-            case R.id.btnSignIn:
+            case R.id.tvSignIn:
                 if (networkOk) {
-                    progressView.setVisibility(View.VISIBLE);
-                    progressView.startAnimation();
+                    progressBar.setVisibility(View.VISIBLE);
                     mDeviceId = manager.getDeviceId();
+                    loginDisable(true);
                     requestData(email, password, mDeviceId);
 
                 } else {
                     Tools.showNetworkDialog(getSupportFragmentManager());
-                    progressView.setVisibility(View.GONE);
-                    progressView.stopAnimation();
+                    progressBar.setVisibility(View.GONE);
 
 
                 }
@@ -198,17 +213,34 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                 }*/
                 startActivity(new Intent(this, ForgotPassword.class));
                 finish();
-
                 break;
 
             case R.id.imgAbout:
                 startActivity(new Intent(this, About.class));
+                break;
+            case R.id.ivCancel:
+               finish();
                 break;
 
 
         }
 
     }
+    private TextView.OnEditorActionListener editorListener = new TextView.OnEditorActionListener() {
+        @Override
+        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+            switch (actionId) {
+                case EditorInfo.IME_ACTION_NEXT:
+                    Toast.makeText(Login.this, "Next", Toast.LENGTH_SHORT).show();
+                    break;
+                case EditorInfo.IME_ACTION_SEND:
+                    Toast.makeText(Login.this, "Send", Toast.LENGTH_SHORT).show();
+                    break;
+            }
+            return false;
+        }
+    };
+
 
     private void requestData(String email, String password, String mDeviceId) {
         AuthService webService =
@@ -273,16 +305,15 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                     }
                 }
 
-                progressView.setVisibility(View.GONE);
-                progressView.stopAnimation();
-
+                progressBar.setVisibility(View.GONE);
+                loginDisable(false);
             }
 
             @Override
             public void onFailure(Call<LoginUser> call, Throwable t) {
                 Log.d("message", t.getMessage());
-                progressView.setVisibility(View.GONE);
-                progressView.stopAnimation();
+                progressBar.setVisibility(View.GONE);
+                loginDisable(false);
 
             }
         });

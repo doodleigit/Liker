@@ -361,7 +361,7 @@ public class ForgotPassword extends AppCompatActivity implements View.OnClickLis
         @Override
         public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
             switch (actionId) {
-                case EditorInfo.IME_ACTION_GO:
+                case EditorInfo.IME_ACTION_SEND:
                     requestForgotPassword();
                     break;
             }
