@@ -234,7 +234,6 @@ public class FBLogin extends AppCompatActivity {
 
         Call<LoginUser> call = webService.socialLogin(appSocialAccessCode, oauthProvider, oauthId, deviceId);
         sendRequest(call);
-
     }
 
     private void sendRequest(Call<LoginUser> call) {

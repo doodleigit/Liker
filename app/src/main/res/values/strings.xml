@@ -1,11 +1,10 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Liker</string>
-    <string name="copyright"><![CDATA[Copyright &#169; 2019 Liker, LLC]]></string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
-    <string name="test_string" formatted="false">Copyright \u00A9 2019 Liker, LLC</string>
+    <string name="copyright">Copyright \u00A9 %1$d Likeopedia, LLC</string>
     <string name="otp_string">A verifiction code hase been sent to the email address associated with your account.Please type the code to reset your password</string>
     <string name="no_internet">No Internet</string>
     <string name="facebook_app_id">1470061779929464</string>

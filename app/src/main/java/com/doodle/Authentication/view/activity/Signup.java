@@ -853,11 +853,11 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         App.setIsFBSignup(false);
         App.setIsTwitterSignup(false);
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            onHomeClick();
-            return true;
-
-        }
+//        if (keyCode == KeyEvent.KEYCODE_BACK) {
+////            onHomeClick();
+//            return true;
+//
+//        }
         return false;
         //  return super.onKeyDown(keyCode, event);
 

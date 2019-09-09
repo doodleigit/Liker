@@ -142,7 +142,8 @@
                     android:layout_height="wrap_content"
                     android:drawableEnd="@drawable/ic_cancel_black_24dp"
                     android:drawableRight="@drawable/ic_cancel_black_24dp"
-                    android:hint="First Name" />
+                    android:hint="First Name"
+                    android:textSize="14sp"/>
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -159,7 +160,8 @@
                     android:layout_height="wrap_content"
                     android:drawableEnd="@drawable/ic_cancel_black_24dp"
                     android:drawableRight="@drawable/ic_cancel_black_24dp"
-                    android:hint="Last Name" />
+                    android:hint="Last Name"
+                    android:textSize="14sp"/>
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -176,7 +178,8 @@
                     android:layout_height="wrap_content"
                     android:drawableEnd="@drawable/ic_cancel_black_24dp"
                     android:drawableRight="@drawable/ic_cancel_black_24dp"
-                    android:hint="Email" />
+                    android:hint="Email"
+                    android:textSize="14sp"/>
             </android.support.design.widget.TextInputLayout>
 
 
@@ -196,7 +199,8 @@
                     android:hint="Password"
                     android:inputType="textPassword"
                     app:pet_iconHide="@drawable/ic_visibility_black_24dp"
-                    app:pet_iconShow="@drawable/ic_visibility_off_black_24dp" />
+                    app:pet_iconShow="@drawable/ic_visibility_off_black_24dp"
+                    android:textSize="14sp"/>
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -215,7 +219,8 @@
                     android:hint="Confirm Password"
                     android:inputType="textPassword"
                     app:pet_iconHide="@drawable/ic_visibility_black_24dp"
-                    app:pet_iconShow="@drawable/ic_visibility_off_black_24dp" />
+                    app:pet_iconShow="@drawable/ic_visibility_off_black_24dp"
+                    android:textSize="14sp"/>
             </android.support.design.widget.TextInputLayout>
         </LinearLayout>
 

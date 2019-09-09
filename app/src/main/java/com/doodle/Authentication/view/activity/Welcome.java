@@ -23,11 +23,9 @@ public class Welcome extends AppCompatActivity implements View.OnClickListener {
         switch (id) {
             case R.id.btnLogin:
                 startActivity(new Intent(this, Login.class));
-                finish();
                 break;
             case R.id.tvSignup:
                 startActivity(new Intent(this, Signup.class));
-                finish();
                 break;
         }
     }
