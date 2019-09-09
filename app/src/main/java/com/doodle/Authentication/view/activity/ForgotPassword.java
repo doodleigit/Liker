@@ -22,6 +22,7 @@ import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
@@ -40,6 +41,7 @@ import com.doodle.Tool.ClearableEditText;
 import com.doodle.Authentication.service.AuthService;
 import com.doodle.Tool.NetworkHelper;
 import com.doodle.Tool.PrefManager;
+import com.doodle.Tool.Tools;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.google.gson.Gson;
 import com.onesignal.OneSignal;
@@ -82,6 +84,8 @@ public class ForgotPassword extends AppCompatActivity implements View.OnClickLis
     public static final String USER_INFO_ITEM_KEY = "user_info_item_key";
     private CircularProgressView progressView;
 
+    private ProgressBar progressBar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,6 +127,8 @@ public class ForgotPassword extends AppCompatActivity implements View.OnClickLis
 
         }
 
+        progressBar=findViewById(R.id.progress_bar);
+
         mViewFlipper = (ViewFlipper) findViewById(R.id.viewFlipperContent);
         //   findViewById(R.id.btnLogin).setOnClickListener(this);
         //  findViewById(R.id.btnSignIn).setOnClickListener(this);
@@ -134,12 +140,14 @@ public class ForgotPassword extends AppCompatActivity implements View.OnClickLis
         findViewById(R.id.imgResetAbout).setOnClickListener(this);
         findViewById(R.id.tvResendOTP).setOnClickListener(this);
 
+
         //  findViewById(R.id.fbLogin).setOnClickListener(this);
         //   findViewById(R.id.twitterLogin).setOnClickListener(this);
 
         //  etPassword = (EditText) findViewById(R.id.etPassword);
         etNewPassword = (EditText) findViewById(R.id.etNewPassword);
         etConfirmPassword = (EditText) findViewById(R.id.etConfirmPassword);
+        etConfirmPassword.setOnEditorActionListener(editorListener);
         //   etEmail = (ClearableEditText) findViewById(R.id.etEmail);
         etForgotEmail = (ClearableEditText) findViewById(R.id.etForgotEmail);
         etForgotEmail.setOnEditorActionListener(editorListener);
@@ -161,9 +169,9 @@ public class ForgotPassword extends AppCompatActivity implements View.OnClickLis
 
         //findViewById(R.id.tvForgot).setOnClickListener(this);
         //   findViewById(R.id.tvCancel).setOnClickListener(this);
-        findViewById(R.id.tvEmailCancel).setOnClickListener(this);
-        findViewById(R.id.tvOTPCancel).setOnClickListener(this);
-        findViewById(R.id.tvResetPasswordCancel).setOnClickListener(this);
+        findViewById(R.id.imgEmailCancel).setOnClickListener(this);
+        findViewById(R.id.imgOTPCancel).setOnClickListener(this);
+        findViewById(R.id.imgResetPasswordCancel).setOnClickListener(this);
 
         slideRightIn = AnimationUtils.loadAnimation(this, R.anim.slide_right_in);
         slideRightOut = AnimationUtils.loadAnimation(this, R.anim.slide_right_out);
@@ -177,6 +185,7 @@ public class ForgotPassword extends AppCompatActivity implements View.OnClickLis
         //btnSignIn.setEnabled(false);
 
         final PinView pinView = findViewById(R.id.firstPinView);
+        pinView.setOnEditorActionListener(editorListener);
 
 //        etEmail.setDrawableClickListener(new ClearableEditText.DrawableClickListener() {
 //            @Override
@@ -361,13 +370,51 @@ public class ForgotPassword extends AppCompatActivity implements View.OnClickLis
         @Override
         public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
             switch (actionId) {
+                case EditorInfo.IME_ACTION_GO:
+                    if (networkOk) {
+                        progressBar.setVisibility(View.VISIBLE);
+                        loginDisable(true,btnContinue);
+                        requestForgotPassword();
+
+                    } else {
+                        Tools.showNetworkDialog(getSupportFragmentManager());
+                        progressBar.setVisibility(View.GONE);
+
+                    }
+                    break;
+                case EditorInfo.IME_ACTION_DONE:
+                    if (networkOk) {
+                        progressBar.setVisibility(View.VISIBLE);
+                        loginDisable(true,btnOTPContinue);
+                        requestForOTP();
+                    } else {
+                        Tools.showNetworkDialog(getSupportFragmentManager());
+                        progressBar.setVisibility(View.GONE);
+
+                    }
+
+
+                    break;
                 case EditorInfo.IME_ACTION_SEND:
-                    requestForgotPassword();
+
+                    if (networkOk) {
+                        progressBar.setVisibility(View.VISIBLE);
+                        loginDisable(true,btnFinish);
+                        requestNewPassword();
+
+                    } else {
+                        Tools.showNetworkDialog(getSupportFragmentManager());
+                        progressBar.setVisibility(View.GONE);
+
+                    }
+
+
                     break;
             }
             return false;
         }
     };
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -439,37 +486,39 @@ public class ForgotPassword extends AppCompatActivity implements View.OnClickLis
 //                    mViewFlipper.setInAnimation(slideLeftIn);
 //                    mViewFlipper.setOutAnimation(slideLeftOut);
 //                    mViewFlipper.showNext();
-                    requestForgotPassword();
+
+                    if (networkOk) {
+                        progressBar.setVisibility(View.VISIBLE);
+                        loginDisable(true,btnContinue);
+                        requestForgotPassword();
+
+                    } else {
+                        Tools.showNetworkDialog(getSupportFragmentManager());
+                        progressBar.setVisibility(View.GONE);
+
+                    }
+
                 }
                 break;
             case R.id.btnOTPContinue:
                 if (flipperId == 1) {
-//                    flipperId++;
-//                    mViewFlipper.setInAnimation(slideLeftIn);
-//                    mViewFlipper.setOutAnimation(slideLeftOut);
-//                    mViewFlipper.showNext();
-                    requestForOTP();
+                    if (networkOk) {
+                        progressBar.setVisibility(View.VISIBLE);
+                        loginDisable(true,btnOTPContinue);
+                        requestForOTP();
+                    } else {
+                        Tools.showNetworkDialog(getSupportFragmentManager());
+                        progressBar.setVisibility(View.GONE);
+
+                    }
                 }
                 break;
-//            case R.id.tvCancel:
-//                if (flipperId == 0) {
-//                    mViewFlipper.setInAnimation(slideRightIn);
-//                    mViewFlipper.setOutAnimation(slideRightOut);
-//                    mViewFlipper.showPrevious();
-//                    flipperId--;
-//                }
-//                break;
-            case R.id.tvEmailCancel:
-              /*  if (flipperId == 0) {
-                    mViewFlipper.setInAnimation(slideRightIn);
-                    mViewFlipper.setOutAnimation(slideRightOut);
-                    mViewFlipper.showPrevious();
-                    flipperId--;
-                }*/
+
+            case R.id.imgEmailCancel:
                 startActivity(new Intent(this, Login.class));
                 finish();
                 break;
-            case R.id.tvOTPCancel:
+            case R.id.imgOTPCancel:
                 if (flipperId == 1) {
                     mViewFlipper.setInAnimation(slideRightIn);
                     mViewFlipper.setOutAnimation(slideRightOut);
@@ -477,7 +526,7 @@ public class ForgotPassword extends AppCompatActivity implements View.OnClickLis
                     flipperId--;
                 }
                 break;
-            case R.id.tvResetPasswordCancel:
+            case R.id.imgResetPasswordCancel:
                 if (flipperId == 2) {
                     mViewFlipper.setInAnimation(slideRightIn);
                     mViewFlipper.setOutAnimation(slideRightOut);
@@ -508,7 +557,17 @@ public class ForgotPassword extends AppCompatActivity implements View.OnClickLis
 //                //finish();
 //                break;
             case R.id.btnFinish:
-                requestNewPassword();
+                if (networkOk) {
+                    progressBar.setVisibility(View.VISIBLE);
+                    loginDisable(true,btnFinish);
+                    requestNewPassword();
+
+                } else {
+                    Tools.showNetworkDialog(getSupportFragmentManager());
+                    progressBar.setVisibility(View.GONE);
+
+                }
+
                 break;
 //            case R.id.fbLogin:
 //                startActivity(new Intent(this, FBLogin.class));
@@ -534,10 +593,65 @@ public class ForgotPassword extends AppCompatActivity implements View.OnClickLis
 //                break;
 
             case R.id.tvResendOTP:
-                Toast.makeText(this, "resend otp still deploy!!", Toast.LENGTH_SHORT).show();
+                if (networkOk) {
+                    progressBar.setVisibility(View.VISIBLE);
+                    loginDisable(true,btnContinue);
+                    requestResendForgotPassword();
+
+                } else {
+                    Tools.showNetworkDialog(getSupportFragmentManager());
+                    progressBar.setVisibility(View.GONE);
+
+                }
                 break;
 
         }
+    }
+
+    private void requestResendForgotPassword() {
+
+        AuthService webService =
+                AuthService.retrofitBase.create(AuthService.class);
+        Call<com.doodle.Authentication.model.ForgotPassword> call = webService.forgotPassword(forgotEmail);
+        resendForgotPasswordRequest(call);
+
+
+    }
+
+    private void resendForgotPasswordRequest(Call<com.doodle.Authentication.model.ForgotPassword> call) {
+        call.enqueue(new Callback<com.doodle.Authentication.model.ForgotPassword>() {
+            @Override
+            public void onResponse(Call<com.doodle.Authentication.model.ForgotPassword> call, Response<com.doodle.Authentication.model.ForgotPassword> response) {
+                forgotPassword = response.body();
+                boolean status = forgotPassword.isStatus();
+                if (status) {
+                    String message = "Forgot password request send to your email address successfully. Please, check your email.";
+                    showStatus(message);
+                /*    flipperId++;
+                    mViewFlipper.setInAnimation(slideLeftIn);
+                    mViewFlipper.setOutAnimation(slideLeftOut);
+                    mViewFlipper.showNext();*/
+                } else if (forgotPassword.getError() != null) {
+                    Error error = forgotPassword.getError();
+                    String message = error.getEmail();
+                    showStatus(message);
+                } else {
+                    String message = "Invalid email address";
+                    showStatus(message);
+                }
+
+                progressBar.setVisibility(View.GONE);
+                loginDisable(false,btnContinue);
+
+            }
+
+            @Override
+            public void onFailure(Call<com.doodle.Authentication.model.ForgotPassword> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
+                loginDisable(false,btnContinue);
+            }
+        });
+
     }
 
     private void requestNewPassword() {
@@ -586,10 +700,16 @@ public class ForgotPassword extends AppCompatActivity implements View.OnClickLis
                 }
 
 
+                progressBar.setVisibility(View.GONE);
+                loginDisable(false,btnFinish);
+
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
+
+                progressBar.setVisibility(View.GONE);
+                loginDisable(false,btnFinish);
 
             }
         });
@@ -633,10 +753,17 @@ public class ForgotPassword extends AppCompatActivity implements View.OnClickLis
                 }
 
 
+                progressBar.setVisibility(View.GONE);
+                loginDisable(false,btnOTPContinue);
+
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
+
+                progressBar.setVisibility(View.GONE);
+                loginDisable(false,btnOTPContinue);
+
 
             }
         });
@@ -785,8 +912,16 @@ public class ForgotPassword extends AppCompatActivity implements View.OnClickLis
                 AuthService.retrofitBase.create(AuthService.class);
         Call<com.doodle.Authentication.model.ForgotPassword> call = webService.forgotPassword(forgotEmail);
         sendForgotPasswordRequest(call);
+    }
 
-
+    private void loginDisable(boolean disable,View view) {
+        if (disable) {
+            view.setBackgroundResource(R.drawable.btn_round_outline_disable);
+            view.setEnabled(false);
+        } else {
+            view.setBackgroundResource(R.drawable.btn_round_outline);
+            view.setEnabled(true);
+        }
     }
 
     com.doodle.Authentication.model.ForgotPassword forgotPassword;
@@ -814,11 +949,15 @@ public class ForgotPassword extends AppCompatActivity implements View.OnClickLis
                     showStatus(message);
                 }
 
+                progressBar.setVisibility(View.GONE);
+                loginDisable(false,btnContinue);
+
             }
 
             @Override
             public void onFailure(Call<com.doodle.Authentication.model.ForgotPassword> call, Throwable t) {
-
+                progressBar.setVisibility(View.GONE);
+                loginDisable(false,btnContinue);
             }
         });
 

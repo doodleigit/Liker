@@ -78,6 +78,7 @@ public interface AuthService {
                               @Field("is_apps") String is_apps,
                               @Field("img_url") String img_url
     );
+
     @POST(AppConstants.LOGIN_NEW)
     @FormUrlEncoded
     Call<LoginUser> loginUser(
@@ -91,6 +92,7 @@ public interface AuthService {
     Call<ForgotPassword> forgotPassword(
             @Field("email") String email
     );
+
 
     @POST(AppConstants.OTP)
     @FormUrlEncoded
@@ -115,7 +117,8 @@ public interface AuthService {
             @Field("device_id") String deviceId,
             @Field("verify_otp") String verifyOTP
     );
-//resend_signup_otp
+
+    //resend_signup_otp
     @POST(AppConstants.RESEND_SIGNUP_OTP)
     @FormUrlEncoded
     Call<String> resendSignUpOTP(

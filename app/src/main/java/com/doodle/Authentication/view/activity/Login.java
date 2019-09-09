@@ -42,7 +42,7 @@ import static com.doodle.Tool.AppConstants.POST_IMAGES;
 
 public class Login extends AppCompatActivity implements View.OnClickListener {
 
-    private EditText etEmail;
+    private ClearableEditText etEmail;
     private EditText etPassword;
     private String email, password;
     private TextView tvForgot;
@@ -61,7 +61,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         networkOk = NetworkHelper.hasNetworkAccess(this);
         findViewById(R.id.fbLogin).setOnClickListener(this);
         findViewById(R.id.twitterLogin).setOnClickListener(this);
-        etEmail = (EditText) findViewById(R.id.etEmail);
+        etEmail = (ClearableEditText) findViewById(R.id.etEmail);
         findViewById(R.id.etEmail).setOnClickListener(this);
         etPassword = (EditText) findViewById(R.id.etPassword);
         etEmail.setOnEditorActionListener(editorListener);
@@ -91,12 +91,12 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         });
 
 
-     /*   etEmail.setDrawableClickListener(new ClearableEditText.DrawableClickListener() {
+        etEmail.setDrawableClickListener(new ClearableEditText.DrawableClickListener() {
             @Override
             public void onClick() {
                 etEmail.setText(null);
             }
-        });*/
+        });
 
 
         etEmail.addTextChangedListener(new TextWatcher() {
@@ -199,7 +199,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                     Tools.showNetworkDialog(getSupportFragmentManager());
                     progressBar.setVisibility(View.GONE);
 
-
                 }
                 break;
 
@@ -231,10 +230,21 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
             switch (actionId) {
                 case EditorInfo.IME_ACTION_NEXT:
-                    Toast.makeText(Login.this, "Next", Toast.LENGTH_SHORT).show();
+                  //  Toast.makeText(Login.this, "Next", Toast.LENGTH_SHORT).show();
                     break;
                 case EditorInfo.IME_ACTION_SEND:
-                    Toast.makeText(Login.this, "Send", Toast.LENGTH_SHORT).show();
+                    if (networkOk) {
+                        progressBar.setVisibility(View.VISIBLE);
+                        mDeviceId = manager.getDeviceId();
+                        loginDisable(true);
+                        requestData(email, password, mDeviceId);
+
+                    } else {
+                        Tools.showNetworkDialog(getSupportFragmentManager());
+                        progressBar.setVisibility(View.GONE);
+
+
+                    }
                     break;
             }
             return false;
@@ -248,7 +258,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
         Call<LoginUser> call = webService.loginUser(email, password, mDeviceId);
         sendRequest(call);
-
 
     }
 
