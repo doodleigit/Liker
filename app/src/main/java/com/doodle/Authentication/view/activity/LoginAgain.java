@@ -30,7 +30,8 @@ public class LoginAgain extends AppCompatActivity implements View.OnClickListene
         manager = new PrefManager(this);
 
         findViewById(R.id.tvLoginPage).setOnClickListener(this);
-        findViewById(R.id.tvFacebookPage).setOnClickListener(this);
+        findViewById(R.id.tvSignUpPage).setOnClickListener(this);
+        findViewById(R.id.profile_layout).setOnClickListener(this);
         profileImage = findViewById(R.id.profile_image);
         tvProfileName = findViewById(R.id.tvProfileName);
 
@@ -57,11 +58,12 @@ public class LoginAgain extends AppCompatActivity implements View.OnClickListene
         switch (id) {
             case R.id.tvLoginPage:
                 startActivity(new Intent(this, Welcome.class));
-                finish();
                 break;
-            case R.id.tvFacebookPage:
-                startActivity(new Intent(this, FBLogin.class));
-                finish();
+            case R.id.tvSignUpPage:
+                startActivity(new Intent(this, Signup.class));
+                break;
+            case R.id.profile_layout:
+//                startActivity(new Intent(this, Signup.class));
                 break;
         }
 

@@ -27,6 +27,7 @@ import com.doodle.Home.holder.TextMimHolder;
 import com.doodle.Home.holder.VideoHolder;
 import com.doodle.Home.view.activity.Home;
 import com.doodle.Post.view.fragment.MultipleMediaPopUpFragment;
+import com.doodle.Post.view.fragment.NewMultipleMediaPopUpFragment;
 import com.doodle.R;
 import com.doodle.Tool.AppConstants;
 import com.doodle.Tool.PrefManager;
@@ -82,7 +83,8 @@ public class PostPopup extends AppCompatActivity
         token = manager.getToken();
         commentService = CommentService.mRetrofit.create(CommentService.class);
 
-        initialFragment(new MultipleMediaPopUpFragment());
+        initialFragment(new NewMultipleMediaPopUpFragment());
+//        initialFragment(new MultipleMediaPopUpFragment());
     }
 
     private void initialFragment(Fragment fragment) {

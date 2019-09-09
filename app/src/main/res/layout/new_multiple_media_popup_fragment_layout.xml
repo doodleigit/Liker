@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/post_main_layout"
+        android:background="@color/colorBlack">
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <ImageView
+            android:id="@+id/next"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="5dp"
+            android:background="@drawable/rectangle_corner_round_five"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:src="@drawable/ic_keyboard_arrow_right_white_24dp"
+            android:visibility="gone"/>
+
+        <ImageView
+            android:id="@+id/previous"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dp"
+            android:background="@drawable/rectangle_corner_round_five"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:src="@drawable/ic_keyboard_arrow_left_white_24dp"
+            android:visibility="gone"/>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/post_main_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/colorWhite">
+
+        <LinearLayout
+            android:id="@+id/postBodyLayer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/containerHeader"
+            android:orientation="vertical">
+
+            <com.borjabravo.readmoretextview.ReadMoreTextView
+                android:id="@+id/tvPostContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/_5sdp"
+                android:textColor="#333"
+                android:textSize="14sp"
+                app:colorClickableText="@android:color/holo_blue_light"
+                app:trimCollapsedText="Show less"
+                app:trimExpandedText="Show more"
+                app:trimLength="200"
+                app:trimMode="trimModeLength"
+                tools:text="Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.vHere is my first post.Here is my first post.Here is my first post. " />
+
+            <com.vanniktech.emoji.EmojiTextView
+                android:id="@+id/tvPostEmojiContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/_5sdp"
+                android:background="@null"
+                android:imeOptions="actionSend"
+                android:inputType="textCapSentences|textMultiLine" />
+
+            <include
+                layout="@layout/list_item_post_footer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+        <include
+            android:id="@+id/containerHeader"
+            layout="@layout/list_item_post_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

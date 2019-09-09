@@ -225,6 +225,7 @@
     <string name="select_day">Select Day</string>
     <string name="are_you_sure">Are you sure you want to remove</string>
     <string name="search_by_name">Search By Name</string>
+    <string name="dont_have_a_liker_account">Don\'t have a Liker account? Sign up</string>
 
     <string name="who_can_send_you_friend_requests">Who can send you friend requests:</string>
     <string name="who_can_post_on_your_wall">Who can post on your wall:</string>
@@ -310,5 +311,8 @@
     <string name="posts">Posts</string>
     <string name="checking">Checking...</string>
     <string name="transition_photo">transition photo</string>
+    <string name="login_in_with_facebook">Log in with <b>facebook</b></string>
+    <string name="login_in_with_twitter">Log in with <b>twitter</b></string>
+    <string name="login_in">Log in</string>
 
 </resources>

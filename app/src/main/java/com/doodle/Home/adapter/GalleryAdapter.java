@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,17 @@ import com.doodle.Home.model.PostFile;
 import com.doodle.R;
 import com.doodle.Tool.AppConstants;
 import com.github.chrisbanes.photoview.PhotoView;
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
+import com.google.android.exoplayer2.upstream.DataSource;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.upstream.RawResourceDataSource;
+import com.google.android.exoplayer2.util.Util;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
@@ -45,7 +57,6 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
     }
 
 
-
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(mContext);
@@ -61,6 +72,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
 
         if (item.getPostType().equals("2")) {
             holder.mediaVideoLayout.setVisibility(View.VISIBLE);
+            holder.mediaControllerLayout.setVisibility(View.VISIBLE);
             holder.imageMedia.setVisibility(View.GONE);
             postImages = AppConstants.POST_VIDEOS_THUMBNAIL + item.getImageName();
 
@@ -71,6 +83,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
                     .into(holder.mediaVideoThumbnail);
         } else {
             holder.mediaVideoLayout.setVisibility(View.GONE);
+            holder.mediaControllerLayout.setVisibility(View.GONE);
             holder.imageMedia.setVisibility(View.VISIBLE);
             postImages = AppConstants.POST_IMAGES + item.getImageName();
 
@@ -83,14 +96,14 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         holder.imageMedia.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                viewFullImage(postImages);
+                viewFullImage(item.getPostType(), postImages);
             }
         });
 
         holder.mediaVideoLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                viewFullImage(postImages);
+                viewFullImage(item.getPostType(), item.getVideoName());
             }
         });
 
@@ -107,16 +120,18 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
 
         private RecyclerViewClickListener mListener;
 
-        public FrameLayout mediaVideoLayout;
-        public ImageView imageMedia, mediaVideoThumbnail, mediaVideoVolumeControl;
+        public FrameLayout mediaVideoLayout, mediaControllerLayout;
+        public ImageView imageMedia, mediaVideoThumbnail, mediaVideoVolumeControl, mediaVideoPlay;
         public ProgressBar mediaVideoProgressBar;
 
         public ViewHolder(View itemView, RecyclerViewClickListener listener) {
             super(itemView);
             mediaVideoLayout = itemView.findViewById(R.id.media_video);
+            mediaControllerLayout = itemView.findViewById(R.id.media_controller);
             imageMedia = itemView.findViewById(R.id.media_image);
             mediaVideoThumbnail = itemView.findViewById(R.id.media_video_thumbnail);
             mediaVideoVolumeControl = itemView.findViewById(R.id.media_video_volume_control);
+            mediaVideoPlay = itemView.findViewById(R.id.media_video_one_play);
             mediaVideoProgressBar = itemView.findViewById(R.id.media_video_progressBar);
             mListener = listener;
             itemView.setOnClickListener(this);
@@ -145,12 +160,32 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         }
     };
 
-    private void viewFullImage(String url) {
+    private void viewFullImage(String postType, String url) {
         Dialog dialog = new Dialog(mContext, R.style.Theme_Dialog);
         dialog.setContentView(R.layout.image_full_view);
 
         ImageView close = dialog.findViewById(R.id.close);
         PhotoView photoView = dialog.findViewById(R.id.photo_view);
+        PlayerView videoView = dialog.findViewById(R.id.video_view);
+
+        if (postType.equals("2")) {
+            photoView.setVisibility(View.GONE);
+            videoView.setVisibility(View.VISIBLE);
+            // Setup Exoplayer instance
+            SimpleExoPlayer exoPlayerInstance = ExoPlayerFactory.newSimpleInstance(mContext);
+// Produces DataSource instances through which media data is loaded.
+            DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(mContext, Util.getUserAgent(mContext, "simpleExoPlayer"));
+            //Getting media from raw resource
+            MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
+                    .createMediaSource(Uri.parse(AppConstants.POST_VIDEOS + url));
+//Prepare the exoPlayerInstance with the source
+            exoPlayerInstance.prepare(videoSource);
+            videoView.setPlayer(exoPlayerInstance);
+        } else {
+            photoView.setVisibility(View.VISIBLE);
+            videoView.setVisibility(View.GONE);
+        }
+
         Glide.with(App.getAppContext())
                 .load(url)
                 .dontAnimate()
