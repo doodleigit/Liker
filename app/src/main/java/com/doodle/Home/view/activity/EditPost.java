@@ -578,7 +578,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 //                    makeText(PostNew.this, "mention-data: " + mentionMessage, LENGTH_SHORT).show();
                 }
 
-                //  List<String> extractedUrls = extractUrls("Welcome to https://stackoverflow.com/ and here is another link http://www.google.com/ \n which is a great search engine");
+                //  List<String> extractedUrls = extractUrls("ForgotPassword to https://stackoverflow.com/ and here is another link http://www.google.com/ \n which is a great search engine");
 
 
             }

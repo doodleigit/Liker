@@ -4,11 +4,9 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.StrictMode;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -36,9 +34,6 @@ import com.doodle.Tool.NetworkHelper;
 import com.doodle.Tool.PrefManager;
 import com.doodle.Tool.Tools;
 import com.google.gson.Gson;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -194,7 +189,7 @@ public class MyTwitter extends AppCompatActivity implements View.OnClickListener
             mtweet_layout.setVisibility(View.VISIBLE);
             mtwitter_login_layout.setVisibility(View.GONE);
             mSharedPreferences.getString(PREF_USER_NAME, "");
-            username_tv.setText("Welcome \n" + mSharedPreferences.getString(PREF_USER_NAME, ""));
+            username_tv.setText("ForgotPassword \n" + mSharedPreferences.getString(PREF_USER_NAME, ""));
 
         } else {
             mtweet_layout.setVisibility(View.GONE);
@@ -297,7 +292,7 @@ public class MyTwitter extends AppCompatActivity implements View.OnClickListener
             manager.setProfileName(username);
             String jj = user.getDescription();
             Log.d("Description", jj);
-            username_tv.setText("Welcome\n " + username);
+            username_tv.setText("ForgotPassword\n " + username);
 
             mtweet_layout.setVisibility(View.VISIBLE);
             mtwitter_login_layout.setVisibility(View.GONE);
@@ -361,8 +356,9 @@ public class MyTwitter extends AppCompatActivity implements View.OnClickListener
                     manager.setProfileId(profileId);
                     manager.setUserName(userName);
                     Intent intent = new Intent(MyTwitter.this, Home.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
+                    finish();
                 } else {
                     App.setIsTwitterLogin(status);
                     App.setIsFBLogin(true);
@@ -488,7 +484,7 @@ public class MyTwitter extends AppCompatActivity implements View.OnClickListener
                 mtweet_layout.setVisibility(View.GONE);
                 mtwitter_login_layout.setVisibility(View.VISIBLE);
                 twitter_logout_btn.setVisibility(View.GONE);
-                Intent intent = new Intent(MyTwitter.this, Welcome.class);
+                Intent intent = new Intent(MyTwitter.this, ForgotPassword.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 finish();

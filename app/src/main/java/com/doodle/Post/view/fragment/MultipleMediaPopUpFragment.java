@@ -224,6 +224,7 @@ public class MultipleMediaPopUpFragment extends Fragment {
         };
 
         galleryAdapter = new GalleryAdapter(getActivity(), item.getPostFiles(), listener);
+        singleImgRecyclerView.setMediaObjects(item.getPostFiles());
         singleImgRecyclerView.setAdapter(galleryAdapter);
     }
 

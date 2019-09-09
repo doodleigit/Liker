@@ -461,7 +461,11 @@ public class TrendingPost extends Fragment   {
                 progressView.setVisibility(View.GONE);
                 progressView.stopAnimation();
                 refreshLayout.setRefreshing(false);
-                ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(0);
+                try {
+                    ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(0);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
 

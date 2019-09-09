@@ -74,7 +74,7 @@ public interface AuthService {
                               @Field("oauth_id") String oauth_id,
                               @Field("token") String token,
                               @Field("secret") String secret,
-                              @Field("social_name ") String social_name,
+                              @Field("social_name") String social_name,
                               @Field("is_apps") String is_apps,
                               @Field("img_url") String img_url
     );

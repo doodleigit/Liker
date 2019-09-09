@@ -25,11 +25,12 @@ public class Splash extends AppCompatActivity {
 //        handler.postDelayed(new Runnable() {
 //            @Override
 //            public void run() {
-//                startActivity(new Intent(Splash.this, Welcome.class));
+//                startActivity(new Intent(Splash.this, ForgotPassword.class));
 //                finish();
 //            }
 //        },2000);
         if (manager.getProfileId().isEmpty()) {
+         //   startActivity(new Intent(Splash.this, ForgotPassword.class));
             startActivity(new Intent(Splash.this, Welcome.class));
         } else {
             startActivity(new Intent(Splash.this, Home.class));

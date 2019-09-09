@@ -333,7 +333,7 @@ public class ProfileActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 if (result != null) {
                     imageUri = result.getUri();
-//                    uploadImage();
+                    uploadImage();
                 } else {
                     Toast.makeText(getApplicationContext(), "Somethings went wrong", LENGTH_SHORT).show();
                 }
@@ -543,19 +543,21 @@ public class ProfileActivity extends AppCompatActivity {
                 try {
                     JSONObject object = new JSONObject(response.body());
                     boolean status = object.getBoolean("status");
-                    String message = object.getString("message");
                     if (status) {
-                        String image = object.getString("image");
+                        String image = object.getString("file_name");
+                        String message;
                         if (uploadContentType == 0) {
-                            userImage = image;
+                            userImage = AppConstants.USER_UPLOADED_IMAGES + image;
                             loadProfileImage();
+                            message = getString(R.string.profile_photo_has_been_updated);
                         } else {
-                            coverImage = image;
+                            coverImage = AppConstants.USER_UPLOADED_IMAGES + image;
                             loadCoverImage();
+                            message = getString(R.string.cover_photo_has_been_updated);
                         }
                         Toast.makeText(getApplicationContext(), message, LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(getApplicationContext(), "Something went wrong.", LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), getString(R.string.something_went_wrong), LENGTH_SHORT).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

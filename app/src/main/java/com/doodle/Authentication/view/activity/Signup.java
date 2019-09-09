@@ -66,6 +66,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.doodle.Tool.Tools.isNullOrEmpty;
+
 public class Signup extends AppCompatActivity implements View.OnClickListener, ResendEmail.BottomSheetListener {
 
 
@@ -136,7 +138,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
 
             countryInfos = intent.getParcelableArrayListExtra(MyService.MY_SERVICE_PAYLOAD);
             displayData();
-            Log.d("Datalist", countryInfos.toString());
+
         }
     };
     private String isApps = "true";
@@ -584,10 +586,13 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
             etEmail.setText(manager.getFbEmail());
             String imageUrl = manager.getFbImageUrl();
 
-            Picasso.with(Signup.this)
-                    .load(imageUrl)
-                    .placeholder(R.drawable.ic_facebook)
-                    .into(fbSignUp);
+            if(!isNullOrEmpty(imageUrl)){
+                Picasso.with(Signup.this)
+                        .load(imageUrl)
+                        .placeholder(R.drawable.ic_facebook)
+                        .into(fbSignUp);
+            }
+
 
         } else if (profileId != null && App.isIsTwitterSignup()) {
             tvHeader.setText("YOU'RE ALMOST DONE " + "\n" + "WE NEED A FEW MORE DETAILS...");
@@ -595,10 +600,14 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
             etFirstName.setText(manager.getTwitterName());
             String imageUrl = manager.getFbImageUrl();
 
-            Picasso.with(Signup.this)
-                    .load(imageUrl)
-                    .placeholder(R.drawable.ic_twitter)
-                    .into(twitterSignUp);
+            if(!isNullOrEmpty(imageUrl)){
+                Picasso.with(Signup.this)
+                        .load(imageUrl)
+                        .placeholder(R.drawable.ic_twitter)
+                        .into(twitterSignUp);
+            }
+
+
         } else if (profileId != null && !App.isIsFBLogin()) {
             tvHeader.setText("YOU'RE ALMOST DONE " + "\n" + "WE NEED A FEW MORE DETAILS...");
             tvOr.setVisibility(View.GONE);
@@ -704,6 +713,8 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
                     } else {
                         mImgUrl = "";
                     }
+                    mToken=manager.getToken();
+
 
                     requestData(mFirstName, mlastName, mEmail, mPassword, mRetypePassword, mGender, mCountry, mDay, mMonth, mYear, mCity, mProvider, mOauthId, mToken, mSecret, mSocialName, isApps, mImgUrl);
                 } else {
@@ -864,7 +875,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
             flipperId--;
             //  setVerificationLayoutVisibility(false);
         } else {
-            Intent intent = new Intent(this, Welcome.class);
+            Intent intent = new Intent(this, ForgotPassword.class);
             // intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             this.startActivity(intent);
             this.overridePendingTransition(0, 0);
@@ -1021,7 +1032,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-
+                Log.d("message", t.getMessage());
             }
         });
     }
@@ -1129,7 +1140,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
 //                    mViewFlipper.showNext();
 //
 //                }
-                //  startActivity(new Intent(Signup.this,Welcome.class));
+                //  startActivity(new Intent(Signup.this,ForgotPassword.class));
             }
 
             @Override
@@ -1166,7 +1177,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
 //                    mViewFlipper.showNext();
 //
 //                }
-                //  startActivity(new Intent(Signup.this,Welcome.class));
+                //  startActivity(new Intent(Signup.this,ForgotPassword.class));
             }
 
             @Override

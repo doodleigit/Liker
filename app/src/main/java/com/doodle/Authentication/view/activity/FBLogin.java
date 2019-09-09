@@ -144,7 +144,7 @@ public class FBLogin extends AppCompatActivity {
 //
 //                }else {
 //
-//                    startActivity(new Intent(FBLogin.this, Welcome.class));
+//                    startActivity(new Intent(FBLogin.this, ForgotPassword.class));
 //                }
             } else {
                 loadUserProfile(currentAccessToken);

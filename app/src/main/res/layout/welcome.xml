@@ -38,11 +38,11 @@
             android:id="@+id/btnLogin"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:layout_margin="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="@dimen/_20sdp"
             android:background="@drawable/btn_round_outline"
-            android:text="Log In"
+            android:text="Log in"
             android:textAllCaps="false"
-
             android:textColor="@android:color/white" />
     </LinearLayout>
 

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="10dp"
-    tools:context=".Authentication.view.activity.Welcome">
+    tools:context=".Authentication.view.activity.ForgotPassword">
 
     <TextView
         android:id="@+id/tvOTPCancel"
@@ -121,6 +121,8 @@
     </LinearLayout>
 
     <TextView
+
+        android:id="@+id/tvResendOTP"
         android:layout_below="@id/otpContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

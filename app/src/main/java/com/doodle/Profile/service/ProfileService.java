@@ -650,6 +650,16 @@ public interface ProfileService {
             @Field("is_public") boolean isPublic
     );
 
+    @POST(AppConstants.GET_POST_DETAILS)
+    @FormUrlEncoded
+    Call<PostItem> getPostDetails(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("user_id") String userIds,
+            @Field("post_id") String postId
+    );
+
     @POST(AppConstants.POST_DELETE)
     @FormUrlEncoded
     Call<String> postDelete(

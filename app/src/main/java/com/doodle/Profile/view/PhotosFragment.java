@@ -2,7 +2,9 @@ package com.doodle.Profile.view;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -16,7 +18,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.doodle.App;
+import com.doodle.Home.model.PostItem;
+import com.doodle.Post.view.activity.PostPopup;
 import com.doodle.Profile.adapter.AlbumAdapter;
 import com.doodle.Profile.adapter.AlbumPhotoAdapter;
 import com.doodle.Profile.adapter.PhotoAdapter;
@@ -24,6 +30,7 @@ import com.doodle.Profile.model.AlbumPhoto;
 import com.doodle.Profile.model.PhotoAlbum;
 import com.doodle.Profile.model.RecentPhoto;
 import com.doodle.Profile.service.PhotoAlbumClickListener;
+import com.doodle.Profile.service.PhotoClickListener;
 import com.doodle.Profile.service.ProfileService;
 import com.doodle.R;
 import com.doodle.Tool.PrefManager;
@@ -34,6 +41,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.doodle.Tool.AppConstants.ITEM_KEY;
+
 public class PhotosFragment extends Fragment {
 
     View view;
@@ -42,6 +51,7 @@ public class PhotosFragment extends Fragment {
     private ProgressDialog progressDialog;
 
     private PhotoAlbumClickListener photoAlbumClickListener;
+    private PhotoClickListener photoClickListener;
     private ProfileService profileService;
     private PrefManager manager;
     private AlbumAdapter albumAdapter;
@@ -81,6 +91,13 @@ public class PhotosFragment extends Fragment {
             @Override
             public void onAlbumClick(PhotoAlbum photoAlbum) {
                 showAlbumPhotos(photoAlbum);
+            }
+        };
+
+        photoClickListener = new PhotoClickListener() {
+            @Override
+            public void onPhotoClick(RecentPhoto photo) {
+                getPostDetails(photo);
             }
         };
 
@@ -145,6 +162,31 @@ public class PhotosFragment extends Fragment {
         rightSlide = dialog.findViewById(R.id.right_slide);
 
         dialog.show();
+    }
+
+    private void getPostDetails(RecentPhoto recentPhoto) {
+        progressDialog.show();
+        Call<PostItem> call = profileService.getPostDetails(deviceId, userId, token, userId, recentPhoto.getPostId());
+        call.enqueue(new Callback<PostItem>() {
+            @Override
+            public void onResponse(Call<PostItem> call, Response<PostItem> response) {
+                PostItem postItem = response.body();
+                if (postItem != null) {
+                    Intent intent = new Intent(getContext(), PostPopup.class);
+                    intent.putExtra(ITEM_KEY, (Parcelable) postItem);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(getContext(), getString(R.string.something_went_wrong), Toast.LENGTH_SHORT).show();
+                }
+                progressDialog.hide();
+            }
+
+            @Override
+            public void onFailure(Call<PostItem> call, Throwable t) {
+                progressDialog.hide();
+                Toast.makeText(getContext(), getString(R.string.something_went_wrong), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void sendAlbumListRequest(Call<ArrayList<PhotoAlbum>> call) {

@@ -11,11 +11,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <include layout="@layout/welcome" />
+     <!--   <include
+            layout="@layout/welcome" />-->
 
-        <include
+       <!-- <include
             android:id="@+id/loginContent"
-            layout="@layout/login" />
+            layout="@layout/login" />-->
 
         <include layout="@layout/forgot_password" />
 
