@@ -313,5 +313,12 @@
     <string name="login_in_with_facebook">Log in with <b>facebook</b></string>
     <string name="login_in_with_twitter">Log in with <b>twitter</b></string>
     <string name="login_in">Log in</string>
+    <string name="sign_up">Sign up</string>
+    <string name="forgot_password">Forgot Password</string>
+    <string name="reset_password">Reset Password</string>
+    <string name="next">Next</string>
+    <string name="finish">Finish</string>
+    <string name="continuing">Continue</string>
+    <string name="i_did_not_receive_the_email">I did not receive the email</string>
 
 </resources>
