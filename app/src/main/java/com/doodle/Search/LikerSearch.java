@@ -241,7 +241,7 @@ public class LikerSearch extends AppCompatActivity implements View.OnClickListen
                     tvShowSearchResult.setVisibility(View.GONE);
 
                 } else {
-                    Tools.toast(LikerSearch.this, "There is no history", R.drawable.ic_info_outline_blue_24dp);
+                    Tools.toast(LikerSearch.this, getString(R.string.enter_a_few_word_to_search), R.drawable.ic_info_outline_blue_24dp);
                     findViewById(R.id.containerRecent).setVisibility(View.GONE);
                     progressView.stopAnimation();
                     progressView.setVisibility(View.GONE);
@@ -428,7 +428,7 @@ public class LikerSearch extends AppCompatActivity implements View.OnClickListen
                     listView.setVisibility(View.GONE);
                     findViewById(R.id.containerRecent).setVisibility(View.GONE);
 
-                    Tools.toast(LikerSearch.this, "History clear!", R.drawable.ic_check_black_24dp);
+                    Tools.toast(LikerSearch.this, getString(R.string.nothing_to_show), R.drawable.ic_check_black_24dp);
                 } else {
                     Tools.toast(LikerSearch.this, "Please wait.!", R.drawable.ic_info_outline_blue_24dp);
 

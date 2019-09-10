@@ -842,8 +842,9 @@ public class ForgotPassword extends AppCompatActivity implements View.OnClickLis
 //                    intent.putExtra(USER_INFO_ITEM_KEY, (Parcelable) userInfo);
 //                    startActivity(intent);
 
-                    startActivity(new Intent(ForgotPassword.this, Home.class));
-                    finish();
+                    Intent intent = new Intent(ForgotPassword.this, Home.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK |Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
                 } else {
                     String msg = "Username and password miss match";
                     showStatus(msg);

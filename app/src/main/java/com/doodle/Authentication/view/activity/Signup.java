@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.net.Uri;
+import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.content.LocalBroadcastManager;
@@ -51,21 +52,37 @@ import com.doodle.Authentication.view.fragment.ResendEmail;
 import com.doodle.Authentication.viewmodel.SignupViewModel;
 import com.doodle.Home.view.activity.Home;
 import com.doodle.R;
+import com.doodle.Tool.AppConstants;
 import com.doodle.Tool.ClearableEditText;
 import com.doodle.Authentication.service.AuthService;
 import com.doodle.Tool.NetworkHelper;
 import com.doodle.Tool.PrefManager;
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
+import twitter4j.auth.RequestToken;
+import twitter4j.conf.Configuration;
+import twitter4j.conf.ConfigurationBuilder;
 
 import static com.doodle.Authentication.view.activity.Login.SOCIAL_ITEM;
 import static com.doodle.Comment.holder.CommentTextHolder.COMMENT_ITEM_KEY;
@@ -83,7 +100,6 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
     protected Animation slideRightOut;
     protected Animation slideLeftIn;
     protected Animation slideLeftOut;
-
 
     private EditText etPassword, etConFirmPassword;
     private ClearableEditText etFirstName, etLastName, etEmail;
@@ -167,12 +183,22 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
         }
     }
 
-    SocialInfo socialInfo;
+    private SocialInfo socialInfo;
+    private CallbackManager callbackManager;
+    public static final int WEBVIEW_REQUEST_CODE = 100;
+    private String mConsumerKey = null, mConsumerSecret = null, mCallbackUrl = null, mTwitterVerifier = null, mAuthVerifier = null;
+    private Twitter mTwitter = null;
+    private RequestToken mRequestToken = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.registration);
+
+        callbackManager = CallbackManager.Factory.create();
+        mConsumerKey = getString(R.string.com_twitter_sdk_android_CONSUMER_KEY);
+        mConsumerSecret = getString(R.string.com_twitter_sdk_android_CONSUMER_SECRET);
+        mAuthVerifier = "oauth_verifier";
 
         viewModel = ViewModelProviders.of(this).get(SignupViewModel.class);
         countryIds = new ArrayList<>();
@@ -208,7 +234,9 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
         spinnerCountry = findViewById(R.id.spinnerCountry);
         spinnerState = findViewById(R.id.spinnerState);
         findViewById(R.id.imgAboutSignUp).setOnClickListener(this);
-        findViewById(R.id.tvCancelSignup).setOnClickListener(this);
+        findViewById(R.id.ivCancelSignup).setOnClickListener(this);
+        findViewById(R.id.ivPreviousSignup).setOnClickListener(this);
+        findViewById(R.id.ivOTPCancel).setOnClickListener(this);
         btnOTPContinue = findViewById(R.id.btnOTPContinue);
         btnOTPContinue.setOnClickListener(this);
         firstNameLayout = (TextInputLayout) findViewById(R.id.firstNameLayout);
@@ -355,7 +383,6 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
             }
         });
 
-
         tvAcceptTerms = (TextView) findViewById(R.id.tvAcceptTerms);
         tvHeader = (TextView) findViewById(R.id.tvHeader);
         tvOr = (TextView) findViewById(R.id.tvOr);
@@ -364,7 +391,6 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
         tvAcceptFinish.setOnClickListener(this);
         originalTextFinish = (String) tvAcceptFinish.getText();
         originalText = (String) tvAcceptTerms.getText();
-
 
         SpannableString spannableStr = new SpannableString(originalText);
         ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(Color.parseColor("#46ADE3"));
@@ -442,7 +468,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
                 mEmail = etEmail.getText().toString();
 
 
-                if (!TextUtils.isEmpty(password) & !TextUtils.isEmpty(email) & !TextUtils.isEmpty(firstName) & !TextUtils.isEmpty(lastName) & !TextUtils.isEmpty(confirmPassword)) {
+                if (!TextUtils.isEmpty(email) & !TextUtils.isEmpty(firstName) & !TextUtils.isEmpty(lastName)) {
                     btnSignUp.setBackgroundResource(R.drawable.btn_round_outline);
                     btnSignUp.setEnabled(true);
 
@@ -457,7 +483,6 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
             @Override
             public void afterTextChanged(Editable s) {
                 viewModel.validateEmailField(etEmail);
-
             }
         });
 
@@ -470,16 +495,16 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 password = etPassword.getText().toString();
                 mPassword = etPassword.getText().toString();
-                if (!TextUtils.isEmpty(password) & !TextUtils.isEmpty(email) & !TextUtils.isEmpty(firstName) & !TextUtils.isEmpty(lastName) & !TextUtils.isEmpty(confirmPassword)) {
-                    btnSignUp.setBackgroundResource(R.drawable.btn_round_outline);
-                    btnSignUp.setEnabled(true);
-
-
-                } else {
-                    btnSignUp.setBackgroundResource(R.drawable.btn_round_outline_disable);
-                    btnSignUp.setEnabled(false);
-
-                }
+//                if (!TextUtils.isEmpty(password) & !TextUtils.isEmpty(email) & !TextUtils.isEmpty(firstName) & !TextUtils.isEmpty(lastName) & !TextUtils.isEmpty(confirmPassword)) {
+//                    btnSignUp.setBackgroundResource(R.drawable.btn_round_outline);
+//                    btnSignUp.setEnabled(true);
+//
+//
+//                } else {
+//                    btnSignUp.setBackgroundResource(R.drawable.btn_round_outline_disable);
+//                    btnSignUp.setEnabled(false);
+//
+//                }
 
             }
 
@@ -500,7 +525,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 firstName = etFirstName.getText().toString();
                 mFirstName = etFirstName.getText().toString();
-                if (!TextUtils.isEmpty(password) & !TextUtils.isEmpty(email) & !TextUtils.isEmpty(firstName) & !TextUtils.isEmpty(lastName) & !TextUtils.isEmpty(confirmPassword)) {
+                if (!TextUtils.isEmpty(email) & !TextUtils.isEmpty(firstName) & !TextUtils.isEmpty(lastName)) {
                     btnSignUp.setBackgroundResource(R.drawable.btn_round_outline);
                     btnSignUp.setEnabled(true);
 
@@ -515,10 +540,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
 
             @Override
             public void afterTextChanged(Editable s) {
-                /// bitForMessageSave = 1;
-                //   validateEditText(s);
                 viewModel.validateNameField(etFirstName);
-
             }
         });
 
@@ -532,7 +554,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 lastName = etLastName.getText().toString();
                 mlastName = etLastName.getText().toString();
-                if (!TextUtils.isEmpty(password) & !TextUtils.isEmpty(email) & !TextUtils.isEmpty(firstName) & !TextUtils.isEmpty(lastName) & !TextUtils.isEmpty(confirmPassword)) {
+                if (!TextUtils.isEmpty(email) & !TextUtils.isEmpty(firstName) & !TextUtils.isEmpty(lastName)) {
                     btnSignUp.setBackgroundResource(R.drawable.btn_round_outline);
                     btnSignUp.setEnabled(true);
 
@@ -546,9 +568,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
 
             @Override
             public void afterTextChanged(Editable s) {
-                /// bitForMessageSave = 1;
                 viewModel.validateNameField(etLastName);
-
             }
         });
 
@@ -561,15 +581,15 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 confirmPassword = etConFirmPassword.getText().toString();
                 mRetypePassword = etConFirmPassword.getText().toString();
-                if (!TextUtils.isEmpty(password) & !TextUtils.isEmpty(email) & !TextUtils.isEmpty(firstName) & !TextUtils.isEmpty(lastName) & !TextUtils.isEmpty(confirmPassword)) {
-                    btnSignUp.setBackgroundResource(R.drawable.btn_round_outline);
-                    btnSignUp.setEnabled(true);
-
-                } else {
-                    btnSignUp.setBackgroundResource(R.drawable.btn_round_outline_disable);
-                    btnSignUp.setEnabled(false);
-
-                }
+//                if (!TextUtils.isEmpty(password) & !TextUtils.isEmpty(email) & !TextUtils.isEmpty(firstName) & !TextUtils.isEmpty(lastName) & !TextUtils.isEmpty(confirmPassword)) {
+//                    btnSignUp.setBackgroundResource(R.drawable.btn_round_outline);
+//                    btnSignUp.setEnabled(true);
+//
+//                } else {
+//                    btnSignUp.setBackgroundResource(R.drawable.btn_round_outline_disable);
+//                    btnSignUp.setEnabled(false);
+//
+//                }
 
             }
 
@@ -581,100 +601,46 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
             }
         });
 
-        String twitterAuthId = manager.getTwitterOauthId();
-        String oauthId = manager.getOauthId();
-        String profileId = manager.getProfileId();
         socialInfo = getIntent().getExtras().getParcelable(SOCIAL_ITEM);
-
         if (socialInfo == null) {
             throw new AssertionError("Null data item received!");
         }
-
-
-        mOauthId = socialInfo.getAuthId();
-        mSocialName = socialInfo.getSocialName();
-        mImgUrl=socialInfo.getImage();
-
-        if (!isNullOrEmpty(socialInfo.getFirstName())/*profileId != null && App.isIsFBSignup()*/) {
-            //   findViewById(R.id.socialContainer).setVisibility(View.GONE);
-            tvHeader.setText("YOU'RE ALMOST DONE " + "\n" + "WE NEED A FEW MORE DETAILS...");
-            tvOr.setVisibility(View.GONE);
-//            etFirstName.setText(manager.getFbFirstName());
-            etFirstName.setText(socialInfo.getFirstName());
-//            etLastName.setText(manager.getFbLastName());
-            etLastName.setText(socialInfo.getLastName());
-            //  etEmail.setText(manager.getFbEmail());
-            etEmail.setText(socialInfo.getEmail());
-//            String imageUrl = manager.getFbImageUrl();
-            String imageUrl = socialInfo.getImage();
-            mProvider = "facebook";
-            if (!isNullOrEmpty(imageUrl)) {
-                Picasso.with(Signup.this)
-                        .load(imageUrl)
-                        .placeholder(R.drawable.ic_facebook)
-                        .into(fbSignUp);
-            }
-
-
-        } else if (!isNullOrEmpty(socialInfo.getFirstName())) {
-            tvHeader.setText("YOU'RE ALMOST DONE " + "\n" + "WE NEED A FEW MORE DETAILS...");
-            tvOr.setVisibility(View.GONE);
-          //  etFirstName.setText(manager.getTwitterName());
-            etFirstName.setText(socialInfo.getFirstName());
-           // String imageUrl = manager.getFbImageUrl();
-            String imageUrl = socialInfo.getImage();
-            mProvider = "twitter";
-            if (!isNullOrEmpty(imageUrl)) {
-                Picasso.with(Signup.this)
-                        .load(imageUrl)
-                        .placeholder(R.drawable.ic_twitter)
-                        .into(twitterSignUp);
-            }
-
-
-        } else if (!isNullOrEmpty(socialInfo.getFirstName())/*profileId != null && !App.isIsFBLogin()*/) {
-            tvHeader.setText("YOU'RE ALMOST DONE " + "\n" + "WE NEED A FEW MORE DETAILS...");
-            tvOr.setVisibility(View.GONE);
-//            etFirstName.setText(manager.getFbFirstName());
-            etFirstName.setText(socialInfo.getFirstName());
-//            etLastName.setText(manager.getFbLastName());
-            etLastName.setText(socialInfo.getLastName());
-//            etEmail.setText(manager.getFbEmail());
-            etEmail.setText(socialInfo.getEmail());
-            mProvider = "facebook";
-            App.setFbProvider("facebook");
-//            String imageUrl = manager.getFbImageUrl();
-            String imageUrl = socialInfo.getImage();
-            if (!imageUrl.isEmpty())
-                Picasso.with(Signup.this)
-                        .load(imageUrl)
-                        .placeholder(R.drawable.ic_facebook)
-                        .into(fbSignUp);
-
-        } else if (!isNullOrEmpty(socialInfo.getFirstName())) {
-            //   findViewById(R.id.socialContainer).setVisibility(View.GONE);
-            tvHeader.setText("YOU'RE ALMOST DONE " + "\n" + "WE NEED A FEW MORE DETAILS...");
-            tvOr.setVisibility(View.GONE);
-            etFirstName.setText(manager.getTwitterName());
-            etLastName.setText(manager.getTwitterName());
-            etEmail.setText(manager.getTwitterEmail());
-            App.setFbProvider("twitter");
-            mProvider = "twitter";
-            String imageUrl = manager.getTwitterImageUrl();
-
-            Picasso.with(Signup.this)
-                    .load(imageUrl)
-                    .placeholder(R.drawable.ic_twitter)
-                    .into(twitterSignUp);
-
-        } else {
-            //  findViewById(R.id.socialContainer).setVisibility(View.GONE);
-            //   App.setIsFBSignup(false);
-        }
-
-
+        setDate();
     }
 
+    private void setDate() {
+        mOauthId = socialInfo.getAuthId();
+        mSocialName = socialInfo.getSocialName();
+        mImgUrl = socialInfo.getImage();
+        mProvider = socialInfo.getProvider();
+        if (!socialInfo.getFirstName().isEmpty()) {
+            etFirstName.setText(socialInfo.getFirstName());
+        }
+        if (!socialInfo.getLastName().isEmpty()) {
+            etLastName.setText(socialInfo.getLastName());
+        }
+        if (!socialInfo.getEmail().isEmpty()) {
+            etEmail.setText(socialInfo.getEmail());
+        }
+        if (!socialInfo.getImage().isEmpty()) {
+            if (mProvider.equals("facebook")) {
+                Picasso.with(Signup.this)
+                        .load(socialInfo.getImage())
+                        .placeholder(R.drawable.ic_facebook)
+                        .into(fbSignUp);
+                twitterSignUp.setImageResource(R.drawable.ic_twitter);
+            } else if (mProvider.equals("twitter")) {
+                Picasso.with(Signup.this)
+                        .load(socialInfo.getImage())
+                        .placeholder(R.drawable.ic_twitter)
+                        .into(twitterSignUp);
+                fbSignUp.setImageResource(R.drawable.ic_facebook);
+            }
+        }
+        if (!mProvider.isEmpty()) {
+            tvHeader.setText("YOU'RE ALMOST DONE " + "\n" + "WE NEED A FEW MORE DETAILS...");
+        }
+    }
 
     @Override
     public void onClick(View v) {
@@ -685,12 +651,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
             case R.id.btnSignUp:
                 Log.d(TAG, "onClick: " + flipperId);
                 if (flipperId == 0) {
-
-
-                    boolean klsk = App.isIsValidate();
-                    Log.d("", klsk + "");
-
-                    if (App.isIsValidate()) {
+                    if (viewModel.validateNameField(etFirstName) && viewModel.validateNameField(etLastName) && viewModel.validateEmailField(etEmail)) {
                         flipperId++;
                         mViewFlipper.setInAnimation(slideLeftIn);
                         mViewFlipper.setOutAnimation(slideLeftOut);
@@ -700,62 +661,23 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
                         ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(Color.parseColor("#46ADE3"));
                         spannableStr.setSpan(foregroundColorSpan, 46, originalTextFinish.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
                         tvAcceptFinish.setText(spannableStr);
-
                     }
-
-
                 }
 
                 break;
 
             case R.id.btnFinish:
-//                    if (flipperId == 1) {
-//                        flipperId++;
-//                        mViewFlipper.setInAnimation(slideLeftIn);
-//                        mViewFlipper.setOutAnimation(slideLeftOut);
-//                        mViewFlipper.showNext();
-//
-//                    }
-
-                //   String query = intent.getStringExtra(SearchManager.QUERY);
-                if (networkOk) {
-                    //   requestData(query);
-             /*       String oauthId = manager.getOauthId();
-                    if (oauthId != null) {
-                        mOauthId = oauthId;
+                if (viewModel.validatePasswordField(etPassword) && viewModel.validateConfirmPasswordField(etConFirmPassword) && mGender.isEmpty() && mCountry.isEmpty() && mDay.isEmpty() && mMonth.isEmpty() &&
+                        mYear.isEmpty() && mCity.isEmpty() && mProvider.isEmpty() && mOauthId.isEmpty()) {
+                    if (networkOk) {
+                        requestData(mFirstName, mlastName, mEmail, mPassword, mRetypePassword, mGender, mCountry, mDay, mMonth, mYear, mCity, mProvider, mOauthId, mToken, mSecret, mSocialName, isApps, mImgUrl);
                     } else {
-                        mOauthId = "";
+                        showSnackbar(getString(R.string.no_internet));
                     }
-                    if (mProvider == null) {
-                        mProvider = App.getFbProvider();
-                    } else {
-                        mProvider = "";
-                    }
-
-                    if (mSocialName == null) {
-                        mSocialName = manager.getFbName();
-                    } else {
-                        mSocialName = "";
-                    }
-
-                    if (mImgUrl == null) {
-                        mImgUrl = manager.getFbImageUrl();
-                    } else {
-                        mImgUrl = "";
-                    }
-                    mToken = "";*/
-
-
-                    requestData(mFirstName, mlastName, mEmail, mPassword, mRetypePassword, mGender, mCountry, mDay, mMonth, mYear, mCity, mProvider, mOauthId, mToken, mSecret, mSocialName, isApps, mImgUrl);
                 } else {
-                    showSnackbar(getString(R.string.no_internet));
-
+                    showSnackbar(getString(R.string.all_field_required));
                 }
-
-
                 break;
-
-
             case R.id.etFirstName:
                 getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
                 //  Toast.makeText(this, "First name", Toast.LENGTH_SHORT).show();
@@ -775,9 +697,16 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
             case R.id.imgAboutSignUp:
                 startActivity(new Intent(this, About.class));
                 break;
-            case R.id.tvCancelSignup:
-                App.setIsFBSignup(false);
-                App.setIsTwitterSignup(false);
+            case R.id.ivCancelSignup:
+                finish();
+                break;
+            case R.id.ivPreviousSignup:
+                flipperId--;
+                mViewFlipper.setInAnimation(slideLeftIn);
+                mViewFlipper.setOutAnimation(slideLeftOut);
+                mViewFlipper.showPrevious();
+                break;
+            case R.id.ivOTPCancel:
                 finish();
                 break;
             case R.id.tvAcceptTerms:
@@ -790,14 +719,10 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
                 requestForOTPLogin();
                 break;
             case R.id.fbSignUp:
-                App.setIsFBSignup(true);
-                App.setFbProvider("facebook");
-                startActivity(new Intent(this, FBLogin.class));
+                facebookLogin();
                 break;
             case R.id.twitterSignUp:
-                App.setIsTwitterSignup(true);
-                App.setFbProvider("twitter");
-                startActivity(new Intent(this, MyTwitter.class));
+                loginToTwitter();
                 break;
 
         }
@@ -843,7 +768,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
                     if (otpStatus) {
                         // startActivity(new Intent(Signup.this, Liker.class));
                         Intent intent = new Intent(Signup.this, Home.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK |Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(intent);
                     } else {
 
@@ -877,42 +802,6 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
 
 
     }
-
-
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        App.setIsFBSignup(false);
-        App.setIsTwitterSignup(false);
-//        if (keyCode == KeyEvent.KEYCODE_BACK) {
-////            onHomeClick();
-//            return true;
-//
-//        }
-        return false;
-        //  return super.onKeyDown(keyCode, event);
-
-    }
-
-
-    private void onHomeClick() {
-//         int index = mViewFlipper.getDisplayedChild();
-//        int index = mViewFlipper.getDisplayedChild();
-        // int index=mViewFlipper.getCurrentView().getId();
-        if (flipperId > 0) {
-            mViewFlipper.setInAnimation(slideRightIn);
-            mViewFlipper.setOutAnimation(slideRightOut);
-            mViewFlipper.showPrevious();
-            flipperId--;
-            //  setVerificationLayoutVisibility(false);
-        } else {
-            Intent intent = new Intent(this, ForgotPassword.class);
-            // intent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-            this.startActivity(intent);
-            this.overridePendingTransition(0, 0);
-            Signup.this.finish();
-        }
-    }
-
 
     public void goBrowser(String url) {
         if (networkok) {
@@ -966,8 +855,6 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
     boolean status;
 
     private void sendRequest(Call<String> call) {
-
-
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
@@ -1228,4 +1115,121 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
         snackbar.show();
     }
 
+    private void facebookLogin() {
+        LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("email", "public_profile"));
+        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                if (networkOk) {
+                    loadUserProfile(loginResult.getAccessToken());
+                } else {
+                    Toast.makeText(getApplicationContext(), "no internet!", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+
+            }
+        });
+    }
+
+    private void loginToTwitter() {
+        final ConfigurationBuilder builder = new ConfigurationBuilder();
+        builder.setOAuthConsumerKey(mConsumerKey);
+        builder.setOAuthConsumerSecret(mConsumerSecret);
+
+        final Configuration configuration = builder.build();
+        final TwitterFactory factory = new TwitterFactory(configuration);
+        mTwitter = factory.getInstance();
+        try {
+            mRequestToken = mTwitter.getOAuthRequestToken(mCallbackUrl);
+            startWebAuthentication();
+        } catch (TwitterException e) {
+            e.printStackTrace();
+            Log.d("FA", "FA");
+        }
+    }
+
+    protected void startWebAuthentication() {
+        final Intent intent = new Intent(Signup.this,
+                TwitterAuthenticationActivity.class);
+        intent.putExtra(TwitterAuthenticationActivity.EXTRA_URL,
+                mRequestToken.getAuthenticationURL());
+        startActivityForResult(intent, WEBVIEW_REQUEST_CODE);
+    }
+
+    private void loadUserProfile(AccessToken newAccessToken) {
+
+        GraphRequest request = GraphRequest.newMeRequest(newAccessToken, new GraphRequest.GraphJSONObjectCallback() {
+            @Override
+            public void onCompleted(JSONObject object, GraphResponse response) {
+                try {
+                    Log.d("DATA", object.toString());
+
+                    String first_name = object.getString("first_name");
+                    String last_name = object.getString("last_name");
+                    String email = object.getString("email");
+                    String oauthId = object.getString("id");
+                    String image_url = "https://graph.facebook.com/" + oauthId + "/picture?type=normal";
+                    String name = object.getString("name");
+
+                    socialInfo.setAuthId(oauthId);
+                    socialInfo.setFirstName(first_name);
+                    socialInfo.setLastName(last_name);
+                    socialInfo.setEmail(email);
+                    socialInfo.setSocialName(name);
+                    socialInfo.setImage(image_url);
+                    socialInfo.setProvider("facebook");
+                    setDate();
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+
+        Bundle paramBundle = new Bundle();
+//        paramBundle.putString("fields", "first_name,last_name,email,id");
+        paramBundle.putString("fields", "first_name,last_name,email,id,name,gender,birthday");
+        request.setParameters(paramBundle);
+        request.executeAsync();
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == WEBVIEW_REQUEST_CODE) {
+            if (data != null)
+                mTwitterVerifier = data.getExtras().getString(mAuthVerifier);
+
+            twitter4j.auth.AccessToken accessToken;
+            try {
+                accessToken = mTwitter.getOAuthAccessToken(mRequestToken,
+                        mTwitterVerifier);
+
+                long userID = accessToken.getUserId();
+                socialInfo.setAuthId(String.valueOf(userID));
+                final twitter4j.User user = mTwitter.showUser(userID);
+                Log.d("IDS", user.getId() + "");
+                String imageUrl = user.getProfileImageURL();
+                socialInfo.setImage(imageUrl);
+                String username = user.getName();
+                socialInfo.setFirstName(username);
+                socialInfo.setLastName(username);
+                socialInfo.setSocialName(username);
+                socialInfo.setProvider("twitter");
+                Log.d("Description", user.getDescription());
+                setDate();
+
+            } catch (Exception e) {
+            }
+        }
+    }
 }

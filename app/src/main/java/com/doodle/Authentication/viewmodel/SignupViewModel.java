@@ -39,54 +39,49 @@ public class SignupViewModel extends AndroidViewModel {
         return String.valueOf(result);
     }
 
-    public void validateNameField(EditText edt_text) {
+    public boolean validateNameField(EditText edt_text) {
         String str = edt_text.getText().toString();
 
         if (validateTor.isEmpty(str)) {
             edt_text.setError("Field is empty!");
-            App.setIsValidate(false);
+            return false;
         }
         if (validateTor.isAtleastLength(str, 2)
                 && validateTor.isAtMostLength(str, 24)
                 && validateTor.isAlpha(str)
 
         ) {
-            App.setIsValidate(true);
+            return true;
         } else {
-            {
-                edt_text.setError("Be between 2-24 letters" + "\n" + "Letters only");
-
-                App.setIsValidate(false);
-            }
+            edt_text.setError("Be between 2-24 letters" + "\n" + "Letters only");
+            return false;
         }
     }
 
-    public void validateEmailField(EditText edt_email) {
-
+    public boolean validateEmailField(EditText edt_email) {
         String str = edt_email.getText().toString();
 
         if (validateTor.isEmpty(str)) {
             edt_email.setError("Field is empty!");
-            App.setIsValidate(false);
+            return false;
         }
 
         if (!validateTor.isEmail(str)) {
             edt_email.setError("Invalid Email entered!");
-            App.setIsValidate(false);
+            return false;
         } else {
-            // Toast.makeText(getApplication(), "Valid Email!", Toast.LENGTH_SHORT).show();
-            App.setIsValidate(true);
+            return true;
         }
     }
 
     String password, confirmPassword;
 
-    public void validatePasswordField(EditText edt_password) {
+    public boolean validatePasswordField(EditText edt_password) {
         password = edt_password.getText().toString();
         // Check if password field is empty
         if (validateTor.isEmpty(password)) {
             edt_password.setError("Field is empty!");
-            App.setIsValidate(false);
+            return false;
         }
 
         if (validateTor.isAtleastLength(password, 8)
@@ -95,33 +90,30 @@ public class SignupViewModel extends AndroidViewModel {
                 && validateTor.hasAtleastOneLetter(password)
                 && !validateTor.containsSubstring(password, " ")
         ) {
-            // Valid Password
-            App.setIsValidate(true);
+            return true;
         } else {
-            // Invalid Password, handle in ui
             edt_password.setError("Be between 8-20 characters" + "\n" + "Contain at least 1 letter" + "\n" + "Contain at least 1 digit" + "\n" + "Not contain a space");
-            App.setIsValidate(false);
+            return false;
         }
     }
 
-    public void validateConfirmPasswordField(EditText edt_password) {
+    public boolean validateConfirmPasswordField(EditText edt_password) {
         confirmPassword = edt_password.getText().toString();
         // Check if password field is empty
         if (validateTor.isEmpty(confirmPassword)) {
             edt_password.setError("Field is empty!");
-            App.setIsValidate(false);
+            return false;
         }
 
         if (validateTor.containsSubstring(confirmPassword, password)
         ) {
-            // Valid Password
-            App.setIsValidate(true);
+            return true;
         } else {
             // Invalid Password, handle in ui
             edt_password.setError("This field is required" + "\n" + "Password miss match");
-            App.setIsValidate(false);
+            return false;
         }
-}
+    }
 
     public void validateCreditCardField(EditText edt_email) {
 
@@ -148,6 +140,7 @@ public class SignupViewModel extends AndroidViewModel {
 
 
     City city;
+
     public void sendRequest(Call<City> call) {
 
         call.enqueue(new Callback<City>() {
@@ -157,7 +150,7 @@ public class SignupViewModel extends AndroidViewModel {
                 city = response.body();
 
                 Log.d("Message", city.toString());
-              //  Toast.makeText(getApplication(), "Message: " + city.toString(), Toast.LENGTH_SHORT).show();
+                //  Toast.makeText(getApplication(), "Message: " + city.toString(), Toast.LENGTH_SHORT).show();
 
             }
 

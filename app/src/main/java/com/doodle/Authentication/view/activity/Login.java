@@ -1,5 +1,6 @@
 package com.doodle.Authentication.view.activity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.StrictMode;
@@ -15,13 +16,11 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.request.RequestOptions;
 import com.doodle.App;
 import com.doodle.Authentication.model.LoginUser;
 import com.doodle.Authentication.model.SocialInfo;
@@ -44,10 +43,8 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
-import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.google.gson.Gson;
 import com.onesignal.OneSignal;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -79,6 +76,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     private String mDeviceId;
     private boolean networkOk;
     private ProgressBar progressBar;
+    private ProgressDialog progressDialog;
 
     private CallbackManager callbackManager;
     private AccessTokenTracker tokenTracker;
@@ -88,7 +86,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     private String mConsumerKey = null, mConsumerSecret = null, mCallbackUrl = null, mTwitterVerifier = null, mAuthVerifier = null;
     public static final int WEBVIEW_REQUEST_CODE = 100;
 
-   SocialInfo socialInfo;
+    private SocialInfo socialInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,23 +95,27 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
-        socialInfo=new SocialInfo();
+        socialInfo = new SocialInfo();
         manager = new PrefManager(this);
         networkOk = NetworkHelper.hasNetworkAccess(this);
         findViewById(R.id.fbLogin).setOnClickListener(this);
         findViewById(R.id.twitterLogin).setOnClickListener(this);
         etEmail = (ClearableEditText) findViewById(R.id.etEmail);
         findViewById(R.id.etEmail).setOnClickListener(this);
-        etPassword = (EditText) findViewById(R.id.etPassword);
+        etPassword = findViewById(R.id.etPassword);
         etEmail.setOnEditorActionListener(editorListener);
         etPassword.setOnEditorActionListener(editorListener);
-        tvForgot = (TextView) findViewById(R.id.tvForgot);
-        tvSignIn = (TextView) findViewById(R.id.tvSignIn);
+        tvForgot = findViewById(R.id.tvForgot);
+        tvSignIn = findViewById(R.id.tvSignIn);
         tvSignIn.setOnClickListener(this);
         progressBar = findViewById(R.id.progress_bar);
         findViewById(R.id.tvForgot).setOnClickListener(this);
         findViewById(R.id.imgAbout).setOnClickListener(this);
         findViewById(R.id.ivCancel).setOnClickListener(this);
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage(getString(R.string.loading));
+        progressDialog.setCancelable(false);
 
         mConsumerKey = getString(R.string.com_twitter_sdk_android_CONSUMER_KEY);
         mConsumerSecret = getString(R.string.com_twitter_sdk_android_CONSUMER_SECRET);
@@ -136,7 +138,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
             }
         });
-
 
         etEmail.setDrawableClickListener(new ClearableEditText.DrawableClickListener() {
             @Override
@@ -164,13 +165,10 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 email = etEmail.getText().toString();
-
-
                 if (!TextUtils.isEmpty(password) & !TextUtils.isEmpty(email)) {
                     tvForgot.setTextColor(Color.parseColor("#1485CC"));
                     tvSignIn.setBackgroundResource(R.drawable.btn_round_outline);
                     tvSignIn.setEnabled(true);
-
                 } else {
                     tvSignIn.setBackgroundResource(R.drawable.btn_round_outline_disable);
                     tvForgot.setTextColor(Color.parseColor("#89C3E7"));
@@ -299,12 +297,11 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-
-                    if (networkOk) {
-                        loadUserProfile(loginResult.getAccessToken());
-                    } else {
-                        Toast.makeText(getApplicationContext(), "no internet!", Toast.LENGTH_SHORT).show();
-                    }
+                if (networkOk) {
+                    loadUserProfile(loginResult.getAccessToken());
+                } else {
+                    Toast.makeText(getApplicationContext(), "no internet!", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
@@ -369,37 +366,24 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                     Log.d("DATA", object.toString());
 
                     String first_name = object.getString("first_name");
-                    socialInfo.setFirstName(first_name);
-                    manager.setFbFirstName(first_name);
                     String last_name = object.getString("last_name");
-                    socialInfo.setLastName(last_name);
-                    manager.setFbLastName(last_name);
                     String email = object.getString("email");
-                    socialInfo.setEmail(email);
-                    manager.setFbEmail(email);
                     String oauthId = object.getString("id");
-                    socialInfo.setAuthId(oauthId);
-                    manager.setOauthId(oauthId);
-                    manager.setProfileId(oauthId);
                     String image_url = "https://graph.facebook.com/" + oauthId + "/picture?type=normal";
-                    socialInfo.setImage(image_url);
-                    manager.setFbImageUrl(image_url);
-                    manager.setProfileImage(image_url);
                     String name = object.getString("name");
-                    manager.setFbName(name);
+
+                    socialInfo.setAuthId(oauthId);
+                    socialInfo.setFirstName(first_name);
+                    socialInfo.setLastName(last_name);
+                    socialInfo.setEmail(email);
                     socialInfo.setSocialName(name);
-                    String birthDay = object.getString("birthday");
-                    manager.setFbBirthDay(birthDay);
-                    String mProfileName = first_name + " " + last_name;
-                    manager.setProfileName(mProfileName);
+                    socialInfo.setImage(image_url);
                     socialInfo.setProvider("facebook");
 
                     String appSocialAccessCode = AppConstants.APP_SOCIAL_ACCESS_CODE;
                     String oauthProvider = AppConstants.OAUTH_PROVIDER_FB;
                     String deviceId = manager.getDeviceId();
                     socialLoginFacebook(appSocialAccessCode, oauthProvider, oauthId, deviceId);
-
-
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -459,22 +443,23 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                 boolean status = loginUser.isStatus();
                 if (status) {
                     String mToken = loginUser.getToken();
-                    manager.setToken(mToken);
                     UserInfo userInfo = loginUser.getUserInfo();
                     Gson gson = new Gson();
                     String json = gson.toJson(userInfo);
-                    manager.setUserInfo(json);
                     String profileName = userInfo.getFirstName() + " " + userInfo.getLastName();
                     String userName = userInfo.getUserName();
                     String photo = userInfo.getPhoto();
                     App.setProfilePhoto(photo);
                     String profileId = userInfo.getUserId();
+
+                    manager.setUserInfo(json);
+                    manager.setToken(mToken);
                     manager.setProfileName(profileName);
                     manager.setProfileImage(POST_IMAGES + photo);
                     manager.setProfileId(profileId);
                     manager.setUserName(userName);
                     Intent intent = new Intent(Login.this, Home.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK |Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
                 } else {
                     Intent intent = new Intent(Login.this, Signup.class);
@@ -499,30 +484,29 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                 boolean status = loginUser.isStatus();
                 if (status) {
                     String mToken = loginUser.getToken();
-                    manager.setToken(mToken);
                     UserInfo userInfo = loginUser.getUserInfo();
                     Gson gson = new Gson();
                     String json = gson.toJson(userInfo);
-                    manager.setUserInfo(json);
                     String profileName = userInfo.getFirstName() + " " + userInfo.getLastName();
                     String userName = userInfo.getUserName();
                     String photo = userInfo.getPhoto();
                     App.setProfilePhoto(photo);
                     String profileId = userInfo.getUserId();
+
+                    manager.setUserInfo(json);
+                    manager.setToken(mToken);
                     manager.setProfileName(profileName);
                     manager.setProfileImage(POST_IMAGES + photo);
                     manager.setProfileId(profileId);
                     manager.setUserName(userName);
                     Intent intent = new Intent(Login.this, Home.class);
-                    //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK |Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
-                    finish();
                 } else {
                     Intent intent = new Intent(Login.this, Signup.class);
                     intent.putExtra(SOCIAL_ITEM, socialInfo);
                     startActivity(intent);
                     finish();
-
                 }
 
             }
@@ -538,34 +522,29 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         call.enqueue(new Callback<LoginUser>() {
             @Override
             public void onResponse(Call<LoginUser> call, Response<LoginUser> response) {
-
                 LoginUser loginUser = response.body();
                 boolean status = loginUser.isStatus();
-
                 if (status) {
                     String mToken = loginUser.getToken();
-                    manager.setToken(mToken);
                     showSnackbar("login success!");
                     UserInfo userInfo = loginUser.getUserInfo();
                     Gson gson = new Gson();
                     String json = gson.toJson(userInfo);
-                    manager.setUserInfo(json);
                     String profileName = userInfo.getFirstName() + " " + userInfo.getLastName();
                     String userName = userInfo.getUserName();
                     String photo = userInfo.getPhoto();
                     App.setProfilePhoto(photo);
                     String profileId = userInfo.getUserId();
+
+                    manager.setToken(mToken);
+                    manager.setUserInfo(json);
                     manager.setProfileName(profileName);
                     manager.setProfileImage(POST_IMAGES + photo);
                     manager.setProfileId(profileId);
                     manager.setUserName(userName);
-                    //   startActivity(new Intent(ForgotPassword.this, Liker.class));
-//                    Intent intent=new Intent(ForgotPassword.this,Home.class);
-//                    intent.putExtra(USER_INFO_ITEM_KEY, (Parcelable) userInfo);
-//                    startActivity(intent);
-
-                    startActivity(new Intent(Login.this, Home.class));
-                    finish();
+                    Intent intent = new Intent(Login.this, Home.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK |Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
                 } else {
                     String msg = "Username and password miss match";
                     showStatus(msg);
@@ -594,7 +573,6 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                 Log.d("message", t.getMessage());
                 progressBar.setVisibility(View.GONE);
                 loginDisable(false);
-
             }
         });
     }
@@ -641,45 +619,28 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                 accessToken = mTwitter.getOAuthAccessToken(mRequestToken,
                         mTwitterVerifier);
 
-
                 long userID = accessToken.getUserId();
                 socialInfo.setAuthId(String.valueOf(userID));
-
-                manager.setTwitterOauthId(String.valueOf(userID));
-                manager.setProfileId(String.valueOf(userID));
                 final User user = mTwitter.showUser(userID);
-
-                long ids = user.getId();
-                Log.d("IDS", ids + "");
+                Log.d("IDS", user.getId() + "");
                 String imageUrl = user.getProfileImageURL();
                 socialInfo.setImage(imageUrl);
-                manager.setTwitter_imageUrl(imageUrl);
-                manager.setProfileImage(imageUrl);
                 String username = user.getName();
                 socialInfo.setFirstName(username);
                 socialInfo.setLastName(username);
                 socialInfo.setSocialName(username);
-                manager.setTwitterName(username);
-                manager.setProfileName(username);
-                String jj = user.getDescription();
-                Log.d("Description", jj);
-//                saveTwitterInformation(accessToken);
-                if (App.isIsTwitterSignup()) {
-                    startActivity(new Intent(Login.this, Signup.class));
-                    finish();
-                } else {
-                    if (networkOk) {
-                        String appSocialAccessCode = AppConstants.APP_SOCIAL_ACCESS_CODE;
-                        String oauthProvider = AppConstants.OAUTH_PROVIDER_TWITTER;
-                        String deviceId = manager.getDeviceId();
+                socialInfo.setEmail("");
+                socialInfo.setProvider("twitter");
+                Log.d("Description", user.getDescription());
 
-                        //String oauthId = manager.getTwitterOauthId();
-                      //  String oauthId = manager.getProfileId();
-                        String oauthId =socialInfo.getAuthId();
-                        socialLoginTwitter(appSocialAccessCode, oauthProvider, oauthId, deviceId);
-                    } else {
-                        Toast.makeText(getApplicationContext(), "no internet!", Toast.LENGTH_SHORT).show();
-                    }
+                if (networkOk) {
+                    String appSocialAccessCode = AppConstants.APP_SOCIAL_ACCESS_CODE;
+                    String oauthProvider = AppConstants.OAUTH_PROVIDER_TWITTER;
+                    String deviceId = manager.getDeviceId();
+                    String oauthId = socialInfo.getAuthId();
+                    socialLoginTwitter(appSocialAccessCode, oauthProvider, oauthId, deviceId);
+                } else {
+                    Toast.makeText(getApplicationContext(), "no internet!", Toast.LENGTH_SHORT).show();
                 }
 
             } catch (Exception e) {

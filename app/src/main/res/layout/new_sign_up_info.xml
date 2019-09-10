@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,6 +8,11 @@
     android:orientation="vertical"
     tools:context=".Authentication.view.activity.Signup">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:focusableInTouchMode="true"
+        android:orientation="vertical">
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -16,7 +21,7 @@
         android:layout_marginBottom="10dp">
 
         <ImageView
-            android:id="@+id/ivCancelSignup"
+            android:id="@+id/ivPreviousSignup"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:paddingTop="5dp"
@@ -216,9 +221,12 @@
         android:id="@+id/tvAcceptFinish"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="20dp"
         android:layout_marginBottom="20dp"
         android:gravity="bottom|center"
         android:text="By signing up you confirm that you\n
 accept all Terms of Service" />
 
-</LinearLayout>
+    </LinearLayout>
+
+</ScrollView>

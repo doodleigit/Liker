@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".Authentication.view.activity.ForgotPassword">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="10dp">
+
+        <ImageView
+            android:id="@+id/ivOTPCancel"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:paddingTop="5dp"
+            android:paddingStart="5dp"
+            android:paddingEnd="5dp"
+            android:paddingBottom="5dp"
+            android:layout_gravity="start|center"
+            android:src="@drawable/ic_keyboard_arrow_left_black_24dp"
+            android:tint="#798A9A" />
+
+        <TextView
+            android:id="@+id/tvHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/sign_up_account"
+            android:textStyle="bold"
+            android:textSize="16sp"/>
+
+        <ImageView
+            android:id="@+id/imgOTPAbout"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:paddingTop="10dp"
+            android:paddingStart="5dp"
+            android:paddingEnd="15dp"
+            android:paddingBottom="10dp"
+            android:layout_gravity="end|center"
+            android:src="@drawable/ic_list_black_24dp"
+            android:tint="#798A9A" />
+
+    </FrameLayout>
+
+    <TextView
+        android:id="@+id/tvOTP"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvHeader"
+        android:layout_margin="15dp"
+        android:text="@string/otp_string_signup" />
+
+
+    <LinearLayout
+        android:id="@+id/otpContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvOTP"
+        android:gravity="center"
+        android:orientation="vertical"
+        tools:context="com.chaos.view.example.MainActivity">
+
+        <com.chaos.view.PinView
+            android:id="@+id/firstPinView"
+            style="@style/PinWidget.PinView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:cursorVisible="true"
+            android:hint="Hint."
+            android:inputType="text"
+            android:itemBackground="@mipmap/ic_launcher"
+            android:padding="5dp"
+            android:textColor="@color/text_colors"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:cursorColor="@color/line_selected"
+            app:cursorWidth="2dp"
+            app:itemCount="6"
+            app:itemHeight="48dp"
+            app:itemRadius="4dp"
+            app:itemSpacing="5dp"
+            app:itemWidth="48dp"
+            app:lineColor="@color/line_colors"
+            app:lineWidth="2dp"
+            app:viewType="rectangle">
+
+            <requestFocus />
+        </com.chaos.view.PinView>
+
+        <Button
+            android:id="@+id/btnOTPContinue"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginLeft="50dp"
+            android:layout_marginTop="25dp"
+            android:layout_marginRight="50dp"
+            android:background="@drawable/btn_round_outline_disable"
+            android:text="@string/continuing"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white" />
+
+    </LinearLayout>
+
+    <TextView
+
+        android:id="@+id/tvResendOTP"
+        android:layout_below="@id/otpContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:textColor="#57A9DD"
+        android:text="@string/i_did_not_receive_the_email" />
+
+</LinearLayout>
+

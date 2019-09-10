@@ -13,9 +13,9 @@
 
         <include
             android:id="@+id/signupContent"
-            layout="@layout/signup" />
-        <include layout="@layout/signup_info" />
-        <include layout="@layout/otp_signup" />
+            layout="@layout/new_signup" />
+        <include layout="@layout/new_sign_up_info" />
+        <include layout="@layout/new_otp_signup" />
         <!--<include layout="@layout/about" />-->
 
     </ViewFlipper>

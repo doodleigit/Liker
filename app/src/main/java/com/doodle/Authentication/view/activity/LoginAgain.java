@@ -61,7 +61,6 @@ public class LoginAgain extends AppCompatActivity implements View.OnClickListene
         switch (id) {
             case R.id.tvLoginPage:
                 startActivity(new Intent(this, Login.class));
-                finish();
                 break;
             case R.id.tvSignUpPage:
                 SocialInfo info = new SocialInfo("","","","","","","");
