@@ -14,7 +14,7 @@
         android:layout_marginBottom="10dp">
 
         <ImageView
-            android:id="@+id/ivOTPCancel"
+            android:id="@+id/imgOTPCancel"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:paddingTop="5dp"

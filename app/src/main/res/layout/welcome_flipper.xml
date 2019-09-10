@@ -11,7 +11,7 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_centerInParent="true"
-        android:visibility="visible" />
+        android:visibility="gone" />
 
     <ViewFlipper
         android:id="@+id/viewFlipperContent"
@@ -24,12 +24,15 @@
         <!-- <include
              android:id="@+id/loginContent"
              layout="@layout/login" />-->
+<!--
+        <include layout="@layout/forgot_password" />-->
+        <include layout="@layout/new_forget_password" />
 
-        <include layout="@layout/forgot_password" />
+      <!--  <include layout="@layout/otp" />-->
+        <include layout="@layout/new_otp"/>
 
-        <include layout="@layout/otp" />
-
-        <include layout="@layout/reset_password" />
+       <!-- <include layout="@layout/reset_password" />-->
+        <include layout="@layout/new_reset_password" />
 
         <!--<include layout="@layout/about" />-->
 
