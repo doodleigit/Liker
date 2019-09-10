@@ -1,12 +1,16 @@
 package com.doodle.Authentication.view.activity;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.TextView;
 
 import com.doodle.R;
 import com.doodle.Setting.view.SettingActivity;
+
+import java.util.Calendar;
 
 public class About extends AppCompatActivity implements View.OnClickListener {
 
@@ -18,6 +22,10 @@ public class About extends AppCompatActivity implements View.OnClickListener {
         findViewById(R.id.containerTerms).setOnClickListener(this);
         findViewById(R.id.privacyContainer).setOnClickListener(this);
         findViewById(R.id.contactContainer).setOnClickListener(this);
+
+        String cr = String.format(getString(R.string.copyright), Calendar.getInstance().get(Calendar.YEAR));
+        TextView copyright = findViewById(R.id.copyright);
+        copyright.setText(cr);
     }
 
     @Override

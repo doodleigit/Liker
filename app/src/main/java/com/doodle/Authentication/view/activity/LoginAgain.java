@@ -9,9 +9,12 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.doodle.Authentication.model.SocialInfo;
 import com.doodle.R;
 import com.doodle.Tool.PrefManager;
 import com.squareup.picasso.Picasso;
+
+import static com.doodle.Authentication.view.activity.Login.SOCIAL_ITEM;
 
 public class LoginAgain extends AppCompatActivity implements View.OnClickListener {
 
@@ -61,7 +64,10 @@ public class LoginAgain extends AppCompatActivity implements View.OnClickListene
                 finish();
                 break;
             case R.id.tvSignUpPage:
-                startActivity(new Intent(this, Signup.class));
+                SocialInfo info = new SocialInfo("","","","","","","");
+                Intent intent=new Intent(this,Signup.class);
+                intent.putExtra(SOCIAL_ITEM,info);
+                startActivity(intent);
                 break;
             case R.id.profile_layout:
 //                startActivity(new Intent(this, Signup.class));

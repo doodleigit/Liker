@@ -5,7 +5,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
+import com.doodle.Authentication.model.SocialInfo;
 import com.doodle.R;
+
+import static com.doodle.Authentication.view.activity.Login.SOCIAL_ITEM;
 
 public class Welcome extends AppCompatActivity implements View.OnClickListener {
 
@@ -23,11 +26,12 @@ public class Welcome extends AppCompatActivity implements View.OnClickListener {
         switch (id) {
             case R.id.btnLogin:
                 startActivity(new Intent(this, Login.class));
-                finish();
                 break;
             case R.id.tvSignup:
-                startActivity(new Intent(this, Signup.class));
-                finish();
+                SocialInfo info = new SocialInfo("","","","","","","");
+                Intent intent = new Intent(this, Signup.class);
+                intent.putExtra(SOCIAL_ITEM, info);
+                startActivity(intent);
                 break;
         }
     }

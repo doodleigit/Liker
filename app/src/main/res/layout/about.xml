@@ -207,8 +207,8 @@ android:layout_margin="10dp"
 
     </LinearLayout>
 
-
      <TextView
+         android:id="@+id/copyright"
          android:layout_alignParentBottom="true"
          android:layout_width="match_parent"
          android:layout_height="wrap_content"
@@ -216,7 +216,7 @@ android:layout_margin="10dp"
          android:layout_margin="20dp"
          android:paddingBottom="20dp"
          android:textColor="#788898"
-         android:text="@string/test_string"
+         android:text="@string/copyright"
          />
 
 

@@ -44,6 +44,7 @@ import com.doodle.Authentication.model.CountryInfo;
 import com.doodle.Authentication.model.CountrySpinner;
 import com.doodle.Authentication.model.Data;
 import com.doodle.Authentication.model.ResendStatus;
+import com.doodle.Authentication.model.SocialInfo;
 import com.doodle.Authentication.model.User;
 import com.doodle.Authentication.service.MyService;
 import com.doodle.Authentication.view.fragment.ResendEmail;
@@ -66,6 +67,10 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.doodle.Authentication.view.activity.Login.SOCIAL_ITEM;
+import static com.doodle.Comment.holder.CommentTextHolder.COMMENT_ITEM_KEY;
+import static com.doodle.Comment.holder.CommentTextHolder.POST_ITEM_KEY;
+import static com.doodle.Comment.holder.CommentTextHolder.REPLY_KEY;
 import static com.doodle.Tool.Tools.isNullOrEmpty;
 
 public class Signup extends AppCompatActivity implements View.OnClickListener, ResendEmail.BottomSheetListener {
@@ -162,6 +167,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
         }
     }
 
+    SocialInfo socialInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -172,6 +178,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
         countryIds = new ArrayList<>();
         countryNames = new ArrayList<>();
         user = new User();
+        socialInfo = new SocialInfo();
         networkOk = NetworkHelper.hasNetworkAccess(this);
         manager = new PrefManager(this);
         mDeviceId = manager.getDeviceId();
@@ -577,16 +584,31 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
         String twitterAuthId = manager.getTwitterOauthId();
         String oauthId = manager.getOauthId();
         String profileId = manager.getProfileId();
-        if (profileId != null && App.isIsFBSignup()) {
+        socialInfo = getIntent().getExtras().getParcelable(SOCIAL_ITEM);
+
+        if (socialInfo == null) {
+            throw new AssertionError("Null data item received!");
+        }
+
+
+        mOauthId = socialInfo.getAuthId();
+        mSocialName = socialInfo.getSocialName();
+        mImgUrl=socialInfo.getImage();
+
+        if (!isNullOrEmpty(socialInfo.getFirstName())/*profileId != null && App.isIsFBSignup()*/) {
             //   findViewById(R.id.socialContainer).setVisibility(View.GONE);
             tvHeader.setText("YOU'RE ALMOST DONE " + "\n" + "WE NEED A FEW MORE DETAILS...");
             tvOr.setVisibility(View.GONE);
-            etFirstName.setText(manager.getFbFirstName());
-            etLastName.setText(manager.getFbLastName());
-            etEmail.setText(manager.getFbEmail());
-            String imageUrl = manager.getFbImageUrl();
-
-            if(!isNullOrEmpty(imageUrl)){
+//            etFirstName.setText(manager.getFbFirstName());
+            etFirstName.setText(socialInfo.getFirstName());
+//            etLastName.setText(manager.getFbLastName());
+            etLastName.setText(socialInfo.getLastName());
+            //  etEmail.setText(manager.getFbEmail());
+            etEmail.setText(socialInfo.getEmail());
+//            String imageUrl = manager.getFbImageUrl();
+            String imageUrl = socialInfo.getImage();
+            mProvider = "facebook";
+            if (!isNullOrEmpty(imageUrl)) {
                 Picasso.with(Signup.this)
                         .load(imageUrl)
                         .placeholder(R.drawable.ic_facebook)
@@ -594,13 +616,15 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
             }
 
 
-        } else if (profileId != null && App.isIsTwitterSignup()) {
+        } else if (!isNullOrEmpty(socialInfo.getFirstName())) {
             tvHeader.setText("YOU'RE ALMOST DONE " + "\n" + "WE NEED A FEW MORE DETAILS...");
             tvOr.setVisibility(View.GONE);
-            etFirstName.setText(manager.getTwitterName());
-            String imageUrl = manager.getFbImageUrl();
-
-            if(!isNullOrEmpty(imageUrl)){
+          //  etFirstName.setText(manager.getTwitterName());
+            etFirstName.setText(socialInfo.getFirstName());
+           // String imageUrl = manager.getFbImageUrl();
+            String imageUrl = socialInfo.getImage();
+            mProvider = "twitter";
+            if (!isNullOrEmpty(imageUrl)) {
                 Picasso.with(Signup.this)
                         .load(imageUrl)
                         .placeholder(R.drawable.ic_twitter)
@@ -608,21 +632,26 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
             }
 
 
-        } else if (profileId != null && !App.isIsFBLogin()) {
+        } else if (!isNullOrEmpty(socialInfo.getFirstName())/*profileId != null && !App.isIsFBLogin()*/) {
             tvHeader.setText("YOU'RE ALMOST DONE " + "\n" + "WE NEED A FEW MORE DETAILS...");
             tvOr.setVisibility(View.GONE);
-            etFirstName.setText(manager.getFbFirstName());
-            etLastName.setText(manager.getFbLastName());
-            etEmail.setText(manager.getFbEmail());
+//            etFirstName.setText(manager.getFbFirstName());
+            etFirstName.setText(socialInfo.getFirstName());
+//            etLastName.setText(manager.getFbLastName());
+            etLastName.setText(socialInfo.getLastName());
+//            etEmail.setText(manager.getFbEmail());
+            etEmail.setText(socialInfo.getEmail());
+            mProvider = "facebook";
             App.setFbProvider("facebook");
-            String imageUrl = manager.getFbImageUrl();
+//            String imageUrl = manager.getFbImageUrl();
+            String imageUrl = socialInfo.getImage();
             if (!imageUrl.isEmpty())
                 Picasso.with(Signup.this)
                         .load(imageUrl)
                         .placeholder(R.drawable.ic_facebook)
                         .into(fbSignUp);
 
-        } else if (profileId != null && !App.isIsTwitterLogin()) {
+        } else if (!isNullOrEmpty(socialInfo.getFirstName())) {
             //   findViewById(R.id.socialContainer).setVisibility(View.GONE);
             tvHeader.setText("YOU'RE ALMOST DONE " + "\n" + "WE NEED A FEW MORE DETAILS...");
             tvOr.setVisibility(View.GONE);
@@ -630,6 +659,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
             etLastName.setText(manager.getTwitterName());
             etEmail.setText(manager.getTwitterEmail());
             App.setFbProvider("twitter");
+            mProvider = "twitter";
             String imageUrl = manager.getTwitterImageUrl();
 
             Picasso.with(Signup.this)
@@ -690,7 +720,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
                 //   String query = intent.getStringExtra(SearchManager.QUERY);
                 if (networkOk) {
                     //   requestData(query);
-                    String oauthId = manager.getOauthId();
+             /*       String oauthId = manager.getOauthId();
                     if (oauthId != null) {
                         mOauthId = oauthId;
                     } else {
@@ -713,7 +743,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
                     } else {
                         mImgUrl = "";
                     }
-                    mToken=manager.getToken();
+                    mToken = "";*/
 
 
                     requestData(mFirstName, mlastName, mEmail, mPassword, mRetypePassword, mGender, mCountry, mDay, mMonth, mYear, mCity, mProvider, mOauthId, mToken, mSecret, mSocialName, isApps, mImgUrl);
@@ -853,11 +883,11 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         App.setIsFBSignup(false);
         App.setIsTwitterSignup(false);
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            onHomeClick();
-            return true;
-
-        }
+//        if (keyCode == KeyEvent.KEYCODE_BACK) {
+////            onHomeClick();
+//            return true;
+//
+//        }
         return false;
         //  return super.onKeyDown(keyCode, event);
 
