@@ -482,7 +482,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             public void onResponse(Call<LoginUser> call, Response<LoginUser> response) {
                 LoginUser loginUser = response.body();
                 boolean status = loginUser.isStatus();
-                if (status) {
+                 if (status) {
                     String mToken = loginUser.getToken();
                     UserInfo userInfo = loginUser.getUserInfo();
                     Gson gson = new Gson();

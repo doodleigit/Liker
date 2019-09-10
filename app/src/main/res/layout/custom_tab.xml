@@ -4,6 +4,6 @@
     android:layout_height="wrap_content"
     android:gravity="center_horizontal"
     android:id="@+id/tab"
-    android:textColor="@color/colorAccent"
+    android:textColor="@android:color/darker_gray"
     android:textSize="@dimen/tab_label"
     android:fontFamily="@string/font_fontFamily_medium"/>

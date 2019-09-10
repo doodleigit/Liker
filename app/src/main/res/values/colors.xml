@@ -47,4 +47,8 @@
     <color name="light_green">#DFF0D8</color>
     <color name="deep_green">#558955</color>
 
+
+    <color name="colorHintTextLight">#80FFFFFF</color>
+    <color name="colorPrimaryTextLight">#FFFFFF</color>
+
 </resources>
