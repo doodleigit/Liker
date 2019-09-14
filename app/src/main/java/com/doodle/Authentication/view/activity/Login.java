@@ -62,7 +62,7 @@ import twitter4j.auth.RequestToken;
 import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
 
-import static com.doodle.Tool.AppConstants.POST_IMAGES;
+import static com.doodle.Tool.AppConstants.PROFILE_IMAGE;
 
 public class Login extends AppCompatActivity implements View.OnClickListener {
 
@@ -455,7 +455,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                     manager.setUserInfo(json);
                     manager.setToken(mToken);
                     manager.setProfileName(profileName);
-                    manager.setProfileImage(POST_IMAGES + photo);
+                    manager.setProfileImage(PROFILE_IMAGE + photo);
                     manager.setProfileId(profileId);
                     manager.setUserName(userName);
                     Intent intent = new Intent(Login.this, Home.class);
@@ -496,7 +496,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                     manager.setUserInfo(json);
                     manager.setToken(mToken);
                     manager.setProfileName(profileName);
-                    manager.setProfileImage(POST_IMAGES + photo);
+                    manager.setProfileImage(PROFILE_IMAGE + photo);
                     manager.setProfileId(profileId);
                     manager.setUserName(userName);
                     Intent intent = new Intent(Login.this, Home.class);
@@ -539,7 +539,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                     manager.setToken(mToken);
                     manager.setUserInfo(json);
                     manager.setProfileName(profileName);
-                    manager.setProfileImage(POST_IMAGES + photo);
+                    manager.setProfileImage(PROFILE_IMAGE + photo);
                     manager.setProfileId(profileId);
                     manager.setUserName(userName);
                     Intent intent = new Intent(Login.this, Home.class);

@@ -9,10 +9,11 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp">
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginBottom="5dp">
 
         <include
-
             android:id="@+id/imagePostContainer"
             layout="@layout/post_star_user_header_image"
             android:layout_width="50dp"
@@ -55,7 +56,8 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:layout_marginLeft="@dimen/_5sdp"
-                    android:text="7 minutes ago" />
+                    android:text="7 minutes ago"
+                    android:textColor="@color/colorPrimaryText"/>
             </LinearLayout>
 
             <LinearLayout
@@ -67,7 +69,8 @@
                     android:id="@+id/tvHeaderInfo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="33 Likes | 25 Stars | 10 Followers | Auto- Toyota Car Menufacturee" />
+                    android:text="33 Likes | 25 Stars | 10 Followers | Auto- Toyota Car Menufacturee"
+                    android:textColor="@color/colorPrimaryText"/>
 
             </LinearLayout>
 
@@ -79,8 +82,6 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerInParent="true"
-            android:layout_marginLeft="@dimen/_10sdp"
-            android:layout_marginRight="@dimen/_5sdp"
             android:src="@drawable/ic_more_vert_black_24dp"
             android:tint="#8596A3" />
 

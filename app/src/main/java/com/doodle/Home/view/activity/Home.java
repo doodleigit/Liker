@@ -10,19 +10,24 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -36,6 +41,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.doodle.App;
+import com.doodle.Authentication.model.LoginInfo;
 import com.doodle.Authentication.model.UserInfo;
 import com.doodle.Authentication.view.activity.LoginAgain;
 import com.doodle.Comment.model.Comment_;
@@ -108,17 +114,20 @@ public class Home extends AppCompatActivity implements
         ReportPersonMessageSheet.BottomSheetListener,
         ReportLikerMessageSheet.BottomSheetListener,
         FollowSheet.BottomSheetListener,
-        BlockUserDialog.BlockListener {
+        BlockUserDialog.BlockListener,
+        NavigationView.OnNavigationItemSelectedListener {
 
+    private DrawerLayout drawer;
+    private NavigationView mainNavigationView, navigationView, footerNavigationView;
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private Toolbar toolbar;
-    private CircleImageView profileImage;
+    private CircleImageView profileImage, navProfileImage;
     private Spinner categorySpinner;
     private ProgressDialog progressDialog;
     private PrefManager manager;
     private String image_url;
-    private String token, deviceId, userId, userName, selectedCategory = "";
+    private String token, deviceId, userId, userName, profileName, selectedCategory = "";
     int categoryPosition = 0;
     private Socket socket, mSocket;
     private HomeService webService;
@@ -133,8 +142,8 @@ public class Home extends AppCompatActivity implements
     private ArrayList<CommonCategory> commonCategories;
     private CategoryTitleAdapter categoryTitleAdapter;
 
-    private ImageView imageNewPost, imageNotification, imageFriendRequest, imageProfile, imageStarContributor;
-    private TextView newNotificationCount, newMessageNotificationCount, filterItem;
+    private ImageView navClose, imageNewPost, imageNotification, imageFriendRequest, imageStarContributor;
+    private TextView navUserName, navLogout, newNotificationCount, newMessageNotificationCount, filterItem;
     private RecyclerView categoryRecyclerView;
 
     public LoadCompleteListener loadCompleteListener;
@@ -186,7 +195,6 @@ public class Home extends AppCompatActivity implements
         setBroadcast();
         sendCategoryListRequest();
 
-
     }
 
     private void initialComponent() {
@@ -214,14 +222,22 @@ public class Home extends AppCompatActivity implements
         registerReceiver(reconnectSocketBroadcast, reFilter);
 
         findViewById(R.id.tvSearchInput).setOnClickListener(this);
+        drawer = findViewById(R.id.drawer_layout);
+        mainNavigationView = findViewById(R.id.main_nav_view);
+        navigationView = findViewById(R.id.nav_view);
+        footerNavigationView = findViewById(R.id.footer_nav_view);
+        mainNavigationView.setNavigationItemSelectedListener(this);
+        navigationView.setNavigationItemSelectedListener(this);
+        navProfileImage = navigationView.getHeaderView(0).findViewById(R.id.nav_user_image);
+        navUserName = navigationView.getHeaderView(0).findViewById(R.id.nav_user_name);
+        navLogout = footerNavigationView.getHeaderView(0).findViewById(R.id.nav_log_out);
+        navClose = navigationView.getHeaderView(0).findViewById(R.id.nav_close);
         imageNewPost = findViewById(R.id.imageNewPost);
         imageNewPost.setOnClickListener(this);
         imageNotification = findViewById(R.id.imageNotification);
         imageNotification.setOnClickListener(this);
         imageFriendRequest = findViewById(R.id.imageFriendRequest);
         imageFriendRequest.setOnClickListener(this);
-        imageProfile = findViewById(R.id.imageProfile);
-        imageProfile.setOnClickListener(this);
         imageStarContributor = findViewById(R.id.imageStarContributor);
         imageStarContributor.setOnClickListener(this);
         profileImage = findViewById(R.id.profile_image);
@@ -242,15 +258,22 @@ public class Home extends AppCompatActivity implements
         deviceId = manager.getDeviceId();
         userId = manager.getProfileId();
         userName = manager.getUserName();
+        profileName = manager.getProfileName();
         profileId = manager.getProfileId();
         token = manager.getToken();
-
 
         if (image_url != null && image_url.length() > 0) {
             Picasso.with(Home.this)
                     .load(image_url)
                     .placeholder(R.drawable.profile)
                     .into(profileImage);
+            Picasso.with(Home.this)
+                    .load(image_url)
+                    .placeholder(R.drawable.profile)
+                    .into(navProfileImage);
+        }
+        if (profileName != null && profileName.length() > 0) {
+            navUserName.setText(profileName);
         }
 
         socket = new SocketIOManager().getWSocketInstance();
@@ -280,6 +303,31 @@ public class Home extends AppCompatActivity implements
             }
         };
 
+        profileImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(Home.this, ProfileActivity.class).putExtra("user_id", userId).putExtra("user_name", userName));
+            }
+        });
+
+        navClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                drawer.closeDrawer(Gravity.END);
+            }
+        });
+
+        navLogout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LoginInfo loginInfo = new LoginInfo(manager.getUserInfo(), manager.getToken(), manager.getProfileName(), manager.getProfileImage(), manager.getProfileId(), manager.getUserName(), manager.getDeviceId());
+                Intent loginAgain = new Intent(Home.this, LoginAgain.class);
+                loginAgain.putExtra("login_info", loginInfo);
+                manager.pref.edit().clear().apply();
+                startActivity(loginAgain);
+                finish();
+            }
+        });
 
     }
 
@@ -801,7 +849,7 @@ public class Home extends AppCompatActivity implements
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("TabbedCoordinatorLayout");
-        Drawable drawable = ContextCompat.getDrawable(getApplicationContext(), R.drawable.ic_arrow_drop_down);
+        Drawable drawable = ContextCompat.getDrawable(getApplicationContext(), R.drawable.settings);
         toolbar.setOverflowIcon(drawable);
 // getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
@@ -946,8 +994,8 @@ public class Home extends AppCompatActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.home_menu, menu);
-        MenuCompat.setGroupDividerEnabled(menu, true);
+        getMenuInflater().inflate(R.menu.nav_menu, menu);
+//        MenuCompat.setGroupDividerEnabled(menu, true);
 
         return true;
     }
@@ -955,58 +1003,13 @@ public class Home extends AppCompatActivity implements
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        switch (id) {
-            case R.id.action_log_out:
-                manager.pref.edit().clear().apply();
-                startActivity(new Intent(this, LoginAgain.class));
-                finish();
-                return true;
 
-            case R.id.action_account_setting:
-                Intent accountIntent = new Intent(this, SettingActivity.class);
-                accountIntent.putExtra("type", "account");
-                accountIntent.putExtra("link", getString(R.string.how_to_use_liker_link));
-                startActivity(accountIntent);
-                return true;
-
-            case R.id.action_find_friends:
-                Intent findFriendsIntent = new Intent(this, SettingActivity.class);
-                findFriendsIntent.putExtra("type", "findFriends");
-                findFriendsIntent.putExtra("link", getString(R.string.how_to_use_liker_link));
-                startActivity(findFriendsIntent);
-                return true;
-
-            case R.id.action_privacy_security:
-                Intent privacyIntent = new Intent(this, SettingActivity.class);
-                privacyIntent.putExtra("type", "privacy");
-                privacyIntent.putExtra("link", getString(R.string.how_to_use_liker_link));
-                startActivity(privacyIntent);
-                return true;
-
-            case R.id.action_notification_settings:
-                Intent notificationIntent = new Intent(this, SettingActivity.class);
-                notificationIntent.putExtra("type", "notification");
-                notificationIntent.putExtra("link", getString(R.string.how_to_use_liker_link));
-                startActivity(notificationIntent);
-                return true;
-
-            case R.id.action_contributor_settings:
-                Intent contributorIntent = new Intent(this, SettingActivity.class);
-                contributorIntent.putExtra("type", "contributor");
-                contributorIntent.putExtra("link", getString(R.string.how_to_use_liker_link));
-                startActivity(contributorIntent);
-                return true;
-
-            case R.id.action_how_to_use_liker:
-                Intent intent = new Intent(this, SettingActivity.class);
-                intent.putExtra("type", getString(R.string.how_to_use_liker));
-                intent.putExtra("link", getString(R.string.how_to_use_liker_link));
-                startActivity(intent);
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
+        if (id == R.id.navigation_setting) {
+            drawer.openDrawer(Gravity.END);
+            return true;
         }
+
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -1036,10 +1039,6 @@ public class Home extends AppCompatActivity implements
                 startActivity(new Intent(this, MessageActivity.class));
 // imageFriendRequest.setCircleBackgroundColor(getResources().getColor(R.color.colorWhite));
 // imageFriendRequest.setImageResource(R.drawable.ic_people_outline_blue_24dp);
-                break;
-
-            case R.id.imageProfile:
-                startActivity(new Intent(this, ProfileActivity.class).putExtra("user_id", userId).putExtra("user_name", userName));
                 break;
 
             case R.id.imageStarContributor:
@@ -1086,7 +1085,11 @@ public class Home extends AppCompatActivity implements
             return;
         }
         JZVideoPlayer.releaseAllVideos();
-        super.onBackPressed();
+        if (drawer.isDrawerOpen(GravityCompat.END)) {
+            drawer.closeDrawer(GravityCompat.END);
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
@@ -1263,46 +1266,60 @@ public class Home extends AppCompatActivity implements
         });
     }
 
-
     @Override
     public void onCancelResult(DialogFragment dlg) {
         // Toast.makeText(this, "Neutral button", Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
 
-    public void sendDeletePostRequest(Call<String> call) {
+        switch (id) {
+            case R.id.action_account_setting:
+                Intent accountIntent = new Intent(this, SettingActivity.class);
+                accountIntent.putExtra("type", "account");
+                accountIntent.putExtra("link", getString(R.string.how_to_use_liker_link));
+                startActivity(accountIntent);
+                break;
 
+            case R.id.action_find_friends:
+                Intent findFriendsIntent = new Intent(this, SettingActivity.class);
+                findFriendsIntent.putExtra("type", "findFriends");
+                findFriendsIntent.putExtra("link", getString(R.string.how_to_use_liker_link));
+                startActivity(findFriendsIntent);
+                break;
 
-        call.enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                if (response.isSuccessful()) {
-                    if (response.body() != null) {
-                        try {
-                            JSONObject object = new JSONObject(response.body());
-                            boolean status = object.getBoolean("status");
-                            App.setDeleteStatus(status);
+            case R.id.action_privacy_security:
+                Intent privacyIntent = new Intent(this, SettingActivity.class);
+                privacyIntent.putExtra("type", "privacy");
+                privacyIntent.putExtra("link", getString(R.string.how_to_use_liker_link));
+                startActivity(privacyIntent);
+                break;
 
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        Log.i("onSuccess", response.body().toString());
-                    } else {
-                        Log.i("onEmptyResponse", "Returned empty response");
-                    }
-                }
+            case R.id.action_notification_settings:
+                Intent notificationIntent = new Intent(this, SettingActivity.class);
+                notificationIntent.putExtra("type", "notification");
+                notificationIntent.putExtra("link", getString(R.string.how_to_use_liker_link));
+                startActivity(notificationIntent);
+                break;
 
-            }
+            case R.id.action_contributor_settings:
+                Intent contributorIntent = new Intent(this, SettingActivity.class);
+                contributorIntent.putExtra("type", "contributor");
+                contributorIntent.putExtra("link", getString(R.string.how_to_use_liker_link));
+                startActivity(contributorIntent);
+                break;
 
-            @Override
-            public void onFailure(Call<String> call, Throwable t) {
+            case R.id.action_how_to_use_liker:
+                Intent intent = new Intent(this, SettingActivity.class);
+                intent.putExtra("type", getString(R.string.how_to_use_liker));
+                intent.putExtra("link", getString(R.string.how_to_use_liker_link));
+                startActivity(intent);
+                break;
+        }
 
-            }
-
-        });
-
-
+        drawer.closeDrawer(GravityCompat.END);
+        return true;
     }
-
-
 }

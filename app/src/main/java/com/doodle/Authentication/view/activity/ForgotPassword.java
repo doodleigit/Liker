@@ -57,6 +57,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.doodle.Tool.AppConstants.POST_IMAGES;
+import static com.doodle.Tool.AppConstants.PROFILE_IMAGE;
 
 public class ForgotPassword extends AppCompatActivity implements View.OnClickListener, ResendEmail.BottomSheetListener {
 
@@ -806,8 +807,6 @@ public class ForgotPassword extends AppCompatActivity implements View.OnClickLis
 
         Call<LoginUser> call = webService.loginUser(email, password, mDeviceId);
         sendRequest(call);
-
-
     }
 
     UserInfo userInfo;
@@ -834,7 +833,7 @@ public class ForgotPassword extends AppCompatActivity implements View.OnClickLis
                     App.setProfilePhoto(photo);
                     String profileId = userInfo.getUserId();
                     manager.setProfileName(profileName);
-                    manager.setProfileImage(POST_IMAGES + photo);
+                    manager.setProfileImage(PROFILE_IMAGE + photo);
                     manager.setProfileId(profileId);
                     manager.setUserName(userName);
                     //   startActivity(new Intent(ForgotPassword.this, Liker.class));

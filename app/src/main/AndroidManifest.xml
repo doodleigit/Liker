@@ -15,11 +15,12 @@
         android:theme="@style/AppTheme"
         android:vmSafeMode="true"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".Authentication.view.activity.Login"
-            android:theme="@style/AppTheme.NoActionBar"
-            />
-        <activity android:name=".Authentication.view.activity.Welcome"
-            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".Authentication.view.activity.Login"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Authentication.view.activity.Welcome"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Post.view.activity.PostPopup"
             android:theme="@style/AppTheme.SlidrActivityTheme" />
@@ -181,11 +182,11 @@
             android:enabled="true"
             android:exported="true" />
     </application>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
-
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
 </manifest>

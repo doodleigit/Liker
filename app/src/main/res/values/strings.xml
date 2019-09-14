@@ -1,9 +1,18 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">Liker</string>
+    <integer-array name="privacy_list_drawable">
+        <item>@drawable/public_</item>
+        <item>@drawable/only_me</item>
+        <item>@drawable/friends</item>
+    </integer-array>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <integer-array name="privacy_list_two_drawable">
+        <item>@drawable/public_</item>
+        <item>@drawable/friends</item>
+    </integer-array>
 
+    <string name="app_name">Liker</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="copyright">Copyright \u00A9 %1$d Likeopedia, LLC</string>
     <string name="otp_string">A verifiction code hase been sent to the email address associated with your account.Please type the code to reset your password</string>
     <string name="no_internet">No Internet</string>
@@ -13,159 +22,60 @@
     <string name="ui_fist_name">First Name Empty</string>
     <string name="btn_resend">RESEND</string>
     <string name="com.twitter.sdk.android.CONSUMER_KEY" tools:ignore="ExtraTranslation">ko3F8utVGev4bn7v5YS554zIU</string>
-    <string name="com.twitter.sdk.android.CONSUMER_SECRET" tools:ignore="ExtraTranslation">PJUCYZZEZadnljLo8OQ22ApwG24QZx0wsbXqSnUUFBlAjHmkBY</string>
-    <string name="otp_string_signup">A verifiction code hase been sent to the email address associated with your account.Please type the code to Sign up your Account</string>
 
     //menu_home
+    <string name="com.twitter.sdk.android.CONSUMER_SECRET" tools:ignore="ExtraTranslation">PJUCYZZEZadnljLo8OQ22ApwG24QZx0wsbXqSnUUFBlAjHmkBY</string>
+    <string name="otp_string_signup">A verifiction code hase been sent to the email address associated with your account.Please type the code to Sign up your Account</string>
     <string name="action_how_to_use_liker">How to use Liker</string>
     <string name="action_account_setting">Account Settings</string>
     <string name="action_find_friends">Find Friends</string>
     <string name="action_privacy_security">Privacy &amp; Security</string>
     <string name="action_notification_settings">Notification Settings</string>
-    <string name="action_contributor_settings">Contributor Settings</string>
-    <string name="action_log_out">Log Out</string>
 
     //Expandale list
+    <string name="action_contributor_settings">Contributor Settings</string>
+    <string name="action_log_out">Log Out</string>
     <string name="text_alcohol">Alcohol</string>
     <string name="text_coffee">Coffee</string>
     <string name="text_pasta">Pasta</string>
     <string name="text_cold_drinks">Cold Drinks</string>
     <string name="text_expanded">Expanded</string>
     <string name="text_collapsed">Collapsed</string>
+
+
     <string name="tvLikeCount"><u>10</u></string>
+
     <string name="search_hint">Search</string>
 
-
-    <string-array name="string_array_alcohol">
-        <item>Vodka</item>
-        <item>Rum</item>
-        <item>Whiskey</item>
-        <item>Gin</item>
-        <item>Tequila</item>
-    </string-array>
-
-    <string-array name="string_array_coffee">
-        <item>Espresso</item>
-        <item>Macchiato</item>
-        <item>Cappuccino</item>
-        <item>Cafe Latte</item>
-        <item>Ristretto</item>
-    </string-array>
-
-    <string-array name="string_array_pasta">
-        <item>Carbonara</item>
-        <item>Capellini</item>
-        <item>Spaghetti</item>
-        <item>Gnocchi</item>
-        <item>Lasagnette</item>
-    </string-array>
-
-    <string-array name="string_array_cold_drinks">
-        <item>Cola</item>
-        <item>Lemonade</item>
-        <item>Citrus soda</item>
-        <item>Juice</item>
-        <item>Sparkling Water</item>
-    </string-array>
-
-    <string-array name="gender_list">
-        <item>Select</item>
-        <item>Male</item>
-        <item>Female</item>
-    </string-array>
-
-    <string-array name="privacy_list">
-        <item>Public</item>
-        <item>Only Me</item>
-        <item>Friends</item>
-    </string-array>
-
-    <integer-array name="privacy_list_drawable">
-        <item>@drawable/public_</item>
-        <item>@drawable/only_me</item>
-        <item>@drawable/friends</item>
-    </integer-array>
-
-    <string-array name="privacy_list_two">
-        <item>Everyone</item>
-        <item>Nobody</item>
-    </string-array>
-
-    <integer-array name="privacy_list_two_drawable">
-        <item>@drawable/public_</item>
-        <item>@drawable/friends</item>
-    </integer-array>
-
-    <string-array name="institute_list">
-        <item>Select</item>
-        <item>High School</item>
-        <item>Collage</item>
-        <item>University</item>
-    </string-array>
-
-    <string-array name="phone_type_list">
-        <item>Office</item>
-        <item>Home</item>
-        <item>Work</item>
-    </string-array>
-
-    <string-array name="month_list">
-        <item>Select</item>
-        <item>January</item>
-        <item>February</item>
-        <item>March</item>
-        <item>April</item>
-        <item>May</item>
-        <item>June</item>
-        <item>July</item>
-        <item>August</item>
-        <item>September</item>
-        <item>October</item>
-        <item>November</item>
-        <item>December</item>
-    </string-array>
-
-    <string-array name="url_type_list">
-        <item>Select Type</item>
-        <item>Website</item>
-        <item>Facebook</item>
-        <item>Twitter</item>
-        <item>Linkedin</item>
-        <item>Instagram</item>
-        <item>Skype</item>
-        <item>Pinterest</item>
-        <item>Google Plus</item>
-        <item>YouTube</item>
-    </string-array>
-
-    <string-array name="story_type_list">
-        <item>About You</item>
-        <item>Early life</item>
-        <item>Family</item>
-        <item>Career</item>
-        <item>Background</item>
-        <item>Childhood</item>
-        <item>Personal life</item>
-        <item>intro</item>
-    </string-array>
-
     <string name="grant">permission granted</string>
+
     <string name="permission_denied">permission denied</string>
+
     <string name="gallery_granted">Gallery granted</string>
+
     <string name="request_permission">You must grant permission!</string>
 
     <string name="insert_url">Insert a text containing an url</string>
+
     <string name="restart">Restart</string>
+
     <string name="about">About</string>
+
     <string name="preview_area">Preview Area</string>
+
     <string name="post_area">Post Area</string>
+
     <string name="no_urls">No urls has been found</string>
+
     <string name="failed_preview">Preview failed.\nClick to dismiss.</string>
+
     <string name="submit">Submit</string>
+
     <string name="random">Random</string>
     <string name="post">Post</string>
     <string name="previous">←</string>
     <string name="forward">→</string>
+
     <string name="choose_thumbnail">Choose a thumbnail</string>
     <string name="no_thumbnail">No thumbnail</string>
     <string name="enter_title">Enter a title</string>
@@ -174,7 +84,6 @@
     <string name="title_activity_about">About</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
-
     <string name="new_post">New Post</string>
     <string name="notifications">Notifications</string>
     <string name="friend_requests">Friend Requests</string>
@@ -187,6 +96,7 @@
     <string name="today">Today</string>
     <string name="few_second_ago">A few seconds</string>
     <string name="minute_ago">minute ago</string>
+
     <string name="minutes_ago">minutes ago</string>
     <string name="hour_ago">hour ago</string>
     <string name="hours_ago">hours ago</string>
@@ -194,11 +104,9 @@
     <string name="choose_category">Choose Category</string>
     <string name="done">done</string>
     <string name="personalize_your_feed">Personalize your feed</string>
-
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="font_fontFamily_medium">sans-serif</string>
-
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
     <string name="title_notifications">Notifications</string>
@@ -208,9 +116,11 @@
     <string name="share_as_a_post">Share as a Post</string>
     <string name="share_on_facebook">Share on Facebook</string>
     <string name="share_on_twitter">Share on Twitter</string>
+
     <string name="copy_link">Copy Link</string>
     <string name="publics">Public</string>
     <string name="friends">Friends</string>
+
     <string name="only_me">Only Me</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
@@ -225,7 +135,6 @@
     <string name="are_you_sure">Are you sure you want to remove</string>
     <string name="search_by_name">Search By Name</string>
     <string name="dont_have_a_liker_account">Don\'t have a Liker account? Sign up</string>
-
     <string name="who_can_send_you_friend_requests">Who can send you friend requests:</string>
     <string name="who_can_post_on_your_wall">Who can post on your wall:</string>
     <string name="who_can_see_your_friend_list">Who can see your friend list:</string>
@@ -238,6 +147,7 @@
     <string name="cancel">Cancel</string>
     <string name="change">Change</string>
     <string name="change_all">Change All</string>
+
     <string name="save">Save</string>
     <string name="save_all">Save All</string>
     <string name="find_user">Find User</string>
@@ -324,5 +234,106 @@
     <string name="all_field_required">All field required</string>
     <string name="enter_a_few_word_to_search">Enter a few word to search</string>
     <string name="nothing_to_show">Nothing to Show</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_tools">Tools</string>
+    <string name="menu_share">Share</string>
+    <string name="menu_send">Send</string>
+    <string-array name="string_array_alcohol">
+        <item>Vodka</item>
+        <item>Rum</item>
+        <item>Whiskey</item>
+        <item>Gin</item>
+        <item>Tequila</item>
+    </string-array>
+    <string-array name="string_array_coffee">
+        <item>Espresso</item>
+        <item>Macchiato</item>
+        <item>Cappuccino</item>
+        <item>Cafe Latte</item>
+        <item>Ristretto</item>
+    </string-array>
+    <string-array name="string_array_pasta">
+        <item>Carbonara</item>
+        <item>Capellini</item>
+        <item>Spaghetti</item>
+        <item>Gnocchi</item>
+        <item>Lasagnette</item>
+    </string-array>
+    <string-array name="string_array_cold_drinks">
+        <item>Cola</item>
+        <item>Lemonade</item>
+        <item>Citrus soda</item>
+        <item>Juice</item>
+        <item>Sparkling Water</item>
+    </string-array>
+    <string-array name="gender_list">
+        <item>Select</item>
+        <item>Male</item>
+        <item>Female</item>
+    </string-array>
+    <string-array name="privacy_list">
+        <item>Public</item>
+        <item>Only Me</item>
+        <item>Friends</item>
+    </string-array>
+
+    <string-array name="privacy_list_two">
+        <item>Everyone</item>
+        <item>Nobody</item>
+    </string-array>
+    <string-array name="institute_list">
+        <item>Select</item>
+        <item>High School</item>
+        <item>Collage</item>
+        <item>University</item>
+    </string-array>
+    <string-array name="phone_type_list">
+        <item>Office</item>
+        <item>Home</item>
+        <item>Work</item>
+    </string-array>
+    <string-array name="month_list">
+        <item>Select</item>
+        <item>January</item>
+        <item>February</item>
+        <item>March</item>
+        <item>April</item>
+        <item>May</item>
+        <item>June</item>
+        <item>July</item>
+        <item>August</item>
+        <item>September</item>
+        <item>October</item>
+        <item>November</item>
+        <item>December</item>
+    </string-array>
+    <string-array name="url_type_list">
+        <item>Select Type</item>
+        <item>Website</item>
+        <item>Facebook</item>
+        <item>Twitter</item>
+        <item>Linkedin</item>
+        <item>Instagram</item>
+        <item>Skype</item>
+        <item>Pinterest</item>
+        <item>Google Plus</item>
+        <item>YouTube</item>
+    </string-array>
+    <string-array name="story_type_list">
+        <item>About You</item>
+        <item>Early life</item>
+        <item>Family</item>
+        <item>Career</item>
+        <item>Background</item>
+        <item>Childhood</item>
+        <item>Personal life</item>
+        <item>intro</item>
+    </string-array>
 
 </resources>

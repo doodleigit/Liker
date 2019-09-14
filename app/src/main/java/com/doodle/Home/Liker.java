@@ -336,11 +336,6 @@ public class Liker extends AppCompatActivity implements
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         switch (id) {
-            case R.id.action_log_out:
-                startActivity(new Intent(this, LoginAgain.class));
-                finish();
-                return true;
-
             default:
                 return super.onOptionsItemSelected(item);
         }

@@ -8,6 +8,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="Home"
-        android:textSize="14sp"/>
+        android:textSize="14sp"
+        android:textColor="@color/colorPrimaryText"/>
 
 </FrameLayout>

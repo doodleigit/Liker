@@ -92,7 +92,7 @@
             android:layout_marginBottom="@dimen/_5sdp"
             android:layout_toLeftOf="@id/imagePostShare"
             android:src="@drawable/ic_comment_black_24dp"
-            android:tint="#C4C9D4" />
+            />
 
 
         <ImageView
@@ -104,8 +104,7 @@
             android:layout_marginRight="@dimen/_15sdp"
             android:layout_marginBottom="@dimen/_5sdp"
             android:layout_toLeftOf="@id/tvImgShareCount"
-            android:src="@drawable/ic_share_black_24dp"
-            android:tint="#C4C9D4" />
+            android:src="@drawable/ic_share_black_24dp" />
 
         <TextView
             android:id="@+id/tvImgShareCount"
@@ -114,8 +113,11 @@
             android:layout_alignParentRight="true"
             android:layout_centerInParent="true"
             android:layout_marginRight="@dimen/_5sdp"
+            android:paddingStart="2dp"
+            android:paddingEnd="0dp"
             android:background="@drawable/share_count_box"
-            android:textAlignment="center" />
+            android:textAlignment="center"
+            android:text="0"/>
 
         <!-- TODO: Update blank fragment layout -->
         <com.github.rahatarmanahmed.cpv.CircularProgressView xmlns:app="http://schemas.android.com/apk/res-auto"

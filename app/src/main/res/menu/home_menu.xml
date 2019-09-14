@@ -1,42 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <group android:id="@+id/sorting">
         <item
             android:id="@+id/action_how_to_use_liker"
-            android:title="@string/action_how_to_use_liker" />
-    </group>
+            android:title="@string/action_how_to_use_liker"
+            android:icon="@drawable/ic_slideshow_black_24dp"/>
 
-    <group android:id="@+id/settings_account">
         <item
             android:id="@+id/action_account_setting"
-            android:title="@string/action_account_setting" />
-    </group>
+            android:title="@string/action_account_setting"
+            android:icon="@drawable/ic_account_setting_black_24dp"/>
 
-    <group android:id="@+id/setting_friends">
         <item
             android:id="@+id/action_find_friends"
-            android:title="@string/action_find_friends" />
-    </group>
-    <group android:id="@+id/setting_privacy">
+            android:title="@string/action_find_friends"
+            android:icon="@drawable/ic_find_friend_black_24dp"/>
+
         <item
             android:id="@+id/action_privacy_security"
-            android:title="@string/action_privacy_security" />
-    </group>
-    <group android:id="@+id/setting_notification">
+            android:title="@string/action_privacy_security"
+            android:icon="@drawable/ic_security_setting_black_24dp"/>
+
         <item
             android:id="@+id/action_notification_settings"
-            android:title="@string/action_notification_settings" />
-    </group>
-    <group android:id="@+id/setting_contributor">
+            android:title="@string/action_notification_settings"
+            android:icon="@drawable/ic_notifications_setting_black_24dp"/>
+
         <item
             android:id="@+id/action_contributor_settings"
-            android:title="@string/action_contributor_settings" />
-    </group>
-
-    <group android:id="@+id/setting_logout">
-        <item
-            android:id="@+id/action_log_out"
-            android:title="@string/action_log_out" />
-    </group>
+            android:title="@string/action_contributor_settings"
+            android:icon="@drawable/ic_contributor_setting_black_24dp"/>
 </menu>

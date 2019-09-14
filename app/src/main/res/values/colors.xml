@@ -51,4 +51,6 @@
     <color name="colorHintTextLight">#80FFFFFF</color>
     <color name="colorPrimaryTextLight">#FFFFFF</color>
 
+    <color name="colorPrimaryText">#8596A3</color>
+
 </resources>

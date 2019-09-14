@@ -122,7 +122,7 @@ public class LikerSearch extends AppCompatActivity implements View.OnClickListen
             search = (SearchView) menu.findItem(R.id.action_search).getActionView();
             search.setIconified(false);
             search.setQueryHint("Search item...");
-            search.clearFocus();
+//            search.clearFocus();
             search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String s) {
