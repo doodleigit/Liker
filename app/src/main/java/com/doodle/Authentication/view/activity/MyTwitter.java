@@ -189,7 +189,7 @@ public class MyTwitter extends AppCompatActivity implements View.OnClickListener
             mtweet_layout.setVisibility(View.VISIBLE);
             mtwitter_login_layout.setVisibility(View.GONE);
             mSharedPreferences.getString(PREF_USER_NAME, "");
-            username_tv.setText("ForgotPassword \n" + mSharedPreferences.getString(PREF_USER_NAME, ""));
+            username_tv.setText("ForgotPasswords \n" + mSharedPreferences.getString(PREF_USER_NAME, ""));
 
         } else {
             mtweet_layout.setVisibility(View.GONE);
@@ -292,7 +292,7 @@ public class MyTwitter extends AppCompatActivity implements View.OnClickListener
             manager.setProfileName(username);
             String jj = user.getDescription();
             Log.d("Description", jj);
-            username_tv.setText("ForgotPassword\n " + username);
+            username_tv.setText("ForgotPasswords\n " + username);
 
             mtweet_layout.setVisibility(View.VISIBLE);
             mtwitter_login_layout.setVisibility(View.GONE);
@@ -484,7 +484,7 @@ public class MyTwitter extends AppCompatActivity implements View.OnClickListener
                 mtweet_layout.setVisibility(View.GONE);
                 mtwitter_login_layout.setVisibility(View.VISIBLE);
                 twitter_logout_btn.setVisibility(View.GONE);
-                Intent intent = new Intent(MyTwitter.this, ForgotPassword.class);
+                Intent intent = new Intent(MyTwitter.this, ForgotPasswords.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 finish();

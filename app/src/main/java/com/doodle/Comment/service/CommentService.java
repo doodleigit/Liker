@@ -155,7 +155,7 @@ user_id	28827
 
     @Multipart
     @POST(AppConstants.ADDED_COMMENT_REPLY)
-    Call<Comment_> addedCommentReply(
+    Call<String> addedCommentReply(
             @Header("Device-Id") String deviceId,
             @Header("User-Id") String userId,
             @Header("Security-Token") String token,
@@ -193,7 +193,7 @@ user_id	28827
 
     @Multipart
     @POST(AppConstants.EDIT_COMMENT_REPLY)
-    Call<Comment_> editCommentReply(
+    Call<String> editCommentReply(
             @Header("Device-Id") String deviceId,
             @Header("User-Id") String userId,
             @Header("Security-Token") String token,

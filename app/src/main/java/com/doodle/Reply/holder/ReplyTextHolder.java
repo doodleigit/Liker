@@ -1,4 +1,4 @@
-package com.doodle.Comment.holder;
+package com.doodle.Reply.holder;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -67,19 +67,17 @@ import static com.doodle.Tool.Tools.dismissDialog;
 import static com.doodle.Tool.Tools.extractMentionText;
 import static com.doodle.Tool.Tools.extractMentionUser;
 import static com.doodle.Tool.Tools.extractUrls;
-import static com.doodle.Tool.Tools.getSpannableStringBuilder;
 import static com.doodle.Tool.Tools.isContain;
 import static com.doodle.Tool.Tools.isNullOrEmpty;
 import static com.doodle.Tool.Tools.showBlockUser;
-import static java.lang.Integer.getInteger;
 import static java.lang.Integer.parseInt;
 
-public class CommentTextHolder extends RecyclerView.ViewHolder {
+public class ReplyTextHolder extends RecyclerView.ViewHolder {
 
 
     public CircleImageView imagePostUser;
     public ReadMoreTextView tvPostContent;
-
+    public EmojiTextView tvPostEmojiContent;
     public ImageView star1, star2, star3, star4, star5, star6, star7, star8,
             star9, star10, star11, star12, star13, star14, star15, star16;
     public LinearLayout postBodyLayer;
@@ -93,11 +91,11 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
 
 
     //Comment
-    Comment_ commentItem;
+    Reply replyItem;
 
 
     private String commentText, commentUserName, commentUserImage, commentImage, commentTime;
-    public EmojiTextView tvPostEmojiContent;
+
     public ImageView imageCommentSettings, imgCommentLike;
 
     public TextView tvCommentUserName, tvCommentTime, tvCommentReply, tvCountCommentLike;
@@ -126,11 +124,11 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
 
 
     PostItem postItem;
-    List<Reply> replyItem;
+    List<Reply> replyList;
 
 
     //EDIT COMMENT
-    CommentListener listener;
+    ReplyListener listener;
     String replyId = "";
     Reply reply;
 
@@ -142,14 +140,16 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
     private int commentLikeNumeric;
 
 
-    public interface CommentListener {
+    public interface ReplyListener {
 
-        void onTitleClicked(Comment_ commentItem, int position, Reply reply);
+        void onTitleClicked(int position, Reply reply);
 
-        void commentDelete(Comment_ commentItem, int position, Reply reply);
+        void commentDelete(int position, Reply reply);
+
+        void replyToReply(int position, Reply reply);
     }
 
-    public CommentTextHolder(View itemView, Context context, final CommentListener listener) {
+    public ReplyTextHolder(View itemView, Context context, final ReplyListener listener) {
         super(itemView);
 
         mContext = context;
@@ -182,9 +182,8 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
 
         //Comment
         tvPostEmojiContent = itemView.findViewById(R.id.tvPostEmojiContent);
-        tvPostContent = itemView.findViewById(R.id.tvPostContent);
         imagePostUser = itemView.findViewById(R.id.imagePostUser);
-
+        tvPostContent = itemView.findViewById(R.id.tvPostContent);
 
         imageCommentSettings = itemView.findViewById(R.id.imageCommentSettings);
 
@@ -209,7 +208,7 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
 
         //commentAllReply
         mProgressBar = itemView.findViewById(R.id.ProgressBar);
-        replyItem = new ArrayList<>();
+        replyList = new ArrayList<>();
 
 
     }
@@ -236,25 +235,26 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
     int position;
     AppCompatActivity activity;
 
-    public void setItem(Comment_ commentItem, PostItem postItem, int position) {
+    public void setItem(Reply replyItem, PostItem postItem, int position) {
 
-        this.commentItem = commentItem;
+        this.replyItem = replyItem;
         this.postItem = postItem;
         this.position = position;
-        List<Reply> replyList = commentItem.getReplies();
 
 
         //  userPostId = item.getPostId();
 //        commentPostId = commentItem.getPostId();
 
 
-        commentText = commentItem.getCommentText();
-        commentUserName = commentItem.getUserFirstName() + " " + commentItem.getUserLastName();
-        commentUserImage = commentItem.getUserPhoto();
-        commentImage = commentItem.getCommentImage();
-        commentTime = commentItem.getDateTime();
-        goldStar = Integer.parseInt(commentItem.getUserGoldStars());
-        silverStar = parseInt(commentItem.getUserSliverStars());
+        commentText = replyItem.getCommentText();
+        commentUserName = replyItem.getFirstName() + " " + replyItem.getLastName();
+        commentUserImage = replyItem.getUserPhoto();
+        commentImage = replyItem.getCommentImage();
+        commentTime = replyItem.getDateTime();
+        goldStar = Integer.parseInt(replyItem.getUserGoldStars());
+        silverStar = parseInt(replyItem.getUserSliverStars());
+
+
         tvCommentUserName.setText(commentUserName);
         tvCommentTime.setText(Tools.chatDateCompare(mContext, Long.valueOf(commentTime)));
 
@@ -271,10 +271,9 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
 
 
 
-        if (!isNullOrEmpty(commentItem.getReplyId())) {
-            commentLike = commentItem.getTotalReplyLike();
-        } else {
-            commentLike = commentItem.getTotalLike();
+
+        if (!isNullOrEmpty(replyItem.getId())) {
+            commentLike = replyItem.getTotalLike();
         }
 
 
@@ -285,110 +284,57 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
 
             SpannableString content = new SpannableString(commentLike);
             content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-
             tvCountCommentLike.setVisibility(View.VISIBLE);
             tvCountCommentLike.setText(content);
         }
+
+
+        tvCommentReply.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                App.setReplyItem(replyItem);
+                listener.replyToReply(position, replyItem);
+            }
+        });
 
 
         imgCommentLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if (!isNullOrEmpty(commentItem.getReplyId())) {
+                if (!isNullOrEmpty(replyItem.getId())) {
 
-                    if (commentItem.isLikeUserStatus()) {
+                    if (userIds.equalsIgnoreCase(replyItem.getUserId())) {
+                        Tools.toast(mContext, "On Liker, you can't like your own reply. That would be cheating", R.drawable.ic_info_outline_blue_24dp);
+                    } else {
+                        if (replyItem.isIsLikeReplied()) {
 
-                        if (networkOk) {
-                            Call<String> call = commentService.unLikeCommentReply(deviceId, profileId, token, commentItem.getCommentId(), commentItem.getReplyId(), commentItem.getPostId(), profileId);
-                            sendUnLikeCommentReplyRequest(call);
-                        } else {
+                            if (networkOk) {
+                                Call<String> call = commentService.unLikeCommentReply(deviceId, profileId, token, replyItem.getCommentId(), replyItem.getId(), postItem.getPostId(), profileId);
+                                sendUnLikeCommentReplyRequest(call);
+                            } else {
 //                            Tools.showNetworkDialog(activity.getSupportFragmentManager());
-                            Tools.showNetworkDialogs(v);
-                        }
+                                Tools.showNetworkDialogs(v);
+                            }
 
-                    } else {
-                        if (networkOk) {
-                            Call<String> call = commentService.likeCommentReply(deviceId, profileId, token, commentItem.getCommentId(), commentItem.getReplyId(), commentItem.getPostId(), profileId);
-                            sendLikeCommentReplyRequest(call);
                         } else {
-                            Tools.showNetworkDialog(activity.getSupportFragmentManager());
+                            if (networkOk) {
+                                Call<String> call = commentService.likeCommentReply(deviceId, profileId, token, replyItem.getCommentId(), replyItem.getId(), postItem.getPostId(), profileId);
+                                sendLikeCommentReplyRequest(call);
+                            } else {
+                                Tools.showNetworkDialog(activity.getSupportFragmentManager());
 
+                            }
                         }
                     }
 
 
-                } else {
-
-                    if (commentItem.isLikeUserStatus()) {
-
-                        if (networkOk) {
-
-                            Call<String> call = commentService.commentUnLike(deviceId, profileId, token, commentItem.getId(), profileId);
-                            sendCommentUnLikeRequest(call);
-
-                        } else {
-                            Tools.showNetworkDialog(activity.getSupportFragmentManager());
-                        }
-
-                    } else {
-                        if (networkOk) {
-
-                            Call<String> call = commentService.commentLike(deviceId, profileId, token, commentItem.getId(), userIds);
-                            sendCommentLikeRequest(call);
-
-                        } else {
-                            Tools.showNetworkDialog(activity.getSupportFragmentManager());
-                        }
-                    }
-
-                }
-
-                //commentLike
-
-            }
-        });
-
-        if (!isNullOrEmpty(commentItem.getTotalReply()) && Integer.parseInt(commentItem.getTotalReply()) > 0) {
-            tvCommentReply.setText(String.format("%s Reply", commentItem.getTotalReply()));
-        }
-
-        tvCommentReply.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AppCompatActivity activity = (AppCompatActivity) v.getContext();
-
-                String commentReply = commentItem.getTotalReply();
-
-                if (!isNullOrEmpty(commentReply)) {
-                    if (Integer.parseInt(commentReply) > 0) {
-                        if (networkOk) {
-
-                            Call<List<Reply>> call = commentService.getPostCommentReplyList(deviceId, profileId, token, commentItem.getId(), "false", limit, offset, commentItem.getPostId(), userIds);
-                            sendAllCommentReplyListRequest(call);
-                            delayLoadComment(mProgressBar);
-                        } else {
-                            Tools.showNetworkDialog(activity.getSupportFragmentManager());
-
-                        }
-                    } else if (Integer.parseInt(commentReply) == 0) {
-                        Intent intent = new Intent(mContext, ReplyPost.class);
-                        intent.putExtra(COMMENT_ITEM_KEY, (Parcelable) commentItem);
-                        intent.putExtra(POST_ITEM_KEY, (Parcelable) postItem);
-                        intent.putParcelableArrayListExtra(REPLY_KEY, (ArrayList<? extends Parcelable>) replyItem);
-                        mContext.startActivity(intent);
-                    }
-                } else {
-                    Intent intent = new Intent(mContext, ReplyPost.class);
-                    intent.putExtra(COMMENT_ITEM_KEY, (Parcelable) commentItem);
-                    intent.putExtra(POST_ITEM_KEY, (Parcelable) postItem);
-                    intent.putParcelableArrayListExtra(REPLY_KEY, (ArrayList<? extends Parcelable>) replyItem);
-                    mContext.startActivity(intent);
                 }
 
 
             }
         });
+
 
         if (silverStar > 8) {
             silverStar = 8;
@@ -539,12 +485,12 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
 
         //mention
 
-        text = commentItem.getCommentText();
+        text = replyItem.getCommentText();
         StringBuilder nameBuilder = new StringBuilder();
-        List<String> mentionUrl = extractUrls(commentItem.getCommentText());
+        List<String> mentionUrl = extractUrls(replyItem.getCommentText());
 
 
-        for (CommentTextIndex temp : commentItem.getCommentTextIndex()) {
+        for (CommentTextIndex temp : replyItem.getCommentTextIndex()) {
             String postType = temp.getType();
             if (postType.equalsIgnoreCase("mention")) {
                 String mentionUserName = extractMentionUser(temp.getText());
@@ -555,13 +501,13 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
         }
 
 
-        if (mentionUrl.size() > 0 && extractMentionText(commentItem).trim().length() > 0) {
+        if (mentionUrl.size() > 0 && extractMentionText(replyItem).trim().length() > 0) {
 
-            full_text = extractMentionText(commentItem).trim();
+            full_text = extractMentionText(replyItem).trim();
 
             if (containsIllegalCharacters(full_text)) {
-                  tvPostContent.setVisibility(View.GONE);
-                 tvPostEmojiContent.setVisibility(View.VISIBLE);
+                tvPostContent.setVisibility(View.GONE);
+                tvPostEmojiContent.setVisibility(View.VISIBLE);
 
                 String nameStr = nameBuilder.toString();
                 String[] mentionArr = nameStr.split(" ");
@@ -653,8 +599,7 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
                 popupCommentMenu.getMenuInflater().inflate(R.menu.post_comment_menu, popupCommentMenu.getMenu());
 
 
-
-                String commentUserId = commentItem.getUserId();
+                String commentUserId = replyItem.getUserId();
 
 
                 if (userIds.equalsIgnoreCase(commentUserId)) {
@@ -680,20 +625,24 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
                         int id = menuItem.getItemId();
 
                         if (id == R.id.reportComment) {
-                            App.setCommentItem(commentItem);
+
+                            App.setReplyItem(replyItem);
+                            App.setItem(postItem);
                             activity = (AppCompatActivity) v.getContext();
                             if (networkOk) {
-                                Call<ReportReason> call = commentService.getReportReason(deviceId, profileId, token, commentItem.getUserId(), "2", userIds);
+                                Call<ReportReason> call = commentService.getReportReason(deviceId, profileId, token, replyItem.getUserId(), "2", userIds);
                                 sendReportReason(call);
                             } else {
                                 Tools.showNetworkDialog(activity.getSupportFragmentManager());
                             }
+
                         }
 
                         if (id == R.id.blockUser) {
 
+
                             if (!((Activity) mContext).isFinishing()) {
-                                App.setCommentItem(commentItem);
+                                App.setReplyItem(replyItem);
                                 showBlockUser(v);
                             } else {
                                 dismissDialog();
@@ -701,36 +650,15 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
 
                         }
                         if (id == R.id.editComment) {
+                            App.setReplyItem(replyItem);
+                            listener.onTitleClicked(position, replyItem);
 
-                            Reply replyItem = new Reply();
-                            List<Reply> replyList = commentItem.getReplies();
-                            if (replyList.size() == 0) {
-                                Reply reply = new Reply();
-                                reply.setId("1");
-                                reply.setCommentId("2");
-                                listener.onTitleClicked(commentItem, position, reply);
-                            } else {
-                                replyItem = replyList.get(0);
-                                listener.onTitleClicked(commentItem, position, replyItem);
-                            }
-
-
-                            //  Tools.showNetworkDialog(activity.getSupportFragmentManager());
                         }
 
                         if (id == R.id.deleteComment) {
 
-                            Reply replyItem = new Reply();
-                            List<Reply> replyList = commentItem.getReplies();
-                            if (replyList.size() == 0) {
-                                Reply reply = new Reply();
-                                reply.setId("1");
-                                reply.setCommentId("2");
-                                listener.commentDelete(commentItem, position, reply);
-                            } else {
-                                replyItem = replyList.get(0);
-                                listener.commentDelete(commentItem, position, replyItem);
-                            }
+                            App.setReplyItem(replyItem);
+                            listener.commentDelete(position, replyItem);
 
 
                         }
@@ -744,6 +672,7 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
 
 
     }
+
 
     private void sendLikeCommentReplyRequest(Call<String> call) {
 
@@ -762,9 +691,9 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
                                             deviceId,//"8b64708fa409da20341b1a555d1ddee526444",
                                             profileId,//"26444",
                                             token,// "5d199fc8529c2$2y$10$C9mvDyOEhJ2Nc/e4Ji4gVOivCvaO4OBobPW2ky4oftvVniCZ8hKzuJhxEGIHYSCprmWSJ1rd4hGHDEqUNRAwAR4fxMWwEyV6VSZEU",
-                                            commentItem.getUserId(),//"26444",
+                                            replyItem.getUserId(),//"26444",
                                             userIds,//"26444",
-                                            commentItem.getPostId(),
+                                            postItem.getPostId(),
                                             "like_on_reply"
                                     );
                                     sendBrowserNotificationRequest(mCall);
@@ -787,7 +716,7 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
                                 if ("You could not liked your own reply".equalsIgnoreCase(object.getString("error"))) {
                                     Tools.toast(mContext, "You could not liked your own post", R.drawable.ic_info_outline_blue_24dp);
                                 } else {
-                                    Call<String> mCall = commentService.unLikeCommentReply(deviceId, profileId, token, commentItem.getCommentId(), commentItem.getReplyId(), commentItem.getPostId(), profileId);
+                                    Call<String> mCall = commentService.unLikeCommentReply(deviceId, profileId, token, replyItem.getCommentId(), replyItem.getId(), postItem.getPostId(), profileId);
                                     sendUnLikeCommentReplyRequest(mCall);
                                 }
 
@@ -838,11 +767,10 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
                                     }
                                 }
 
-
                             }
 
                             if (isContain(object, "error")) {
-                                Call<String> mCall = commentService.likeCommentReply(deviceId, profileId, token, commentItem.getCommentId(), commentItem.getReplyId(), commentItem.getPostId(), profileId);
+                                Call<String> mCall = commentService.likeCommentReply(deviceId, profileId, token, replyItem.getCommentId(), replyItem.getId(), postItem.getPostId(), profileId);
                                 sendLikeCommentReplyRequest(mCall);
                             }
 
@@ -863,125 +791,6 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
         });
     }
 
-    private void sendCommentUnLikeRequest(Call<String> call) {
-        call.enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                if (response.isSuccessful()) {
-                    if (response.body() != null) {
-                        try {
-                            JSONObject object = new JSONObject(response.body());
-
-                            if (isContain(object, "status")) {
-                                String status = object.getString("status");
-                                if ("true".equalsIgnoreCase(status)) {
-                                    commentLikeNumeric = Integer.parseInt(commentLike);
-                                    commentLikeNumeric--;
-                                    commentLike = String.valueOf(commentLikeNumeric);
-
-                                    if (0 == commentLikeNumeric) {
-                                        tvCountCommentLike.setText("");
-
-                                        tvCountCommentLike.setVisibility(View.GONE);
-                                    } else {
-                                        SpannableString content = new SpannableString(String.valueOf(commentLikeNumeric));
-                                        content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-
-                                        tvCountCommentLike.setVisibility(View.VISIBLE);
-                                        tvCountCommentLike.setText(content);
-                                    }
-                                }
-
-
-                            }
-
-                            if (isContain(object, "error")) {
-                                Call<String> mCall = commentService.commentLike(deviceId, profileId, token, commentItem.getId(), userIds);
-                                sendCommentLikeRequest(mCall);
-                            }
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        Log.i("onSuccess", response.body().toString());
-                    } else {
-                        Log.i("onEmptyResponse", "Returned empty response");
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<String> call, Throwable t) {
-
-            }
-        });
-    }
-
-    private void sendCommentLikeRequest(Call<String> call) {
-
-
-        call.enqueue(new Callback<String>() {
-            @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                if (response.isSuccessful()) {
-                    if (response.body() != null) {
-                        try {
-                            JSONObject object = new JSONObject(response.body());
-                            if (isContain(object, "status")) {
-                                String status = object.getString("status");
-                                if ("true".equalsIgnoreCase(status)) {
-
-                                    Call<String> mCall = webService.sendBrowserNotification(
-                                            deviceId,//"8b64708fa409da20341b1a555d1ddee526444",
-                                            profileId,//"26444",
-                                            token,// "5d199fc8529c2$2y$10$C9mvDyOEhJ2Nc/e4Ji4gVOivCvaO4OBobPW2ky4oftvVniCZ8hKzuJhxEGIHYSCprmWSJ1rd4hGHDEqUNRAwAR4fxMWwEyV6VSZEU",
-                                            commentItem.getUserId(),//"26444",
-                                            userIds,//"26444",
-                                            commentItem.getPostId(),
-                                            "like_comment"
-                                    );
-                                    sendBrowserNotificationRequest(mCall);
-
-                                    commentLikeNumeric = Integer.parseInt(commentLike);
-                                    commentLikeNumeric++;
-                                    commentLike = String.valueOf(commentLikeNumeric);
-
-
-                                    SpannableString content = new SpannableString(String.valueOf(commentLikeNumeric));
-                                    content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-
-                                    tvCountCommentLike.setVisibility(View.VISIBLE);
-                                    tvCountCommentLike.setText(content);
-
-                                }
-                            }
-
-                            if (isContain(object, "error")) {
-                                if ("You could not liked your own post".equalsIgnoreCase(object.getString("error"))) {
-                                    Tools.toast(mContext, "You could not liked your own post", R.drawable.ic_info_outline_blue_24dp);
-                                } else {
-                                    Call<String> mCall = commentService.commentUnLike(deviceId, profileId, token, commentItem.getId(), profileId);
-                                    sendCommentUnLikeRequest(mCall);
-                                }
-
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        Log.i("onSuccess", response.body().toString());
-                    } else {
-                        Log.i("onEmptyResponse", "Returned empty response");
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<String> call, Throwable t) {
-
-            }
-        });
-
-    }
 
     private void sendBrowserNotificationRequest(Call<String> mCall) {
 
@@ -1054,39 +863,6 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
             }
         });
 
-    }
-
-
-    private void sendAllCommentReplyListRequest(Call<List<Reply>> call) {
-
-        call.enqueue(new Callback<List<Reply>>() {
-
-            @Override
-            public void onResponse(Call<List<Reply>> mCall, Response<List<Reply>> response) {
-
-
-                if (response.body() != null) {
-                    replyItem = response.body();
-
-                    Intent intent = new Intent(mContext, ReplyPost.class);
-                    intent.putExtra(COMMENT_ITEM_KEY, (Parcelable) commentItem);
-                    intent.putExtra(POST_ITEM_KEY, (Parcelable) postItem);
-
-                    intent.putParcelableArrayListExtra(REPLY_KEY, (ArrayList<? extends Parcelable>) replyItem);
-                    mContext.startActivity(intent);
-
-
-                }
-
-
-            }
-
-            @Override
-            public void onFailure(Call<List<Reply>> call, Throwable t) {
-                Log.d("MESSAGE: ", t.getMessage());
-
-            }
-        });
     }
 
 

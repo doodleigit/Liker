@@ -13,6 +13,7 @@ import android.util.Log;
 
 import com.danikula.videocache.HttpProxyCacheServer;
 import com.doodle.Comment.model.Comment_;
+import com.doodle.Comment.model.Reply;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Post.model.Category;
 import com.doodle.Post.model.Subcatg;
@@ -53,6 +54,7 @@ public class App extends Application {
     private static String profilePhoto;
     private static boolean isFirstTimeShowReply;
     private static Comment_ commentItem;
+    private static Reply replyItem;
     private static PostItem item;
     private static boolean isFollow;
     private static boolean isBockComment;
@@ -102,6 +104,14 @@ public class App extends Application {
 
     public static void setPosition(int position) {
         App.position = position;
+    }
+
+    public static Reply getReplyItem() {
+        return replyItem;
+    }
+
+    public static void setReplyItem(Reply replyItem) {
+        App.replyItem = replyItem;
     }
 
     public static boolean isNotificationStatus() {
