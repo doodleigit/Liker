@@ -34,6 +34,7 @@ import android.text.SpannableString;
 import android.text.TextWatcher;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.StyleSpan;
+import android.text.style.UnderlineSpan;
 import android.transition.Fade;
 import android.transition.Transition;
 import android.transition.TransitionManager;
@@ -44,15 +45,18 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.borjabravo.readmoretextview.ReadMoreTextView;
 import com.doodle.App;
 import com.doodle.Authentication.model.UserInfo;
 import com.doodle.Comment.adapter.CommentAdapter;
 import com.doodle.Comment.model.Comment;
 import com.doodle.Comment.model.CommentItem;
+import com.doodle.Comment.model.CommentTextIndex;
 import com.doodle.Comment.model.Comment_;
 import com.doodle.Comment.model.Reply;
 import com.doodle.Comment.holder.CommentImageHolder;
@@ -86,6 +90,7 @@ import com.leocardz.link.preview.library.TextCrawler;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.vanniktech.emoji.EmojiPopup;
+import com.vanniktech.emoji.EmojiTextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -99,6 +104,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -116,10 +122,16 @@ import static com.doodle.Tool.MediaUtil.getDataColumn;
 import static com.doodle.Tool.MediaUtil.isDownloadsDocument;
 import static com.doodle.Tool.MediaUtil.isGooglePhotosUri;
 import static com.doodle.Tool.MediaUtil.isMediaDocument;
+import static com.doodle.Tool.Tools.containsIllegalCharacters;
 import static com.doodle.Tool.Tools.getMD5EncryptedString;
 import static com.doodle.Tool.Tools.isNullOrEmpty;
+import static java.lang.Integer.parseInt;
 
 public class ReplyPost extends AppCompatActivity implements View.OnClickListener,
+        CommentTextHolder.CommentListener,
+        CommentYoutubeHolder.CommentListener,
+        CommentLinkScriptHolder.CommentListener,
+        CommentImageHolder.CommentListener,
         ReplyTextHolder.ReplyListener,
         ReplyLinkScriptHolder.ReplyListener,
         ReplyYoutubeHolder.ReplyListener,
@@ -134,7 +146,7 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
     private static final String TAG = "CommentPost";
     private List<Comment> commentList;
     private List<Comment_> comment_list;
-    private RecyclerView recyclerView;
+    private RecyclerView recyclerView, rvCommentHeader;
     private TextView userName;
     private Drawable mDrawable;
     private EditText etComment;
@@ -181,6 +193,7 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
     ProgressBar progressView;
     PostItem postItem;
     ReplyAdapter adapter;
+    CommentAdapter adapterHeader;
     private String fileEncoded;
     MultipartBody.Part fileToUpload;
     private ProgressDialog progressDialog;
@@ -217,6 +230,26 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
     private String blockUserId;
     private String repLiesUserId;
 
+    //HEADER POST
+    public CircleImageView imagePostUser;
+    public ReadMoreTextView tvPostContent;
+
+    public ImageView star1, star2, star3, star4, star5, star6, star7, star8,
+            star9, star10, star11, star12, star13, star14, star15, star16;
+    public LinearLayout postBodyLayer;
+
+    public EmojiTextView tvPostEmojiContent;
+    public ImageView imageCommentSettings, imgCommentLike;
+
+    public TextView tvCommentUserName, tvCommentTime, tvCommentReply, tvCountCommentLike;
+    private String commentUserName;
+    private String commentLike;
+    private int commentLikeNumeric;
+
+    int goldStar;
+    int silverStar;
+    private String commentUserImage, commentTime;
+    private TextView tvLikes, tvStarts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -254,6 +287,8 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
 
         imageSendComment = findViewById(R.id.imageSendComment);
         imageEditComment = findViewById(R.id.imageEditComment);
+        tvLikes = findViewById(R.id.tvLikes);
+        tvStarts = findViewById(R.id.tvStars);
         imageSendComment.setOnClickListener(this);
         imageEditComment.setOnClickListener(this);
 
@@ -271,9 +306,10 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
         comment_list = new ArrayList<Comment_>();
         replyItems = new ArrayList<>();
         recyclerView = findViewById(R.id.recyclerView);
+        rvCommentHeader = findViewById(R.id.rvCommentHeader);
         rvSearchMention = findViewById(R.id.rvSearchMention);
         layoutManager = new LinearLayoutManager(this);
-        layoutManager.setReverseLayout(true);
+//        layoutManager.setReverseLayout(true);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
@@ -291,52 +327,22 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
         if (replyItems == null) {
             throw new AssertionError("Null data item received!");
         }
-
+        int totalStar=Integer.parseInt(commentItem.getUserGoldStars())+Integer.parseInt(commentItem.getUserSliverStars());
+      //  tvStarts.setText(String.valueOf(totalStar));
+       // tvLikes.setText(commentItem.getTotalLike());
         postId = postItem.getSharedPostId();
         commentId = commentItem.getId();
 
-/*
-        for (Reply temp : replyItems) {
-
-
-            Comment_ mComment = new Comment_();
-
-            Reply reply = new Reply();
-            reply.setCommentId(commentId);
-            reply.setId(String.valueOf(temp.getId()));
-            List<Reply> replies = new ArrayList<>();
-            replies.add(reply);
-            mComment.setReplies(replies);
-
-            mComment.setReplyId(temp.getId());
-            mComment.setLikeUserStatus(temp.isIsLikeReplied());
-            mComment.setTotalReplyLike(temp.getTotalLike());
-            mComment.setCommentId(temp.getCommentId());
-            mComment.setCommentImage(temp.getCommentImage());
-            mComment.setUserPhoto(temp.getUserPhoto());
-            mComment.setCommentType(String.valueOf(temp.getCommentType()));
-            mComment.setCommentText(temp.getCommentText());
-            mComment.setHasMention(String.valueOf(temp.getHasMention()));
-            mComment.setCommentTextIndex(temp.getCommentTextIndex());
-            mComment.setLinkData(temp.getLinkData());
-            mComment.setId(temp.getId());
-          //  mComment.setReplies(replyItems);
-            mComment.setPostId(postId);
-            mComment.setUserId(temp.getUserId());
-            mComment.setUserFirstName(temp.getFirstName());
-            mComment.setUserLastName(temp.getLastName());
-            mComment.setUserGoldStars(temp.getUserGoldStars());
-            mComment.setUserSliverStars(temp.getUserSliverStars());
-            mComment.setDateTime(String.valueOf(temp.getDateTime()));
-            comment_list.add(mComment);
-        }
-*/
+        List<Comment_> commentList = new ArrayList<>();
+        commentList.add(commentItem);
 
 
         commentService = CommentService.mRetrofit.create(CommentService.class);
         webService = PostService.mRetrofit.create(PostService.class);
         //  Picasso.with(App.getInstance()).load(imageUrl).into(target);
         adapter = new ReplyAdapter(this, replyItems, postItem, this, this, this, this);
+        adapterHeader = new CommentAdapter(this, commentList, postItem, this, this, this, this);
+        rvCommentHeader.setAdapter(adapterHeader);
         recyclerView.setAdapter(adapter);
 
         userName.setText(String.format("%s %s", userInfo.getFirstName(), userInfo.getLastName()));
@@ -447,14 +453,97 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
 
                 if (isScrolling && (currentItems + scrollOutItems == totalItems)) {
                     isScrolling = false;
-                    PerformPagination();
+                    //   PerformPagination();
                 }
 
 
             }
         });
 
+
+        //  initHeader();
+
     }
+
+//    private void initHeader() {
+//
+//        star1 = findViewById(R.id.star1);
+//        star2 = findViewById(R.id.star2);
+//        star3 =findViewById(R.id.star3);
+//        star4 = findViewById(R.id.star4);
+//        star5 = findViewById(R.id.star5);
+//        star6 = findViewById(R.id.star6);
+//        star7 = findViewById(R.id.star7);
+//        star8 = findViewById(R.id.star8);
+//        star9 = findViewById(R.id.star9);
+//        star10 =findViewById(R.id.star10);
+//        star11 = findViewById(R.id.star11);
+//        star12 = findViewById(R.id.star12);
+//        star13 = findViewById(R.id.star13);
+//        star14 = findViewById(R.id.star14);
+//        star15 = findViewById(R.id.star15);
+//        star16 = findViewById(R.id.star16);
+//
+//        //Comment
+//        tvPostEmojiContent = findViewById(R.id.tvPostEmojiContent);
+//        tvPostContent = findViewById(R.id.tvPostContent);
+//        imagePostUser = findViewById(R.id.imagePostUser);
+//
+//
+//        imageCommentSettings = findViewById(R.id.imageCommentSettings);
+//
+//        tvCommentUserName = findViewById(R.id.tvCommentUserName);
+//        tvCommentTime =findViewById(R.id.tvCommentTime);
+//        imgCommentLike = findViewById(R.id.imgCommentLike);
+//        tvCommentReply = findViewById(R.id.tvCommentReply);
+//        tvCountCommentLike = findViewById(R.id.tvCountCommentLike);
+//        tvCountCommentLike.setVisibility(View.GONE);
+//
+//
+//        commentText = commentItem.getCommentText();
+//        commentUserName = commentItem.getUserFirstName() + " " + commentItem.getUserLastName();
+//        commentUserImage = commentItem.getUserPhoto();
+//        commentImage = commentItem.getCommentImage();
+//        commentTime = commentItem.getDateTime();
+//        goldStar = Integer.parseInt(commentItem.getUserGoldStars());
+//        silverStar = parseInt(commentItem.getUserSliverStars());
+//        tvCommentUserName.setText(commentUserName);
+//        tvCommentTime.setText(Tools.chatDateCompare(this, Long.valueOf(commentTime)));
+//
+//        if (containsIllegalCharacters(commentText)) {
+//            tvPostContent.setVisibility(View.GONE);
+//            tvPostEmojiContent.setVisibility(View.VISIBLE);
+//            tvPostEmojiContent.setText(commentText);
+//
+//        } else {
+//            tvPostEmojiContent.setVisibility(View.GONE);
+//            tvPostContent.setVisibility(View.VISIBLE);
+//            tvPostContent.setText(commentText);
+//        }
+//
+//
+//
+//        if (!isNullOrEmpty(commentItem.getReplyId())) {
+//            commentLike = commentItem.getTotalReplyLike();
+//        } else {
+//            commentLike = commentItem.getTotalLike();
+//        }
+//
+//
+//        if ("0".equalsIgnoreCase(commentLike)) {
+//            tvCountCommentLike.setText("");
+//            tvCountCommentLike.setVisibility(View.GONE);
+//        } else {
+//
+//            SpannableString content = new SpannableString(commentLike);
+//            content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+//
+//            tvCountCommentLike.setVisibility(View.VISIBLE);
+//            tvCountCommentLike.setText(content);
+//        }
+//
+//
+//    }
 
     private void mentionUsers() {
         if (networkOk) {
@@ -619,8 +708,10 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
             public void run() {
                 if (networkOk) {
 
-                    Call<CommentItem> call = commentService.getAllPostComments(deviceId, profileId, token, "false", limit, offset, "DESC", postItem.getPostId(), userIds);
-                    //  sendAllCommentItemRequest(call);
+                    Reply reply = App.getReplyItem();
+                    Call<List<Reply>> call = commentService.getPostCommentReplyList(deviceId, profileId, token, commentItem.getCommentId(), "false", limit, offset, postItem.getPostId(), userIds);
+                    //    sendAllCommentReplyListRequest(blockCall);
+                    sendCommentReplyList(call);
                 } else {
                     Tools.showNetworkDialog(getSupportFragmentManager());
                     progressView.setVisibility(View.GONE);
@@ -630,35 +721,36 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
 
     }
 
-//    private void sendAllCommentItemRequest(Call<CommentItem> call) {
-//        call.enqueue(new Callback<CommentItem>() {
-//
-//            @Override
-//            public void onResponse(Call<CommentItem> mCall, Response<CommentItem> response) {
-//
-//                CommentItem commentItem = response.body();
-//                commentList = commentItem.getComments();
-//                for (Comment temp : commentList) {
-//                    Collections.reverse(temp.getComments());
-//                    comment_list = temp.getComments();
-//                }
-//                Log.d("commentItem", commentItem.toString());
-//                if (commentList != null) {
-//                    adapter.addPagingData(comment_list);
-//                    offset += 10;
-//                    progressView.setVisibility(View.GONE);
-//                }
-//
-//            }
-//
-//            @Override
-//            public void onFailure(Call<CommentItem> mCall, Throwable t) {
-//                Log.d("MESSAGE: ", t.getMessage());
-//                progressView.setVisibility(View.GONE);
-//            }
-//        });
-//
-//    }
+    private void sendCommentReplyList(Call<List<Reply>> call) {
+
+        call.enqueue(new Callback<List<Reply>>() {
+
+            @Override
+            public void onResponse(Call<List<Reply>> mCall, Response<List<Reply>> response) {
+
+
+                if (response.body() != null) {
+                    List<Reply> replyItem = response.body();
+                    Collections.reverse(replyItem);
+
+                    if (replyItem != null) {
+                        adapter.addPagingData(replyItem);
+                        offset += 10;
+                        progressView.setVisibility(View.GONE);
+                    }
+                }
+
+
+            }
+
+            @Override
+            public void onFailure(Call<List<Reply>> call, Throwable t) {
+                Log.d("MESSAGE: ", t.getMessage());
+
+            }
+        });
+    }
+
 
     private Target target = new Target() {
         @Override
@@ -703,7 +795,7 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
                 }
 
 
-                Call<String> call = commentService.addedCommentReply(deviceId, profileId, token, commentId, fileToUpload, commentText, commentType, mention, linkUrl, repLiesUserId, postId, userIds);
+                Call<Reply> call = commentService.addedCommentReply(deviceId, profileId, token, commentId, fileToUpload, commentText, commentType, mention, linkUrl, repLiesUserId, postId, userIds);
                 sendCommentItemRequest(call);
 
                 break;
@@ -1075,65 +1167,62 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
                 .build(etComment);
     }
 
-    private void sendCommentItemRequest(Call<String> call) {
+    private void sendCommentItemRequest(Call<Reply> call) {
 
-        call.enqueue(new Callback<String>() {
+        call.enqueue(new Callback<Reply>() {
 
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
+            public void onResponse(Call<Reply> call, Response<Reply> response) {
 
 
                 if (response.isSuccessful()) {
                     if (response.body() != null) {
-                        try {
-                            JSONObject object = new JSONObject(response.body());
-                            String insertId = object.getString("insert_id");
 
-                            if (insertId.length() > 0) {
+                        Reply reply = response.body();
+                        String insertId = reply.getId();
 
-                                Reply reply = new Reply();
-                                reply.setId(insertId);
+                        if (insertId.length() > 0) {
 
-                                reply.setCommentImage(object.getString("comment_image"));
+                         /*       Reply replyItem = new Reply();
+                                replyItem.setId(insertId);
 
+                                replyItem.setCommentImage(reply.getCommentImage());
 
-                                reply.setIsLikeReplied(false);
-                                reply.setTotalLike("0");
-                                reply.setCommentId(commentId);
+                                replyItem.setIsLikeReplied(false);
+                                replyItem.setTotalLike("0");
+                                replyItem.setCommentId(commentId);
 
-                                reply.setUserPhoto(userInfo.getPhoto());
-                                reply.setCommentType(String.valueOf(commentType));
-                                reply.setCommentText(object.getString("comment_text"));
-                                reply.setHasMention(String.valueOf(hasMention));
-                                reply.setIsBlock("0");
-                                reply.setTotalLike("0");
+                                replyItem.setUserPhoto(userInfo.getPhoto());
+                                replyItem.setCommentType(String.valueOf(commentType));
+                                replyItem.setCommentText(reply.getCommentText());
+                                replyItem.setCommentTextIndex(reply.getCommentTextIndex());
+                                replyItem.setHasMention(String.valueOf(hasMention));
+                                replyItem.setIsBlock("0");
+                                replyItem.setTotalLike("0");
                                 long seconds = System.currentTimeMillis() / 1000;
-                                reply.setDateTime(String.valueOf(seconds));
-                                reply.setIsLikeReplied(false);
-                                reply.setFirstName(userInfo.getFirstName());
-                                reply.setLastName(userInfo.getLastName());
-                                reply.setUserGoldStars(userInfo.getGoldStars());
-                                reply.setUserSliverStars(userInfo.getSliverStars());
-                                reply.setUserId(postId);
+                                replyItem.setDateTime(String.valueOf(seconds));
+                                replyItem.setIsLikeReplied(false);
+                                replyItem.setFirstName(userInfo.getFirstName());
+                                replyItem.setLastName(userInfo.getLastName());
+                                replyItem.setUserGoldStars(userInfo.getGoldStars());
+                                replyItem.setUserSliverStars(userInfo.getSliverStars());
+                                replyItem.setUserId(postId);*/
 
 
 //                                int insertIndex = replyItems.size()-1;
 //                                replyItems.add(insertIndex, reply);
 //                                adapter.notifyItemInserted(insertIndex);
 
-                                adapter.refreshData(reply);
-                                progressDialog.dismiss();
-                                etComment.setText("");
-                                offset++;
-                                recyclerView.smoothScrollToPosition(0);
+
+                            adapter.refreshData(reply);
+                            progressDialog.dismiss();
+                            etComment.setText("");
+                            offset++;
+                            recyclerView.smoothScrollToPosition(0);
 
 
-                            }
-
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
                         }
+
 
                     } else {
 
@@ -1144,7 +1233,7 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
+            public void onFailure(Call<Reply> call, Throwable t) {
                 Log.d("MESSAGE: ", t.getMessage());
 
             }
@@ -1202,8 +1291,8 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
         this.reply = reply;
         imageEditComment.setVisibility(View.GONE);
         imageSendComment.setVisibility(View.VISIBLE);
-      //  etComment.setText(reply.getCommentText());
-        repLiesUserId=reply.getUserId();
+        //  etComment.setText(reply.getCommentText());
+        repLiesUserId = reply.getUserId();
         etComment.requestFocus();
         etComment.postDelayed(new Runnable() {
                                   @Override
@@ -1215,7 +1304,7 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
                 , 200);
 
 
-        String name=reply.getFirstName()+" "+reply.getLastName();
+        String name = reply.getFirstName() + " " + reply.getLastName();
 
 //        nameList.add(reply.getCommentText());
 //        rvMentionUserShow = true;
@@ -1225,8 +1314,8 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
         String id = reply.getUserId();
 
         nameList.add(name);
-        commentText=name;
-        userQuery="@"+friends;
+        commentText = name;
+        userQuery = "@" + friends;
         idList.add(id);
         StringBuilder nameBuilder = new StringBuilder();
         nameBuilder.append(name);
@@ -1417,6 +1506,16 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
 
     @Override
     public void onCancelResult(DialogFragment dlg) {
+
+    }
+
+    @Override
+    public void onTitleClicked(Comment_ commentItem, int position, Reply reply) {
+
+    }
+
+    @Override
+    public void commentDelete(Comment_ commentItem, int position, Reply reply) {
 
     }
 

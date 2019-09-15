@@ -619,7 +619,7 @@ public class PostShare extends AppCompatActivity implements
                 emojiPopup.toggle();
                 break;
             case R.id.imageCancelPost:
-                startActivity(new Intent(this, Home.class));
+               finish();
                 break;
             case R.id.tvSubmitPost:
                 final String text = editPostMessage.getText().toString().trim();
@@ -699,6 +699,7 @@ public class PostShare extends AppCompatActivity implements
                                 );
                                 sendBrowserNotificationRequest(mCall);
                                 //sendBrowserNotification
+                                finish();
                             }
 
                         } catch (JSONException e) {
