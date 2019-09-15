@@ -30,6 +30,7 @@ import android.widget.ViewFlipper;
 import com.chaos.view.PinView;
 import com.doodle.App;
 import com.doodle.Authentication.model.Error;
+import com.doodle.Authentication.model.ForgotPassword;
 import com.doodle.Authentication.model.LoginUser;
 import com.doodle.Authentication.model.ResendStatus;
 import com.doodle.Authentication.model.UserInfo;
@@ -58,7 +59,7 @@ import retrofit2.Response;
 
 import static com.doodle.Tool.AppConstants.POST_IMAGES;
 
-public class ForgotPassword extends AppCompatActivity implements View.OnClickListener, ResendEmail.BottomSheetListener {
+public class ForgotPasswords extends AppCompatActivity implements View.OnClickListener, ResendEmail.BottomSheetListener {
 
 
     private ViewFlipper mViewFlipper;
@@ -74,7 +75,7 @@ public class ForgotPassword extends AppCompatActivity implements View.OnClickLis
     private TextView tvForgot, tvSignup;
     private Button btnLogin, btnContinue,/* btnSignIn,*/
             btnOTPContinue, btnFinish;
-    private static final String TAG = "ForgotPassword";
+    private static final String TAG = "ForgotPasswords";
     public static final String MULTIPART_FORM_DATA = "multipart/form-data";
     private boolean networkOk;
     LoginViewModel viewModel;
@@ -447,7 +448,7 @@ public class ForgotPassword extends AppCompatActivity implements View.OnClickLis
         } else {
 
             this.overridePendingTransition(0, 0);
-            ForgotPassword.this.finish();
+            ForgotPasswords.this.finish();
         }
     }
 
@@ -535,16 +536,16 @@ public class ForgotPassword extends AppCompatActivity implements View.OnClickLis
                 }
                 break;
 //            case R.id.imgAbout:
-//                startActivity(new Intent(ForgotPassword.this, About.class));
+//                startActivity(new Intent(ForgotPasswords.this, About.class));
 //                break;
             case R.id.imgEmailAbout:
-                startActivity(new Intent(ForgotPassword.this, About.class));
+                startActivity(new Intent(ForgotPasswords.this, About.class));
                 break;
             case R.id.imgOTPAbout:
-                startActivity(new Intent(ForgotPassword.this, About.class));
+                startActivity(new Intent(ForgotPasswords.this, About.class));
                 break;
             case R.id.imgResetAbout:
-                startActivity(new Intent(ForgotPassword.this, About.class));
+                startActivity(new Intent(ForgotPasswords.this, About.class));
                 break;
 //            case R.id.etEmail:
 //                getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
@@ -553,7 +554,7 @@ public class ForgotPassword extends AppCompatActivity implements View.OnClickLis
 //                getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 //                break;
 //            case R.id.tvSignup:
-//                startActivity(new Intent(ForgotPassword.this, Signup.class));
+//                startActivity(new Intent(ForgotPasswords.this, Signup.class));
 //                //finish();
 //                break;
             case R.id.btnFinish:
@@ -612,16 +613,16 @@ public class ForgotPassword extends AppCompatActivity implements View.OnClickLis
 
         AuthService webService =
                 AuthService.retrofitBase.create(AuthService.class);
-        Call<com.doodle.Authentication.model.ForgotPassword> call = webService.forgotPassword(forgotEmail);
+        Call<ForgotPassword> call = webService.forgotPassword(forgotEmail);
         resendForgotPasswordRequest(call);
 
 
     }
 
-    private void resendForgotPasswordRequest(Call<com.doodle.Authentication.model.ForgotPassword> call) {
-        call.enqueue(new Callback<com.doodle.Authentication.model.ForgotPassword>() {
+    private void resendForgotPasswordRequest(Call<ForgotPassword> call) {
+        call.enqueue(new Callback<ForgotPassword>() {
             @Override
-            public void onResponse(Call<com.doodle.Authentication.model.ForgotPassword> call, Response<com.doodle.Authentication.model.ForgotPassword> response) {
+            public void onResponse(Call<ForgotPassword> call, Response<ForgotPassword> response) {
                 forgotPassword = response.body();
                 boolean status = forgotPassword.isStatus();
                 if (status) {
@@ -646,7 +647,7 @@ public class ForgotPassword extends AppCompatActivity implements View.OnClickLis
             }
 
             @Override
-            public void onFailure(Call<com.doodle.Authentication.model.ForgotPassword> call, Throwable t) {
+            public void onFailure(Call<ForgotPassword> call, Throwable t) {
                 progressBar.setVisibility(View.GONE);
                 loginDisable(false,btnContinue);
             }
@@ -686,10 +687,10 @@ public class ForgotPassword extends AppCompatActivity implements View.OnClickLis
                             //   mViewFlipper.setDisplayedChild(1);
                             // mViewFlipper.setDisplayedChild(mViewFlipper.indexOfChild(findViewById(R.id.loginContent)));
 
-                            startActivity(new Intent(ForgotPassword.this, Login.class));
+                            startActivity(new Intent(ForgotPasswords.this, Login.class));
                             finish();
                         }
-                        // startActivity(new Intent(ForgotPassword.this, Liker.class));
+                        // startActivity(new Intent(ForgotPasswords.this, Liker.class));
 
                     } else {
                         String message = "Failed to set password";
@@ -837,12 +838,12 @@ public class ForgotPassword extends AppCompatActivity implements View.OnClickLis
                     manager.setProfileImage(POST_IMAGES + photo);
                     manager.setProfileId(profileId);
                     manager.setUserName(userName);
-                    //   startActivity(new Intent(ForgotPassword.this, Liker.class));
-//                    Intent intent=new Intent(ForgotPassword.this,Home.class);
+                    //   startActivity(new Intent(ForgotPasswords.this, Liker.class));
+//                    Intent intent=new Intent(ForgotPasswords.this,Home.class);
 //                    intent.putExtra(USER_INFO_ITEM_KEY, (Parcelable) userInfo);
 //                    startActivity(intent);
 
-                    Intent intent = new Intent(ForgotPassword.this, Home.class);
+                    Intent intent = new Intent(ForgotPasswords.this, Home.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK |Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
                 } else {
@@ -859,7 +860,7 @@ public class ForgotPassword extends AppCompatActivity implements View.OnClickLis
                             }
 
                         } else if (loginUser.getBounceData().equalsIgnoreCase(String.valueOf(1)) || loginUser.getBounceData().equalsIgnoreCase(String.valueOf(2))) {
-                            Toast.makeText(ForgotPassword.this, "Email is invalid", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ForgotPasswords.this, "Email is invalid", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
@@ -925,7 +926,7 @@ public class ForgotPassword extends AppCompatActivity implements View.OnClickLis
         }
     }
 
-    com.doodle.Authentication.model.ForgotPassword forgotPassword;
+   ForgotPassword forgotPassword;
 
     private void sendForgotPasswordRequest(Call<com.doodle.Authentication.model.ForgotPassword> call) {
 
@@ -969,7 +970,7 @@ public class ForgotPassword extends AppCompatActivity implements View.OnClickLis
         snackbar.setAction("Set Action", new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(ForgotPassword.this, "Tap Action Button!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ForgotPasswords.this, "Tap Action Button!", Toast.LENGTH_SHORT).show();
                 snackbar.dismiss();
             }
         });

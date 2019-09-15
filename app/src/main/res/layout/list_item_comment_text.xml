@@ -6,28 +6,18 @@
     android:orientation="vertical"
     xmlns:tools="http://schemas.android.com/tools">
 
-
-
-
-
-
-
-
     <include
-
         android:id="@+id/imageCommentUser"
         layout="@layout/post_star_user_header_image"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_alignParentStart="true"
         android:layout_marginStart="15dp"
-
         />
-
 
     <LinearLayout
         android:id="@+id/messageContainer"
-android:layout_marginBottom="@dimen/_5sdp"
+        android:layout_marginBottom="@dimen/_5sdp"
         android:layout_marginTop="@dimen/_5sdp"
         android:layout_toRightOf="@+id/imageCommentUser"
         android:orientation="vertical"
@@ -52,7 +42,7 @@ android:layout_marginBottom="@dimen/_5sdp"
                 android:textColor="@color/colorAccent"
                 tools:text="User Comment full name" />
             <com.vanniktech.emoji.EmojiTextView
-                android:id="@+id/tvCommentMessage"
+                android:id="@+id/tvPostEmojiContent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start|center"
@@ -62,10 +52,24 @@ android:layout_marginBottom="@dimen/_5sdp"
                 android:paddingBottom="7dp"
                 android:textColor="@color/colorBlack"
                 android:textSize="14sp"
-                tools:text="Hellodddd" />
+                android:text="Emoji.." />
+
+
+            <com.borjabravo.readmoretextview.ReadMoreTextView
+                android:id="@+id/tvPostContent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/_5sdp"
+                android:textColor="#333"
+                android:textSize="14sp"
+                app:colorClickableText="@android:color/holo_blue_light"
+                app:trimCollapsedText="Show less"
+                app:trimExpandedText="Show more"
+                app:trimLength="200"
+                app:trimMode="trimModeLength"
+                tools:text="Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.vHere is my first post.Here is my first post.Here is my first post. " />
+
         </LinearLayout>
-
-
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
@@ -83,7 +87,6 @@ android:layout_marginBottom="@dimen/_5sdp"
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-
                 android:orientation="horizontal">
 
                 <TextView
@@ -107,8 +110,9 @@ android:layout_marginBottom="@dimen/_5sdp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textAlignment="center"
+
                     android:textColor="@color/colorPrimaryDark"
-                    android:text="1" />
+                    tools:text="1" />
 
                 <TextView
                     android:id="@+id/tvCommentReply"
@@ -116,6 +120,8 @@ android:layout_marginBottom="@dimen/_5sdp"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/_10sdp"
                     android:text="Reply" />
+
+
 
                 <ImageView
                     android:visibility="gone"

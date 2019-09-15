@@ -15,13 +15,16 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.doodle.App;
+import com.doodle.Authentication.model.UserInfo;
 import com.doodle.Comment.model.Comment_;
+import com.doodle.Comment.model.Reply;
 import com.doodle.Comment.service.CommentService;
 import com.doodle.Home.model.PostItem;
 import com.doodle.R;
 import com.doodle.Tool.NetworkHelper;
 import com.doodle.Tool.PrefManager;
 import com.doodle.Tool.Tools;
+import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,21 +40,24 @@ public class ReportPersonMessageSheet extends BottomSheetDialogFragment implemen
     private BottomSheetListener mListener;
     public static final String MESSAGE_key = "message_key";
     public static final String COMMENT_key = "comment_key";
+    public static final String REPLY_key = "reply_key";
     private PrefManager manager;
     private BottomSheetBehavior mBehavior;
     private Comment_ commentItem;
+    private Reply replyItem;
     private CommentService commentService;
-    private String commentId,postId,toId;
+    private String commentId, postId, toId;
     private String reportType;
 
 
-    public static ReportPersonMessageSheet newInstance(String message, Comment_ commentItem) {
+    public static ReportPersonMessageSheet newInstance(String message, Comment_ commentItem, Reply replyItem) {
 
         Bundle args = new Bundle();
         //args.putString(ExampleBottomSheetDialog.MESSAGE_key, resend);
 //        args.putParcelable(ResendEmail.MESSAGE_key, message);
         args.putString(ReportPersonMessageSheet.MESSAGE_key, message);
         args.putParcelable(ReportSendCategorySheet.COMMENT_key, commentItem);
+        args.putParcelable(ReportSendCategorySheet.REPLY_key, replyItem);
         ReportPersonMessageSheet fragment = new ReportPersonMessageSheet();
         fragment.setArguments(args);
         return fragment;
@@ -62,10 +68,11 @@ public class ReportPersonMessageSheet extends BottomSheetDialogFragment implemen
         super.onSaveInstanceState(outState);
     }
 
-    private String message,personTitle,personSubTitle,personName;
+    private String message, personTitle, personSubTitle, personName;
     private String deviceId, profileId, token, userIds;
     private String reasonId;
     boolean networkOk;
+    PostItem item;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -75,36 +82,46 @@ public class ReportPersonMessageSheet extends BottomSheetDialogFragment implemen
         // setStyle(BottomSheetDialogFragment.STYLE_NORMAL, R.style.CustomBottomSheetStyle);
 
         deviceId = manager.getDeviceId();
-        profileId = manager.getProfileId();
+        //  profileId = manager.getProfileId();
         token = manager.getToken();
-        userIds = manager.getProfileId();
+        //    userIds = manager.getProfileId();
+
+        Gson gson = new Gson();
+        String json = manager.getUserInfo();
+        UserInfo userInfo = gson.fromJson(json, UserInfo.class);
+        userIds = userInfo.getUserId();
+        profileId = userInfo.getUserId();
+
 
         commentService = CommentService.mRetrofit.create(CommentService.class);
         networkOk = NetworkHelper.hasNetworkAccess(getActivity());
-
+        replyItem = new Reply();
         commentItem = new Comment_();
         Bundle argument = getArguments();
+
+        item = new PostItem();
+        item = App.getItem();
+
+
         if (argument != null) {
             reasonId = argument.getString(MESSAGE_key);
             commentItem = argument.getParcelable(COMMENT_key);
-            if(!isEmpty(commentItem)){
+            replyItem = argument.getParcelable(REPLY_key);
+            if (!isEmpty(commentItem)) {
 
-                personName=commentItem.getUserFirstName()+" "+commentItem.getUserLastName();
-            }else {
-                PostItem item=new PostItem();
-                item=App.getItem();
-                personName=item.getUserFirstName()+" "+item.getUserLastName();
-            }
-            personTitle="Send a Message to "+personName;
-            personSubTitle="Letting "+ personName+" know what you think may help him make a better post next time.";
+                personName = commentItem.getUserFirstName() + " " + commentItem.getUserLastName();
+            } else if (!isEmpty(item)) {
+                personName = item.getUserFirstName() + " " + item.getUserLastName();
+            } else if (!isEmpty(replyItem))
+                personTitle = "Send a Message to " + personName;
+            personSubTitle = "Letting " + personName + " know what you think may help him make a better post next time.";
 
         }
     }
 
 
-    private TextView tvReportPersonTitle,tvReportPersonSubTitle,tvReportPersonName;
+    private TextView tvReportPersonTitle, tvReportPersonSubTitle, tvReportPersonName;
     private EditText etReportPerson;
-
 
 
     @Nullable
@@ -115,11 +132,11 @@ public class ReportPersonMessageSheet extends BottomSheetDialogFragment implemen
         root.findViewById(R.id.imgCloseReason).setOnClickListener(this);
         root.findViewById(R.id.btnReasonContinue).setOnClickListener(this);
 
-        tvReportPersonTitle=root.findViewById(R.id.tvReportPersonTitle);
-        tvReportPersonSubTitle=root.findViewById(R.id.tvReportPersonSubTitle);
-        tvReportPersonName=root.findViewById(R.id.tvReportPersonName);
+        tvReportPersonTitle = root.findViewById(R.id.tvReportPersonTitle);
+        tvReportPersonSubTitle = root.findViewById(R.id.tvReportPersonSubTitle);
+        tvReportPersonName = root.findViewById(R.id.tvReportPersonName);
 
-        etReportPerson=root.findViewById(R.id.etReportPerson);
+        etReportPerson = root.findViewById(R.id.etReportPerson);
 
 
         tvReportPersonTitle.setText(personTitle);
@@ -138,27 +155,30 @@ public class ReportPersonMessageSheet extends BottomSheetDialogFragment implemen
             case R.id.btnReasonContinue:
                 if (networkOk) {
 
-                    if(!isEmpty(commentItem)){
-                         commentId = commentItem.getId();
-                         toId=commentItem.getUserId();
-                         postId = commentItem.getPostId();
-                         reportType="3";
-                    }else {
-                        PostItem item=new PostItem();
-                        item=App.getItem();
-                        commentId="";
-                        toId=item.getPostUserid();
-                        reportType="2";
-                        postId=item.getPostId();
+                    if (commentItem != null) {
+                        commentId = commentItem.getId();
+                        toId = commentItem.getUserId();
+                        postId = commentItem.getPostId();
+                        reportType = "3";
+                    } else if (item != null && replyItem != null) {
+                        commentId = replyItem.getCommentId();
+                        toId = replyItem.getUserId();
+                        postId = item.getPostId();
+                        reportType = "3";
+                    } else {
+                        commentId = "";
+                        toId = item.getPostUserid();
+                        reportType = "2";
+                        postId = item.getPostId();
                     }
 
                     message = etReportPerson.getText().toString();
 
-                    if(!isNullOrWhiteSpace(message)){
+                    if (!isNullOrWhiteSpace(message)) {
                         Call<String> call = commentService.reportUser(deviceId, profileId, token, commentId, message, postId, reasonId, reportType, "1", toId, userIds);
                         sendReportUserRequest(call);
-                    }else {
-                        Tools.toast(getActivity(),"Message Required!",R.drawable.icon_checked);
+                    } else {
+                        Tools.toast(getActivity(), "Message Required!", R.drawable.icon_checked);
                     }
 
 
@@ -189,7 +209,7 @@ public class ReportPersonMessageSheet extends BottomSheetDialogFragment implemen
 
                             if (status) {
                                 // adapter.notifyDataSetChanged();
-                                Tools.toast(getActivity(),"your message was successfully sent",R.drawable.icon_checked);
+                                Tools.toast(getActivity(), "your message was successfully sent", R.drawable.icon_checked);
                                 dismiss();
 
                             }
@@ -207,7 +227,7 @@ public class ReportPersonMessageSheet extends BottomSheetDialogFragment implemen
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                Log.d("message",t.getMessage());
+                Log.d("message", t.getMessage());
             }
         });
     }

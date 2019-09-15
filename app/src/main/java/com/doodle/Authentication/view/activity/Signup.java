@@ -1057,7 +1057,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
 //                    mViewFlipper.showNext();
 //
 //                }
-                //  startActivity(new Intent(Signup.this,ForgotPassword.class));
+                //  startActivity(new Intent(Signup.this,ForgotPasswords.class));
             }
 
             @Override
@@ -1094,7 +1094,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
 //                    mViewFlipper.showNext();
 //
 //                }
-                //  startActivity(new Intent(Signup.this,ForgotPassword.class));
+                //  startActivity(new Intent(Signup.this,ForgotPasswords.class));
             }
 
             @Override

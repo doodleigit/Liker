@@ -34,7 +34,7 @@ import com.doodle.Comment.model.Reason;
 import com.doodle.Comment.model.Reply;
 import com.doodle.Comment.model.ReportReason;
 import com.doodle.Comment.service.CommentService;
-import com.doodle.Comment.view.activity.ReplyPost;
+import com.doodle.Reply.view.ReplyPost;
 import com.doodle.Comment.view.fragment.ReportReasonSheet;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.service.HomeService;
@@ -95,9 +95,9 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
 
     private String commentText, commentUserName, commentUserImage, commentImage, commentTime;
     public EmojiTextView tvCommentMessage;
-    public ImageView imagePostCommenting, imageCommentLikeThumb, imageCommentSettings;
+    public ImageView imagePostCommenting, imageCommentSettings,imgCommentLike;
 
-    public TextView tvCommentUserName, tvCommentTime, tvCommentLike, tvCommentReply, tvCountCommentLike,tvLinkHost,tvDescription;
+    public TextView tvCommentUserName, tvCommentTime,  tvCommentReply, tvCountCommentLike,tvLinkHost,tvDescription;
     private String userPostId;
     private PopupMenu popupCommentMenu;
 
@@ -174,15 +174,15 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
         youtubeHold = itemView.findViewById(R.id.youtubeHold);
 
         imagePostCommenting = itemView.findViewById(R.id.image_post);
-        imageCommentLikeThumb = itemView.findViewById(R.id.imageCommentLikeThumb);
+
         imageCommentSettings = itemView.findViewById(R.id.imageCommentSettings);
 
         tvCommentUserName = itemView.findViewById(R.id.tvCommentUserName);
         tvCommentTime = itemView.findViewById(R.id.tvCommentTime);
-        tvCommentLike = itemView.findViewById(R.id.tvCommentLike);
+        imgCommentLike = itemView.findViewById(R.id.imgCommentLike);
         tvCommentReply = itemView.findViewById(R.id.tvCommentReply);
         tvCountCommentLike = itemView.findViewById(R.id.tvCountCommentLike);
-        imageCommentLikeThumb.setVisibility(View.GONE);
+
         tvCountCommentLike.setVisibility(View.GONE);
 
 
@@ -292,12 +292,15 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
 
         if ("0".equalsIgnoreCase(commentLike)) {
             tvCountCommentLike.setText("");
-            imageCommentLikeThumb.setVisibility(View.GONE);
+
             tvCountCommentLike.setVisibility(View.GONE);
         } else {
-            imageCommentLikeThumb.setVisibility(View.VISIBLE);
+            SpannableString content = new SpannableString(commentLike);
+            content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+
+
             tvCountCommentLike.setVisibility(View.VISIBLE);
-            tvCountCommentLike.setText(commentLike);
+            tvCountCommentLike.setText(content);
         }
 
 
@@ -305,7 +308,10 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
 
 
 
-        tvCommentLike.setOnClickListener(new View.OnClickListener() {
+
+
+
+        imgCommentLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
@@ -654,12 +660,12 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
 
                                     if (0 == commentLikeNumeric) {
                                         tvCountCommentLike.setText("");
-                                        imageCommentLikeThumb.setVisibility(View.GONE);
+
                                         tvCountCommentLike.setVisibility(View.GONE);
                                     } else {
                                         SpannableString content = new SpannableString(String.valueOf(commentLikeNumeric));
                                         content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-                                        imageCommentLikeThumb.setVisibility(View.VISIBLE);
+
                                         tvCountCommentLike.setVisibility(View.VISIBLE);
                                         tvCountCommentLike.setText(content);
                                     }
@@ -720,7 +726,7 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
 
                                     SpannableString content = new SpannableString(String.valueOf(commentLikeNumeric));
                                     content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-                                    imageCommentLikeThumb.setVisibility(View.VISIBLE);
+
                                     tvCountCommentLike.setVisibility(View.VISIBLE);
                                     tvCountCommentLike.setText(content);
 
@@ -772,12 +778,12 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
 
                                     if (0 == commentLikeNumeric) {
                                         tvCountCommentLike.setText("");
-                                        imageCommentLikeThumb.setVisibility(View.GONE);
+
                                         tvCountCommentLike.setVisibility(View.GONE);
                                     } else {
                                         SpannableString content = new SpannableString(String.valueOf(commentLikeNumeric));
                                         content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-                                        imageCommentLikeThumb.setVisibility(View.VISIBLE);
+
                                         tvCountCommentLike.setVisibility(View.VISIBLE);
                                         tvCountCommentLike.setText(content);
                                     }
@@ -840,7 +846,7 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
 
                                     SpannableString content = new SpannableString(String.valueOf(commentLikeNumeric));
                                     content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-                                    imageCommentLikeThumb.setVisibility(View.VISIBLE);
+
                                     tvCountCommentLike.setVisibility(View.VISIBLE);
                                     tvCountCommentLike.setText(content);
 

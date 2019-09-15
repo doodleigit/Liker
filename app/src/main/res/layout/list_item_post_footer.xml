@@ -76,8 +76,7 @@
             android:id="@+id/tvCommentCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_5sdp"
-            android:layout_marginRight="@dimen/_5sdp"
+            android:layout_marginTop="@dimen/_10sdp"
             android:layout_marginBottom="@dimen/_5sdp"
             android:layout_toLeftOf="@id/imagePostComment"
             tools:text="1" />
@@ -86,26 +85,27 @@
             android:id="@+id/imagePostComment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:padding="@dimen/_5sdp"
             android:layout_centerInParent="true"
             android:layout_marginTop="@dimen/_5sdp"
-            android:layout_marginRight="@dimen/_15sdp"
+            android:layout_marginRight="@dimen/_5sdp"
             android:layout_marginBottom="@dimen/_5sdp"
             android:layout_toLeftOf="@id/imagePostShare"
             android:src="@drawable/ic_comment_black_24dp"
-            android:tint="#C4C9D4" />
+            android:tint="#8596a3" />
 
 
         <ImageView
+            android:padding="@dimen/_5sdp"
             android:id="@+id/imagePostShare"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:layout_marginTop="@dimen/_5sdp"
-            android:layout_marginRight="@dimen/_15sdp"
             android:layout_marginBottom="@dimen/_5sdp"
             android:layout_toLeftOf="@id/tvImgShareCount"
             android:src="@drawable/ic_share_black_24dp"
-            android:tint="#C4C9D4" />
+            android:tint="#8596a3" />
 
         <TextView
             android:id="@+id/tvImgShareCount"
@@ -114,6 +114,7 @@
             android:layout_alignParentRight="true"
             android:layout_centerInParent="true"
             android:layout_marginRight="@dimen/_5sdp"
+            android:textColor="#8596a3"
             android:background="@drawable/share_count_box"
             android:textAlignment="center" />
 

@@ -42,7 +42,7 @@
             android:name=".Profile.view.ProfileActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".Comment.view.activity.ReplyPost"
+            android:name=".Reply.view.ReplyPost"
             android:parentActivityName=".Home.view.activity.Home"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
@@ -86,7 +86,7 @@
         <activity android:name=".Home.view.CheckedActivity" />
         <activity
             android:name=".Authentication.view.activity.MyTwitter"
-            android:parentActivityName=".Authentication.view.activity.ForgotPassword"
+            android:parentActivityName=".Authentication.view.activity.ForgotPasswords"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Authentication.view.activity.TwitterAuthenticationActivity"
@@ -104,7 +104,7 @@
             android:name=".Authentication.view.activity.Signup"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".Authentication.view.activity.ForgotPassword"
+            android:name=".Authentication.view.activity.ForgotPasswords"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Home.view.activity.Home"

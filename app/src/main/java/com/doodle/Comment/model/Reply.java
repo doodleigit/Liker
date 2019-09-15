@@ -101,6 +101,33 @@ public class Reply implements Serializable, Parcelable
     ;
     private final static long serialVersionUID = -7066296240955379444L;
 
+
+    public Reply(String id, String userId, String commentId, String commentType, String textSize, String hasMention, String isBlock, String totalLike, String dateTime, boolean isLikeReplied, String userName, String firstName, String lastName, String userTotalLikes, String userGoldStars, String userSliverStars, String userTopCommenter, String userPhoto, String deactivated, String commentText, String commentImage, List<CommentTextIndex> commentTextIndex, LinkData linkData) {
+        this.id = id;
+        this.userId = userId;
+        this.commentId = commentId;
+        this.commentType = commentType;
+        this.textSize = textSize;
+        this.hasMention = hasMention;
+        this.isBlock = isBlock;
+        this.totalLike = totalLike;
+        this.dateTime = dateTime;
+        this.isLikeReplied = isLikeReplied;
+        this.userName = userName;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.userTotalLikes = userTotalLikes;
+        this.userGoldStars = userGoldStars;
+        this.userSliverStars = userSliverStars;
+        this.userTopCommenter = userTopCommenter;
+        this.userPhoto = userPhoto;
+        this.deactivated = deactivated;
+        this.commentText = commentText;
+        this.commentImage = commentImage;
+        this.commentTextIndex = commentTextIndex;
+        this.linkData = linkData;
+    }
+
     protected Reply(Parcel in) {
         this.id = ((String) in.readValue((String.class.getClassLoader())));
         this.userId = ((String) in.readValue((String.class.getClassLoader())));

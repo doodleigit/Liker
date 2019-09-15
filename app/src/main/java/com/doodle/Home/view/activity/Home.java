@@ -39,6 +39,7 @@ import com.doodle.App;
 import com.doodle.Authentication.model.UserInfo;
 import com.doodle.Authentication.view.activity.LoginAgain;
 import com.doodle.Comment.model.Comment_;
+import com.doodle.Comment.model.Reply;
 import com.doodle.Comment.service.CommentService;
 import com.doodle.Comment.view.fragment.BlockUserDialog;
 import com.doodle.Comment.view.fragment.FollowSheet;
@@ -1018,7 +1019,7 @@ public class Home extends AppCompatActivity implements
                 break;
             case R.id.imageNewPost:
                 startActivity(new Intent(this, PostNew.class));
-                Toast.makeText(this, "new post", Toast.LENGTH_SHORT).show();
+
 // imageNewPost.setCircleBackgroundColor(getResources().getColor(R.color.colorWhite));
                 imageNewPost.setImageResource(R.drawable.ic_mode_edit_blue_24dp);
                 break;
@@ -1186,8 +1187,10 @@ public class Home extends AppCompatActivity implements
     public void onPersonLikerClicked(int image, String text) {
         String message = text;
         Comment_ commentChild = new Comment_();
-        commentChild = App.getCommentItem();
-        ReportPersonMessageSheet reportPersonMessageSheet = ReportPersonMessageSheet.newInstance(reportId, commentChild);
+        commentChild = null;
+        Reply reply = new Reply();
+        reply=null;
+        ReportPersonMessageSheet reportPersonMessageSheet = ReportPersonMessageSheet.newInstance(reportId, commentChild, reply);
         reportPersonMessageSheet.show(getSupportFragmentManager(), "ReportPersonMessageSheet");
     }
 

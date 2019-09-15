@@ -387,9 +387,9 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
 
                 }
 
-
-            /*    if (!isNullOrEmpty(comment_Item.getCommentText())) {
-                    if (commentText.equalsIgnoreCase(comment_Item.getCommentText())) {
+             /*   Reply reply = App.getReplyItem();
+                if (!isNullOrEmpty(reply.getCommentText())) {
+                    if (commentText.equalsIgnoreCase(reply.getCommentText())) {
                         imageEditComment.setVisibility(View.GONE);
                         imageSendComment.setVisibility(View.VISIBLE);
                     } else {
@@ -399,9 +399,10 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
                 } else {
                     imageEditComment.setVisibility(View.GONE);
                     imageSendComment.setVisibility(View.VISIBLE);
-                }*/
-
-
+                }
+*/
+                imageEditComment.setVisibility(View.GONE);
+                imageSendComment.setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -654,7 +655,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
 
                 if (response.body() != null) {
                     CommentItem commentItem = response.body();
-                    PostItem item=new PostItem();
+                    PostItem item = new PostItem();
                     Intent intent = new Intent(CommentPost.this, CommentPost.class);
                     intent.putExtra(COMMENT_KEY, (Parcelable) commentItem);
                     intent.putExtra(ITEM_KEY, (Parcelable) item);
@@ -785,6 +786,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
                     commentItem.setHasMention(String.valueOf(hasMention));
                     commentItem.setCommentTextIndex(commentItems.getCommentTextIndex());
                     commentItem.setLinkData(commentItems.getLinkData());
+                    commentItem.setTotalLike("0");
                     commentItem.setUserId(profileId);
                     commentItem.setUserFirstName(userInfo.getFirstName());
                     commentItem.setUserLastName(userInfo.getLastName());
@@ -1054,6 +1056,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
                     commentItem.setCommentText(commentItems.getCommentText());
                     commentItem.setHasMention(String.valueOf(hasMention));
                     commentItem.setPostId(postId);
+                    commentItem.setTotalLike("0");
                     //  commentItem.getLinkData().setLinkFullUrl(linkUrl);
 
                     //  commentItem.getLinkData().setLinkFullUrl(linkUrl);
@@ -1195,9 +1198,10 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
 
     @Override
     public void onPersonLikerClicked(int image, String text) {
-        String message = text;
+
         commentChild = App.getCommentItem();
-        ReportPersonMessageSheet reportPersonMessageSheet = ReportPersonMessageSheet.newInstance(reportId, commentChild);
+        Reply reply = new Reply();
+        ReportPersonMessageSheet reportPersonMessageSheet = ReportPersonMessageSheet.newInstance(reportId, commentChild, reply);
         reportPersonMessageSheet.show(getSupportFragmentManager(), "ReportPersonMessageSheet");
     }
 
@@ -1275,13 +1279,12 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
         });
 
 
-
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if(App.isIsBockReply()){
+        if (App.isIsBockReply()) {
             App.setIsBockReply(false);
             Call<CommentItem> blockCall = commentService.getAllPostComments(deviceId, profileId, token, "false", limit, offset, "DESC", postItem.getPostId(), userIds);
             sendBlockCommentItemRequest(blockCall);

@@ -46,6 +46,7 @@ import com.borjabravo.readmoretextview.ReadMoreTextView;
 import com.doodle.App;
 import com.doodle.Authentication.service.MyService;
 import com.doodle.Comment.model.Comment_;
+import com.doodle.Comment.model.Reply;
 import com.doodle.Comment.view.fragment.BlockUserDialog;
 import com.doodle.Comment.view.fragment.DeletePostDialog;
 import com.doodle.Home.model.PostItem;
@@ -161,6 +162,32 @@ public class Tools {
         network.show(manager, "NetworkDialogFragment");
     }
 
+    public static void showNetworkDialogs(View view) {
+        AppCompatActivity activity = (AppCompatActivity) view.getContext();
+        Network network = new Network();
+        // TODO: Use setCancelable() to make the dialog non-cancelable
+        network.setCancelable(false);
+        network.show(activity.getSupportFragmentManager(), "NetworkDialogFragment");
+    }
+    public static String extractMentionText(Reply replyItem) {
+
+        String mentionString = replyItem.getCommentText();
+        // String html = "<p>An <a href='http://example.com/'><b>example</b></a> link.</p>";
+        Document doc = Jsoup.parse(mentionString);
+        Element link = doc.select("a").first();
+
+        String text = doc.body().text(); // "An example link"
+        Log.d("Text", text);
+           /* String linkHref = link.attr("href"); // "http://example.com/"
+            Log.d("URL: ", linkHref);
+            String linkText = link.text(); // "example""
+            String linkOuterH = link.outerHtml();
+            // "<a href="http://example.com"><b>example</b></a>"
+            String linkInnerH = link.html(); // "<b>example</b>"*/
+        return text;
+
+
+    }
    public static void showBlockUser(View v) {
         AppCompatActivity activity = (AppCompatActivity) v.getContext();
         BlockUserDialog blockUserDialog = new BlockUserDialog();

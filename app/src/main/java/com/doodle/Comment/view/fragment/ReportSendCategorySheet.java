@@ -15,6 +15,7 @@ import android.widget.RadioGroup;
 
 import com.doodle.App;
 import com.doodle.Comment.model.Comment_;
+import com.doodle.Comment.model.Reply;
 import com.doodle.Home.model.PostItem;
 import com.doodle.R;
 import com.doodle.Tool.PrefManager;
@@ -25,6 +26,7 @@ import java.util.List;
 import static com.doodle.Tool.Tools.isEmpty;
 
 public class ReportSendCategorySheet extends BottomSheetDialogFragment implements View.OnClickListener {
+    public static String REPLY_key="reply_key";
     private BottomSheetListener mListener;
     public static final String MESSAGE_key = "message_key";
     public static final String COMMENT_key = "comment_key";
@@ -69,7 +71,7 @@ public class ReportSendCategorySheet extends BottomSheetDialogFragment implement
             reportId = argument.getString(MESSAGE_key);
             isFollow = argument.getBoolean(IS_FOLLOW_key);
             commentItem = argument.getParcelable(COMMENT_key);
-          //  Toast.makeText(getActivity(), "comment_key: " + commentItem.getUserFirstName() + "isFriend: " + isFriend, Toast.LENGTH_SHORT).show();
+            //  Toast.makeText(getActivity(), "comment_key: " + commentItem.getUserFirstName() + "isFriend: " + isFriend, Toast.LENGTH_SHORT).show();
 
         }
     }
@@ -89,13 +91,16 @@ public class ReportSendCategorySheet extends BottomSheetDialogFragment implement
 
 
         radioGroupSendCategory = (RadioGroup) root.findViewById(R.id.radioGroupSendCategory);
-
-        if(!isEmpty(commentItem)){
+        PostItem item = new PostItem();
+        item = App.getItem();
+        Reply replyItem = App.getReplyItem();
+        if (!isEmpty(commentItem)) {
             reportPersonName = commentItem.getUserFirstName() + " " + commentItem.getUserLastName();
-        }else {
-            PostItem item=new PostItem();
-            item=App.getItem();
+        } else if (!isEmpty(commentItem)) {
+
             reportPersonName = item.getUserFirstName() + " " + item.getUserLastName();
+        } else if (!isEmpty(replyItem)) {
+            reportPersonName = replyItem.getFirstName() + " " + replyItem.getLastName();
         }
 
         reoprtUser = "Send a message to " + reportPersonName;
@@ -126,7 +131,7 @@ public class ReportSendCategorySheet extends BottomSheetDialogFragment implement
                 RadioButton radioBtn = (RadioButton) root.findViewById(checkedRadioButtonId);
                 //  reasonId=String.valueOf(checkedRadioButtonId);
                 categoryName = radioBtn.getText().toString();
-             //   Toast.makeText(getActivity(), categoryName, Toast.LENGTH_SHORT).show();
+                //   Toast.makeText(getActivity(), categoryName, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -153,7 +158,6 @@ public class ReportSendCategorySheet extends BottomSheetDialogFragment implement
                     mListener.onReportLikerClicked(R.drawable.ic_public_black_12dp, categoryName);
                     dismiss();
                 }
-
 
 
                 break;
