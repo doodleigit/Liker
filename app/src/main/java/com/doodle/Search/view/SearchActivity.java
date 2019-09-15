@@ -58,6 +58,7 @@ public class SearchActivity extends AppCompatActivity {
     int offset = 10;
     RecyclerView recyclerView;
     Toolbar toolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,17 +88,11 @@ public class SearchActivity extends AppCompatActivity {
         mUserList = advanceSearches.getUser();
         mPostList = advanceSearches.getPost();
         mAdapter = new AdvanceSearchAdapter(this, mUserList, mPostList);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                shimmerFrameLayout.stopShimmer();
-                shimmerFrameLayout.setVisibility(View.GONE);
+        shimmerFrameLayout.stopShimmer();
+        shimmerFrameLayout.setVisibility(View.GONE);
 
-                recyclerView.setVisibility(View.VISIBLE);
-                recyclerView.setAdapter(mAdapter);
-            }
-        }, 5000);
-
+        recyclerView.setVisibility(View.VISIBLE);
+        recyclerView.setAdapter(mAdapter);
 
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -130,21 +125,16 @@ public class SearchActivity extends AppCompatActivity {
     private void PerformPagination() {
         progressView.setVisibility(View.VISIBLE);
         progressView.startAnimation();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (networkOk) {
-                    String queryResult = App.getQueryResult();
-                    Call<AdvanceSearches> call = webService.advanceSearchPaging(deviceId, profileId, token, mProfileId, queryResult, limit, offset, 1);
-                    sendAdvanceSearchRequest(call);
+        if (networkOk) {
+            String queryResult = App.getQueryResult();
+            Call<AdvanceSearches> call = webService.advanceSearchPaging(deviceId, profileId, token, mProfileId, queryResult, limit, offset, 1);
+            sendAdvanceSearchRequest(call);
 
-                } else {
-                    Tools.showNetworkDialog(getSupportFragmentManager());
-                    progressView.setVisibility(View.GONE);
-                    progressView.stopAnimation();
-                }
-            }
-        }, 5000);
+        } else {
+            Tools.showNetworkDialog(getSupportFragmentManager());
+            progressView.setVisibility(View.GONE);
+            progressView.stopAnimation();
+        }
 
     }
 
@@ -155,8 +145,6 @@ public class SearchActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(Call<AdvanceSearches> call, Response<AdvanceSearches> response) {
-
-
                 AdvanceSearches advanceSearches = response.body();
                 mUserList = advanceSearches.getUser();
                 mPostList = advanceSearches.getPost();

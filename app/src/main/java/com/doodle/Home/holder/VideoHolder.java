@@ -288,6 +288,8 @@ public class VideoHolder extends RecyclerView.ViewHolder {
 
         if (!isNullOrEmpty(item.getTotalComment()) && !"0".equalsIgnoreCase(item.getTotalComment())) {
             tvCommentCount.setText(item.getTotalComment());
+        } else {
+            tvCommentCount.setText("");
         }
 
 

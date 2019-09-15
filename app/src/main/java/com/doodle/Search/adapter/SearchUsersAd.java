@@ -1,6 +1,7 @@
 package com.doodle.Search.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -9,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.Search.model.SearchUser;
 import com.doodle.App;
 import com.doodle.R;
@@ -20,11 +23,13 @@ import static com.doodle.Tool.AppConstants.POST_IMAGES;
 
 public class SearchUsersAd extends ArrayAdapter<SearchUser> {
 
+    private Context context;
     private List<SearchUser> mSearchUsers;
     private LayoutInflater mInflater;
 
     public SearchUsersAd(@NonNull Context context, @NonNull List<SearchUser> objects) {
         super(context, R.layout.advance_search_user_item, objects);
+        this.context = context;
         mSearchUsers = objects;
         mInflater = LayoutInflater.from(context);
     }
@@ -49,13 +54,20 @@ public class SearchUsersAd extends ArrayAdapter<SearchUser> {
         mLike.setText(item.totalLikes);
         mStar.setText(totalaStar + " Stars");
 
-        if (image_url != null && image_url.length() > 0) {
+        if (image_url.length() > 0) {
             Picasso.with(App.getAppContext())
                     .load(image_url)
                     .placeholder(R.drawable.profile)
                     .into(mImage);
 
         }
+
+        convertView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                context.startActivity(new Intent(context, ProfileActivity.class).putExtra("user_id", mSearchUsers.get(position).getUserId()).putExtra("user_name", mSearchUsers.get(position).getUserName()));
+            }
+        });
 
         return convertView;
     }

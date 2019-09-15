@@ -20,6 +20,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.TextView;
 
 import com.doodle.App;
 import com.doodle.Comment.model.CommentItem;
@@ -87,6 +88,7 @@ public class BreakingPost extends Fragment {
     int offset = 0;
     private String catIds = "";
     private ShimmerFrameLayout shimmerFrameLayout;
+    private TextView tvAlert;
 
     //Delete post item
     public static TextHolder.PostItemListener mCallback;
@@ -95,10 +97,6 @@ public class BreakingPost extends Fragment {
     public static LinkScriptYoutubeHolder.PostItemListener youtubeListener;
     public static LinkScriptHolder.PostItemListener linkListener;
     public static ImageHolder.PostItemListener imageListener;
-
-    private Handler handler;
-    private int previousPosition, currentPosition;
-    private boolean videoPauseNotify = false;
 
     PostItem deletePostItem;
     int deletePosition;
@@ -125,7 +123,7 @@ public class BreakingPost extends Fragment {
         networkOk = NetworkHelper.hasNetworkAccess(getActivity());
         postItemList = new ArrayList<>();
         deletePostItem = new PostItem();
-        handler = new Handler();
+
     }
 
     @Override
@@ -136,16 +134,14 @@ public class BreakingPost extends Fragment {
         layoutManager = new LinearLayoutManager(getActivity());
         progressView = (CircularProgressView) root.findViewById(R.id.progress_view);
         shimmerFrameLayout = (ShimmerFrameLayout) root.findViewById(R.id.shimmer_view_post_container);
+        tvAlert = root.findViewById(R.id.alert);
         refreshLayout = root.findViewById(R.id.refreshLayout);
         recyclerView = root.findViewById(R.id.rvBreakingPost);
         recyclerView.setLayoutManager(layoutManager);
-        v = root;
-        getData();
 
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                offset = 0;
                 getData();
             }
         });
@@ -258,6 +254,11 @@ public class BreakingPost extends Fragment {
             }
         };
 
+        adapter = new PostAdapter(getActivity(), postItemList, mCallback, mimListener, videoListener, youtubeListener, linkListener, imageListener, true);
+        recyclerView.setMediaObjects(postItemList);
+        recyclerView.setAdapter(adapter);
+        getData();
+
         return root;
     }
 
@@ -297,8 +298,10 @@ public class BreakingPost extends Fragment {
                             JSONObject object = new JSONObject(response.body());
                             boolean status = object.getBoolean("status");
                             if (status) {
-                                postItemList.remove(deletePostItem);
-                                adapter.deleteItem(deletePosition);
+//                                postItemList.remove(deletePostItem);
+//                                adapter.deleteItem(deletePosition);
+                                postItemList.remove(deletePosition);
+                                adapter.notifyDataSetChanged();
                                 offset--;
                                 recyclerView.smoothScrollToPosition(0);
                             }
@@ -325,6 +328,7 @@ public class BreakingPost extends Fragment {
     }
 
     private void getData() {
+        offset = 0;
         if (networkOk) {
             progressView.setVisibility(View.VISIBLE);
             progressView.startAnimation();
@@ -341,24 +345,8 @@ public class BreakingPost extends Fragment {
     private void PerformPagination() {
         progressView.setVisibility(View.VISIBLE);
         progressView.startAnimation();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (networkOk) {
-                    String queryResult = App.getQueryResult();
-                    Call<List<PostItem>> call = webService.feed(deviceId, profileId, token, userIds, limit, offset, "breaking", catIds, 1, false);
-                    PostItemPagingRequest(call);
-
-                } else {
-                    Tools.showNetworkDialog(getActivity().getSupportFragmentManager());
-                    progressView.setVisibility(View.GONE);
-                    progressView.stopAnimation();
-                    isPaginationDone = true;
-                    isScrolling = true;
-                }
-            }
-        }, 2000);
-
+        Call<List<PostItem>> call = webService.feed(deviceId, profileId, token, userIds, limit, offset, "breaking", catIds, 1, false);
+        PostItemPagingRequest(call);
     }
 
     private void PostItemPagingRequest(Call<List<PostItem>> call) {
@@ -368,9 +356,10 @@ public class BreakingPost extends Fragment {
             @Override
             public void onResponse(Call<List<PostItem>> call, Response<List<PostItem>> response) {
 
-                postItemList = response.body();
+                List<PostItem> list = response.body();
 
-                if (postItemList != null) {
+                if (list != null) {
+                    postItemList.addAll(list);
                     String totalPostIDs;
                     List<String> postIdSet = new ArrayList<>();
                     for (PostItem temp : postItemList) {
@@ -390,10 +379,12 @@ public class BreakingPost extends Fragment {
 
                     totalPostIDs = sb.substring(separator.length()).replaceAll("\\s+", "");
                     Log.d("friends", totalPostIDs);
-                    Call<CommentItem> mCall = webService.getPostComments(deviceId, profileId, token, "false", limit, offset, "DESC", totalPostIDs, userIds);
-                    sendCommentItemPagingRequest(mCall);
-
-
+//                    Call<CommentItem> mCall = webService.getPostComments(deviceId, profileId, token, "false", limit, offset, "DESC", totalPostIDs, userIds);
+//                    sendCommentItemPagingRequest(mCall);
+                    offset += 5;
+                    onPostResponsePagination();
+                } else {
+                    onPostResponsePagination();
                 }
 
             }
@@ -401,40 +392,7 @@ public class BreakingPost extends Fragment {
             @Override
             public void onFailure(Call<List<PostItem>> call, Throwable t) {
                 Log.d("MESSAGE: ", t.getMessage());
-                progressView.setVisibility(View.GONE);
-                progressView.stopAnimation();
-                isPaginationDone = true;
-            }
-        });
-    }
-
-    private void sendCommentItemPagingRequest(Call<CommentItem> mCall) {
-
-        mCall.enqueue(new Callback<CommentItem>() {
-
-            @Override
-            public void onResponse(Call<CommentItem> mCall, Response<CommentItem> response) {
-
-                CommentItem commentItem = response.body();
-                //  comments = commentItem.getComments();
-                Log.d("commentItem", commentItem.toString());
-                if (postItemList != null) {
-                    adapter.addPagingData(postItemList);
-                    offset += 5;
-                    progressView.setVisibility(View.GONE);
-                    progressView.stopAnimation();
-                }
-                isPaginationDone = true;
-
-            }
-
-            @Override
-            public void onFailure(Call<CommentItem> mCall, Throwable t) {
-                Log.d("MESSAGE: ", t.getMessage());
-                progressView.setVisibility(View.GONE);
-                progressView.stopAnimation();
-                isPaginationDone = true;
-
+                onPostResponsePagination();
             }
         });
     }
@@ -446,8 +404,10 @@ public class BreakingPost extends Fragment {
             @Override
             public void onResponse(Call<List<PostItem>> call, Response<List<PostItem>> response) {
 
-                postItemList = response.body();
-                if (postItemList != null) {
+                List<PostItem> itemList = response.body();
+                if (itemList != null) {
+                    postItemList.clear();
+                    postItemList.addAll(itemList);
 
                     String totalPostIDs;
                     List<String> postIdSet = new ArrayList<>();
@@ -468,8 +428,13 @@ public class BreakingPost extends Fragment {
 
                     totalPostIDs = sb.substring(separator.length()).replaceAll("\\s+", "");
                     Log.d("friends", totalPostIDs);
-                    Call<CommentItem> mCall = webService.getPostComments(deviceId, profileId, token, "false", limit, offset, "DESC", totalPostIDs, userIds);
-                    sendCommentItemRequest(mCall);
+
+                    offset = limit;
+                    onPostResponse();
+
+
+//                    Call<CommentItem> mCall = webService.getPostComments(deviceId, profileId, token, "false", limit, offset, "DESC", totalPostIDs, userIds);
+//                    sendCommentItemRequest(mCall);
 
 //             adapter = new PostAdapter(getActivity(), postItemList);
 //
@@ -486,10 +451,10 @@ public class BreakingPost extends Fragment {
 //
 
                     //  Log.d("PostItem: ", categoryItem.toString() + "");
-                    progressView.setVisibility(View.GONE);
-                    progressView.stopAnimation();
+
                 } else {
-                    refreshLayout.setRefreshing(false);
+                    postItemList.clear();
+                    onPostResponseFailure();
                 }
 
             }
@@ -497,68 +462,52 @@ public class BreakingPost extends Fragment {
             @Override
             public void onFailure(Call<List<PostItem>> call, Throwable t) {
                 Log.d("MESSAGE: ", t.getMessage());
-                progressView.setVisibility(View.GONE);
-                progressView.stopAnimation();
-                refreshLayout.setRefreshing(false);
-                try {
-                    ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(1);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
+                postItemList.clear();
+                onPostResponseFailure();
             }
         });
 
     }
 
-    private void sendCommentItemRequest(Call<CommentItem> mCall) {
+    private void onPostResponse() {
+        shimmerFrameLayout.stopShimmer();
+        shimmerFrameLayout.setVisibility(View.GONE);
+        progressView.setVisibility(View.GONE);
+        progressView.stopAnimation();
+        adapter.notifyDataSetChanged();
+        refreshLayout.setRefreshing(false);
+        tvAlert.setVisibility(View.GONE);
+        try {
+            ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
-        mCall.enqueue(new Callback<CommentItem>() {
+    private void onPostResponsePagination() {
+        shimmerFrameLayout.stopShimmer();
+        shimmerFrameLayout.setVisibility(View.GONE);
+        progressView.setVisibility(View.GONE);
+        progressView.stopAnimation();
+        adapter.notifyDataSetChanged();
+        refreshLayout.setRefreshing(false);
+        tvAlert.setVisibility(View.GONE);
+        isPaginationDone = true;
+    }
 
-            @Override
-            public void onResponse(Call<CommentItem> mCall, Response<CommentItem> response) {
-
-                CommentItem commentItem = response.body();
-                //  comments = commentItem.getComments();
-                Log.d("commentItem", commentItem.toString());
-                if (postItemList != null) {
-                    adapter = new PostAdapter(getActivity(), postItemList, mCallback, mimListener, videoListener, youtubeListener, linkListener, imageListener, true);
-                    offset = limit;
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            shimmerFrameLayout.stopShimmer();
-                            shimmerFrameLayout.setVisibility(View.GONE);
-
-                            recyclerView.setVisibility(View.VISIBLE);
-                            recyclerView.setMediaObjects(postItemList);
-                            recyclerView.setAdapter(adapter);
-
-                        }
-                    }, 1000);
-
-
-                    //  Log.d("PostItem: ", categoryItem.toString() + "");
-                    progressView.setVisibility(View.GONE);
-                    progressView.stopAnimation();
-                }
-                try {
-                    ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(1);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                refreshLayout.setRefreshing(false);
-            }
-
-            @Override
-            public void onFailure(Call<CommentItem> mCall, Throwable t) {
-                Log.d("MESSAGE: ", t.getMessage());
-                progressView.setVisibility(View.GONE);
-                progressView.stopAnimation();
-                refreshLayout.setRefreshing(false);
-                ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(1);
-            }
-        });
+    private void onPostResponseFailure() {
+        shimmerFrameLayout.stopShimmer();
+        shimmerFrameLayout.setVisibility(View.GONE);
+        progressView.setVisibility(View.GONE);
+        progressView.stopAnimation();
+        adapter.notifyDataSetChanged();
+        refreshLayout.setRefreshing(false);
+        tvAlert.setVisibility(View.VISIBLE);
+        try {
+            ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadComplete(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

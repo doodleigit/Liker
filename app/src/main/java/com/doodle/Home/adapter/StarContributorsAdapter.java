@@ -1,6 +1,7 @@
 package com.doodle.Home.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.doodle.App;
 import com.doodle.Home.model.StarContributor;
+import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.R;
 import com.doodle.Tool.AppConstants;
 
@@ -55,6 +57,13 @@ public class StarContributorsAdapter extends RecyclerView.Adapter<StarContributo
                 .centerCrop()
                 .dontAnimate()
                 .into(viewHolder.ivUserImage);
+
+        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                context.startActivity(new Intent(context, ProfileActivity.class).putExtra("user_id", arrayList.get(i).getUserId()).putExtra("user_name", arrayList.get(i).getUserName()));
+            }
+        });
     }
 
     @Override

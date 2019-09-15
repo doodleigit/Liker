@@ -502,7 +502,10 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
         tvPostLinkDescription.setText(item.getPostLinkDesc());
         if (!isNullOrEmpty(item.getTotalComment()) && !"0".equalsIgnoreCase(item.getTotalComment())) {
             tvCommentCount.setText(item.getTotalComment());
+        } else {
+            tvCommentCount.setText("");
         }
+
         try {
             String domainName = getDomainName(item.getPostLinkUrl());
             tvPostLinkHost.setText(domainName);

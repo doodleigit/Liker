@@ -143,7 +143,7 @@ public class Home extends AppCompatActivity implements
     private CategoryTitleAdapter categoryTitleAdapter;
 
     private ImageView navClose, imageNewPost, imageNotification, imageFriendRequest, imageStarContributor;
-    private TextView navUserName, navLogout, newNotificationCount, newMessageNotificationCount, filterItem;
+    private TextView tvHome, navUserName, navLogout, newNotificationCount, newMessageNotificationCount, filterItem;
     private RecyclerView categoryRecyclerView;
 
     public LoadCompleteListener loadCompleteListener;
@@ -228,6 +228,7 @@ public class Home extends AppCompatActivity implements
         footerNavigationView = findViewById(R.id.footer_nav_view);
         mainNavigationView.setNavigationItemSelectedListener(this);
         navigationView.setNavigationItemSelectedListener(this);
+        tvHome = findViewById(R.id.tvHome);
         navProfileImage = navigationView.getHeaderView(0).findViewById(R.id.nav_user_image);
         navUserName = navigationView.getHeaderView(0).findViewById(R.id.nav_user_name);
         navLogout = footerNavigationView.getHeaderView(0).findViewById(R.id.nav_log_out);
@@ -303,6 +304,13 @@ public class Home extends AppCompatActivity implements
             }
         };
 
+        tvHome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                viewPager.setCurrentItem(0);
+            }
+        });
+
         profileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -336,8 +344,8 @@ public class Home extends AppCompatActivity implements
         setNotificationCount(newNotificationCount);
         int newMessageCount = manager.getMessageNotificationCount();
         setMessageNotificationCount(newMessageCount);
-        categories.add(new PostFilterCategory("1", "All Category", new ArrayList<>()));
-        categories.add(new PostFilterCategory("2", "My Category", new ArrayList<>()));
+        categories.add(new PostFilterCategory("1", "All Categories", new ArrayList<>()));
+        categories.add(new PostFilterCategory("2", "My Favourites", new ArrayList<>()));
         categories.add(new PostFilterCategory("3", "Single Category", new ArrayList<>()));
         categoryFilter();
     }
@@ -462,6 +470,12 @@ public class Home extends AppCompatActivity implements
                                 subCategories.add(new PostFilterSubCategory("", subCatId, subCatName, false, singleArrayList));
                                 multipleSubCategories.add(new PostFilterSubCategory("", subCatId, subCatName, false, multipleArrayList));
                             }
+                            if (subCategories.size() > 0) {
+                                subCategories.remove(0);
+                            }
+                            if (multipleSubCategories.size() > 0) {
+                                multipleSubCategories.remove(0);
+                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -575,13 +589,9 @@ public class Home extends AppCompatActivity implements
 
         tvCategoryName.setText(categories.get(categoryPosition).getCatName());
         if (categoryPosition == 2) {
-            if (subCategories.size() != 0) {
-                tvFilterItemName.setText(selectedCategory.isEmpty() ? subCategories.get(0).getSubCatName() : selectedCategory);
-            } else {
-                tvFilterItemName.setText("No Category");
-            }
+            tvFilterItemName.setText(selectedCategory.isEmpty() ? getString(R.string.select_category) : selectedCategory);
         } else {
-            tvFilterItemName.setText(getString(R.string.personalize_your_feed));
+            tvFilterItemName.setText(getString(R.string.select_categories));
         }
 
         FilterClickListener filterClickListener = new FilterClickListener() {
@@ -699,9 +709,9 @@ public class Home extends AppCompatActivity implements
 
         tvCategoryName.setText(categories.get(categoryPosition).getCatName());
         if (categoryPosition == 2) {
-            tvFilterItemName.setText(multipleSubCategories.get(0).getSubCatName());
+            tvFilterItemName.setText(getString(R.string.select_category));
         } else {
-            tvFilterItemName.setText(getString(R.string.personalize_your_feed));
+            tvFilterItemName.setText(getString(R.string.select_categories));
         }
 
         FilterClickListener filterClickListener = new FilterClickListener() {
@@ -1122,14 +1132,16 @@ public class Home extends AppCompatActivity implements
             if (selectedCategory.isEmpty()) {
                 showSingleFilterDialog();
             }
-            filterItem.setText(selectedCategory.isEmpty() ? subCategories.get(0).getSubCatName() : selectedCategory);
+            filterItem.setText(selectedCategory.isEmpty() ? getString(R.string.select_category) : selectedCategory);
         } else {
             if (position == 1) {
                 if (categories.get(categoryPosition).getPostFilterSubCategories().size() == 0) {
                     showMultipleFilterDialog();
                 }
+            } else if (position == 0) {
+                categories.get(categoryPosition).getPostFilterSubCategories().clear();
             }
-            filterItem.setText(getString(R.string.personalize_your_feed));
+            filterItem.setText(getString(R.string.select_categories));
         }
         ArrayList<String> arrayList = new ArrayList<>();
         commonCategories.clear();

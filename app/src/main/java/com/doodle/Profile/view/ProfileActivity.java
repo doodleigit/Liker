@@ -429,7 +429,7 @@ public class ProfileActivity extends AppCompatActivity {
         tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.posts)));
         tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.about)));
         tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.followers)));
-        tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.followings)));
+        tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.following)));
         tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.photos)));
         tabLayout.addTab(tabLayout.newTab().setText(getString(R.string.stars)));
         initialFragment(new PostFragment());

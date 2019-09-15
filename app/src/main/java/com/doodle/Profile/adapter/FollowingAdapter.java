@@ -1,11 +1,13 @@
 package com.doodle.Profile.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -13,6 +15,7 @@ import com.bumptech.glide.Glide;
 import com.doodle.App;
 import com.doodle.Profile.model.FollowingResult;
 import com.doodle.Profile.service.FollowUnfollowClickListener;
+import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.R;
 import com.doodle.Tool.AppConstants;
 
@@ -75,6 +78,13 @@ public class FollowingAdapter extends RecyclerView.Adapter<FollowingAdapter.View
             }
         });
 
+        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                context.startActivity(new Intent(context, ProfileActivity.class).putExtra("user_id", arrayList.get(i).getUserId()).putExtra("user_name", arrayList.get(i).getUserName()));
+            }
+        });
+
     }
 
     @Override
@@ -85,7 +95,8 @@ public class FollowingAdapter extends RecyclerView.Adapter<FollowingAdapter.View
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         ImageView userImage;
-        TextView userName, likes, stars, follow;
+        TextView userName, likes, stars;
+        Button follow;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);

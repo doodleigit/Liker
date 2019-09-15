@@ -80,7 +80,7 @@
             android:layout_marginRight="@dimen/_5sdp"
             android:layout_marginBottom="@dimen/_5sdp"
             android:layout_toLeftOf="@id/imagePostComment"
-            tools:text="1" />
+            tools:text="" />
 
         <ImageView
             android:id="@+id/imagePostComment"

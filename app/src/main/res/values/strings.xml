@@ -104,6 +104,8 @@
     <string name="choose_category">Choose Category</string>
     <string name="done">done</string>
     <string name="personalize_your_feed">Personalize your feed</string>
+    <string name="select_categories">Select Categories</string>
+    <string name="select_category">Select Category</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="font_fontFamily_medium">sans-serif</string>
@@ -147,6 +149,7 @@
     <string name="cancel">Cancel</string>
     <string name="change">Change</string>
     <string name="change_all">Change All</string>
+    <string name="there_are_no_more_posts">There are no more posts.</string>
 
     <string name="save">Save</string>
     <string name="save_all">Save All</string>
@@ -216,7 +219,7 @@
     <string name="follow">Follow</string>
     <string name="unfollow">Unfollow</string>
     <string name="followers">Followers</string>
-    <string name="followings">Followings</string>
+    <string name="following">Following</string>
     <string name="posts">Posts</string>
     <string name="checking">Checking...</string>
     <string name="transition_photo">transition photo</string>

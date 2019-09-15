@@ -1,6 +1,7 @@
 package com.doodle.Search.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.request.RequestOptions;
 import com.doodle.App;
+import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.R;
 import com.doodle.Search.model.Post;
 import com.doodle.Search.model.User;
@@ -112,20 +114,18 @@ public class AdvanceSearchAdapter extends RecyclerView.Adapter<RecyclerView.View
             tvUserName.setText(user.getFullname());
             String imagePhoto = POST_IMAGES + user.getPhoto();
 
-            RequestOptions options = new RequestOptions()
-                    .centerCrop()
-                    .placeholder(R.drawable.circle)
-                    .error(R.drawable.ic_cancel_black_24dp)
-                    .priority(Priority.HIGH);
-
-
-            if (imagePhoto != null && imagePhoto.length() > 0) {
+            if (imagePhoto.length() > 0) {
                 Picasso.with(App.getAppContext())
                         .load(imagePhoto)
                         .placeholder(R.drawable.drawable_comment)
                         .into(imgUser);
-
             }
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    context.startActivity(new Intent(context, ProfileActivity.class).putExtra("user_id", user.getUserId()).putExtra("user_name", user.getUserName()));
+                }
+            });
         }
     }
 

@@ -444,7 +444,10 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
         tvHeaderInfo.setText(builder);
         if (!isNullOrEmpty(item.getTotalComment()) && !"0".equalsIgnoreCase(item.getTotalComment())) {
             tvCommentCount.setText(item.getTotalComment());
+        } else {
+            tvCommentCount.setText("");
         }
+
         PostFooter postFooter = item.getPostFooter();
          postLike = postFooter.getPostTotalLike();
         int postTotalShare = postFooter.getPostTotalShare();
