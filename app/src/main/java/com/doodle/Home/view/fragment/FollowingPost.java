@@ -68,7 +68,7 @@ public class FollowingPost extends Fragment   {
     private HomeService webService;
     private PrefManager manager;
     private String deviceId, profileId, token, userIds;
-    private int cat_id, filter;
+    private int cat_id, filter = 1;
     private boolean isPublic;
     private boolean networkOk;
     private CircularProgressView progressView;
@@ -300,7 +300,7 @@ public class FollowingPost extends Fragment   {
         if (networkOk) {
             progressView.setVisibility(View.VISIBLE);
             progressView.startAnimation();
-            Call<List<PostItem>> call = webService.feed(deviceId, profileId, token, userIds, limit, offset, "following", catIds, 1, false);
+            Call<List<PostItem>> call = webService.feed(deviceId, profileId, token, userIds, limit, offset, "following", catIds, filter, false);
             sendPostItemRequest(call);
         } else {
             Tools.showNetworkDialog(getActivity().getSupportFragmentManager());
@@ -313,7 +313,7 @@ public class FollowingPost extends Fragment   {
     private void PerformPagination() {
         progressView.setVisibility(View.VISIBLE);
         progressView.startAnimation();
-        Call<List<PostItem>> call = webService.feed(deviceId, profileId, token, userIds, limit, offset, "following", catIds, 1, false);
+        Call<List<PostItem>> call = webService.feed(deviceId, profileId, token, userIds, limit, offset, "following", catIds, filter, false);
         PostItemPagingRequest(call);
 
     }
@@ -515,6 +515,7 @@ public class FollowingPost extends Fragment   {
         @Override
         public void onReceive(Context context, Intent intent) {
             catIds = intent.getStringExtra("category_ids");
+            filter = intent.getIntExtra("filter", 1);
             ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadInitial();
             getData();
         }

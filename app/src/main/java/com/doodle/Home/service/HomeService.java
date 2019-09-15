@@ -1,6 +1,7 @@
 package com.doodle.Home.service;
 
 import com.doodle.Comment.model.CommentItem;
+import com.doodle.Home.model.LikeUsers;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.StarContributor;
 import com.doodle.Home.model.postshare.PostShareItem;
@@ -196,5 +197,37 @@ public interface HomeService {
             @Field("post_id") String postId
     );
 
+    @POST(AppConstants.POST_LIKERS)
+    @FormUrlEncoded
+    Call<LikeUsers> postLiker(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("user_id") String userIds,
+            @Field("postid") String postId,
+            @Field("offset") int offset,
+            @Field("limit") int limit,
+            @Field("current") int current
+    );
+
+    @POST(AppConstants.FOLLOW)
+    @FormUrlEncoded
+    Call<String> setFollow(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String userIds,
+            @Field("follow_id") String followId
+    );
+
+    @POST(AppConstants.UNFOLLOW)
+    @FormUrlEncoded
+    Call<String> setUnFollow(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String userIds,
+            @Field("follow_id") String followId
+    );
 
 }
