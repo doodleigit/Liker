@@ -155,7 +155,7 @@ user_id	28827
 
     @Multipart
     @POST(AppConstants.ADDED_COMMENT_REPLY)
-    Call<String> addedCommentReply(
+    Call<Reply> addedCommentReply(
             @Header("Device-Id") String deviceId,
             @Header("User-Id") String userId,
             @Header("Security-Token") String token,

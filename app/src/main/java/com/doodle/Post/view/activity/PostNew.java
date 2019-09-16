@@ -220,7 +220,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
     private String imageFile;
     private List<String> uploadImageName = new ArrayList<>();
     private int contentType;
-    private int categoryId, subCategoryId;
+    private String categoryId = "", subCategoryId = "";
     private String contentTitle;
     private String contentLinkUrl;
     private String contentHost;
@@ -297,7 +297,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
         tvPermission = findViewById(R.id.tvPermission);
         tvPermission.setText(manager.getPostPermission());
         tvAudience = findViewById(R.id.tvAudience);
-        tvAudience.setText(manager.getPostAudience());
+        tvAudience.setText(manager.getPostAudience().isEmpty() ? getString(R.string.audience) : manager.getPostAudience());
         imgPermission = findViewById(R.id.imgPermission);
         contentPostPermission = findViewById(R.id.contentPostPermission);
         contentPostPermission.setOnClickListener(this);
@@ -850,15 +850,30 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
         Category mCategory = App.getmCategory();
         Subcatg mSubcatg = App.getmSubcatg();
 
-        if (mSubcatg != null && mCategory != null) {
-            categoryId = Integer.parseInt(mCategory.getCategoryId());
-            subCategoryId = Integer.parseInt(mSubcatg.getSubCategoryId());
+        if (mCategory != null) {
+            categoryId = mCategory.getCategoryId();
             App.setCategoryId(mCategory.getCategoryId());
             categoryName = mCategory.getCategoryName();
+            audience = "";
+            manager.setPostAudience(categoryName);
+            tvAudience.setText(categoryName);
+        }
+        if (mSubcatg != null) {
+            subCategoryId = mSubcatg.getSubCategoryId();
             audience = mSubcatg.getSubCategoryName();
             manager.setPostAudience(audience);
             tvAudience.setText(audience);
         }
+
+//        if (mSubcatg != null && mCategory != null) {
+//            categoryId = mCategory.getCategoryId();
+//            subCategoryId = mSubcatg.getSubCategoryId();
+//            App.setCategoryId(mCategory.getCategoryId());
+//            categoryName = mCategory.getCategoryName();
+//            audience = mSubcatg.getSubCategoryName();
+//            manager.setPostAudience(audience);
+//            tvAudience.setText(audience);
+//        }
 
     }
 
@@ -869,16 +884,33 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
         Category mCategory = App.getmCategory();
         Subcatg mSubcatg = App.getmSubcatg();
 
-        if (mSubcatg != null && mCategory != null) {
-            categoryId = Integer.parseInt(mCategory.getCategoryId());
+        if (mCategory != null) {
+            categoryId = mCategory.getCategoryId();
             App.setCategoryId(mCategory.getCategoryId());
-            subCategoryId = Integer.parseInt(mSubcatg.getSubCategoryId());
             categoryName = mCategory.getCategoryName();
+            audience = "";
+            manager.setPostAudience(categoryName);
+            tvAudience.setText(categoryName);
+        }
+        if (mSubcatg != null) {
+            subCategoryId = mSubcatg.getSubCategoryId();
             audience = mSubcatg.getSubCategoryName();
             manager.setPostAudience(audience);
             tvAudience.setText(audience);
         }
+
+//        if (mSubcatg != null && mCategory != null) {
+//            categoryId = mCategory.getCategoryId();
+//            App.setCategoryId(mCategory.getCategoryId());
+//            subCategoryId = mSubcatg.getSubCategoryId();
+//            categoryName = mCategory.getCategoryName();
+//            audience = mSubcatg.getSubCategoryName();
+//            manager.setPostAudience(audience);
+//            tvAudience.setText(audience);
+//        }
     }
+
+
 
     @Override
     public void onClick(View v) {
@@ -892,7 +924,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
             case R.id.btnAttachment:
                 break;
             case R.id.imageCancelPost:
-                startActivity(new Intent(this, Home.class));
+                finish();
                 break;
             case R.id.messageContainer:
 //                editPostMessage.setEnabled(true);
@@ -944,7 +976,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
             case R.id.tvSubmitPost:
 
                 checkContentType();
-                if (categoryId == 0 && subCategoryId == 0) {
+                if (categoryId.isEmpty() && subCategoryId.isEmpty()) {
                     Tools.showCustomToast(PostNew.this, mView, " Choose Audience !", Gravity.TOP);
                 } else if (!isAddContentTitle) {
                     Tools.showCustomToast(PostNew.this, mView, " You must add description to your post !", Gravity.TOP);
@@ -1129,7 +1161,12 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                             postId = successObject.getInt("post_id");
 
                             if (topContributorStatus) {
-                                String msg = categoryName + "-" + audience + " ?";
+                                String msg;
+                                if (audience.isEmpty()) {
+                                    msg = categoryName + "-" + audience + " ?";
+                                } else {
+                                    msg = categoryName + "-" + audience + " ?";
+                                }
 //                                ResendEmail resendEmail = ResendEmail.newInstance(msg);
 //                                resendEmail.show(getSupportFragmentManager(), "ResendEmail");
                                 ContributorStatus status = ContributorStatus.newInstance(msg);
@@ -1209,6 +1246,9 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
     @Override
     public void onDestroy() {  // could be in onPause or onStop
         Picasso.with(this).cancelRequest(target);
+        App.setmCategory(null);
+        App.setmSubcatg(null);
+        manager.setPostAudience("");
         super.onDestroy();
     }
 

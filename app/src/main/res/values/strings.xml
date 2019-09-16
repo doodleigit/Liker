@@ -152,6 +152,7 @@
     <string name="there_are_no_more_posts">There are no more posts.</string>
     <string name="people_liked_this_post">people liked this post</string>
 
+    <string name="audience">Audience</string>
     <string name="save">Save</string>
     <string name="save_all">Save All</string>
     <string name="find_user">Find User</string>

@@ -30,9 +30,11 @@ public class ReplyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     final int VIEW_TYPE_TEXT_LINK_SCRIPT_YOUTUBE = 4;
 
 
+
     private List<Reply> replyList;
     private Context mContext;
     PostItem postItem;
+    Comment_ comment_;
     private int size = 0;
 
 
@@ -51,6 +53,7 @@ public class ReplyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         this.mContext = context;
         this.replyList = replyList;
         this.postItem = postItem;
+        this.comment_ = comment_;
         this.replyTextListener = replyTextListener;
         this.replyLinkListener = replyLinkListener;
         this.replyYoutubeListener = replyYoutubeListener;
@@ -62,26 +65,28 @@ public class ReplyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         View view;
+
+
         if (viewType == VIEW_TYPE_TEXT) {
-            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_comment_text, parent, false);
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_reply_text, parent, false);
             return new ReplyTextHolder(view, mContext, replyTextListener);
         }
 
 
         if (viewType == VIEW_TYPE_TEXT_IMAGE) {
 
-            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_comment_image, parent, false);
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_reply_image, parent, false);
             return new ReplyImageHolder(view, mContext, replyImageListener);
         }
         if (viewType == VIEW_TYPE_TEXT_LINK_SCRIPT) {
 
-            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_comment_linkscript, parent, false);
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_reply_linkscript, parent, false);
             return new ReplyLinkScriptHolder(view, mContext, replyLinkListener);
         }
 
         if (viewType == VIEW_TYPE_TEXT_LINK_SCRIPT_YOUTUBE) {
 
-            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_comment_youtube, parent, false);
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_reply_youtube, parent, false);
             return new ReplyYoutubeHolder(view, mContext, replyYoutubeListener);
         }
 
@@ -129,17 +134,18 @@ public class ReplyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
         String commentType = replyList.get(position).getCommentType();
         int viewType = Integer.parseInt(commentType);
-        switch (viewType) {
-            case 1:
-                return VIEW_TYPE_TEXT;
-            case 2:
-                return VIEW_TYPE_TEXT_IMAGE;
-            case 3:
-                return VIEW_TYPE_TEXT_LINK_SCRIPT;
-            case 4:
-                return VIEW_TYPE_TEXT_LINK_SCRIPT_YOUTUBE;
-            default:
-                return -1;
+
+            switch (viewType) {
+                case 1:
+                    return VIEW_TYPE_TEXT;
+                case 2:
+                    return VIEW_TYPE_TEXT_IMAGE;
+                case 3:
+                    return VIEW_TYPE_TEXT_LINK_SCRIPT;
+                case 4:
+                    return VIEW_TYPE_TEXT_LINK_SCRIPT_YOUTUBE;
+                default:
+                    return -1;
         }
     }
 

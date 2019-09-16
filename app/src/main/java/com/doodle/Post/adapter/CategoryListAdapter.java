@@ -6,10 +6,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.doodle.App;
 import com.doodle.Post.model.Category;
 import com.doodle.Post.model.Subcatg;
+import com.doodle.Post.view.activity.PostCategory;
 import com.doodle.R;
 
 import java.util.HashMap;
@@ -79,8 +82,17 @@ public class CategoryListAdapter extends BaseExpandableListAdapter {
         }
 
         TextView lblListHeader =  convertView.findViewById(R.id.groupHeader);
+        ImageView add = convertView.findViewById(R.id.add);
         lblListHeader.setTypeface(null, Typeface.BOLD);
         lblListHeader.setText(name);
+        add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                App.setmCategory(listGroup.get(groupPosition));
+                App.setmSubcatg(null);
+                ((PostCategory) mContext).onBackPressed();
+            }
+        });
 
         return convertView;
     }
@@ -99,7 +111,16 @@ public class CategoryListAdapter extends BaseExpandableListAdapter {
         }
 
         TextView txtListChild =  convertView.findViewById(R.id.childItem);
+        ImageView add = convertView.findViewById(R.id.add);
         txtListChild.setText(subName);
+        add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                App.setmCategory(listGroup.get(groupPosition));
+                App.setmSubcatg(listChild.get(listGroup.get(groupPosition)).get(childPosition));
+                ((PostCategory) mContext).onBackPressed();
+            }
+        });
         return convertView;
     }
 

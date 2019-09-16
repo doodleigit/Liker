@@ -193,7 +193,6 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
         imgCommentLike = itemView.findViewById(R.id.imgCommentLike);
         tvCommentReply = itemView.findViewById(R.id.tvCommentReply);
         tvCountCommentLike = itemView.findViewById(R.id.tvCountCommentLike);
-
         tvCountCommentLike.setVisibility(View.GONE);
 
 
