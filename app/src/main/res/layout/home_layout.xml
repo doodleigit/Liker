@@ -392,7 +392,8 @@
 
                     <RelativeLayout
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:background="@color/colorAccent">
 
                         <Spinner
                             android:id="@+id/spinnerCategoryType"
@@ -404,7 +405,7 @@
                         <ImageView
                             android:layout_width="25dp"
                             android:layout_height="25dp"
-                            android:layout_alignEnd="@+id/spinnerCategoryType"
+                            android:layout_toEndOf="@+id/spinnerCategoryType"
                             android:layout_centerInParent="true"
                             android:padding="5dp"
                             android:src="@drawable/arrow_down_white" />

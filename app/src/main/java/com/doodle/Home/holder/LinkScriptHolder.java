@@ -7,7 +7,11 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.view.menu.MenuPopupHelper;
@@ -43,7 +47,9 @@ import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.postshare.PostShareItem;
 import com.doodle.Home.service.HomeService;
 import com.doodle.Home.view.activity.EditPost;
+import com.doodle.Home.view.activity.Home;
 import com.doodle.Home.view.activity.PostShare;
+import com.doodle.Home.view.fragment.LikerUserListFragment;
 import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.R;
 import com.doodle.Tool.AppConstants;
@@ -522,6 +528,32 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
             e.printStackTrace();
         }
 
+        if (item.getPostFooter().isLikeUserStatus()) {
+            imgLike.setImageResource(R.drawable.like_done);
+        } else {
+            imgLike.setImageResource(R.drawable.like_normal);
+        }
+
+        tvPostLikeCount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentTransaction ft = ((Home) mContext).getSupportFragmentManager().beginTransaction();
+                Fragment prev = ((Home) mContext).getSupportFragmentManager().findFragmentByTag("dialog");
+                if (prev != null) {
+                    ft.remove(prev);
+                }
+                ft.addToBackStack(null);
+                DialogFragment dialogFragment = new LikerUserListFragment();
+
+                Bundle bundle = new Bundle();
+                bundle.putString("post_id", item.getPostId());
+                bundle.putString("total_likes", item.getPostFooter().getPostTotalLike());
+                dialogFragment.setArguments(bundle);
+
+                dialogFragment.show(ft, "dialog");
+            }
+        });
+
         tvPostUserName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -829,7 +861,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
                             if ("true".equalsIgnoreCase(status)) {
 
                                 postLikeNumeric = Integer.parseInt(postLike);
-                                postLikeNumeric--;
+                                postLikeNumeric = postLikeNumeric <= 0 ? 0 : --postLikeNumeric;
                                 postLike=String.valueOf(postLikeNumeric);
 
                                 if (0 == postLikeNumeric) {
@@ -840,7 +872,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
                                     tvPostLikeCount.setVisibility(View.VISIBLE);
                                     tvPostLikeCount.setText(content);
                                 }
-
+                                imgLike.setImageResource(R.drawable.like_normal);
                             } else {
                                 Call<String> mCall = webService.postLike(deviceId, userIds, token, userIds, item.getPostUserid(), item.getPostId());
                                 sendPostLikeRequest(mCall);
@@ -894,7 +926,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
                                 content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
                                 tvPostLikeCount.setVisibility(View.VISIBLE);
                                 tvPostLikeCount.setText(content);
-
+                                imgLike.setImageResource(R.drawable.like_done);
                             } else {
 
                                 Call<String> mCall = webService.postUnlike(deviceId, userIds, token, userIds, item.getPostUserid(), item.getPostId());

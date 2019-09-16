@@ -150,6 +150,7 @@
     <string name="change">Change</string>
     <string name="change_all">Change All</string>
     <string name="there_are_no_more_posts">There are no more posts.</string>
+    <string name="people_liked_this_post">people liked this post</string>
 
     <string name="save">Save</string>
     <string name="save_all">Save All</string>
@@ -212,6 +213,7 @@
     <string name="send_linkedin_invitation">Send Linkedin Invitation</string>
     <string name="there_is_no_followers">There are no followers.</string>
     <string name="there_is_no_following">There are no following.</string>
+    <string name="there_is_no_people">There is no people.</string>
     <string name="there_is_no_facebook_friends">There are no facebook friends.</string>
     <string name="there_is_no_twitter_friends">There are no twitter friends.</string>
     <string name="there_is_no_likedin_friends">There are no linkedin friends.</string>

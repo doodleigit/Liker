@@ -22,6 +22,7 @@ public class CategoryTitleAdapter extends RecyclerView.Adapter<CategoryTitleAdap
     private ArrayList<CommonCategory> arrayList;
     private CategoryRemoveListener categoryRemoveListener;
     private int position = -1;
+    private boolean isSelectable = true;
 
     public CategoryTitleAdapter(Context context, ArrayList<CommonCategory> arrayList, CategoryRemoveListener categoryRemoveListener) {
         this.context = context;
@@ -54,20 +55,22 @@ public class CategoryTitleAdapter extends RecyclerView.Adapter<CategoryTitleAdap
         viewHolder.mainLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (position == -1) {
-                    position = i;
-                    categoryRemoveListener.onCategorySelect(arrayList.get(i));
-                    viewHolder.mainLayout.setBackgroundResource(R.drawable.rectangle_corner_round_six);
-                } else {
-                    if (position == i) {
-                        position = -1;
-                        categoryRemoveListener.onCategoryDeSelect();
-                        viewHolder.mainLayout.setBackgroundResource(R.drawable.rectangle_corner_round_five);
-                    } else {
-                        notifyItemChanged(position);
+                if (isSelectable) {
+                    if (position == -1) {
                         position = i;
                         categoryRemoveListener.onCategorySelect(arrayList.get(i));
                         viewHolder.mainLayout.setBackgroundResource(R.drawable.rectangle_corner_round_six);
+                    } else {
+                        if (position == i) {
+                            position = -1;
+                            categoryRemoveListener.onCategoryDeSelect();
+                            viewHolder.mainLayout.setBackgroundResource(R.drawable.rectangle_corner_round_five);
+                        } else {
+                            notifyItemChanged(position);
+                            position = i;
+                            categoryRemoveListener.onCategorySelect(arrayList.get(i));
+                            viewHolder.mainLayout.setBackgroundResource(R.drawable.rectangle_corner_round_six);
+                        }
                     }
                 }
             }
@@ -78,6 +81,10 @@ public class CategoryTitleAdapter extends RecyclerView.Adapter<CategoryTitleAdap
     @Override
     public int getItemCount() {
         return arrayList.size();
+    }
+
+    public void setSelectable(boolean isSelectable) {
+        this.isSelectable = isSelectable;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
