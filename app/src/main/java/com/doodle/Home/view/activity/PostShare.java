@@ -60,6 +60,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.jzvd.JZVideoPlayerStandard;
+import de.hdodenhof.circleimageview.CircleImageView;
 import io.socket.client.Ack;
 import io.socket.client.Socket;
 import retrofit2.Call;
@@ -72,6 +73,7 @@ import static com.doodle.Tool.Tools.extractMentionText;
 import static com.doodle.Tool.Tools.extractMentionUser;
 import static com.doodle.Tool.Tools.extractUrls;
 import static com.doodle.Tool.Tools.getDomainName;
+import static com.doodle.Tool.Tools.isNullOrEmpty;
 
 public class PostShare extends AppCompatActivity implements
         View.OnClickListener,
@@ -127,6 +129,8 @@ public class PostShare extends AppCompatActivity implements
     private Socket socket;
     private Headers headers;
     private PostShares postShares;
+    private String imageUrl;
+    private CircleImageView imgPostUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,6 +155,21 @@ public class PostShare extends AppCompatActivity implements
         editPostMessage = findViewById(R.id.editPostMessage);
         tvSubmitPost = findViewById(R.id.tvSubmitPost);
         tvSubmitPost.setOnClickListener(this);
+
+
+        imgPostUser=findViewById(R.id.imgPostUser);
+        imageUrl=manager.getProfileImage();
+        if (!isNullOrEmpty(imageUrl)) {
+            Picasso.with(this)
+                    .load(imageUrl)
+                    .placeholder(R.drawable.profile)
+                    .into(imgPostUser);
+            Picasso.with(this)
+                    .load(imageUrl)
+                    .placeholder(R.drawable.profile)
+                    .into(imgPostUser);
+        }
+
 
         //HEADER
         profileId = manager.getProfileId();
@@ -217,6 +236,10 @@ public class PostShare extends AppCompatActivity implements
         String hasMim = item.getHasMeme();
         int mimId = Integer.parseInt(hasMim);
 
+
+
+
+
         switch (viewType) {
             case 1:
                 if (mimId > 0) {
@@ -247,6 +270,9 @@ public class PostShare extends AppCompatActivity implements
                 break;
 
         }
+
+
+
 
     }
 
@@ -687,6 +713,8 @@ public class PostShare extends AppCompatActivity implements
                             boolean status = successObject.getBoolean("status");
                             if (status) {
                                 Toast.makeText(PostShare.this, "successfully shared!", Toast.LENGTH_SHORT).show();
+
+                                App.setIsPostShare(true);
 
                                 Call<String> mCall = webService.sendBrowserNotification(
                                         deviceId,//"8b64708fa409da20341b1a555d1ddee526444",

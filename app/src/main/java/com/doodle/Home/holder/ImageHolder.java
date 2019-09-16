@@ -143,7 +143,8 @@ public class ImageHolder extends RecyclerView.ViewHolder {
     int offset = 0;
     boolean networkOk;
     ProgressBar mProgressBar;
-    public ImageView imagePostComment;
+    private ImageView imagePostComment;
+    private LinearLayout commentContainer;
     LinearLayout commentBox;
     public static final String COMMENT_KEY = "comment_item_key";
     private String postPermissions;
@@ -157,6 +158,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
     public ImageView imgLike;
     private int postLikeNumeric;
     private String postLike;
+    private int postTotalShare;
 
 
     public interface PostItemListener {
@@ -237,6 +239,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
         networkOk = NetworkHelper.hasNetworkAccess(mContext);
         mProgressBar = (ProgressBar) itemView.findViewById(R.id.ProgressBar);
         imagePostComment = (ImageView) itemView.findViewById(R.id.imagePostComment);
+        commentContainer =itemView.findViewById(R.id.commentContainer);
         singleImgRecyclerView = itemView.findViewById(R.id.singleImgRecyclerView);
         imgLike = itemView.findViewById(R.id.imgLike);
 
@@ -542,7 +545,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
 
         PostFooter postFooter = item.getPostFooter();
         postLike = postFooter.getPostTotalLike();
-        int postTotalShare = postFooter.getPostTotalShare();
+        postTotalShare = postFooter.getPostTotalShare();
         tvImgShareCount.setText(String.valueOf(postTotalShare));
         if ("0".equalsIgnoreCase(postLike)) {
             tvPostLikeCount.setVisibility(View.GONE);
@@ -654,6 +657,14 @@ public class ImageHolder extends RecyclerView.ViewHolder {
 
                 popup = new PopupMenu(mContext, v);
                 popup.getMenuInflater().inflate(R.menu.share_menu, popup.getMenu());
+
+                if (App.isIsPostShare()) {
+                    postTotalShare++;
+                    popup.getMenu().add(1, R.id.shareAsPost, 1, "Share as a Post (" + postTotalShare + ")").setIcon(R.drawable.like_done);
+                } else {
+                    popup.getMenu().add(1, R.id.shareAsPost, 1, "Share as a Post (" + postTotalShare + ")").setIcon(R.drawable.like_normal);
+                }
+
 
 //                popup.show();
                 MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popup.getMenu(), v);
@@ -878,7 +889,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
 
             }
         });
-        imagePostComment.setOnClickListener(new View.OnClickListener() {
+        commentContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AppCompatActivity activity = (AppCompatActivity) v.getContext();
@@ -917,7 +928,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
                                 postLikeNumeric = Integer.parseInt(postLike);
 
                                 postLikeNumeric = postLikeNumeric <= 0 ? 0 : --postLikeNumeric;
-                                postLike=String.valueOf(postLikeNumeric);
+                                postLike = String.valueOf(postLikeNumeric);
 
                                 if (0 == postLikeNumeric) {
                                     tvPostLikeCount.setVisibility(View.GONE);
@@ -974,7 +985,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
 
                                 postLikeNumeric = Integer.parseInt(postLike);
                                 postLikeNumeric++;
-                                postLike=String.valueOf(postLikeNumeric);
+                                postLike = String.valueOf(postLikeNumeric);
 
 
                                 SpannableString content = new SpannableString(String.valueOf(postLikeNumeric));

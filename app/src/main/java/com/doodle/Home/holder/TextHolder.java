@@ -144,7 +144,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
     public TextView tvCommentUserName, tvCommentTime, tvCommentLike, tvCommentReply, tvCountCommentLike;
     private String userPostId;
     private PopupMenu popupCommentMenu;
-
+    private LinearLayout commentContainer;
 
     //SHOW ALL COMMENTS
     private CommentService commentService;
@@ -172,6 +172,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
     public PostItemListener postTextListener;
     private String postLike;
     private int postLikeNumeric;
+    private int postTotalShare;
 
     public interface PostItemListener {
         void deletePost(PostItem postItem, int position);
@@ -235,6 +236,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
         tvCommentMessage = itemView.findViewById(R.id.tvCommentMessage);
         commentHold = (RelativeLayout) itemView.findViewById(R.id.commentHold);
         imagePostCommenting = itemView.findViewById(R.id.imagePostCommenting);
+        commentContainer = itemView.findViewById(R.id.commentContainer);
         imageCommentLikeThumb = itemView.findViewById(R.id.imageCommentLikeThumb);
         imageCommentSettings = itemView.findViewById(R.id.imageCommentSettings);
         imageCommentUser = itemView.findViewById(R.id.imageCommentUser);
@@ -607,8 +609,8 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
         PostFooter postFooter = item.getPostFooter();
         postLike = postFooter.getPostTotalLike();
-        int postTotalShare = postFooter.getPostTotalShare();
-        tvImgShareCount.setText(String.valueOf(postTotalShare));
+        postTotalShare = postFooter.getPostTotalShare();
+        // tvImgShareCount.setText(String.valueOf(postTotalShare));
         if ("0".equalsIgnoreCase(postLike)) {
             tvPostLikeCount.setVisibility(View.GONE);
         } else {
@@ -618,8 +620,10 @@ public class TextHolder extends RecyclerView.ViewHolder {
             tvPostLikeCount.setText(content);
         }
         if (!isNullOrEmpty(item.getTotalComment()) && !"0".equalsIgnoreCase(item.getTotalComment())) {
+            tvCommentCount.setVisibility(View.VISIBLE);
             tvCommentCount.setText(item.getTotalComment());
         } else {
+            tvCommentCount.setVisibility(View.GONE);
             tvCommentCount.setText("");
         }
 
@@ -680,7 +684,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
             }
         });
 
-        imagePostComment.setOnClickListener(new View.OnClickListener() {
+        commentContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AppCompatActivity activity = (AppCompatActivity) v.getContext();
@@ -711,6 +715,14 @@ public class TextHolder extends RecyclerView.ViewHolder {
                 popup = new PopupMenu(mContext, v);
                 popup.getMenuInflater().inflate(R.menu.share_menu, popup.getMenu());
 
+                if (App.isIsPostShare()) {
+                    postTotalShare++;
+                    popup.getMenu().add(1, R.id.shareAsPost, 1, "Share as a Post (" + postTotalShare+")").setIcon(R.drawable.like_done);
+                } else {
+                    popup.getMenu().add(1, R.id.shareAsPost, 1, "Share as a Post ("+postTotalShare+")").setIcon(R.drawable.like_normal);
+                }
+
+
 //                popup.show();
                 MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popup.getMenu(), v);
                 menuHelper.setForceShowIcon(true);
@@ -725,7 +737,6 @@ public class TextHolder extends RecyclerView.ViewHolder {
                             String postId = item.getSharedPostId();
                             Call<PostShareItem> call = webService.getPostDetails(deviceId, profileId, token, userIds, postId);
                             sendShareItemRequest(call);
-
                         }
 
                         if (id == R.id.shareFacebook) {
@@ -967,7 +978,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
                                 postLikeNumeric = Integer.parseInt(postLike);
                                 postLikeNumeric = postLikeNumeric <= 0 ? 0 : --postLikeNumeric;
-                                postLike=String.valueOf(postLikeNumeric);
+                                postLike = String.valueOf(postLikeNumeric);
 
                                 if (0 == postLikeNumeric) {
                                     tvPostLikeCount.setVisibility(View.GONE);
@@ -1024,7 +1035,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
                                 postLikeNumeric = Integer.parseInt(postLike);
                                 postLikeNumeric++;
-                                postLike=String.valueOf(postLikeNumeric);
+                                postLike = String.valueOf(postLikeNumeric);
 
 
                                 SpannableString content = new SpannableString(String.valueOf(postLikeNumeric));

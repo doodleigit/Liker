@@ -112,6 +112,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -258,6 +259,8 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
     //Multiple Media File
     List<String> mediaFiles;
     ProgressDialog progressDialog;
+    private CircleImageView imgPostUser;
+    private String imageUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -379,6 +382,19 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
         rootView = findViewById(R.id.main_activity_root_view);
         emojiButton = findViewById(R.id.main_activity_emoji);
         final ImageView sendButton = findViewById(R.id.main_activity_send);
+        imgPostUser=findViewById(R.id.imgPostUser);
+        imageUrl=manager.getProfileImage();
+        if (!isNullOrEmpty(imageUrl)) {
+            Picasso.with(this)
+                    .load(imageUrl)
+                    .placeholder(R.drawable.profile)
+                    .into(imgPostUser);
+            Picasso.with(this)
+                    .load(imageUrl)
+                    .placeholder(R.drawable.profile)
+                    .into(imgPostUser);
+        }
+
 
 //        emojiButton.setColorFilter(ContextCompat.getColor(this, R.color.emoji_icons), PorterDuff.Mode.SRC_IN);
 //        sendButton.setColorFilter(ContextCompat.getColor(this, R.color.emoji_icons), PorterDuff.Mode.SRC_IN);
@@ -464,7 +480,6 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
                 //  makeText(PostNew.this, "beforeTextChanged " + s, LENGTH_SHORT).show();
-
             }
 
             @Override
@@ -1385,8 +1400,13 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
             if (resultCode == RESULT_OK) {
 
+
                 String imagePath = imageUri.getPath();
                 File file = new File(imagePath);
+
+                String strMD5 = getMD5EncryptedString(imagePath);
+                fileEncoded = strMD5;
+
                 //Parsing any Media type file
                 RequestBody requestFile = RequestBody.create(MediaType.parse("image"), file);
                 MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("picture", file.getName(), requestFile);
@@ -1394,7 +1414,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                 addPhotoRequest(mediaCall);
 
                 progressDialog.show();
-                postImages.add(new PostImage(imagePath));
+                postImages.add(new PostImage("file://"+imagePath));
                 if (postImages.size() > 0)
                     rvMediaShow = true;
                 mediaRecyclerViewToggle();
@@ -1463,7 +1483,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                Log.i("Response", response.body().toString());
+
                 if (response.isSuccessful()) {
                     if (response.body() != null) {
                         try {

@@ -139,6 +139,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
 
     //SHOW ALL COMMENTS
     private CommentService commentService;
+    private LinearLayout commentContainer;
     int limit = 10;
     int offset = 0;
     boolean networkOk;
@@ -155,6 +156,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
     //Delete post
     public PostItemListener listener;
     private String postLike;
+    private int postTotalShare;
 
     public interface PostItemListener {
         void deletePost(PostItem postItem, int position);
@@ -163,7 +165,9 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
 
     private ImageView imgLike;
     private int postLikeNumeric;
-    
+
+
+
 
     public TextMimHolder(View itemView, Context context, PostItemListener mimListener, boolean isPopup) {
         super(itemView);
@@ -234,6 +238,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
         commentService = CommentService.mRetrofit.create(CommentService.class);
         networkOk = NetworkHelper.hasNetworkAccess(mContext);
         mProgressBar = (ProgressBar) itemView.findViewById(R.id.ProgressBar);
+        commentContainer=itemView.findViewById(R.id.commentContainer);
     }
 
     AppCompatActivity activity;
@@ -548,7 +553,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
 
         PostFooter postFooter = item.getPostFooter();
          postLike = postFooter.getPostTotalLike();
-        int postTotalShare = postFooter.getPostTotalShare();
+         postTotalShare = postFooter.getPostTotalShare();
         tvImgShareCount.setText(String.valueOf(postTotalShare));
         if ("0".equalsIgnoreCase(postLike)) {
             tvPostLikeCount.setVisibility(View.GONE);
@@ -635,6 +640,15 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
 
                 popup = new PopupMenu(mContext, v);
                 popup.getMenuInflater().inflate(R.menu.share_menu, popup.getMenu());
+
+
+                if (App.isIsPostShare()) {
+                    postTotalShare++;
+                    popup.getMenu().add(1, R.id.shareAsPost, 1, "Share as a Post (" + postTotalShare+")").setIcon(R.drawable.like_done);
+                } else {
+                    popup.getMenu().add(1, R.id.shareAsPost, 1, "Share as a Post ("+postTotalShare+")").setIcon(R.drawable.like_normal);
+                }
+
 
 //                popup.show();
                 MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popup.getMenu(), v);
@@ -864,7 +878,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
         });
 
 
-        imagePostComment.setOnClickListener(new View.OnClickListener() {
+        commentContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AppCompatActivity activity = (AppCompatActivity) v.getContext();

@@ -135,6 +135,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
     boolean networkOk;
     ProgressBar mProgressBar;
     public ImageView imagePostComment;
+    private LinearLayout commentContainer;
     LinearLayout commentBox;
     public static final String COMMENT_KEY = "comment_item_key";
     AppCompatActivity activity;
@@ -146,6 +147,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
     private String postLike;
     private ImageView imgLike;
     private int postLikeNumeric;
+    private int postTotalShare;
 
     public interface PostItemListener {
         void deletePost(PostItem postItem, int position);
@@ -222,6 +224,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
         networkOk = NetworkHelper.hasNetworkAccess(mContext);
         mProgressBar = (ProgressBar) itemView.findViewById(R.id.ProgressBar);
         imagePostComment = (ImageView) itemView.findViewById(R.id.imagePostComment);
+        commentContainer =  itemView.findViewById(R.id.commentContainer);
 
     }
 
@@ -441,7 +444,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
 
         PostFooter postFooter = item.getPostFooter();
          postLike = postFooter.getPostTotalLike();
-        int postTotalShare = postFooter.getPostTotalShare();
+         postTotalShare = postFooter.getPostTotalShare();
         tvImgShareCount.setText(String.valueOf(postTotalShare));
         if ("0".equalsIgnoreCase(postLike)) {
             tvPostLikeCount.setVisibility(View.GONE);
@@ -585,6 +588,16 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
 
                 popup = new PopupMenu(mContext, v);
                 popup.getMenuInflater().inflate(R.menu.share_menu, popup.getMenu());
+
+
+                if (App.isIsPostShare()) {
+                    postTotalShare++;
+                    popup.getMenu().add(1, R.id.shareAsPost, 1, "Share as a Post (" + postTotalShare+")").setIcon(R.drawable.like_done);
+                } else {
+                    popup.getMenu().add(1, R.id.shareAsPost, 1, "Share as a Post ("+postTotalShare+")").setIcon(R.drawable.like_normal);
+                }
+
+
 
 //                popup.show();
                 MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popup.getMenu(), v);
@@ -810,7 +823,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
         });
 
 
-        imagePostComment.setOnClickListener(new View.OnClickListener() {
+        commentContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AppCompatActivity activity = (AppCompatActivity) v.getContext();

@@ -65,6 +65,15 @@ public class App extends Application {
     private static boolean isMimPopup;
     private static boolean isImagePopup;
     private static List<String> deleteMediaIds;
+    private static boolean isPostShare;
+
+    public static boolean isIsPostShare() {
+        return isPostShare;
+    }
+
+    public static void setIsPostShare(boolean isPostShare) {
+        App.isPostShare = isPostShare;
+    }
 
     public static List<String> getDeleteMediaIds() {
         return deleteMediaIds;
