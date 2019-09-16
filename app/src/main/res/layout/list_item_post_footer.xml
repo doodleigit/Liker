@@ -59,26 +59,23 @@
             android:textColor="#788B9A"
             android:visibility="invisible" />
 
-        <TextView
-            android:id="@+id/tvCommentCount"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/_5sdp"
-            android:layout_marginRight="@dimen/_5sdp"
-            android:layout_marginBottom="@dimen/_5sdp"
-            android:layout_toLeftOf="@id/imagePostComment"
-            tools:text="" />
-
         <ImageView
             android:id="@+id/imagePostComment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
             android:padding="@dimen/_5sdp"
-            android:layout_toLeftOf="@id/imagePostShare"
+            android:layout_toLeftOf="@id/tvCommentCount"
             android:src="@drawable/ic_comment_black_24dp"
             />
 
+        <TextView
+            android:id="@+id/tvCommentCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@id/imagePostShare"
+            android:layout_centerInParent="true"
+            tools:text="" />
 
         <ImageView
             android:id="@+id/imagePostShare"
