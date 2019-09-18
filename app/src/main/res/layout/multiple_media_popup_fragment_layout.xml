@@ -110,12 +110,13 @@
 
                     </LinearLayout>
 
-                    <include
-                        layout="@layout/list_item_post_footer"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
-
                 </LinearLayout>
+
+                <include
+                    layout="@layout/list_item_post_footer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/postBodyLayer"/>
 
                 <include
                     android:id="@+id/containerHeader"
