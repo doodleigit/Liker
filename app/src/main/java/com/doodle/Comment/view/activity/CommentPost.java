@@ -40,6 +40,8 @@ import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.EditText;
@@ -51,6 +53,7 @@ import android.widget.Toast;
 import com.doodle.App;
 import com.doodle.Authentication.model.UserInfo;
 import com.doodle.Comment.adapter.CommentAdapter;
+import com.doodle.Comment.model.AnimationItem;
 import com.doodle.Comment.model.Comment;
 import com.doodle.Comment.model.CommentItem;
 import com.doodle.Comment.model.Comment_;
@@ -210,6 +213,11 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
     private List<Reason> reasonList;
     private boolean isFriend;
     private String blockUserId;
+
+    //ANIMATION
+    private AnimationItem[] mAnimationItems;
+    private AnimationItem mSelectedItem;
+    private final Handler mHandler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -439,7 +447,35 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
         });
 
 
+        mAnimationItems = getAnimationItems();
+        mSelectedItem = mAnimationItems[1];
+        runLayoutAnimation(recyclerView, mSelectedItem);
+
     }
+
+
+
+
+    private AnimationItem[] getAnimationItems() {
+        return new AnimationItem[] {
+                new AnimationItem("Fall down", R.anim.layout_animation_fall_down),
+                new AnimationItem("Slide from right", R.anim.layout_animation_from_right),
+                new AnimationItem("Slide from bottom", R.anim.layout_animation_from_bottom)
+        };
+    }
+
+
+    private void runLayoutAnimation(final RecyclerView recyclerView, final AnimationItem item) {
+        final Context context = recyclerView.getContext();
+
+        final LayoutAnimationController controller =
+                AnimationUtils.loadLayoutAnimation(context, item.getResourceId());
+
+        recyclerView.setLayoutAnimation(controller);
+        recyclerView.getAdapter().notifyDataSetChanged();
+        recyclerView.scheduleLayoutAnimation();
+    }
+
 
     private void mentionUsers() {
         if (networkOk) {
@@ -1301,5 +1337,6 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
     protected void onDestroy() {
         super.onDestroy();
         Tools.dismissDialog();
+        mHandler.removeCallbacksAndMessages(null);
     }
 }

@@ -114,6 +114,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -248,7 +249,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
     private boolean isDuplicateFile;
 
     private String imageFilePath, videoFilePath;
-    private String fileEncoded;
+    private String fileEncoded = "";
     private String replaceContent;
     List<String> nameList = new ArrayList<>();
     List<String> idList = new ArrayList<>();
@@ -269,6 +270,9 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
     List<String> mediaFiles;
     ProgressDialog progressDialog;
     private String deleteMediaIds;
+    private CircleImageView imgPostUser;
+    private String imageUrl;
+    List<String> idSet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -301,7 +305,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
         recyclerViewSearchMention = (RecyclerView) findViewById(R.id.rvSearchMention);
         editPostMessage = findViewById(R.id.editPostMessage);
         editPostMessage.setOnClickListener(this);
-
+        idSet = new ArrayList<>();
         contentPost = findViewById(R.id.contentPost);
         linkScriptContainer = findViewById(R.id.linkScriptContainer);
 
@@ -394,6 +398,18 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 
         chatAdapter = new ChatAdapter();
 
+        imgPostUser = findViewById(R.id.imgPostUser);
+        imageUrl = manager.getProfileImage();
+        if (!isNullOrEmpty(imageUrl)) {
+            Picasso.with(this)
+                    .load(imageUrl)
+                    .placeholder(R.drawable.profile)
+                    .into(imgPostUser);
+            Picasso.with(this)
+                    .load(imageUrl)
+                    .placeholder(R.drawable.profile)
+                    .into(imgPostUser);
+        }
 
         rootView = findViewById(R.id.main_activity_root_view);
         emojiButton = findViewById(R.id.main_activity_emoji);
@@ -817,14 +833,14 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
             for (PostFile temp : postFiles) {
 
                 videoString = temp.getVideoName();
-                String postType=temp.getPostType();
-                if(!isNullOrEmpty(postType)){
-                    if("1".equalsIgnoreCase(postType)){
+                String postType = temp.getPostType();
+                if (!isNullOrEmpty(postType)) {
+                    if ("1".equalsIgnoreCase(postType)) {
                         imageString = temp.getImageName();
-                        postImages.add(new PostImage(imageString,temp.getId()));
-                    }else if("2".equalsIgnoreCase(postType)){
+                        postImages.add(new PostImage(imageString, temp.getId()));
+                    } else if ("2".equalsIgnoreCase(postType)) {
                         videoString = temp.getVideoName();
-                        postVideos.add(new PostVideo(videoString,temp.getId()));
+                        postVideos.add(new PostVideo(videoString, temp.getId()));
                     }
                 }
 
@@ -1250,19 +1266,22 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 
                     //  friendSet.add(id);
                     String separator = ", ";
-                    List<String> idSet = new ArrayList<>();
-                    idSet=App.getDeleteMediaIds();
-                    int total = idSet.size() * separator.length();
-                    for (String s : idSet) {
-                        total += s.length();
+
+                    idSet = App.getDeleteMediaIds();
+                    if (idSet != null && idSet.size() > 0) {
+                        int total = idSet.size() * separator.length();
+                        for (String s : idSet) {
+                            total += s.length();
+                        }
+
+                        StringBuilder sb = new StringBuilder(total);
+                        for (String s : idSet) {
+                            sb.append(separator).append(s);
+                        }
+
+                        deleteMediaIds = sb.substring(separator.length()).replaceAll("\\s+", "");
                     }
 
-                    StringBuilder sb = new StringBuilder(total);
-                    for (String s : idSet) {
-                        sb.append(separator).append(s);
-                    }
-
-                    deleteMediaIds= sb.substring(separator.length()).replaceAll("\\s+", "");
 
                     createNewPost();
                 }
@@ -1435,8 +1454,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                 Log.i("Response", response.body().toString());
-                //Toast.makeText()
+
                 if (response.isSuccessful()) {
                     if (response.body() != null) {
 
@@ -1709,6 +1727,10 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 
                 String imagePath = imageUri.getPath();
                 File file = new File(imagePath);
+
+                String strMD5 = getMD5EncryptedString(imagePath);
+                fileEncoded = strMD5;
+
                 //Parsing any Media type file
                 RequestBody requestFile = RequestBody.create(MediaType.parse("image"), file);
                 MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("picture", file.getName(), requestFile);
@@ -1716,7 +1738,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                 addPhotoRequest(mediaCall);
 
                 progressDialog.show();
-                postImages.add(new PostImage(imagePath));
+                postImages.add(new PostImage("file://" + imagePath));
                 if (postImages.size() > 0)
                     rvMediaShow = true;
                 mediaRecyclerViewToggle();

@@ -17,7 +17,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="@dimen/_35sdp"
-            android:background="@color/colorPrimaryDark" />
+            android:background="@color/colorPrimary" />
 
 
         <ImageView
@@ -123,7 +123,8 @@
                     <LinearLayout
                         android:id="@+id/messageContainer"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/_100sdp"
+                        android:layout_height="wrap_content"
+                        android:minHeight="@dimen/_100sdp"
                         android:background="@android:color/white">
 
                         <com.vanniktech.emoji.EmojiEditText
@@ -132,10 +133,13 @@
                             android:layout_height="wrap_content"
                             android:layout_margin="@dimen/_10sdp"
                             android:background="@null"
+                            android:isScrollContainer="true"
                             android:hint="Speak your mind..."
                             android:imeOptions="actionSend"
-                            android:inputType="textCapSentences|textMultiLine" />
 
+                            android:inputType="textCapSentences|textMultiLine" >
+                        <requestFocus />
+                        </com.vanniktech.emoji.EmojiEditText>
 
                     </LinearLayout>
                     <android.support.v7.widget.RecyclerView

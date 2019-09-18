@@ -53,8 +53,8 @@
                         android:focusable="true"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp">
+                        android:paddingTop="7dp"
+                        android:paddingBottom="13dp">
 
                         <ImageView
 
@@ -87,8 +87,8 @@
                         android:focusable="true"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp">
+                        android:paddingTop="7dp"
+                        android:paddingBottom="13dp">
 
                         <RelativeLayout
                             android:layout_width="40dp"
@@ -140,8 +140,8 @@
                         android:focusable="true"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp">
+                        android:paddingTop="7dp"
+                        android:paddingBottom="13dp">
 
                         <RelativeLayout
                             android:layout_width="40dp"
@@ -223,8 +223,8 @@
                         android:focusable="true"
                         android:gravity="center"
                         android:orientation="vertical"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp">
+                        android:paddingTop="7dp"
+                        android:paddingBottom="13dp">
 
                         <ImageView
 

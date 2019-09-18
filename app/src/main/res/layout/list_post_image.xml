@@ -10,17 +10,31 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <include
+
+        <LinearLayout
+            android:id="@+id/layoutHeader"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <include layout="@layout/list_item_post_header_share"/>
+            <include layout="@layout/list_item_post_header"/>
+
+
+        </LinearLayout>
+
+
+     <!--   <include
             android:id="@+id/containerHeader"
             layout="@layout/list_item_post_header"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content" />-->
 
         <LinearLayout
             android:id="@+id/postBodyLayer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/containerHeader"
+            android:layout_below="@id/layoutHeader"
 
             android:orientation="vertical">
 

@@ -50,6 +50,7 @@ import com.doodle.Comment.view.fragment.ReportReasonSheet;
 import com.doodle.Home.model.PostFooter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.PostTextIndex;
+import com.doodle.Home.model.SharedProfile;
 import com.doodle.Home.model.postshare.PostShareItem;
 import com.doodle.Home.service.HomeService;
 import com.doodle.Home.view.activity.EditPost;
@@ -90,6 +91,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.doodle.Tool.AppConstants.FACEBOOK_SHARE;
+import static com.doodle.Tool.Tools.chatDateCompare;
 import static com.doodle.Tool.Tools.containsIllegalCharacters;
 import static com.doodle.Tool.Tools.delayLoadComment;
 import static com.doodle.Tool.Tools.dismissDialog;
@@ -114,7 +116,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
     private Drawable mDrawable;
     List<Mim> viewColors = DataProvider.mimList;
 
-    PostItem item;
+    PostItem postItem;
 
     List<String> mentions;
     ArrayList<String> mList;
@@ -144,7 +146,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
     public TextView tvCommentUserName, tvCommentTime, tvCommentLike, tvCommentReply, tvCountCommentLike;
     private String userPostId;
     private PopupMenu popupCommentMenu;
-
+    private LinearLayout commentContainer;
 
     //SHOW ALL COMMENTS
     private CommentService commentService;
@@ -172,6 +174,27 @@ public class TextHolder extends RecyclerView.ViewHolder {
     public PostItemListener postTextListener;
     private String postLike;
     private int postLikeNumeric;
+    private int postTotalShare;
+
+
+    //SHARE-POST-HEADER
+    private String sharedFirstName;
+    private String sharedLastName;
+    private String sharedFullName;
+    private String isShared;
+    private String sharedDateTime;
+    private String sharedUserProfileImage;
+    private int sharedTotalStar;
+    private String sharedPostPermission;
+    private String sharedUserProfileLike;
+    private String sharedPostText;
+    private String sharedCategoryName;
+
+    private LinearLayout containerHeaderShare;
+    private CircleImageView imageSharePostUser;
+    private ImageView imageSharePermission,imageSharePostPermission;
+    private TextView tvSharePostUserName, tvSharePostTime,tvShareHeaderInfo,tvSharePostContent;
+
 
     public interface PostItemListener {
         void deletePost(PostItem postItem, int position);
@@ -235,6 +258,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
         tvCommentMessage = itemView.findViewById(R.id.tvCommentMessage);
         commentHold = (RelativeLayout) itemView.findViewById(R.id.commentHold);
         imagePostCommenting = itemView.findViewById(R.id.imagePostCommenting);
+        commentContainer = itemView.findViewById(R.id.commentContainer);
         imageCommentLikeThumb = itemView.findViewById(R.id.imageCommentLikeThumb);
         imageCommentSettings = itemView.findViewById(R.id.imageCommentSettings);
         imageCommentUser = itemView.findViewById(R.id.imageCommentUser);
@@ -255,6 +279,17 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
         //Like
         imgLike = itemView.findViewById(R.id.imgLike);
+
+        //SHARE_POST_HEADER
+        containerHeaderShare = itemView.findViewById(R.id.containerHeaderShare);
+        imageSharePostUser = itemView.findViewById(R.id.imageSharePostUser);
+        tvSharePostUserName = itemView.findViewById(R.id.tvSharePostUserName);
+        tvSharePostTime = itemView.findViewById(R.id.tvSharePostTime);
+        tvShareHeaderInfo = itemView.findViewById(R.id.tvShareHeaderInfo);
+        imageSharePermission = itemView.findViewById(R.id.imageSharePermission);
+        imageSharePostPermission = itemView.findViewById(R.id.imageSharePostPermission);
+        tvSharePostContent = itemView.findViewById(R.id.tvSharePostContent);
+
     }
 
 
@@ -278,7 +313,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
     int position;
 
     public void setItem(final PostItem item, int position) {
-        this.item = item;
+        this.postItem = item;
         this.position = position;
         userPostId = item.getPostUserid();
 
@@ -294,6 +329,50 @@ public class TextHolder extends RecyclerView.ViewHolder {
             case "2":
                 imagePostPermission.setBackgroundResource(R.drawable.ic_friends_12dp);
                 break;
+        }
+
+
+        isShared = item.getIsShared();
+
+        if ("1".equalsIgnoreCase(isShared)) {
+            containerHeaderShare.setVisibility(View.VISIBLE);
+            imagePermission.setVisibility(View.GONE);
+
+            SharedProfile itemSharedProfile = item.getSharedProfile();
+            sharedFirstName = itemSharedProfile.getUserFirstName();
+            sharedLastName = itemSharedProfile.getUserLastName();
+            sharedFullName = sharedFirstName + " " + sharedLastName;
+            sharedDateTime = itemSharedProfile.getDateTime();
+            sharedUserProfileImage = itemSharedProfile.getUesrProfileImg();
+            sharedTotalStar = Integer.parseInt(itemSharedProfile.getUserGoldStars()) + Integer.parseInt(itemSharedProfile.getUserSilverStars());
+            sharedPostPermission = itemSharedProfile.getPermission();
+            sharedUserProfileLike = itemSharedProfile.getUserProfileLikes();
+            sharedPostText=item.getSharedPostText();
+            sharedCategoryName=item.getCatName();
+            SpannableStringBuilder builder = getSpannableStringBuilder(sharedUserProfileLike, "", sharedTotalStar, sharedCategoryName);
+            long myMillis = Long.parseLong(sharedDateTime) * 1000;
+            String postDate = Operation.getFormattedDateFromTimestamp(myMillis);
+            //    tvSharePostTime.setText(chatDateCompare(mContext,myMillis));
+            tvSharePostUserName.setText(sharedFullName);
+            tvShareHeaderInfo.setText(builder);
+            tvSharePostTime.setText(postDate);
+            tvSharePostContent.setText(sharedPostText);
+
+            switch (sharedPostPermission) {
+                case "0":
+                    imageSharePostPermission.setBackgroundResource(R.drawable.ic_public_black_24dp);
+                    break;
+                case "1":
+                    imageSharePostPermission.setBackgroundResource(R.drawable.ic_only_me_12dp);
+                    break;
+                case "2":
+                    imageSharePostPermission.setBackgroundResource(R.drawable.ic_friends_12dp);
+                    break;
+            }
+
+        } else {
+            containerHeaderShare.setVisibility(View.GONE);
+            imagePermission.setVisibility(View.VISIBLE);
         }
 
 
@@ -593,7 +672,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
         }
 
         int totalStars = silverStar + goldStar;
-        String categoryName = item.getCatName();
+       String  categoryName = item.getCatName();
 //
 
         SpannableStringBuilder builder = getSpannableStringBuilder(likes, followers, totalStars, categoryName);
@@ -602,13 +681,14 @@ public class TextHolder extends RecyclerView.ViewHolder {
         tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
         long myMillis = Long.parseLong(item.getDateTime()) * 1000;
         String postDate = Operation.getFormattedDateFromTimestamp(myMillis);
+
         tvPostTime.setText(postDate);
         tvHeaderInfo.setText(builder);
 
         PostFooter postFooter = item.getPostFooter();
         postLike = postFooter.getPostTotalLike();
-        int postTotalShare = postFooter.getPostTotalShare();
-        tvImgShareCount.setText(String.valueOf(postTotalShare));
+        postTotalShare = postFooter.getPostTotalShare();
+        // tvImgShareCount.setText(String.valueOf(postTotalShare));
         if ("0".equalsIgnoreCase(postLike)) {
             tvPostLikeCount.setVisibility(View.GONE);
         } else {
@@ -618,8 +698,10 @@ public class TextHolder extends RecyclerView.ViewHolder {
             tvPostLikeCount.setText(content);
         }
         if (!isNullOrEmpty(item.getTotalComment()) && !"0".equalsIgnoreCase(item.getTotalComment())) {
+            tvCommentCount.setVisibility(View.VISIBLE);
             tvCommentCount.setText(item.getTotalComment());
         } else {
+            tvCommentCount.setVisibility(View.GONE);
             tvCommentCount.setText("");
         }
 
@@ -639,6 +721,15 @@ public class TextHolder extends RecyclerView.ViewHolder {
 //                .placeholder(R.drawable.loading_spinner)
                 //  .crossFade()
                 .into(imagePostUser);
+
+        String shareUserImageUrl = AppConstants.PROFILE_IMAGE + sharedUserProfileImage;
+        Glide.with(App.getAppContext())
+                .load(shareUserImageUrl)
+                .centerCrop()
+                .dontAnimate()
+//                .placeholder(R.drawable.loading_spinner)
+                //  .crossFade()
+                .into(imageSharePostUser);
 
         if (item.getPostFooter().isLikeUserStatus()) {
             imgLike.setImageResource(R.drawable.like_done);
@@ -680,7 +771,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
             }
         });
 
-        imagePostComment.setOnClickListener(new View.OnClickListener() {
+        commentContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AppCompatActivity activity = (AppCompatActivity) v.getContext();
@@ -711,6 +802,14 @@ public class TextHolder extends RecyclerView.ViewHolder {
                 popup = new PopupMenu(mContext, v);
                 popup.getMenuInflater().inflate(R.menu.share_menu, popup.getMenu());
 
+                if (App.isIsPostShare()) {
+                    postTotalShare++;
+                    popup.getMenu().add(1, R.id.shareAsPost, 1, "Share as a Post (" + postTotalShare + ")").setIcon(R.drawable.like_done);
+                } else {
+                    popup.getMenu().add(1, R.id.shareAsPost, 1, "Share as a Post (" + postTotalShare + ")").setIcon(R.drawable.like_normal);
+                }
+
+
 //                popup.show();
                 MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popup.getMenu(), v);
                 menuHelper.setForceShowIcon(true);
@@ -722,10 +821,10 @@ public class TextHolder extends RecyclerView.ViewHolder {
                         int id = menuItem.getItemId();
 
                         if (id == R.id.shareAsPost) {
-                            String postId = item.getSharedPostId();
-                            Call<PostShareItem> call = webService.getPostDetails(deviceId, profileId, token, userIds, postId);
-                            sendShareItemRequest(call);
 
+                            String postId = postItem.getSharedPostId();
+                            Call<PostShareItem> call = webService.getPostDetails(deviceId, profileId, token, userIds, postId);
+                             sendShareItemRequest(call);
                         }
 
                         if (id == R.id.shareFacebook) {
@@ -950,6 +1049,173 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
             }
         });
+        imageSharePermission.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("RestrictedApi")
+            @Override
+            public void onClick(View v) {
+
+
+                String postUserId = item.getPostUserid();
+                boolean isNotificationOff = item.isIsNotificationOff();
+
+                popupMenu = new PopupMenu(mContext, v);
+                popupMenu.getMenuInflater().inflate(R.menu.post_permission_menu, popupMenu.getMenu());
+
+
+                if (userIds.equalsIgnoreCase(postUserId)) {
+                    popupMenu.getMenu().findItem(R.id.blockedUser).setVisible(false);
+                    popupMenu.getMenu().findItem(R.id.reportedPost).setVisible(false);
+                    popupMenu.getMenu().findItem(R.id.publics).setVisible(true);
+                    popupMenu.getMenu().findItem(R.id.friends).setVisible(true);
+                    popupMenu.getMenu().findItem(R.id.onlyMe).setVisible(true);
+                    popupMenu.getMenu().findItem(R.id.edit).setVisible(true);
+                    popupMenu.getMenu().findItem(R.id.delete).setVisible(true);
+                    //  popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(false);
+
+                } else {
+                    popupMenu.getMenu().findItem(R.id.blockedUser).setVisible(true);
+                    popupMenu.getMenu().findItem(R.id.reportedPost).setVisible(true);
+                    popupMenu.getMenu().findItem(R.id.publics).setVisible(false);
+                    popupMenu.getMenu().findItem(R.id.friends).setVisible(false);
+                    popupMenu.getMenu().findItem(R.id.onlyMe).setVisible(false);
+                    popupMenu.getMenu().findItem(R.id.edit).setVisible(false);
+                    popupMenu.getMenu().findItem(R.id.delete).setVisible(false);
+                    // popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(false);
+
+
+                }
+
+
+                if (App.isNotificationStatus()) {
+
+                    if (notificationOff) {
+                        popupMenu.getMenu().add(1, R.id.turnOffNotification, 1, "Turn on notifications").setIcon(R.drawable.ic_notifications_black_24dp);
+                    } else {
+                        popupMenu.getMenu().add(1, R.id.turnOffNotification, 1, "Turn off notifications").setIcon(R.drawable.ic_notifications_off_black_24dp);
+
+                    }
+
+
+                } else {
+                    if (isNotificationOff) {
+                        popupMenu.getMenu().add(1, R.id.turnOffNotification, 1, "Turn on notifications").setIcon(R.drawable.ic_notifications_black_24dp);
+
+                    } else {
+                        popupMenu.getMenu().add(1, R.id.turnOffNotification, 1, "Turn off notifications").setIcon(R.drawable.ic_notifications_off_black_24dp);
+
+                    }
+                }
+
+
+                MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popupMenu.getMenu(), v);
+                menuHelper.setForceShowIcon(true);
+                menuHelper.show();
+
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem menuItem) {
+                        int id = menuItem.getItemId();
+                        postPermissions = menuItem.getTitle().toString();
+                        if (id == R.id.blockedUser) {
+                            if (!((Activity) mContext).isFinishing()) {
+                                App.setItem(item);
+                                showBlockUser(v);
+                            } else {
+                                dismissDialog();
+                            }
+                        }
+
+                        if (id == R.id.reportedPost) {
+                            App.setItem(item);
+                            activity = (AppCompatActivity) v.getContext();
+                            if (networkOk) {
+                                Call<ReportReason> call = commentService.getReportReason(deviceId, profileId, token, item.getPostUserid(), "2", userIds);
+                                sendReportReason(call);
+                            } else {
+                                Tools.showNetworkDialog(activity.getSupportFragmentManager());
+                            }
+                        }
+                        if (id == R.id.publics) {
+
+                            activity = (AppCompatActivity) v.getContext();
+                            if (networkOk) {
+                                Call<String> call = webService.postPermission(deviceId, profileId, token, "0", item.getPostId());
+                                sendPostPermissionRequest(call);
+                            } else {
+                                Tools.showNetworkDialog(activity.getSupportFragmentManager());
+                            }
+
+
+                        }
+                        if (id == R.id.friends) {
+                            activity = (AppCompatActivity) v.getContext();
+                            if (networkOk) {
+                                Call<String> call = webService.postPermission(deviceId, profileId, token, "2", item.getPostId());
+                                sendPostPermissionRequest(call);
+                            } else {
+                                Tools.showNetworkDialog(activity.getSupportFragmentManager());
+                            }
+                        }
+                        if (id == R.id.onlyMe) {
+                            activity = (AppCompatActivity) v.getContext();
+                            if (networkOk) {
+                                Call<String> call = webService.postPermission(deviceId, profileId, token, "1", item.getPostId());
+                                sendPostPermissionRequest(call);
+                            } else {
+                                Tools.showNetworkDialog(activity.getSupportFragmentManager());
+                            }
+
+                        }
+
+                        if (id == R.id.edit) {
+                            Intent intent = new Intent(mContext, EditPost.class);
+                            App.setPosition(position);
+                            intent.putExtra(ITEM_KEY, (Parcelable) item);
+                            mContext.startActivity(intent);
+                            ((Activity) mContext).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
+                        }
+                        if (id == R.id.delete) {
+                            if (!((Activity) mContext).isFinishing()) {
+                                App.setItem(item);
+                                App.setPosition(position);
+                                postTextListener.deletePost(item, position);
+                            } else {
+                                dismissDialog();
+                            }
+                        }
+                        if (id == R.id.turnOffNotification) {
+
+                            activity = (AppCompatActivity) v.getContext();
+
+                            switch (postPermissions) {
+                                case "Turn off notifications":
+                                    notificationOff = true;
+                                    if (networkOk) {
+                                        Call<String> call = webService.postNotificationTurnOff(deviceId, profileId, token, userIds, item.getPostId());
+                                        sendNotificationRequest(call);
+                                    } else {
+                                        Tools.showNetworkDialog(activity.getSupportFragmentManager());
+                                    }
+                                    break;
+                                case "Turn on notifications":
+                                    notificationOff = false;
+                                    if (networkOk) {
+                                        Call<String> call = webService.postNotificationTurnOn(deviceId, profileId, token, userIds, item.getPostId());
+                                        sendNotificationRequest(call);
+                                    } else {
+                                        Tools.showNetworkDialog(activity.getSupportFragmentManager());
+                                    }
+                                    break;
+
+                            }
+
+                        }
+                        return true;
+                    }
+                });
+
+            }
+        });
 
     }
 
@@ -968,8 +1234,8 @@ public class TextHolder extends RecyclerView.ViewHolder {
                                 postLikeNumeric = Integer.parseInt(postLike);
                                 postLikeNumeric = postLikeNumeric <= 0 ? 0 : --postLikeNumeric;
                                 postLike=String.valueOf(postLikeNumeric);
-                                item.getPostFooter().setPostTotalLike(postLike);
-                                item.getPostFooter().setLikeUserStatus(false);
+                                postItem.getPostFooter().setPostTotalLike(postLike);
+                                postItem.getPostFooter().setLikeUserStatus(false);
 
                                 if (0 == postLikeNumeric) {
                                     tvPostLikeCount.setVisibility(View.GONE);
@@ -981,7 +1247,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
                                 }
                                 imgLike.setImageResource(R.drawable.like_normal);
                             } else {
-                                Call<String> mCall = webService.postLike(deviceId, userIds, token, userIds, item.getPostUserid(), item.getPostId());
+                                Call<String> mCall = webService.postLike(deviceId, userIds, token, userIds, postItem.getPostUserid(), postItem.getPostId());
                                 sendPostLikeRequest(mCall);
                             }
                         } catch (JSONException e) {
@@ -1017,9 +1283,9 @@ public class TextHolder extends RecyclerView.ViewHolder {
                                         deviceId,//"8b64708fa409da20341b1a555d1ddee526444",
                                         profileId,//"26444",
                                         token,// "5d199fc8529c2$2y$10$C9mvDyOEhJ2Nc/e4Ji4gVOivCvaO4OBobPW2ky4oftvVniCZ8hKzuJhxEGIHYSCprmWSJ1rd4hGHDEqUNRAwAR4fxMWwEyV6VSZEU",
-                                        item.getPostUserid(),//"26444",
+                                        postItem.getPostUserid(),//"26444",
                                         userIds,//"26444",
-                                        item.getPostId(),
+                                        postItem.getPostId(),
                                         "like_post"
                                 );
                                 sendBrowserNotificationRequest(mCall);
@@ -1027,8 +1293,8 @@ public class TextHolder extends RecyclerView.ViewHolder {
                                 postLikeNumeric = Integer.parseInt(postLike);
                                 postLikeNumeric++;
                                 postLike=String.valueOf(postLikeNumeric);
-                                item.getPostFooter().setPostTotalLike(postLike);
-                                item.getPostFooter().setLikeUserStatus(true);
+                                postItem.getPostFooter().setPostTotalLike(postLike);
+                                postItem.getPostFooter().setLikeUserStatus(true);
 
                                 SpannableString content = new SpannableString(String.valueOf(postLikeNumeric));
                                 content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
@@ -1038,7 +1304,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
                             } else {
 
-                                Call<String> mCall = webService.postUnlike(deviceId, userIds, token, userIds, item.getPostUserid(), item.getPostId());
+                                Call<String> mCall = webService.postUnlike(deviceId, userIds, token, userIds, postItem.getPostUserid(), postItem.getPostId());
                                 sendPostUnLikeRequest(mCall);
 
                             }
@@ -1127,16 +1393,31 @@ public class TextHolder extends RecyclerView.ViewHolder {
                             JSONObject object = new JSONObject(response.body());
                             boolean status = object.getBoolean("status");
                             if (status) {
-                                switch (postPermissions) {
-                                    case "Public":
-                                        imagePostPermission.setBackgroundResource(R.drawable.ic_public_black_24dp);
-                                        break;
-                                    case "Friends":
-                                        imagePostPermission.setBackgroundResource(R.drawable.ic_friends_12dp);
-                                        break;
-                                    case "Only Me":
-                                        imagePostPermission.setBackgroundResource(R.drawable.ic_only_me_12dp);
-                                        break;
+                                if("1".equalsIgnoreCase(isShared)){
+                                    switch (postPermissions) {
+                                        case "Public":
+                                            imageSharePostPermission.setBackgroundResource(R.drawable.ic_public_black_24dp);
+                                            break;
+                                        case "Friends":
+                                            imageSharePostPermission.setBackgroundResource(R.drawable.ic_friends_12dp);
+                                            break;
+                                        case "Only Me":
+                                            imageSharePostPermission.setBackgroundResource(R.drawable.ic_only_me_12dp);
+                                            break;
+
+                                    }
+                                }else {
+                                    switch (postPermissions) {
+                                        case "Public":
+                                            imagePostPermission.setBackgroundResource(R.drawable.ic_public_black_24dp);
+                                            break;
+                                        case "Friends":
+                                            imagePostPermission.setBackgroundResource(R.drawable.ic_friends_12dp);
+                                            break;
+                                        case "Only Me":
+                                            imagePostPermission.setBackgroundResource(R.drawable.ic_only_me_12dp);
+                                            break;
+                                    }
 
                                 }
 
@@ -1204,7 +1485,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
                     Comment_ comment_Item = new Comment_();
                     Intent intent = new Intent(mContext, CommentPost.class);
                     intent.putExtra(COMMENT_KEY, (Parcelable) commentItem);
-                    intent.putExtra(ITEM_KEY, (Parcelable) item);
+                    intent.putExtra(ITEM_KEY, (Parcelable) postItem);
                     //intent.putExtra(COMMENT_CHILD_KEY, (Parcelable) comment_Item);
                     //  intent.putExtra(REASON_KEY, (Parcelable) reportReason);
                     mContext.startActivity(intent);

@@ -123,7 +123,8 @@
                     <LinearLayout
                         android:id="@+id/messageContainer"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/_100sdp"
+                        android:layout_height="wrap_content"
+                        android:minHeight="@dimen/_100sdp"
                         android:background="@android:color/white">
 
                         <com.vanniktech.emoji.EmojiEditText
@@ -134,7 +135,9 @@
                             android:background="@null"
                             android:hint="Speak your mind..."
                             android:imeOptions="actionSend"
-                            android:inputType="textCapSentences|textMultiLine" />
+                            android:inputType="textCapSentences|textMultiLine" >
+                            <requestFocus />
+                        </com.vanniktech.emoji.EmojiEditText>
 
 
                     </LinearLayout>
@@ -252,7 +255,7 @@
                     android:layout_gravity="center"
                     android:layout_marginLeft="@dimen/_10sdp"
                     android:src="@drawable/ic_visibility_black_24dp"
-                    android:tint="@color/colorThemeBlue" />
+                    android:tint="#DCDCDC" />
 
                 <TextView
                     android:id="@+id/tvAudience"
@@ -263,7 +266,7 @@
                     android:layout_marginRight="@dimen/_5sdp"
                     android:text="Audience"
                     app:autoSizeTextType="uniform"
-                    android:textColor="@color/colorThemeBlue"
+                    android:textColor="#DCDCDC"
 
                     />
 
