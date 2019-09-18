@@ -6,8 +6,7 @@
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/_5sdp"
     app:cardCornerRadius="@dimen/_5sdp"
-    app:cardBackgroundColor="@android:color/white"
-    >
+    app:cardBackgroundColor="@android:color/white">
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -128,10 +127,7 @@
                     </LinearLayout>
                 </LinearLayout>
 
-
             </RelativeLayout>
-
-
 
         </LinearLayout>
 
@@ -145,12 +141,10 @@
             android:layout_marginBottom="@dimen/_5sdp"
             android:orientation="horizontal">
 
-
             <ImageView
                 android:id="@+id/imgPostImage"
-                android:layout_width="@dimen/post_img_width"
-                android:layout_height="@dimen/post_img_height"
-                android:src="@drawable/stack" />
+                android:layout_width="140dp"
+                android:layout_height="140dp" />
 
             <TextView
                 android:id="@+id/tvPostText"
@@ -166,7 +160,6 @@
                 android:textColor="@color/colorPostText" />
 
         </LinearLayout>
-
 
     </RelativeLayout>
 </android.support.v7.widget.CardView>

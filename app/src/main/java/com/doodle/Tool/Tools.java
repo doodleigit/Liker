@@ -864,6 +864,47 @@ public class Tools {
         return title;
     }
 
+    public static int getNotificationTypeActionType(String type) {
+        int actionType = -1;
+        switch (type) {
+            case "1":
+            case "2":
+            case "7":
+            case "19":
+            case "28":
+                actionType = 1;
+                break;
+            case "3":
+            case "5":
+            case "11":
+            case "13":
+            case "26":
+            case "27":
+                actionType = 2;
+                break;
+            case "4":
+            case "6":
+            case "10":
+            case "20":
+            case "22":
+            case "21":
+            case "23":
+            case "24":
+            case "25":
+                actionType = 3;
+                break;
+            case "14":
+            case "18":
+                actionType = 0;
+                break;
+            case "15":
+            case "16":
+            case "17":
+                actionType = 5;
+                break;
+        }
+        return actionType;
+    }
 
     /**
      * This method returns true if the objet is null.

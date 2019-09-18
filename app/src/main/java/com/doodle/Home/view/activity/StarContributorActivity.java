@@ -53,9 +53,6 @@ public class StarContributorActivity extends AppCompatActivity {
     private String token, deviceId, userId, selectedCategory = "", selectedCategoryName = "", searchKey = "";
     private int limit = 20, offset = 0;
     private boolean isScrolling = true;
-    private int totalItems;
-    private int scrollOutItems;
-    private int currentItems;
 
     private ArrayList<PostFilterSubCategory> subCategories;
     private ArrayList<StarContributor> starContributors;
@@ -70,6 +67,9 @@ public class StarContributorActivity extends AppCompatActivity {
     }
 
     private void initialComponent() {
+        selectedCategory = getIntent().getStringExtra("category_id");
+        selectedCategoryName = getIntent().getStringExtra("category_name");
+
         layoutManager = new LinearLayoutManager(getApplicationContext());
         toolbar = findViewById(R.id.toolbar);
         recyclerView = findViewById(R.id.recyclerView);
@@ -93,6 +93,8 @@ public class StarContributorActivity extends AppCompatActivity {
 
         starContributorsAdapter = new StarContributorsAdapter(this, starContributors);
         recyclerView.setAdapter(starContributorsAdapter);
+
+        tvFilterItem.setText(selectedCategoryName.isEmpty() ? getString(R.string.all_categories) : selectedCategoryName);
 
         toolbar.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -1,5 +1,6 @@
 package com.doodle.Notification.service;
 
+import com.doodle.Home.model.PostItem;
 import com.doodle.Notification.model.NotificationItem;
 import com.doodle.Tool.AppConstants;
 
@@ -34,6 +35,16 @@ public interface NotificationService {
             @Field("user_id") String userIds,
             @Field("limit") int limit,
             @Field("offset") int offset
+    );
+
+    @POST(AppConstants.GET_POST_DETAILS)
+    @FormUrlEncoded
+    Call<PostItem> getPostDetails(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("user_id") String userIds,
+            @Field("post_id") String postId
     );
 
 }

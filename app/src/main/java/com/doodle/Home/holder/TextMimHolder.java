@@ -163,7 +163,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
 
     private ImageView imgLike;
     private int postLikeNumeric;
-    
+
 
     public TextMimHolder(View itemView, Context context, PostItemListener mimListener, boolean isPopup) {
         super(itemView);
@@ -260,36 +260,19 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                 break;
         }
 
+        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-        if (!App.isIsMimPopup()) {
+                Intent intent = new Intent(mContext, PostPopup.class);
+                intent.putExtra(ITEM_KEY, (Parcelable) item);
+                intent.putExtra("has_footer", true);
+                intent.putExtra("position", position);
+                mContext.startActivity(intent);
+                ((Activity) mContext).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
 
-        /*    viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    Intent intent = new Intent(mContext, PostPopup.class);
-                    intent.putExtra(ITEM_KEY, (Parcelable) item);
-                    App.setIsMimPopup(true);
-                    mContext.startActivity(intent);
-                    ((Activity) mContext).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
-
-                }
-            });*/
-            viewHolder.itemView.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-
-
-                    Intent intent = new Intent(mContext, PostPopup.class);
-                    intent.putExtra(ITEM_KEY, (Parcelable) item);
-                    App.setIsMimPopup(true);
-                     mContext.startActivity(intent);
-                    ((Activity) mContext).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
-                    return false;
-                }
-            });
-        }
-
+            }
+        });
 
         tvCommentLike.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -547,7 +530,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
         }
 
         PostFooter postFooter = item.getPostFooter();
-         postLike = postFooter.getPostTotalLike();
+        postLike = postFooter.getPostTotalLike();
         int postTotalShare = postFooter.getPostTotalShare();
         tvImgShareCount.setText(String.valueOf(postTotalShare));
         if ("0".equalsIgnoreCase(postLike)) {
@@ -577,7 +560,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                 }
             }
         });
-        
+
 
         String userImageUrl = AppConstants.PROFILE_IMAGE + item.getUesrProfileImg();
         Glide.with(App.getAppContext())
@@ -903,7 +886,9 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
 
                                 postLikeNumeric = Integer.parseInt(postLike);
                                 postLikeNumeric = postLikeNumeric <= 0 ? 0 : --postLikeNumeric;
-                                postLike=String.valueOf(postLikeNumeric);
+                                postLike = String.valueOf(postLikeNumeric);
+                                item.getPostFooter().setPostTotalLike(postLike);
+                                item.getPostFooter().setLikeUserStatus(false);
 
                                 if (0 == postLikeNumeric) {
                                     tvPostLikeCount.setVisibility(View.GONE);
@@ -960,8 +945,9 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
 
                                 postLikeNumeric = Integer.parseInt(postLike);
                                 postLikeNumeric++;
-                                postLike=String.valueOf(postLikeNumeric);
-
+                                postLike = String.valueOf(postLikeNumeric);
+                                item.getPostFooter().setPostTotalLike(postLike);
+                                item.getPostFooter().setLikeUserStatus(true);
 
                                 SpannableString content = new SpannableString(String.valueOf(postLikeNumeric));
                                 content.setSpan(new UnderlineSpan(), 0, content.length(), 0);

@@ -8,9 +8,11 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.doodle.App;
 import com.doodle.R;
 import com.doodle.Search.model.Post;
+import com.doodle.Search.service.PostClickListener;
 import com.doodle.Tool.Operation;
 import com.squareup.picasso.Picasso;
 
@@ -23,10 +25,12 @@ public class AdvanceSearchPostAdapter extends RecyclerView.Adapter<AdvanceSearch
 
     private Context context;
     private List<Post> mPost;
+    private PostClickListener postClickListener;
 
-    public AdvanceSearchPostAdapter(Context context, List<Post> mPost) {
+    public AdvanceSearchPostAdapter(Context context, List<Post> mPost, PostClickListener postClickListener) {
         this.context = context;
         this.mPost = mPost;
+        this.postClickListener = postClickListener;
     }
 
     @Override
@@ -69,7 +73,7 @@ public class AdvanceSearchPostAdapter extends RecyclerView.Adapter<AdvanceSearch
             tvPostUserName.setText(post.getFirstName() + " " + post.getLastName());
             //   String postDate = Operation.getDurationBreakdown(Long.parseLong(post.getPostDate()));
             //  String postDate = Operation.getDate(Long.parseLong(post.getPostDate()), "dd/MM/yyyy hh:mm:ss.SSS");
-            long myMillis=Long.parseLong(post.getPostDate())*1000;
+            long myMillis = Long.parseLong(post.getPostDate()) * 1000;
             String postDate = Operation.getFormattedDateFromTimestamp(myMillis);
             tvPostDuration.setText(postDate);
             tvPostLike.setText(post.getTotalLike() + " Likes");
@@ -77,24 +81,26 @@ public class AdvanceSearchPostAdapter extends RecyclerView.Adapter<AdvanceSearch
             tvPostStar.setText(String.valueOf(totalStar) + " Stars");
             postCategory.setText(post.getCategoryName());
             tvPostText.setText(post.getPostText());
-            String imagePhoto = post.getPhoto();
-            String imagePost = post.getPostImage();
+            String imagePhoto = PROFILE_IMAGE + post.getPhoto();
+            String imagePost = POST_IMAGES + post.getPostImage();
 
-            if (imagePhoto != null && imagePhoto.length() > 0) {
-                Picasso.with(App.getAppContext())
-                        .load(PROFILE_IMAGE + imagePhoto)
-                        .noFade()
-                        .placeholder(R.drawable.drawable_comment)
-                        .into(imgPostUser);
-            }
-            if (imagePost != null && imagePost.length() > 0) {
-                imgPostImage.setVisibility(View.VISIBLE);
-                Picasso.with(App.getAppContext())
-                        .load(POST_IMAGES + imagePost)
-                        .placeholder(R.drawable.drawable_comment)
-                        .into(imgPostImage);
-            } else {
+            Glide.with(App.getAppContext())
+                    .load(imagePhoto)
+                    .placeholder(R.drawable.profile)
+                    .error(R.drawable.profile)
+                    .into(imgPostUser);
+
+            Glide.with(App.getAppContext())
+                    .load(imagePost)
+                    .placeholder(R.drawable.stack)
+                    .error(R.drawable.stack)
+                    .centerCrop()
+                    .into(imgPostImage);
+
+            if (post.getPostType().equals("1") || post.getPostType().equals("6")) {
                 imgPostImage.setVisibility(View.GONE);
+            } else {
+                imgPostImage.setVisibility(View.VISIBLE);
             }
 
             int postPermission = Integer.parseInt(post.getPostPermission());
@@ -109,6 +115,15 @@ public class AdvanceSearchPostAdapter extends RecyclerView.Adapter<AdvanceSearch
                     imgPostPermission.setImageResource(R.drawable.ic_people_black_24dp);
                     break;
             }
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (post.getPostType().equals("2") || post.getPostType().equals("3") || post.getPostType().equals("4")) {
+                        postClickListener.onPostClickListener(post);
+                    }
+                }
+            });
         }
     }
 

@@ -895,7 +895,7 @@ public class Home extends AppCompatActivity implements
     }
 
     private void hideProgressBar() {
-        progressDialog.hide();
+        progressDialog.dismiss();
     }
 
     @Override
@@ -1122,7 +1122,7 @@ public class Home extends AppCompatActivity implements
                 break;
 
             case R.id.imageStarContributor:
-                startActivity(new Intent(this, StarContributorActivity.class));
+                startActivity(new Intent(this, StarContributorActivity.class).putExtra("category_id", "").putExtra("category_name", ""));
                 break;
         }
     }

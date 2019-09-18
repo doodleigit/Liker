@@ -174,6 +174,7 @@ public class PhotosFragment extends Fragment {
                 if (postItem != null) {
                     Intent intent = new Intent(getContext(), PostPopup.class);
                     intent.putExtra(ITEM_KEY, (Parcelable) postItem);
+                    intent.putExtra("has_footer", false);
                     startActivity(intent);
                 } else {
                     Toast.makeText(getContext(), getString(R.string.something_went_wrong), Toast.LENGTH_SHORT).show();

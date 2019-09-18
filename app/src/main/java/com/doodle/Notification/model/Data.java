@@ -14,9 +14,18 @@ public class Data implements Serializable, Parcelable
     @SerializedName("id")
     @Expose
     private String id;
+    @SerializedName("user_id")
+    @Expose
+    private String userId;
+    @SerializedName("from_user_id")
+    @Expose
+    private String fromUserId;
     @SerializedName("notif_type")
     @Expose
     private String notifType;
+    @SerializedName("type_id")
+    @Expose
+    private String typeId;
     @SerializedName("time_sent")
     @Expose
     private String timeSent;
@@ -26,6 +35,21 @@ public class Data implements Serializable, Parcelable
     @SerializedName("has_seen_details")
     @Expose
     private String hasSeenDetails;
+    @SerializedName("category_id")
+    @Expose
+    private String categoryId;
+    @SerializedName("sub_catg_id")
+    @Expose
+    private String subCatgId;
+    @SerializedName("username")
+    @Expose
+    private String username;
+    @SerializedName("first_name")
+    @Expose
+    private String firstName;
+    @SerializedName("last_name")
+    @Expose
+    private String lastName;
     @SerializedName("photo")
     @Expose
     private String photo;
@@ -35,9 +59,18 @@ public class Data implements Serializable, Parcelable
     @SerializedName("sliver_stars")
     @Expose
     private String sliverStars;
-    @SerializedName("type_id")
+    @SerializedName("category_name")
     @Expose
-    private String typeId;
+    private String categoryName;
+    @SerializedName("badgeInfo")
+    @Expose
+    private BadgeInfo badgeInfo;
+    @SerializedName("is_followed")
+    @Expose
+    private Boolean isFollowed;
+    @SerializedName("post_user_username")
+    @Expose
+    private String postUserUsername;
     public final static Creator<Data> CREATOR = new Creator<Data>() {
 
 
@@ -54,18 +87,29 @@ public class Data implements Serializable, Parcelable
 
     }
     ;
-    private final static long serialVersionUID = 6309012768416134103L;
+    private final static long serialVersionUID = 1195821140011805011L;
 
     protected Data(Parcel in) {
         this.id = ((String) in.readValue((String.class.getClassLoader())));
+        this.userId = ((String) in.readValue((String.class.getClassLoader())));
+        this.fromUserId = ((String) in.readValue((String.class.getClassLoader())));
         this.notifType = ((String) in.readValue((String.class.getClassLoader())));
+        this.typeId = ((String) in.readValue((String.class.getClassLoader())));
         this.timeSent = ((String) in.readValue((String.class.getClassLoader())));
         this.hasSeen = ((String) in.readValue((String.class.getClassLoader())));
         this.hasSeenDetails = ((String) in.readValue((String.class.getClassLoader())));
+        this.categoryId = ((String) in.readValue((String.class.getClassLoader())));
+        this.subCatgId = ((String) in.readValue((String.class.getClassLoader())));
+        this.username = ((String) in.readValue((String.class.getClassLoader())));
+        this.firstName = ((String) in.readValue((String.class.getClassLoader())));
+        this.lastName = ((String) in.readValue((String.class.getClassLoader())));
         this.photo = ((String) in.readValue((String.class.getClassLoader())));
         this.goldStars = ((String) in.readValue((String.class.getClassLoader())));
         this.sliverStars = ((String) in.readValue((String.class.getClassLoader())));
-        this.typeId = ((String) in.readValue((String.class.getClassLoader())));
+        this.categoryName = ((String) in.readValue((String.class.getClassLoader())));
+        this.badgeInfo = ((BadgeInfo) in.readValue((BadgeInfo.class.getClassLoader())));
+        this.isFollowed = ((Boolean) in.readValue((Boolean.class.getClassLoader())));
+        this.postUserUsername = ((String) in.readValue((String.class.getClassLoader())));
     }
 
     public Data() {
@@ -79,12 +123,36 @@ public class Data implements Serializable, Parcelable
         this.id = id;
     }
 
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getFromUserId() {
+        return fromUserId;
+    }
+
+    public void setFromUserId(String fromUserId) {
+        this.fromUserId = fromUserId;
+    }
+
     public String getNotifType() {
         return notifType;
     }
 
     public void setNotifType(String notifType) {
         this.notifType = notifType;
+    }
+
+    public String getTypeId() {
+        return typeId;
+    }
+
+    public void setTypeId(String typeId) {
+        this.typeId = typeId;
     }
 
     public String getTimeSent() {
@@ -111,6 +179,46 @@ public class Data implements Serializable, Parcelable
         this.hasSeenDetails = hasSeenDetails;
     }
 
+    public String getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(String categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public String getSubCatgId() {
+        return subCatgId;
+    }
+
+    public void setSubCatgId(String subCatgId) {
+        this.subCatgId = subCatgId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
     public String getPhoto() {
         return photo;
     }
@@ -135,24 +243,59 @@ public class Data implements Serializable, Parcelable
         this.sliverStars = sliverStars;
     }
 
-    public String getTypeId() {
-        return typeId;
+    public String getCategoryName() {
+        return categoryName;
     }
 
-    public void setTypeId(String typeId) {
-        this.typeId = typeId;
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    public BadgeInfo getBadgeInfo() {
+        return badgeInfo;
+    }
+
+    public void setBadgeInfo(BadgeInfo badgeInfo) {
+        this.badgeInfo = badgeInfo;
+    }
+
+    public Boolean getIsFollowed() {
+        return isFollowed;
+    }
+
+    public void setIsFollowed(Boolean isFollowed) {
+        this.isFollowed = isFollowed;
+    }
+
+    public String getPostUserUsername() {
+        return postUserUsername;
+    }
+
+    public void setPostUserUsername(String postUserUsername) {
+        this.postUserUsername = postUserUsername;
     }
 
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeValue(id);
+        dest.writeValue(userId);
+        dest.writeValue(fromUserId);
         dest.writeValue(notifType);
+        dest.writeValue(typeId);
         dest.writeValue(timeSent);
         dest.writeValue(hasSeen);
         dest.writeValue(hasSeenDetails);
+        dest.writeValue(categoryId);
+        dest.writeValue(subCatgId);
+        dest.writeValue(username);
+        dest.writeValue(firstName);
+        dest.writeValue(lastName);
         dest.writeValue(photo);
         dest.writeValue(goldStars);
         dest.writeValue(sliverStars);
-        dest.writeValue(typeId);
+        dest.writeValue(categoryName);
+        dest.writeValue(badgeInfo);
+        dest.writeValue(isFollowed);
+        dest.writeValue(postUserUsername);
     }
 
     public int describeContents() {

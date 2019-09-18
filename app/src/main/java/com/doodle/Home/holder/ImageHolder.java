@@ -324,6 +324,8 @@ public class ImageHolder extends RecyclerView.ViewHolder {
             public void onClick(View view) {
                 Intent intent = new Intent(mContext, PostPopup.class);
                 intent.putExtra(ITEM_KEY, (Parcelable) item);
+                intent.putExtra("has_footer", true);
+                intent.putExtra("position", position);
                 App.setIsImagePopup(true);
                 mContext.startActivity(intent);
 //                ((Activity) mContext).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
@@ -918,6 +920,8 @@ public class ImageHolder extends RecyclerView.ViewHolder {
 
                                 postLikeNumeric = postLikeNumeric <= 0 ? 0 : --postLikeNumeric;
                                 postLike=String.valueOf(postLikeNumeric);
+                                item.getPostFooter().setPostTotalLike(postLike);
+                                item.getPostFooter().setLikeUserStatus(false);
 
                                 if (0 == postLikeNumeric) {
                                     tvPostLikeCount.setVisibility(View.GONE);
@@ -975,7 +979,8 @@ public class ImageHolder extends RecyclerView.ViewHolder {
                                 postLikeNumeric = Integer.parseInt(postLike);
                                 postLikeNumeric++;
                                 postLike=String.valueOf(postLikeNumeric);
-
+                                item.getPostFooter().setPostTotalLike(postLike);
+                                item.getPostFooter().setLikeUserStatus(true);
 
                                 SpannableString content = new SpannableString(String.valueOf(postLikeNumeric));
                                 content.setSpan(new UnderlineSpan(), 0, content.length(), 0);

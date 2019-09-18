@@ -151,6 +151,7 @@ public class VideoPlayerRecyclerView extends RecyclerView {
             public void onChildViewDetachedFromWindow(View view) {
                 if (viewHolderParent != null && viewHolderParent.equals(view)) {
                     resetVideoView();
+                    Log.d("resetVideoView", "resetVideoView");
                 }
 
             }

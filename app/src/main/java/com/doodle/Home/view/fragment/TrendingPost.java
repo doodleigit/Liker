@@ -113,6 +113,10 @@ public class TrendingPost extends Fragment   {
         intentFilter.addAction(AppConstants.CATEGORY_CHANGE_BROADCAST);
         Objects.requireNonNull(getActivity()).registerReceiver(broadcastReceiver, intentFilter);
 
+        IntentFilter postFooterIntentFilter = new IntentFilter();
+        postFooterIntentFilter.addAction(AppConstants.POST_FOOTER_CHANGE_BROADCAST);
+        Objects.requireNonNull(getActivity()).registerReceiver(postFooterChangeBroadcast, postFooterIntentFilter);
+
         manager = new PrefManager(getActivity());
         deviceId = manager.getDeviceId();
         profileId = manager.getProfileId();
@@ -517,10 +521,30 @@ public class TrendingPost extends Fragment   {
         }
     };
 
+    BroadcastReceiver postFooterChangeBroadcast = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            PostItem postItem = (PostItem) intent.getSerializableExtra("post_item");
+            int position = intent.getIntExtra("position", -1);
+            if (position != -1) {
+                if (postItemList.size() >= position + 1) {
+                    if (postItemList.get(position).getPostId().equals(postItem.getPostId())) {
+                        postItemList.get(position).getPostFooter().setPostTotalLike(postItem.getPostFooter().getPostTotalLike());
+                        postItemList.get(position).getPostFooter().setLikeUserStatus(postItem.getPostFooter().isLikeUserStatus());
+                        postItemList.get(position).setTotalComment(postItem.getTotalComment());
+                        adapter.notifyItemChanged(position);
+                    }
+                }
+            }
+        }
+    };
+
+
     @Override
     public void onDestroy() {
         super.onDestroy();
         Objects.requireNonNull(getActivity()).unregisterReceiver(broadcastReceiver);
+        Objects.requireNonNull(getActivity()).unregisterReceiver(postFooterChangeBroadcast);
     }
 
 

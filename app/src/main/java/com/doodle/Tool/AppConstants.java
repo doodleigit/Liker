@@ -118,6 +118,7 @@ public class AppConstants {
     public static final String POST_LIKE = "post_like";
     public static final String POST_UNLIKE = "post_unlike";
     public static final String POST_LIKERS = "post-likers";
+    public static final String NOTIFICATION_SEEN = "notification_seen";
 
 
     public static final String NEW_MESSAGE_BROADCAST = "new_message_broadcast";
@@ -127,6 +128,7 @@ public class AppConstants {
     public static final String RECONNECT_SOCKET_BROADCAST = "reconnect_socket_broadcast";
     public static final String CATEGORY_CHANGE_BROADCAST = "category_change_broadcast";
     public static final String PROFILE_PAGE_PAGINATION_BROADCAST = "profile_page_pagination_broadcast";
+    public static final String POST_FOOTER_CHANGE_BROADCAST = "post_footer_change_broadcast";
 
     public static final String NOTIFICATION = "newNotification";
     public static final String CHAT_USERS = "get_chat_users";

@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <com.doodle.Home.service.SingleVideoPlayerRecyclerView
+        <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
@@ -60,6 +60,55 @@
                         android:background="@null"
                         android:imeOptions="actionSend"
                         android:inputType="textCapSentences|textMultiLine" />
+
+                    <LinearLayout
+                        android:id="@+id/linkScriptContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <ImageView
+                            android:id="@+id/imgLinkScript"
+                            android:layout_width="match_parent"
+                            android:layout_height="@dimen/_200sdp"
+                            android:src="#009688" />
+
+                        <TextView
+                            android:id="@+id/tvPostLinkTitle"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/_10sdp"
+                            android:layout_marginLeft="@dimen/_5sdp"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                            android:textColor="@android:color/black"
+                            android:textStyle="bold"
+                            tools:text="Title" />
+
+                        <TextView
+                            android:id="@+id/tvPostLinkDescription"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/_5sdp"
+                            android:layout_marginLeft="@dimen/_5sdp"
+                            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                            android:textColor="@android:color/black"
+                            tools:text="Description" />
+
+                        <TextView
+                            android:id="@+id/tvPostLinkHost"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/_5sdp"
+                            android:layout_marginLeft="@dimen/_5sdp"
+                            android:layout_marginBottom="@dimen/_5sdp"
+                            android:drawablePadding="@dimen/_5sdp"
+                            android:drawableLeft="@drawable/ic_language_black_24dp"
+                            android:drawableTint="@color/colorIconText"
+                            android:textAlignment="center"
+                            android:textAllCaps="true" />
+
+                    </LinearLayout>
 
                     <include
                         layout="@layout/list_item_post_footer"

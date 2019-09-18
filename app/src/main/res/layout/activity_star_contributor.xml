@@ -101,7 +101,7 @@
                             android:maxLines="1"
                             android:paddingLeft="10dp"
                             android:paddingRight="10dp"
-                            android:text="All Categories"
+                            android:text="@string/all_categories"
                             android:textSize="14sp"
                             android:visibility="visible" />
 

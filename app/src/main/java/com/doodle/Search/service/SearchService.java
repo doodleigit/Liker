@@ -1,5 +1,6 @@
 package com.doodle.Search.service;
 
+import com.doodle.Home.model.PostItem;
 import com.doodle.Search.model.AdvanceSearches;
 import com.doodle.Search.model.Message;
 import com.doodle.Search.model.SearchHistory;
@@ -77,5 +78,15 @@ public interface SearchService {
             @Field("limit") int limit,
             @Field("offset") int offset,
             @Field("post_only") int postOnly
+    );
+
+    @POST(AppConstants.GET_POST_DETAILS)
+    @FormUrlEncoded
+    Call<PostItem> getPostDetails(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("user_id") String userIds,
+            @Field("post_id") String postId
     );
 }

@@ -6,6 +6,10 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -23,7 +27,9 @@ import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.style.UnderlineSpan;
 import android.text.util.Linkify;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -64,6 +70,8 @@ import com.doodle.Home.service.SingleVideoPlayerRecyclerView;
 import com.doodle.Home.view.activity.EditPost;
 import com.doodle.Home.view.activity.Home;
 import com.doodle.Home.view.activity.PostShare;
+import com.doodle.Post.model.Mim;
+import com.doodle.Post.service.DataProvider;
 import com.doodle.Post.view.activity.PostPopup;
 import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.R;
@@ -78,11 +86,15 @@ import com.facebook.FacebookException;
 import com.facebook.share.Sharer;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 import com.vanniktech.emoji.EmojiTextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -97,6 +109,7 @@ import static com.doodle.Tool.AppConstants.ITEM_KEY;
 import static com.doodle.Tool.Tools.containsIllegalCharacters;
 import static com.doodle.Tool.Tools.delayLoadComment;
 import static com.doodle.Tool.Tools.dismissDialog;
+import static com.doodle.Tool.Tools.getDomainName;
 import static com.doodle.Tool.Tools.getSpannableStringBuilder;
 import static com.doodle.Tool.Tools.isEmpty;
 import static com.doodle.Tool.Tools.isNullOrEmpty;
@@ -108,15 +121,18 @@ public class MultipleMediaPopUpFragment extends Fragment {
 
     View view;
     private RelativeLayout commentHold;
+    private LinearLayout linkScriptContainer, postBodyLayer;
     private EmojiTextView tvCommentMessage;
-    private TextView tvHeaderInfo, tvPostTime, tvPostUserName, tvImgShareCount, tvPostLikeCount, tvCommentCount, tvCommentUserName, tvCommentTime, tvCommentLike, tvCommentReply, tvCountCommentLike;
+    private TextView tvHeaderInfo, tvPostTime, tvPostUserName, tvPostLinkTitle, tvPostLinkDescription, tvPostLinkHost, tvImgShareCount, tvPostLikeCount, tvCommentCount, tvCommentUserName, tvCommentTime, tvCommentLike, tvCommentReply, tvCountCommentLike;
     private CircleImageView imagePostUser, imageCommentUser;
     private ReadMoreTextView tvPostContent;
     private EmojiTextView tvPostEmojiContent;
-    private ImageView imagePostPermission, imagePostShare, imagePermission, imageCommentLikeThumb, imagePostComment, star1, star2, star3, star4, star5, star6, star7, star8,
+    private ImageView imgLinkScript, imagePostPermission, imagePostShare, imagePermission, imgLike, imageCommentLikeThumb, imagePostComment, star1, star2, star3, star4, star5, star6, star7, star8,
             star9, star10, star11, star12, star13, star14, star15, star16;
     private ProgressBar mProgressBar;
-    private SingleVideoPlayerRecyclerView singleImgRecyclerView;
+    private RecyclerView singleImgRecyclerView;
+
+    private Drawable mDrawable;
 
     private PostItem item;
     private GalleryAdapter galleryAdapter;
@@ -129,9 +145,9 @@ public class MultipleMediaPopUpFragment extends Fragment {
     private PrefManager manager;
 
     private String deviceId, profileId, token, userIds;
-    private int limit = 10;
+    private int limit = 10, position = -1;
     private int offset = 0;
-    private boolean networkOk;
+    private boolean networkOk, hasFooter, isCommentAction;
     private String postPermissions;
     private boolean notificationOff;
 
@@ -152,6 +168,9 @@ public class MultipleMediaPopUpFragment extends Fragment {
 
     private void initialComponent() {
         item = getArguments().getParcelable(ITEM_KEY);
+        hasFooter = getArguments().getBoolean("has_footer");
+        isCommentAction = getArguments().getBoolean("is_comment_action");
+        position = getArguments().getInt("position");
 
         callbackManager = CallbackManager.Factory.create();
         shareDialog = new ShareDialog(getActivity());
@@ -161,9 +180,15 @@ public class MultipleMediaPopUpFragment extends Fragment {
         token = manager.getToken();
         userIds = manager.getProfileId();
         webService = HomeService.mRetrofit.create(HomeService.class);
+
+        linkScriptContainer = view.findViewById(R.id.linkScriptContainer);
+        postBodyLayer = view.findViewById(R.id.postBodyLayer);
+        tvPostLinkTitle = view.findViewById(R.id.tvPostLinkTitle);
+        tvPostLinkDescription = view.findViewById(R.id.tvPostLinkDescription);
+        tvPostLinkHost = view.findViewById(R.id.tvPostLinkHost);
+        imgLinkScript = view.findViewById(R.id.imgLinkScript);
         imagePostShare = view.findViewById(R.id.imagePostShare);
         imagePermission = view.findViewById(R.id.imagePermission);
-
         tvPostUserName = view.findViewById(R.id.tvPostUserName);
         imagePostUser = view.findViewById(R.id.imagePostUser);
         tvHeaderInfo = view.findViewById(R.id.tvHeaderInfo);
@@ -197,6 +222,7 @@ public class MultipleMediaPopUpFragment extends Fragment {
         //Comment
         tvCommentMessage = view.findViewById(R.id.tvCommentMessage);
         commentHold = view.findViewById(R.id.commentHold);
+        imgLike = view.findViewById(R.id.imgLike);
         imageCommentLikeThumb = view.findViewById(R.id.imageCommentLikeThumb);
         imageCommentUser = view.findViewById(R.id.imageCommentUser);
 
@@ -224,7 +250,7 @@ public class MultipleMediaPopUpFragment extends Fragment {
         };
 
         galleryAdapter = new GalleryAdapter(getActivity(), item.getPostFiles(), listener);
-        singleImgRecyclerView.setMediaObjects(item.getPostFiles());
+//        singleImgRecyclerView.setMediaObjects(item.getPostFiles());
         singleImgRecyclerView.setAdapter(galleryAdapter);
     }
 
@@ -242,6 +268,7 @@ public class MultipleMediaPopUpFragment extends Fragment {
                 imagePostPermission.setBackgroundResource(R.drawable.ic_friends_12dp);
                 break;
         }
+
 
         tvCommentLike.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -455,17 +482,48 @@ public class MultipleMediaPopUpFragment extends Fragment {
             tvCommentCount.setText(item.getTotalComment());
         }
 
+        if (item.getPostFooter().isLikeUserStatus()) {
+            imgLike.setImageResource(R.drawable.like_done);
+        } else {
+            imgLike.setImageResource(R.drawable.like_normal);
+        }
+
+        if (isCommentAction) {
+            openCommentSection();
+        }
+
+        setDataPostWise();
+
+        imgLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (userIds.equalsIgnoreCase(item.getPostUserid())) {
+                    Tools.toast(getContext(), "On Liker, you can't like your own posts. That would be cheating ", R.drawable.ic_info_outline_blue_24dp);
+                } else {
+                    PostFooter postFooters = item.getPostFooter();
+                    if (postFooters.isLikeUserStatus()) {
+                        Call<String> call = webService.postUnlike(deviceId, userIds, token, userIds, item.getPostUserid(), item.getPostId());
+                        sendPostUnLikeRequest(call);
+                    } else {
+                        Call<String> call = webService.postLike(deviceId, userIds, token, userIds, item.getPostUserid(), item.getPostId());
+                        sendPostLikeRequest(call);
+                    }
+
+                }
+            }
+        });
+
         tvPostUserName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getActivity().startActivity(new Intent(getContext(), ProfileActivity.class).putExtra("user_id", item.getPostUserid()).putExtra("user_name", item.getPostUsername()));
+                startActivity(new Intent(getContext(), ProfileActivity.class).putExtra("user_id", item.getPostUserid()).putExtra("user_name", item.getPostUsername()));
             }
         });
 
         imagePostUser.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getActivity().startActivity(new Intent(getContext(), ProfileActivity.class).putExtra("user_id", item.getPostUserid()).putExtra("user_name", item.getPostUsername()));
+                startActivity(new Intent(getContext(), ProfileActivity.class).putExtra("user_id", item.getPostUserid()).putExtra("user_name", item.getPostUsername()));
             }
         });
 
@@ -677,17 +735,120 @@ public class MultipleMediaPopUpFragment extends Fragment {
         imagePostComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AppCompatActivity activity = (AppCompatActivity) v.getContext();
-                if (networkOk) {
-                    Call<CommentItem> call = commentService.getAllPostComments(deviceId, profileId, token, "false", limit, offset, "DESC", item.getPostId(), userIds);
-                    sendAllCommentItemRequest(call);
-                    delayLoadComment(mProgressBar);
-                } else {
-                    Tools.showNetworkDialog(activity.getSupportFragmentManager());
-                }
-
+                openCommentSection();
             }
         });
+    }
+
+    private void openCommentSection() {
+        AppCompatActivity activity = (AppCompatActivity) getContext();
+        if (networkOk) {
+            Call<CommentItem> call = commentService.getAllPostComments(deviceId, profileId, token, "false", limit, offset, "DESC", item.getPostId(), userIds);
+            sendAllCommentItemRequest(call);
+            delayLoadComment(mProgressBar);
+        } else {
+            Tools.showNetworkDialog(activity.getSupportFragmentManager());
+        }
+    }
+
+    private void setDataPostWise() {
+        if (item.getPostType().equals("3") || item.getPostType().equals("4")) {
+            linkScriptContainer.setVisibility(View.VISIBLE);
+            if (item.getPostType().equalsIgnoreCase("3")) {
+                String linkImage = AppConstants.Link_IMAGE_PATH + item.getPostImage();
+                Glide.with(App.getAppContext())
+                        .load(linkImage)
+                        .centerCrop()
+                        .dontAnimate()
+                        .into(imgLinkScript);
+            } else if (item.getPostType().equalsIgnoreCase("4")) {
+                String linkImage = AppConstants.YOUTUBE_IMAGE_PATH + item.getPostImage();
+                Glide.with(App.getAppContext())
+                        .load(linkImage)
+                        .centerCrop()
+                        .dontAnimate()
+                        .into(imgLinkScript);
+            }
+            tvPostLinkTitle.setText(item.getPostLinkTitle());
+            tvPostLinkDescription.setText(item.getPostLinkDesc());
+            try {
+                String domainName = getDomainName(item.getPostLinkUrl());
+                tvPostLinkHost.setText(domainName);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+        } else {
+            linkScriptContainer.setVisibility(View.GONE);
+            if (item.getPostType().equals("1")) {
+                String hasMim = item.getHasMeme();
+                int mimId = Integer.parseInt(hasMim);
+                if (mimId > 0)
+                    setMimPost();
+            }
+        }
+    }
+
+    private void setMimPost() {
+        List<Mim> viewColors = DataProvider.mimList;
+        int mimId = Integer.parseInt(item.getHasMeme());
+        for (Mim temp : viewColors) {
+            int getId = temp.getId() == 1 ? 0 : temp.getId();
+            if (mimId == getId && mimId > 0) {
+                String mimColor = temp.getMimColor();
+                if (mimColor.startsWith("#")) {
+                    postBodyLayer.setBackgroundColor(Color.parseColor(mimColor));
+                    ViewGroup.LayoutParams params = postBodyLayer.getLayoutParams();
+                    if (App.isIsMimPopup()) {
+                        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+                        float dpHeight = displayMetrics.heightPixels / displayMetrics.density;
+                        int myMimHeight = (displayMetrics.heightPixels) * 75 / 100;
+                        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+
+                        // params.height= (int) dpHeight;
+                        params.height = myMimHeight;
+                    } else {
+                        params.height = 350;
+                    }
+                    postBodyLayer.setLayoutParams(params);
+                    postBodyLayer.setGravity(Gravity.CENTER);
+                    tvPostContent.setGravity(Gravity.CENTER);
+                    tvPostEmojiContent.setGravity(Gravity.CENTER);
+                    tvPostContent.setTextAppearance(App.getAppContext(), android.R.style.TextAppearance_Large);
+                    tvPostEmojiContent.setTextAppearance(App.getAppContext(), android.R.style.TextAppearance_Large);
+                    tvPostContent.setTextColor(Color.parseColor("#FFFFFF"));
+                    tvPostEmojiContent.setTextColor(Color.parseColor("#FFFFFF"));
+                } else {
+
+                    String imageUrl = AppConstants.MIM_IMAGE + mimColor;
+                    Picasso.with(App.getInstance()).load(imageUrl).into(target);
+                    postBodyLayer.setGravity(Gravity.CENTER);
+                    tvPostContent.setGravity(Gravity.CENTER);
+                    tvPostEmojiContent.setGravity(Gravity.CENTER);
+                    postBodyLayer.setBackground(mDrawable);
+                    tvPostContent.setHeight(150);
+                    tvPostEmojiContent.setHeight(150);
+                    switch (mimColor) {
+                        case "img_bg_birthday.png":
+                            tvPostContent.setTextColor(Color.parseColor("#000000"));
+                            tvPostEmojiContent.setTextColor(Color.parseColor("#000000"));
+                            break;
+                        case "img_bg_love.png":
+                            tvPostContent.setTextColor(Color.parseColor("#2D4F73"));
+                            tvPostEmojiContent.setTextColor(Color.parseColor("#2D4F73"));
+                            break;
+                        case "img_bg_love2.png":
+                            tvPostContent.setTextColor(Color.parseColor("#444748"));
+                            tvPostEmojiContent.setTextColor(Color.parseColor("#444748"));
+                            break;
+                        case "img_bg_red.png":
+                        case "img_bg_love3.png":
+                            tvPostContent.setTextColor(Color.parseColor("#FFFFFF"));
+                            tvPostEmojiContent.setTextColor(Color.parseColor("#FFFFFF"));
+                            break;
+                    }
+                }
+            }
+        }
     }
 
     private void sendPostPermissionRequest(Call<String> call) {
@@ -729,6 +890,118 @@ public class MultipleMediaPopUpFragment extends Fragment {
             }
         });
     }
+
+    private void sendPostUnLikeRequest(Call<String> call) {
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        try {
+                            JSONObject object = new JSONObject(response.body());
+                            String status = object.getString("status");
+                            if ("true".equalsIgnoreCase(status)) {
+
+                                int postLikeNumeric = Integer.valueOf(item.getPostFooter().getPostTotalLike());
+                                postLikeNumeric = postLikeNumeric <= 0 ? 0 : --postLikeNumeric;
+                                item.getPostFooter().setPostTotalLike(String.valueOf(postLikeNumeric));
+                                item.getPostFooter().setLikeUserStatus(false);
+
+                                if (0 == postLikeNumeric) {
+                                    tvPostLikeCount.setVisibility(View.GONE);
+                                } else {
+                                    SpannableString content = new SpannableString(String.valueOf(postLikeNumeric));
+                                    content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+                                    tvPostLikeCount.setVisibility(View.VISIBLE);
+                                    tvPostLikeCount.setText(content);
+                                }
+                                imgLike.setImageResource(R.drawable.like_normal);
+
+                                if (hasFooter)
+                                    getActivity().sendBroadcast((new Intent().putExtra("post_item", (Serializable) item).putExtra("position", position).setAction(AppConstants.POST_FOOTER_CHANGE_BROADCAST)));
+
+                            } else {
+                                Call<String> mCall = webService.postLike(deviceId, userIds, token, userIds, item.getPostUserid(), item.getPostId());
+                                sendPostLikeRequest(mCall);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Log.i("onSuccess", response.body().toString());
+                    } else {
+                        Log.i("onEmptyResponse", "Returned empty response");
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
+
+    }
+
+    private void sendPostLikeRequest(Call<String> call) {
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        try {
+                            JSONObject object = new JSONObject(response.body());
+                            String status = object.getString("status");
+                            if ("true".equalsIgnoreCase(status)) {
+                                Call<String> mCall = webService.sendBrowserNotification(
+                                        deviceId,//"8b64708fa409da20341b1a555d1ddee526444",
+                                        profileId,//"26444",
+                                        token,// "5d199fc8529c2$2y$10$C9mvDyOEhJ2Nc/e4Ji4gVOivCvaO4OBobPW2ky4oftvVniCZ8hKzuJhxEGIHYSCprmWSJ1rd4hGHDEqUNRAwAR4fxMWwEyV6VSZEU",
+                                        item.getPostUserid(),//"26444",
+                                        userIds,//"26444",
+                                        item.getPostId(),
+                                        "like_post"
+                                );
+                                sendBrowserNotificationRequest(mCall);
+
+                                int postLikeNumeric = Integer.valueOf(item.getPostFooter().getPostTotalLike());
+                                postLikeNumeric++;
+                                item.getPostFooter().setPostTotalLike(String.valueOf(postLikeNumeric));
+                                item.getPostFooter().setLikeUserStatus(true);
+
+                                SpannableString content = new SpannableString(String.valueOf(postLikeNumeric));
+                                content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+                                tvPostLikeCount.setVisibility(View.VISIBLE);
+                                tvPostLikeCount.setText(content);
+                                imgLike.setImageResource(R.drawable.like_done);
+
+                                if (hasFooter)
+                                    getActivity().sendBroadcast((new Intent().putExtra("post_item", (Serializable) item).putExtra("position", position).setAction(AppConstants.POST_FOOTER_CHANGE_BROADCAST)));
+
+                            } else {
+
+                                Call<String> mCall = webService.postUnlike(deviceId, userIds, token, userIds, item.getPostUserid(), item.getPostId());
+                                sendPostUnLikeRequest(mCall);
+
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Log.i("onSuccess", response.body().toString());
+                    } else {
+                        Log.i("onEmptyResponse", "Returned empty response");
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
+    }
+
 
     private void sendAllCommentItemRequest(Call<CommentItem> call) {
 
@@ -781,6 +1054,37 @@ public class MultipleMediaPopUpFragment extends Fragment {
         });
     }
 
+    private void sendBrowserNotificationRequest(Call<String> mCall) {
+
+        mCall.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        try {
+                            JSONObject object = new JSONObject(response.body());
+                            boolean status = object.getBoolean("status");
+                            if (status) {
+
+
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Log.i("onSuccess", response.body().toString());
+                    } else {
+                        Log.i("onEmptyResponse", "Returned empty response");
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
+    }
+
     private void sendReportReason(Call<ReportReason> call) {
         call.enqueue(new Callback<ReportReason>() {
             @Override
@@ -804,7 +1108,20 @@ public class MultipleMediaPopUpFragment extends Fragment {
         });
     }
 
-    String reportId;
+    private Target target = new Target() {
+        @Override
+        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+            mDrawable = new BitmapDrawable(App.getInstance().getResources(), bitmap);
+        }
+
+        @Override
+        public void onBitmapFailed(Drawable errorDrawable) {
+        }
+
+        @Override
+        public void onPrepareLoad(Drawable placeHolderDrawable) {
+        }
+    };
 
 
 }

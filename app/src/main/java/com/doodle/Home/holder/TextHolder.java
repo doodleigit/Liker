@@ -968,6 +968,8 @@ public class TextHolder extends RecyclerView.ViewHolder {
                                 postLikeNumeric = Integer.parseInt(postLike);
                                 postLikeNumeric = postLikeNumeric <= 0 ? 0 : --postLikeNumeric;
                                 postLike=String.valueOf(postLikeNumeric);
+                                item.getPostFooter().setPostTotalLike(postLike);
+                                item.getPostFooter().setLikeUserStatus(false);
 
                                 if (0 == postLikeNumeric) {
                                     tvPostLikeCount.setVisibility(View.GONE);
@@ -1025,7 +1027,8 @@ public class TextHolder extends RecyclerView.ViewHolder {
                                 postLikeNumeric = Integer.parseInt(postLike);
                                 postLikeNumeric++;
                                 postLike=String.valueOf(postLikeNumeric);
-
+                                item.getPostFooter().setPostTotalLike(postLike);
+                                item.getPostFooter().setLikeUserStatus(true);
 
                                 SpannableString content = new SpannableString(String.valueOf(postLikeNumeric));
                                 content.setSpan(new UnderlineSpan(), 0, content.length(), 0);

@@ -470,12 +470,12 @@ public class ProfileActivity extends AppCompatActivity {
             public void onResponse(Call<UserAllInfo> call, Response<UserAllInfo> response) {
                 userAllInfo = response.body();
                 setData();
-                progressDialog.hide();
+                progressDialog.dismiss();
             }
 
             @Override
             public void onFailure(Call<UserAllInfo> call, Throwable t) {
-                progressDialog.hide();
+                progressDialog.dismiss();
             }
         });
     }
@@ -498,12 +498,12 @@ public class ProfileActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                progressDialog.hide();
+                progressDialog.dismiss();
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                progressDialog.hide();
+                progressDialog.dismiss();
             }
         });
     }
@@ -526,12 +526,12 @@ public class ProfileActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                progressDialog.hide();
+                progressDialog.dismiss();
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                progressDialog.hide();
+                progressDialog.dismiss();
             }
         });
     }
@@ -562,13 +562,13 @@ public class ProfileActivity extends AppCompatActivity {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                progressDialog.hide();
+                progressDialog.dismiss();
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
                 Toast.makeText(getApplicationContext(), "Something went wrong.", LENGTH_SHORT).show();
-                progressDialog.hide();
+                progressDialog.dismiss();
             }
         });
     }
