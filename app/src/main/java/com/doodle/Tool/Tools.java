@@ -95,6 +95,7 @@ import static com.twitter.sdk.android.core.Twitter.TAG;
 public class Tools {
 
 
+    private static String headerInfo;
 
     public static boolean isNetworkConnected(Context context) {
         ConnectivityManager mConnectManager = (ConnectivityManager) context
@@ -401,7 +402,12 @@ public class Tools {
 
 
     public static SpannableStringBuilder getSpannableStringBuilder(String likes, String followers, int totalStars, String categoryName) {
-        String headerInfo = String.format("%s Likes | %d Stars | %s Followers | %s", likes, totalStars, followers, "");
+        if(!isNullOrEmpty(followers)){
+
+            headerInfo = String.format("%s Likes | %d Stars | %s Followers | %s", likes, totalStars, followers, categoryName);
+        }else {
+            headerInfo = String.format("%s Likes | %d Stars | %s", likes, totalStars, "");
+        }
         SpannableStringBuilder builder = new SpannableStringBuilder();
         SpannableString spannableUserStr = new SpannableString(headerInfo);
         builder.append(spannableUserStr);
@@ -410,6 +416,7 @@ public class Tools {
         spannableCategory.setSpan(foregroundColorSpan, 0, categoryName.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         builder.append(spannableCategory);
         return builder;
+
     }
 
 

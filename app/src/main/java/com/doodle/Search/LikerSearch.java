@@ -133,7 +133,7 @@ public class LikerSearch extends AppCompatActivity implements View.OnClickListen
                     if (networkOk) {
                         progressView.setVisibility(View.VISIBLE);
                         progressView.startAnimation();
-                        Call<AdvanceSearches> call = webService.advanceSearch(deviceId, profileId, token, mProfileId, searchData, 15, 0);
+                        Call<AdvanceSearches> call = webService.advanceSearch(deviceId, profileId, token, mProfileId, searchData, 5, 0, 1, 1);
 
                         sendAdvanceSearchRequest(call);
 
@@ -227,7 +227,7 @@ public class LikerSearch extends AppCompatActivity implements View.OnClickListen
                             if (networkOk) {
                                 progressView.setVisibility(View.VISIBLE);
                                 progressView.startAnimation();
-                                Call<AdvanceSearches> call = webService.advanceSearch(deviceId, profileId, token, mProfileId, searchHistoryList.get(position).searchText, 15, 0);
+                                Call<AdvanceSearches> call = webService.advanceSearch(deviceId, profileId, token, mProfileId, searchHistoryList.get(position).searchText, 5, 0, 1, 1);
 
                                 sendAdvanceSearchRequest(call);
 
@@ -369,7 +369,7 @@ public class LikerSearch extends AppCompatActivity implements View.OnClickListen
                 if (networkOk) {
                     progressView.setVisibility(View.VISIBLE);
                     progressView.startAnimation();
-                    Call<AdvanceSearches> call = webService.advanceSearch(deviceId, profileId, token, mProfileId, queryText, 15, 0);
+                    Call<AdvanceSearches> call = webService.advanceSearch(deviceId, profileId, token, mProfileId, queryText, 5, 0, 1, 1);
 
                     sendAdvanceSearchRequest(call);
 

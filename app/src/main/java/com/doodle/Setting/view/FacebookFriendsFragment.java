@@ -88,7 +88,7 @@ public class FacebookFriendsFragment extends Fragment {
         socialFriendsAdapter = new SocialFriendsAdapter(getActivity(), socialFriends);
 
         callbackManager = CallbackManager.Factory.create();
-        shareDialog = new ShareDialog(getActivity());
+        shareDialog = new ShareDialog(this);
         progressBar = view.findViewById(R.id.progress_bar);
         tvAlertText = view.findViewById(R.id.alertText);
         sendInvitation = view.findViewById(R.id.send_invitation);

@@ -729,14 +729,16 @@ public class Home extends AppCompatActivity implements
         dialog.setContentView(R.layout.multiple_post_category_filter_layout);
 
         int pos = categoryPosition == 0 || categoryPosition == 1 ? 1 : 3;
+        SubCategoryAdapter subCategoryAdapter;
 
         Toolbar toolbar = dialog.findViewById(R.id.toolbar);
         TextView tvCategoryName, tvFilterItemName;
-        FloatingActionButton done;
+        FloatingActionButton done, clear;
         RecyclerView recyclerView;
         tvCategoryName = dialog.findViewById(R.id.categoryName);
         tvFilterItemName = dialog.findViewById(R.id.filterItem);
         done = dialog.findViewById(R.id.done);
+        clear = dialog.findViewById(R.id.clear);
         recyclerView = dialog.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -816,11 +818,12 @@ public class Home extends AppCompatActivity implements
             }
         };
 
+
         if (categoryPosition == 3) {
-            SubCategoryAdapter subCategoryAdapter = new SubCategoryAdapter(this, exceptMultipleSubCategories, filterClickListener, 1);
+            subCategoryAdapter = new SubCategoryAdapter(this, exceptMultipleSubCategories, filterClickListener, 1);
             recyclerView.setAdapter(subCategoryAdapter);
         } else {
-            SubCategoryAdapter subCategoryAdapter = new SubCategoryAdapter(this, multipleSubCategories, filterClickListener, 1);
+            subCategoryAdapter = new SubCategoryAdapter(this, multipleSubCategories, filterClickListener, 1);
             recyclerView.setAdapter(subCategoryAdapter);
         }
 
@@ -856,6 +859,31 @@ public class Home extends AppCompatActivity implements
 
                 filterItem.setText(getString(R.string.select_categories));
                 sendBroadcast((new Intent().putExtra("category_ids", Tools.setCategoryIds(arrayList)).putExtra("filter", (categoryPosition == 3 ? 8 : 1))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
+            }
+        });
+
+        clear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (categoryPosition == 3) {
+                    for (int i = 0; i < exceptMultipleSubCategories.size(); i++) {
+                        exceptMultipleSubCategories.get(i).setSelectedAll(false);
+                        for (int j = 0; j < exceptMultipleSubCategories.get(i).getPostFilterItems().size(); j ++) {
+                            exceptMultipleSubCategories.get(i).getPostFilterItems().get(j).setSelected(false);
+                        }
+                    }
+                } else {
+                    for (int i = 0; i < multipleSubCategories.size(); i++) {
+                        multipleSubCategories.get(i).setSelectedAll(false);
+                        for (int j = 0; j < multipleSubCategories.get(i).getPostFilterItems().size(); j ++) {
+                            multipleSubCategories.get(i).getPostFilterItems().get(j).setSelected(false);
+                        }
+                    }
+                }
+                categories.get(categoryPosition).getPostFilterSubCategories().clear();
+                commonCategories.clear();
+                categoryTitleAdapter.notifyDataSetChanged();
+                subCategoryAdapter.notifyDataSetChanged();
             }
         });
 
@@ -1075,7 +1103,7 @@ public class Home extends AppCompatActivity implements
                 startActivity(new Intent(this, PostNew.class));
 
 // imageNewPost.setCircleBackgroundColor(getResources().getColor(R.color.colorWhite));
-                imageNewPost.setImageResource(R.drawable.ic_mode_edit_blue_24dp);
+//                imageNewPost.setImageResource(R.drawable.ic_mode_edit_blue_24dp);
                 break;
             case R.id.imageNotification:
                 manager.setNotificationCountClear();

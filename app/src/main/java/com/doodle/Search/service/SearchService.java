@@ -61,7 +61,9 @@ public interface SearchService {
             @Field("user_id") String userIds,
             @Field("search_term") String searchTerm,
             @Field("limit") int limit,
-            @Field("offset") int offset
+            @Field("offset") int offset,
+            @Field("post_only") int postOnly,
+            @Field("image_only") int imageOnly
     );
 
     @POST(AppConstants.ADVANCE_SEARCH)

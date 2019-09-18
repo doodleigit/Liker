@@ -1,6 +1,5 @@
 package com.doodle.Search.view;
 
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,9 +8,13 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 import com.doodle.App;
 import com.doodle.Search.adapter.AdvanceSearchAdapter;
+import com.doodle.Search.adapter.AdvanceSearchPostAdapter;
 import com.doodle.Search.model.Post;
 import com.doodle.Search.model.User;
 import com.doodle.Search.model.AdvanceSearches;
@@ -32,14 +35,13 @@ import retrofit2.Response;
 
 public class SearchActivity extends AppCompatActivity {
 
-
     private ShimmerFrameLayout shimmerFrameLayout;
 
     private AdvanceSearches advanceSearches;
-    private CircularProgressView progressView;
     private List<User> mUserList;
     private List<Post> mPostList;
     private AdvanceSearchAdapter mAdapter;
+    private AdvanceSearchPostAdapter searchPostAdapter;
     private boolean networkOk;
     private SearchService webService;
     private PrefManager manager;
@@ -49,14 +51,13 @@ public class SearchActivity extends AppCompatActivity {
     private String mProfileId;
     private String token;
 
-    LinearLayoutManager layoutManager;
-    private int totalItems;
-    private int scrollOutItems;
-    private int currentItems;
-    private boolean isScrolling;
-    int limit = 10;
-    int offset = 10;
-    RecyclerView recyclerView;
+    int limit = 5;
+    int offset = 5, postOffset = 5;
+    boolean isUserLoadComplete = true, isPostLoadComplete = true;
+    LinearLayout userLoadMoreLayout, postLoadMoreLayout;
+    FrameLayout userLoadMore, postLoadMore;
+    ProgressBar userLoadMoreProgress, postLoadMoreProgress;
+    RecyclerView userRecyclerView, postRecyclerView;
     Toolbar toolbar;
 
     @Override
@@ -72,13 +73,22 @@ public class SearchActivity extends AppCompatActivity {
 
         mUserList = new ArrayList<>();
         mPostList = new ArrayList<>();
-        layoutManager = new LinearLayoutManager(this);
         networkOk = NetworkHelper.hasNetworkAccess(this);
         webService = SearchService.mRetrofit.create(SearchService.class);
         manager = new PrefManager(this);
-        progressView = (CircularProgressView) findViewById(R.id.progress_view);
         shimmerFrameLayout = findViewById(R.id.shimmer_view_container);
-        recyclerView = (RecyclerView) findViewById(R.id.rvItems);
+
+        userLoadMoreLayout = findViewById(R.id.user_load_more_layout);
+        postLoadMoreLayout = findViewById(R.id.post_load_more_layout);
+        userLoadMore = findViewById(R.id.user_load_more);
+        postLoadMore = findViewById(R.id.post_load_more);
+        userLoadMoreProgress = findViewById(R.id.user_load_more_progress);
+        postLoadMoreProgress = findViewById(R.id.post_load_more_progress);
+
+        userRecyclerView = findViewById(R.id.userRecyclerView);
+        userRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        postRecyclerView = findViewById(R.id.postRecyclerView);
+        postRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         profileId = manager.getProfileId();
         mProfileId = manager.getProfileId();
         deviceId = manager.getDeviceId();
@@ -87,44 +97,58 @@ public class SearchActivity extends AppCompatActivity {
 
         mUserList = advanceSearches.getUser();
         mPostList = advanceSearches.getPost();
-        mAdapter = new AdvanceSearchAdapter(this, mUserList, mPostList);
+        mAdapter = new AdvanceSearchAdapter(this, mUserList);
+        searchPostAdapter = new AdvanceSearchPostAdapter(this, mPostList);
         shimmerFrameLayout.stopShimmer();
         shimmerFrameLayout.setVisibility(View.GONE);
 
-        recyclerView.setVisibility(View.VISIBLE);
-        recyclerView.setAdapter(mAdapter);
+        userRecyclerView.setAdapter(mAdapter);
+        postRecyclerView.setAdapter(searchPostAdapter);
 
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+        setLoadMoreView();
+
+        userLoadMore.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
-                    isScrolling = true;
+            public void onClick(View view) {
+                if (isUserLoadComplete) {
+                    isUserLoadComplete = false;
+                    postLoadMoreProgress.setVisibility(View.VISIBLE);
+                    String queryResult = App.getQueryResult();
+                    Call<AdvanceSearches> call = webService.advanceSearchPaging(deviceId, profileId, token, mProfileId, queryResult, limit, offset, 1);
+                    sendAdvanceSearchRequest(call);
                 }
-            }
-
-            @Override
-            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                currentItems = layoutManager.getChildCount();
-                scrollOutItems = layoutManager.findFirstVisibleItemPosition();
-                totalItems = layoutManager.getItemCount();
-
-                if (isScrolling && (currentItems + scrollOutItems == totalItems)) {
-                    isScrolling = false;
-                    PerformPagination();
-                }
-
             }
         });
 
+        postLoadMore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (isPostLoadComplete) {
+                    isPostLoadComplete = false;
+                    postLoadMoreProgress.setVisibility(View.VISIBLE);
+                    String queryResult = App.getQueryResult();
+                    Call<AdvanceSearches> call = webService.advanceSearchPaging(deviceId, profileId, token, mProfileId, queryResult, limit, postOffset, 1);
+                    sendPostAdvanceSearchRequest(call);
+                }
+            }
+        });
 
     }
 
+    private void setLoadMoreView() {
+        if (mUserList.size() == 0) {
+            userLoadMoreLayout.setVisibility(View.GONE);
+        } else {
+            userLoadMoreLayout.setVisibility(View.VISIBLE);
+        }
+        if (mPostList.size() == 0) {
+            postLoadMoreLayout.setVisibility(View.GONE);
+        } else {
+            postLoadMoreLayout.setVisibility(View.VISIBLE);
+        }
+    }
+
     private void PerformPagination() {
-        progressView.setVisibility(View.VISIBLE);
-        progressView.startAnimation();
         if (networkOk) {
             String queryResult = App.getQueryResult();
             Call<AdvanceSearches> call = webService.advanceSearchPaging(deviceId, profileId, token, mProfileId, queryResult, limit, offset, 1);
@@ -132,36 +156,63 @@ public class SearchActivity extends AppCompatActivity {
 
         } else {
             Tools.showNetworkDialog(getSupportFragmentManager());
-            progressView.setVisibility(View.GONE);
-            progressView.stopAnimation();
         }
 
     }
 
     private void sendAdvanceSearchRequest(Call<AdvanceSearches> call) {
-
         call.enqueue(new Callback<AdvanceSearches>() {
-
-
             @Override
             public void onResponse(Call<AdvanceSearches> call, Response<AdvanceSearches> response) {
                 AdvanceSearches advanceSearches = response.body();
-                mUserList = advanceSearches.getUser();
-                mPostList = advanceSearches.getPost();
-                mAdapter.addPagingData(mPostList);
-                offset += 10;
-                progressView.setVisibility(View.GONE);
+                if (advanceSearches != null) {
+                    if (advanceSearches.getUser() != null) {
+                        if (advanceSearches.getUser().size() < limit) {
+                            userLoadMoreLayout.setVisibility(View.GONE);
+                        }
+                        mUserList.addAll(advanceSearches.getUser());
+                        offset += 5;
+                        mAdapter.notifyDataSetChanged();
+                    }
+                }
+                isUserLoadComplete = true;
+                userLoadMoreProgress.setVisibility(View.GONE);
             }
 
             @Override
             public void onFailure(Call<AdvanceSearches> call, Throwable t) {
-
-                progressView.setVisibility(View.GONE);
-                progressView.stopAnimation();
+                isUserLoadComplete = true;
+                userLoadMoreProgress.setVisibility(View.GONE);
             }
         });
     }
 
+    private void sendPostAdvanceSearchRequest(Call<AdvanceSearches> call) {
+        call.enqueue(new Callback<AdvanceSearches>() {
+            @Override
+            public void onResponse(Call<AdvanceSearches> call, Response<AdvanceSearches> response) {
+                AdvanceSearches advanceSearches = response.body();
+                if (advanceSearches != null) {
+                    if (advanceSearches.getPost() != null) {
+                        if (advanceSearches.getPost().size() < limit) {
+                            postLoadMoreLayout.setVisibility(View.GONE);
+                        }
+                        mPostList.addAll(advanceSearches.getPost());
+                        postOffset += 5;
+                        searchPostAdapter.notifyDataSetChanged();
+                    }
+                }
+                isPostLoadComplete = true;
+                postLoadMoreProgress.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onFailure(Call<AdvanceSearches> call, Throwable t) {
+                isPostLoadComplete = true;
+                postLoadMoreProgress.setVisibility(View.GONE);
+            }
+        });
+    }
 
     @Override
     protected void onResume() {

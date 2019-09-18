@@ -102,15 +102,32 @@
             android:layout_height="match_parent"
             android:layout_below="@+id/viewCategory"/>
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/done"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:layout_margin="20dp"
             android:layout_centerInParent="true"
-            android:layout_alignParentBottom="true"
-            app:fabSize="mini"
-            android:src="@drawable/done"/>
+            android:layout_alignParentBottom="true">
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/done"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                app:fabSize="mini"
+                android:src="@drawable/done"/>
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                app:backgroundTint="@color/tw__composer_red"
+                app:fabSize="mini"
+                android:src="@drawable/ic_close_black_24dp"/>
+
+        </LinearLayout>
 
     </RelativeLayout>
 

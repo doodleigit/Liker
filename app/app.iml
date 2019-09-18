@@ -146,7 +146,7 @@
     <orderEntry type="library" name="Gradle: com.vanniktech:emoji-twitter:0.6.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.vanniktech:emoji:0.6.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:appcompat-v7:28.0.0@aar" level="project" />
-    <orderEntry type="library" name="Gradle: com.onesignal:OneSignal:3.11.3@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.onesignal:OneSignal:3.11.4@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:cardview-v7:28.0.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:customtabs:28.0.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.twitter.sdk.android:twitter:3.1.1@aar" level="project" />
