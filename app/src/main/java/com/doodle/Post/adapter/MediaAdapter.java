@@ -13,6 +13,10 @@ import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
 import com.doodle.App;
+import com.doodle.Home.holder.TextHolder;
+import com.doodle.Home.holder.mediaHolder.ImageViewHolder;
+import com.doodle.Home.holder.mediaHolder.VideoViewHolder;
+import com.doodle.Home.model.PostItem;
 import com.doodle.Post.model.PostImage;
 import com.doodle.Post.model.PostVideo;
 import com.doodle.Post.view.activity.GalleryView;
@@ -22,6 +26,7 @@ import com.doodle.Tool.AppConstants;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.doodle.App.getPosition;
 import static com.doodle.Tool.Tools.isNullOrEmpty;
 
 public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -29,15 +34,21 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     final int VIEW_TYPE_VIDEO = 1;
 
     Context context;
-    List<PostImage> postImages;
+
     List<PostVideo> postVideos;
+    List<PostImage> postImages;
+    public ImageViewHolder.ImageListener imageListener;
+    public VideoViewHolder.VideoListen videoListen;
     List<String> deleteMediaFiles;
 
-    public MediaAdapter(Context context, List<PostImage> postImages, List<PostVideo> postVideos) {
+    public MediaAdapter(Context context, List<PostImage> postImages, List<PostVideo> postVideos, ImageViewHolder.ImageListener imageListener, VideoViewHolder.VideoListen videoListen) {
         this.context = context;
         this.postImages = postImages;
         this.postVideos = postVideos;
+        this.imageListener = imageListener;
+        this.videoListen = videoListen;
         deleteMediaFiles = new ArrayList<>();
+
     }
 
     @Override
@@ -46,7 +57,7 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         if (viewType == VIEW_TYPE_IMAGE) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_row_image, parent, false);
             //    return new AdvanceSearchAd.UserViewHolder(view);
-            return new ImageViewHolder(view);
+            return new ImageViewHolder(view, imageListener);
         }
 
         if (viewType == VIEW_TYPE_VIDEO) {
@@ -54,7 +65,7 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_row_video, parent, false);
             //  return new AdvanceSearchAd.PostViewHolder(view);
 
-            return new VideoViewHolder(view);
+            return new VideoViewHolder(view, videoListen);
         }
 
         return null;
@@ -63,11 +74,11 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         if (viewHolder instanceof ImageViewHolder) {
-            ((ImageViewHolder) viewHolder).populate(postImages.get(position));
+            ((ImageViewHolder) viewHolder).populate(postImages.get(position), position);
         }
 
         if (viewHolder instanceof VideoViewHolder) {
-            ((VideoViewHolder) viewHolder).populate(postVideos.get(position - postImages.size()));
+            ((VideoViewHolder) viewHolder).populate(postVideos.get(position - postImages.size()), position);
             // if not first item check if item above has the same header
         }
     }
@@ -90,119 +101,6 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return -1;
     }
 
-    public class ImageViewHolder extends RecyclerView.ViewHolder {
-        ImageView imgPost, imgPostCancel;
-
-        public ImageViewHolder(View itemView) {
-            super(itemView);
-
-            imgPost = (ImageView) itemView.findViewById(R.id.imgPost);
-            imgPostCancel = (ImageView) itemView.findViewById(R.id.imgPostCancel);
-        }
-
-        @SuppressLint("ClickableViewAccessibility")
-        public void populate(PostImage postImage) {
-
-            String imagePhoto = postImage.getImagePath();
-
-            if (imagePhoto.startsWith("file:")) {
-                Glide.with(App.getAppContext()).load(imagePhoto)
-                        .skipMemoryCache(false)
-                        .into(imgPost);
-            } else {
-                String postImages = AppConstants.POST_IMAGES + imagePhoto;
-                Glide.with(App.getAppContext())
-                        .load(postImages)
-                        .skipMemoryCache(false)
-                        .into(imgPost);
-            }
-
-
-            imgPostCancel.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    postImages.remove(getPosition());
-                    String mediaId = postImage.getImageId();
-                    if (!isNullOrEmpty(mediaId)) {
-                        deleteMediaFiles.add(mediaId);
-                        App.setDeleteMediaIds(deleteMediaFiles);
-                    }
-                    notifyDataSetChanged();
-                    return false;
-                }
-            });
-
-
-        }
-    }
-
-    public class VideoViewHolder extends RecyclerView.ViewHolder {
-        public ImageView imageVideo, imagePlayVideo, imageDeleteVideo;
-        RelativeLayout selectLayout;
-
-
-        public VideoViewHolder(View itemView) {
-            super(itemView);
-
-            imageVideo = (ImageView) itemView.findViewById(R.id.imageVideo);
-            imagePlayVideo = (ImageView) itemView.findViewById(R.id.imagePlayVideo);
-            imageDeleteVideo = (ImageView) itemView.findViewById(R.id.imageDeleteVideo);
-            selectLayout = (RelativeLayout) itemView.findViewById(R.id.selectLayout);
-
-
-        }
-
-        @SuppressLint("ClickableViewAccessibility")
-        public void populate(PostVideo postVideo) {
-
-            String videoPhoto = postVideo.getVideoPath();
-
-         /*   Glide.with(context).load(videoPhoto)
-                    .skipMemoryCache(false)
-                    .into(imageVideo);
-*/
-
-            // String imagePhoto = postImage.getImagePath();
-
-            if (videoPhoto.startsWith("file:")) {
-                Glide.with(App.getAppContext()).load(videoPhoto)
-                        .skipMemoryCache(false)
-                        .into(imageVideo);
-            } else {
-                String postVideos = AppConstants.POST_VIDEOS + videoPhoto;
-                Glide.with(App.getAppContext())
-                        .load(postVideos)
-                        .skipMemoryCache(false)
-                        .into(imageVideo);
-            }
-
-
-            imagePlayVideo.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent intent_gallery = new Intent(context, GalleryView.class);
-                    intent_gallery.putExtra("video", videoPhoto);
-                    intent_gallery.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    App.getAppContext().startActivity(intent_gallery);
-                }
-            });
-            imageDeleteVideo.setOnTouchListener(new View.OnTouchListener() {
-                @Override
-                public boolean onTouch(View v, MotionEvent event) {
-                    postVideos.remove(getPosition() - postImages.size());
-                    String mediaId = postVideo.getVideoId();
-                    if (!isNullOrEmpty(mediaId)) {
-                        deleteMediaFiles.add(mediaId);
-                        App.setDeleteMediaIds(deleteMediaFiles);
-                    }
-
-//                    postVideos.remove(getAdapterPosition());
-                    notifyDataSetChanged();
-                    return false;
-                }
-            });
-        }
-    }
 
     public void addPagingData(List<PostVideo> postList) {
 
@@ -210,6 +108,19 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         ) {
             postVideos.add(temp);
         }
+        notifyDataSetChanged();
+    }
+
+    public void deleteItem(int position) {
+
+/*
+        PostImage postImage = postImages.get(position);
+        String mediaId = postImage.getImageId();
+        if (!isNullOrEmpty(mediaId)) {
+            deleteMediaFiles.add(mediaId);
+            App.setDeleteMediaIds(deleteMediaFiles);
+        }*/
+
         notifyDataSetChanged();
     }
 }

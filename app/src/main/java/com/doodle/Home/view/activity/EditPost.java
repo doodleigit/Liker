@@ -55,6 +55,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.doodle.App;
+import com.doodle.Home.holder.mediaHolder.ImageViewHolder;
+import com.doodle.Home.holder.mediaHolder.VideoViewHolder;
 import com.doodle.Home.model.PostFile;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.PostTextIndex;
@@ -74,6 +76,7 @@ import com.doodle.Post.model.PostVideo;
 import com.doodle.Post.model.Subcatg;
 import com.doodle.Post.service.DataProvider;
 import com.doodle.Post.service.PostService;
+import com.doodle.Post.view.activity.PostNew;
 import com.doodle.Post.view.fragment.Audience;
 import com.doodle.Post.view.fragment.ContributorStatus;
 import com.doodle.Post.view.fragment.PostPermission;
@@ -274,6 +277,12 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
     private String imageUrl;
     List<String> idSet;
 
+    //DELETE MEDIA
+    public ImageViewHolder.ImageListener imageListener;
+    public VideoViewHolder.VideoListen videoListen;
+   public MediaAdapter mediaAdapter;
+    List<String> deleteMediaFiles;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -298,7 +307,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
         mediaFiles = new ArrayList<>();
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage(getString(R.string.checking));
-
+        deleteMediaFiles=new ArrayList<>();
 
         mediaRecyclerView = findViewById(R.id.rvPostMedia);
         mimRecyclerView = (RecyclerView) findViewById(R.id.rvMim);
@@ -327,7 +336,39 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
         contentPostView = findViewById(R.id.contentPostView);
         messageContainer = findViewById(R.id.messageContainer);
         messageContainer.setOnClickListener(this);
+        mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos, imageListener, videoListen);
+        imageListener=new ImageViewHolder.ImageListener() {
+            @Override
+            public void deleteImage(PostImage postImage, int position) {
 
+                postImages.remove(postImage);
+                mediaAdapter.deleteItem(position);
+                String mediaId = postImage.getImageId();
+                if (!isNullOrEmpty(mediaId)) {
+                    deleteMediaFiles.add(mediaId);
+                    App.setDeleteMediaIds(deleteMediaFiles);
+                }
+
+                makeText(EditPost.this, "image delete", LENGTH_SHORT).show();
+                
+            }
+        };
+        videoListen=new VideoViewHolder.VideoListen() {
+            @Override
+            public void deleteVideo(PostVideo postVideo, int position) {
+                postVideos.remove(postVideo);
+                mediaAdapter.deleteItem(position);
+                String mediaId = postVideo.getVideoId();
+                if (!isNullOrEmpty(mediaId)) {
+                    deleteMediaFiles.add(mediaId);
+                    App.setDeleteMediaIds(deleteMediaFiles);
+                }
+
+                makeText(EditPost.this, "video delete", LENGTH_SHORT).show();
+            }
+        };
+        
+        
         MimAdapter.RecyclerViewClickListener listener = (view, position) -> {
 
 
@@ -848,7 +889,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 
             rvMediaShow = true;
             mediaRecyclerViewToggle();
-            MediaAdapter mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos);
+            MediaAdapter mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos,imageListener,videoListen);
             mediaRecyclerView.setAdapter(mediaAdapter);
 
         }
@@ -1258,9 +1299,9 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 
                 checkContentType();
                 if (categoryId.isEmpty() && subCategoryId.isEmpty()) {
-                    Tools.showCustomToast(EditPost.this, mView, " Choose Audience !", Gravity.TOP);
+                    Tools.showCustomToast(EditPost.this, mView, "Please select your post’s audience.", Gravity.TOP);
                 } else if (!isAddContentTitle) {
-                    Tools.showCustomToast(EditPost.this, mView, " You must add description to your post !", Gravity.TOP);
+                    Tools.showCustomToast(EditPost.this, mView, "you must add the post description!", Gravity.TOP);
                 } else {
 
 
@@ -1738,11 +1779,11 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                 addPhotoRequest(mediaCall);
 
                 progressDialog.show();
-                postImages.add(new PostImage("file://" + imagePath));
+                postImages.add(new PostImage("file://" + imagePath,fileEncoded));
                 if (postImages.size() > 0)
                     rvMediaShow = true;
                 mediaRecyclerViewToggle();
-                MediaAdapter mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos);
+                MediaAdapter mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos,imageListener,videoListen);
                 mediaRecyclerView.setAdapter(mediaAdapter);
                 progressDialog.dismiss();
 
@@ -1859,11 +1900,11 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                             uploadImageName.add(imageFile);
                             if (!isNullOrEmpty(imageFilePath)) {
                                 String imagePath = "file://" + imageFilePath;
-                                postImages.add(new PostImage(imagePath));
+                                postImages.add(new PostImage(imagePath,fileEncoded));
                                 if (postImages.size() > 0)
                                     rvMediaShow = true;
                                 mediaRecyclerViewToggle();
-                                MediaAdapter mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos);
+                                MediaAdapter mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos,imageListener,videoListen);
                                 mediaRecyclerView.setAdapter(mediaAdapter);
                                 progressView.setVisibility(View.GONE);
                                 progressView.stopAnimation();
@@ -2034,19 +2075,22 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                                     progressDialog.show();
 
                                     String videoPath = "file://" + videoFilePath;
-                                    postVideos.add(new PostVideo(videoPath));
+                                    PostVideo postVideo=new PostVideo();
+                                    postVideo.setVideoPath(videoPath);
+                                    postVideo.setMdFive(fileEncoded);
+                                    postVideos.add(postVideo);
                                     if (postVideos.size() > 0)
                                         rvMediaShow = true;
                                     mediaRecyclerViewToggle();
-                                    MediaAdapter mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos);
+                                    MediaAdapter mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos,imageListener,videoListen);
                                     mediaRecyclerView.setAdapter(mediaAdapter);
 
 
                                 }
 
 
-                                String message = "Add gallery successfully!";
-                                Tools.showCustomToast(EditPost.this, mView, message, Gravity.CENTER);
+                              //  String message = "Add gallery successfully!";
+                             //   Tools.showCustomToast(EditPost.this, mView, message, Gravity.CENTER);
 
                             }
 
@@ -2178,11 +2222,11 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 
                                     progressDialog.show();
                                     String imagePath = "file://" + imageFilePath;
-                                    postImages.add(new PostImage(imagePath));
+                                    postImages.add(new PostImage(imagePath,fileEncoded));
                                     if (postImages.size() > 0)
                                         rvMediaShow = true;
                                     mediaRecyclerViewToggle();
-                                    MediaAdapter mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos);
+                                    MediaAdapter mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos,imageListener,videoListen);
                                     mediaRecyclerView.setAdapter(mediaAdapter);
                                     progressView.setVisibility(View.GONE);
                                     progressView.stopAnimation();
@@ -2190,8 +2234,8 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                                 }
 
 
-                                String message = "Add gallery successfully!";
-                                Tools.showCustomToast(EditPost.this, mView, message, Gravity.CENTER);
+                            //    String message = "Add gallery successfully!";
+                             //   Tools.showCustomToast(EditPost.this, mView, message, Gravity.CENTER);
 
                             }
 
@@ -2281,18 +2325,20 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 
                                     String videoPath = "file://" + videoFilePath;
                                     imageFile = "default.mp4";
-                                    postVideos.add(new PostVideo(videoPath));
+                                    PostVideo postVideo=new PostVideo();
+                                    postVideo.setVideoPath(videoPath);
+                                    postVideo.setMdFive(fileEncoded);
+                                    postVideos.add(postVideo);
                                     if (postVideos.size() > 0)
                                         rvMediaShow = true;
                                     mediaRecyclerViewToggle();
-                                    MediaAdapter mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos);
+                                    MediaAdapter mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos,imageListener,videoListen);
                                     mediaRecyclerView.setAdapter(mediaAdapter);
-
-
+                                    
                                 }
 
-                                String message = "Add gallery successfully!";
-                                Tools.showCustomToast(EditPost.this, mView, message, Gravity.CENTER);
+                           //     String message = "Add gallery successfully!";
+                          //      Tools.showCustomToast(EditPost.this, mView, message, Gravity.CENTER);
 
                             }
 

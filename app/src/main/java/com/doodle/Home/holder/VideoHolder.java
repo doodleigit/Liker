@@ -86,6 +86,7 @@ import static com.doodle.Tool.Tools.containsIllegalCharacters;
 import static com.doodle.Tool.Tools.delayLoadComment;
 import static com.doodle.Tool.Tools.dismissDialog;
 import static com.doodle.Tool.Tools.getSpannableStringBuilder;
+import static com.doodle.Tool.Tools.getSpannableStringShareHeader;
 import static com.doodle.Tool.Tools.isNullOrEmpty;
 import static com.doodle.Tool.Tools.sendNotificationRequest;
 import static com.doodle.Tool.Tools.showBlockUser;
@@ -307,7 +308,7 @@ public class VideoHolder extends RecyclerView.ViewHolder {
             sharedUserProfileLike = itemSharedProfile.getUserProfileLikes();
             sharedPostText=item.getSharedPostText();
             sharedCategoryName=item.getCatName();
-            SpannableStringBuilder builder = getSpannableStringBuilder(sharedUserProfileLike, "", sharedTotalStar, sharedCategoryName);
+            SpannableStringBuilder builder = getSpannableStringShareHeader(sharedUserProfileLike, "", sharedTotalStar, sharedCategoryName);
             long myMillis = Long.parseLong(sharedDateTime) * 1000;
             String postDate = Operation.getFormattedDateFromTimestamp(myMillis);
             //    tvSharePostTime.setText(chatDateCompare(mContext,myMillis));

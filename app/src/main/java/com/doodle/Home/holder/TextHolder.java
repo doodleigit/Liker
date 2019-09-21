@@ -98,6 +98,7 @@ import static com.doodle.Tool.Tools.dismissDialog;
 import static com.doodle.Tool.Tools.extractMentionText;
 import static com.doodle.Tool.Tools.extractUrls;
 import static com.doodle.Tool.Tools.getSpannableStringBuilder;
+import static com.doodle.Tool.Tools.getSpannableStringShareHeader;
 import static com.doodle.Tool.Tools.isNullOrEmpty;
 import static com.doodle.Tool.Tools.sendNotificationRequest;
 import static com.doodle.Tool.Tools.showBlockUser;
@@ -198,7 +199,6 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
     public interface PostItemListener {
         void deletePost(PostItem postItem, int position);
-
     }
 
     public TextHolder(View itemView, Context context, PostItemListener postTextListener, boolean isPopup) {
@@ -349,7 +349,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
             sharedUserProfileLike = itemSharedProfile.getUserProfileLikes();
             sharedPostText=item.getSharedPostText();
             sharedCategoryName=item.getCatName();
-            SpannableStringBuilder builder = getSpannableStringBuilder(sharedUserProfileLike, "", sharedTotalStar, sharedCategoryName);
+            SpannableStringBuilder builder = getSpannableStringShareHeader(sharedUserProfileLike, "", sharedTotalStar, sharedCategoryName);
             long myMillis = Long.parseLong(sharedDateTime) * 1000;
             String postDate = Operation.getFormattedDateFromTimestamp(myMillis);
             //    tvSharePostTime.setText(chatDateCompare(mContext,myMillis));
@@ -381,7 +381,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
             public void onClick(View v) {
 
                 if (userIds.equalsIgnoreCase(item.getPostUserid())) {
-                    Tools.toast(mContext, "On Liker, you can't like your own posts. That would be cheating ", R.drawable.ic_info_outline_blue_24dp);
+                    Tools.toast(mContext, "On Liker, you can't like your own posts. That would be cheating ", R.drawable.ic_insert_emoticon_black_24dp);
                 } else {
                     PostFooter postFooters = item.getPostFooter();
                     if (postFooters.isLikeUserStatus()) {
@@ -396,6 +396,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
             }
         });
+
 
         tvCommentLike.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -412,6 +413,8 @@ public class TextHolder extends RecyclerView.ViewHolder {
                 }
             }
         });
+
+
         text = item.getPostText();
         String contentUrl = FACEBOOK_SHARE + item.getSharedPostId();
         StringBuilder nameBuilder = new StringBuilder();
@@ -427,6 +430,8 @@ public class TextHolder extends RecyclerView.ViewHolder {
             }
 
         }
+
+
         if (containsIllegalCharacters(text)) {
             tvPostContent.setVisibility(View.GONE);
             tvPostEmojiContent.setVisibility(View.VISIBLE);

@@ -47,7 +47,7 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
     public GalleryAdapter(Context context, List<PostFile> postFiles, RecyclerViewClickListener listener) {
         this.mContext = context;
         this.postFiles = postFiles;
-        mListener = listener;
+        this.mListener = listener;
     }
 
 
