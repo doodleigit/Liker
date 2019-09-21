@@ -139,7 +139,7 @@
     <string name="dont_have_a_liker_account">Don\'t have a Liker account? Sign up</string>
     <string name="who_can_send_you_friend_requests">Who can send you friend requests:</string>
     <string name="who_can_post_on_your_wall">Who can post on your wall:</string>
-    <string name="who_can_see_your_friend_list">Who can see your friend list:</string>
+    <string name="who_can_see_your_friends_list">Who can see your friends list:</string>
     <string name="who_can_see_your_photos">Who can see your photos:</string>
     <string name="who_can_send_you_message">Who can send you message:</string>
     <string name="block_users">Block Users:</string>
@@ -152,6 +152,13 @@
     <string name="there_are_no_more_posts">There are no more posts.</string>
     <string name="people_liked_this_post">people liked this post</string>
     <string name="all_categories">All Categories</string>
+    <string name="sites_and_social_links">Sites &amp; Social Links</string>
+    <string name="certifications">Certifications</string>
+    <string name="honors_and_awards">Honors &amp; Awards</string>
+    <string name="experience">Experience</string>
+    <string name="education">Education</string>
+    <string name="email_notification">Email Notification</string>
+    <string name="push_notification">Push Notification</string>
 
     <string name="audience">Audience</string>
     <string name="save">Save</string>
@@ -165,7 +172,7 @@
     <string name="browser">Browser</string>
     <string name="selected_categories">Selected Categories</string>
     <string name="please_select_any_category">Please select any category that you would like to declare yourself a contributor to (we will track your likes and add you to the rankings)</string>
-    <string name="you_can_still_post_on_deactivation">You can still post on deactivation (though it doesn’t go anywhere) Post(s) shows once you’ve activate your account again.</string>
+    <string name="you_can_still_post_on_deactivation">You can still make posts while your account is deactivated, but nobody will see them. They will become visible if and when you reactivate your account.</string>
     <string name="security_setting">Security Settings</string>
     <string name="password_setting">Password Settings</string>
     <string name="email_setting">Email Settings</string>
@@ -189,9 +196,9 @@
     <string name="contact_link">https://www.m.liker.com/contact</string>
     <string name="find_friends">Find Friends</string>
     <string name="find_friends_link">https://www.m.liker.com/settings/find-friends</string>
-    <string name="account_setting">Account Setting</string>
-    <string name="contributor_setting">Contributor Setting</string>
-    <string name="notification_setting">Notification Setting</string>
+    <string name="account_settings">Account Settings</string>
+    <string name="contributor_settings">Contributor Settings</string>
+    <string name="notification_settings">Notification Settings</string>
     <string name="privacy_and_security">Privacy and Security</string>
     <string name="please_input">Please input atleast two character</string>
     <string name="password_length_is_less_than_8">password length is less than 8</string>
@@ -212,20 +219,20 @@
     <string name="your_email_address_is_not_valid">Your email address is not valid</string>
     <string name="send_facebook_invitation">Send Facebook Invitation</string>
     <string name="send_twitter_invitation">Send Twitter Invitation</string>
-    <string name="send_linkedin_invitation">Send Linkedin Invitation</string>
+    <string name="send_linkedin_invitation">Send LinkedIn Invitation</string>
     <string name="there_is_no_followers">There are no followers.</string>
     <string name="there_is_no_following">There are no following.</string>
     <string name="there_is_no_people">There is no people.</string>
     <string name="there_is_no_facebook_friends">There are no facebook friends.</string>
     <string name="there_is_no_twitter_friends">There are no twitter friends.</string>
-    <string name="there_is_no_likedin_friends">There are no linkedin friends.</string>
+    <string name="there_is_no_likedin_friends">There are no linkedIn friends.</string>
     <string name="report_post">Report Post</string>
     <string name="follow">Follow</string>
     <string name="unfollow">Unfollow</string>
     <string name="followers">Followers</string>
     <string name="following">Following</string>
     <string name="posts">Posts</string>
-    <string name="checking">Checking...</string>
+    <string name="checking">Checking…</string>
     <string name="transition_photo">transition photo</string>
     <string name="login_in_with_facebook">Log in with <b>facebook</b></string>
     <string name="login_in_with_twitter">Log in with <b>twitter</b></string>
@@ -251,6 +258,7 @@
     <string name="menu_tools">Tools</string>
     <string name="menu_share">Share</string>
     <string name="menu_send">Send</string>
+
     <string-array name="string_array_alcohol">
         <item>Vodka</item>
         <item>Rum</item>

@@ -32,7 +32,7 @@ public class SettingActivity extends AppCompatActivity {
                 initialFragment(new PrivacyAndSecurityFragment());
                 break;
             case "notification":
-                initialFragment(new NotificationSettingFragment());
+                initialFragment(new NewNotificationSettingFragment());
                 break;
             case "contributor":
                 initialFragment(new ContributorSettingFragment());
