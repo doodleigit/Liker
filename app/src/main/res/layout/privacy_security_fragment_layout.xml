@@ -178,7 +178,7 @@
                     android:layout_height="wrap_content"
                     android:layout_toStartOf="@+id/friend_list_privacy_layout"
                     android:padding="10dp"
-                    android:text="@string/who_can_see_your_friend_list"
+                    android:text="@string/who_can_see_your_friends_list"
                     android:textColor="@color/colorPostText"
                     android:textSize="14sp"
                     android:textStyle="bold" />

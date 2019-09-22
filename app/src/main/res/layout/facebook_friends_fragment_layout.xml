@@ -52,8 +52,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
-            android:text="@string/there_is_no_facebook_friends"
             android:visibility="gone"/>
+<!--        android:text="@string/there_is_no_facebook_friends"-->
 
         <ProgressBar
             android:id="@+id/progress_bar"

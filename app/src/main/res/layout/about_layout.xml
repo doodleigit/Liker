@@ -341,7 +341,7 @@
                         android:layout_alignParentStart="true"
                         android:layout_centerInParent="true"
                         android:layout_marginStart="10dp"
-                        android:text="Education"
+                        android:text="@string/education"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -390,7 +390,7 @@
                         android:layout_alignParentStart="true"
                         android:layout_centerInParent="true"
                         android:layout_marginStart="10dp"
-                        android:text="Experience"
+                        android:text="@string/experience"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -439,7 +439,7 @@
                         android:layout_alignParentStart="true"
                         android:layout_centerInParent="true"
                         android:layout_marginStart="10dp"
-                        android:text="Honors &amp; Awards"
+                        android:text="@string/honors_and_awards"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -488,7 +488,7 @@
                         android:layout_alignParentStart="true"
                         android:layout_centerInParent="true"
                         android:layout_marginStart="10dp"
-                        android:text="Certification"
+                        android:text="@string/certifications"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -537,7 +537,7 @@
                         android:layout_alignParentStart="true"
                         android:layout_centerInParent="true"
                         android:layout_marginStart="10dp"
-                        android:text="Sites &amp; Social Links"
+                        android:text="@string/sites_and_social_links"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 

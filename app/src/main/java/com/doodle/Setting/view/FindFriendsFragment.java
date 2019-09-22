@@ -82,7 +82,7 @@ public class FindFriendsFragment extends Fragment {
         tabLayout.getTabAt(0).setText("Suggested");
         tabLayout.getTabAt(1).setText("Facebook");
         tabLayout.getTabAt(2).setText("Twitter");
-        tabLayout.getTabAt(3).setText("Linkedin");
+        tabLayout.getTabAt(3).setText("LinkedIn");
     }
 
     private void getSocialLinks() {

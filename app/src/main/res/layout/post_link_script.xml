@@ -2,10 +2,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_gravity="center_horizontal"
     android:gravity="center_horizontal"
     android:id="@+id/scrollLinkScript"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="fill_parent"
@@ -23,36 +24,39 @@
             android:textSize="18sp"
             android:visibility="gone" />
 
+<!--
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/post"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:background="@drawable/common_button_blue"
+            android:src="@drawable/ic_done_black_24dp"
+            android:textColor="@android:color/white"
+            android:layout_margin="16dp"
+            app:fabSize="mini"
+            android:visibility="gone" />-->
+
         <LinearLayout
             android:id="@+id/drop_preview"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginBottom="10dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
             android:gravity="center_horizontal"
             android:orientation="vertical" >
+
         </LinearLayout>
 
-        <Button
-            android:id="@+id/post"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:background="@drawable/common_button_blue"
-            android:text="@string/post"
-            android:textColor="@android:color/white"
-            android:visibility="gone" />
+
 
         <TextView
             android:id="@+id/post_area"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:text="@string/post_area"
+            tools:text="@string/post_area"
             android:textSize="18sp"
-            android:visibility="gone" />
+            android:visibility="visible" />
 
         <LinearLayout
             android:id="@+id/drop_post"

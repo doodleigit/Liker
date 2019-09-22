@@ -196,7 +196,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 
     //POST LINK SCRIPT
     private EditText editText, editTextTitlePost, editTextDescriptionPost;
-    private Button submitButton, postButton, randomButton;
+    private Button submitButton, randomButton;
     private Context context;
     private ViewGroup dropPreview, dropPost;
     private TextView previewAreaTitle, postAreaTitle;
@@ -521,7 +521,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
         /** --- */
 
 
-        postButton = (Button) findViewById(R.id.post);
+     //   postButton = (Button) findViewById(R.id.post);
 
         previewAreaTitle = (TextView) findViewById(R.id.preview_area);
         postAreaTitle = (TextView) findViewById(R.id.post_area);
@@ -1084,14 +1084,14 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 
 
     private void initPostButton() {
-        postButton.setOnClickListener(new View.OnClickListener() {
+        tvSubmitPost.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 postAreaTitle.setVisibility(View.VISIBLE);
                 tvSubmitPost.setVisibility(View.VISIBLE);
                 previewAreaTitle.setVisibility(View.GONE);
-                postButton.setVisibility(View.GONE);
+              //  postButton.setVisibility(View.GONE);
                 tvSubmitPost.setEnabled(true);
 
                 /** Inflating the preview layout */
@@ -2509,7 +2509,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
             noThumb = false;
             currentTitle = currentDescription = currentUrl = currentCannonicalUrl = "";
 
-            tvSubmitPost.setEnabled(false);
+            tvSubmitPost.setEnabled(true);
 
             /** Inflating the preview layout */
             mainView = getLayoutInflater().inflate(R.layout.main_view, null);
@@ -2554,8 +2554,8 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                 });
 
             } else {
-                postButton.setVisibility(View.VISIBLE);
-
+             //   postButton.setVisibility(View.VISIBLE);
+                tvSubmitPost.setVisibility(View.VISIBLE);
                 currentImageSet = new Bitmap[sourceContent.getImages().size()];
 
                 /**
@@ -2746,7 +2746,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                 urlTextView.setText(sourceContent.getCannonicalUrl());
                 descriptionTextView.setText(sourceContent.getDescription());
 
-                postButton.setVisibility(View.VISIBLE);
+             //   postButton.setVisibility(View.VISIBLE);
             }
 
             currentTitle = sourceContent.getTitle();
@@ -2786,7 +2786,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
     private void releasePreviewArea() {
         tvSubmitPost.setEnabled(true);
         tvSubmitPost.setVisibility(View.VISIBLE);
-        postButton.setVisibility(View.GONE);
+      //  postButton.setVisibility(View.GONE);
         previewAreaTitle.setVisibility(View.GONE);
         dropPreview.removeAllViews();
     }

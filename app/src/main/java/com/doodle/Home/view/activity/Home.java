@@ -83,6 +83,7 @@ import com.doodle.Tool.AppConstants;
 import com.doodle.Tool.NetworkHelper;
 import com.doodle.Tool.PrefManager;
 import com.doodle.Tool.ScreenOnOffBroadcast;
+import com.doodle.Tool.Service.DataFetchingService;
 import com.doodle.Tool.Tools;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
@@ -135,7 +136,6 @@ public class Home extends AppCompatActivity implements
     private TopContributorStatus contributorStatus;
     private Headers headers;
     private String topContributorStatus;
-    private BroadcastReceiver mReceiver;
     private ArrayList<PostFilterCategory> categories;
     private ArrayList<PostFilterSubCategory> subCategories, multipleSubCategories, exceptMultipleSubCategories;
     private ArrayList<CommonCategory> commonCategories;
@@ -153,19 +153,14 @@ public class Home extends AppCompatActivity implements
     private String profileId;
     private String blockUserId;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-
-//        userInfo = getIntent().getExtras().getParcelable(USER_INFO_ITEM_KEY);
-//        if (userInfo == null) {
-//            throw new AssertionError("Null data item received!");
-//        }
-
-
+        startService(new Intent(Home.this, DataFetchingService.class));
         initialComponent();
-
 
         if (topContributorStatus != null) {
             String categoryId = App.getCategoryId();
@@ -186,9 +181,7 @@ public class Home extends AppCompatActivity implements
             });
         }
 
-        getData();
         setData();
-        setBroadcast();
         sendCategoryListRequest();
 
     }
@@ -214,9 +207,6 @@ public class Home extends AppCompatActivity implements
         IntentFilter filter = new IntentFilter();
         filter.addAction(AppConstants.NEW_NOTIFICATION_BROADCAST);
         registerReceiver(broadcastReceiver, filter);
-        IntentFilter reFilter = new IntentFilter();
-        reFilter.addAction(AppConstants.RECONNECT_SOCKET_BROADCAST);
-        registerReceiver(reconnectSocketBroadcast, reFilter);
 
         findViewById(R.id.tvSearchInput).setOnClickListener(this);
         drawer = findViewById(R.id.drawer_layout);
@@ -274,8 +264,8 @@ public class Home extends AppCompatActivity implements
             navUserName.setText(profileName);
         }
 
-        socket = new SocketIOManager().getWSocketInstance();
-        mSocket = new SocketIOManager().getMSocketInstance();
+        socket = SocketIOManager.wSocket;
+        mSocket = SocketIOManager.mSocket;
 
         filterItem.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -329,6 +319,7 @@ public class Home extends AppCompatActivity implements
                 Intent loginAgain = new Intent(Home.this, LoginAgain.class);
                 loginAgain.putExtra("login_info", loginInfo);
                 manager.pref.edit().clear().apply();
+                stopService(new Intent(Home.this, DataFetchingService.class));
                 startActivity(loginAgain);
                 finish();
             }
@@ -346,99 +337,6 @@ public class Home extends AppCompatActivity implements
         categories.add(new PostFilterCategory("3", "Single Category", new ArrayList<>()));
         categories.add(new PostFilterCategory("4", "Everything Except", new ArrayList<>()));
         categoryFilter();
-    }
-
-    private void setBroadcast() {
-        IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
-        filter.addAction(Intent.ACTION_SCREEN_OFF);
-        mReceiver = new ScreenOnOffBroadcast();
-        registerReceiver(mReceiver, filter);
-    }
-
-    private void getData() {
-        mSocket.on("message", new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-                try {
-                    JSONObject messageJson = new JSONObject(args[0].toString());
-                    NewMessage newMessage = new NewMessage();
-
-                    newMessage.setUserId(messageJson.getString("user_id"));
-                    newMessage.setToUserId(messageJson.getString("to_user_id"));
-                    newMessage.setMessage(messageJson.getString("message"));
-                    newMessage.setReturnResult(messageJson.getBoolean("return_result"));
-                    newMessage.setTimePosted(messageJson.getString("time_posted"));
-                    newMessage.setInsertId(messageJson.getString("insert_id"));
-                    newMessage.setUnreadTotal(messageJson.getString("unread_total"));
-
-                    SenderData senderData = new SenderData();
-                    senderData.setId(messageJson.getJSONObject("user_data").getString("id"));
-                    senderData.setUserId(messageJson.getJSONObject("user_data").getString("user_id"));
-                    senderData.setUserName(messageJson.getJSONObject("user_data").getString("user_name"));
-                    senderData.setFirstName(messageJson.getJSONObject("user_data").getString("first_name"));
-                    senderData.setLastName(messageJson.getJSONObject("user_data").getString("last_name"));
-                    senderData.setTotalLikes(messageJson.getJSONObject("user_data").getString("total_likes"));
-                    senderData.setGoldStars(messageJson.getJSONObject("user_data").getString("gold_stars"));
-                    senderData.setSliverStars(messageJson.getJSONObject("user_data").getString("sliver_stars"));
-                    senderData.setPhoto(messageJson.getJSONObject("user_data").getString("photo"));
-                    senderData.setEmail(messageJson.getJSONObject("user_data").getString("email"));
-                    senderData.setDeactivated(messageJson.getJSONObject("user_data").getString("deactivated"));
-                    senderData.setFoundingUser(messageJson.getJSONObject("user_data").getString("founding_user"));
-                    senderData.setLearnAboutSite(messageJson.getJSONObject("user_data").getInt("learn_about_site"));
-                    senderData.setIsTopCommenter(messageJson.getJSONObject("user_data").getString("is_top_commenter"));
-                    senderData.setIsMaster(messageJson.getJSONObject("user_data").getString("is_master"));
-                    senderData.setDescription(messageJson.getJSONObject("user_data").getString("description"));
-
-                    newMessage.setSenderData(senderData);
-                    sendBroadcast((new Intent().putExtra("new_message", (Parcelable) newMessage).putExtra("type", 0)).setAction(AppConstants.NEW_MESSAGE_BROADCAST_FROM_HOME));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                if (!IN_CHAT_MODE)
-                    sendBroadcast((new Intent().putExtra("type", "1")).setAction(AppConstants.NEW_NOTIFICATION_BROADCAST));
-            }
-        });
-
-        mSocket.on("message_own", new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-                try {
-                    JSONObject messageJson = new JSONObject(args[0].toString());
-                    NewMessage newMessage = new NewMessage();
-
-                    newMessage.setUserId(messageJson.getString("user_id"));
-                    newMessage.setToUserId(messageJson.getString("to_user_id"));
-                    newMessage.setMessage(messageJson.getString("message"));
-                    newMessage.setReturnResult(messageJson.getBoolean("return_result"));
-                    newMessage.setTimePosted(messageJson.getString("time_posted"));
-                    newMessage.setInsertId(messageJson.getString("insert_id"));
-                    newMessage.setUnreadTotal(messageJson.getString("unread_total"));
-
-                    SenderData senderData = new SenderData();
-                    senderData.setId(messageJson.getJSONObject("to_user_data").getString("id"));
-                    senderData.setUserId(messageJson.getJSONObject("to_user_data").getString("user_id"));
-                    senderData.setUserName(messageJson.getJSONObject("to_user_data").getString("user_name"));
-                    senderData.setFirstName(messageJson.getJSONObject("to_user_data").getString("first_name"));
-                    senderData.setLastName(messageJson.getJSONObject("to_user_data").getString("last_name"));
-                    senderData.setTotalLikes(messageJson.getJSONObject("to_user_data").getString("total_likes"));
-                    senderData.setGoldStars(messageJson.getJSONObject("to_user_data").getString("gold_stars"));
-                    senderData.setSliverStars(messageJson.getJSONObject("to_user_data").getString("sliver_stars"));
-                    senderData.setPhoto(messageJson.getJSONObject("to_user_data").getString("photo"));
-                    senderData.setEmail(messageJson.getJSONObject("to_user_data").getString("email"));
-                    senderData.setDeactivated(messageJson.getJSONObject("to_user_data").getString("deactivated"));
-                    senderData.setFoundingUser(messageJson.getJSONObject("to_user_data").getString("founding_user"));
-                    senderData.setLearnAboutSite(messageJson.getJSONObject("to_user_data").getInt("learn_about_site"));
-                    senderData.setIsTopCommenter(messageJson.getJSONObject("to_user_data").getString("is_top_commenter"));
-                    senderData.setIsMaster(messageJson.getJSONObject("to_user_data").getString("is_master"));
-                    senderData.setDescription(messageJson.getJSONObject("to_user_data").getString("description"));
-
-                    newMessage.setSenderData(senderData);
-                    sendBroadcast((new Intent().putExtra("new_message", (Parcelable) newMessage).putExtra("type", 1)).setAction(AppConstants.NEW_MESSAGE_BROADCAST_FROM_HOME));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
     }
 
     private void sendCategoryListRequest() {
@@ -905,24 +803,8 @@ public class Home extends AppCompatActivity implements
             App.setIsBockComment(false);
             startActivity(getIntent());
             finish();
-
-        } else {
-
         }
         // code to update the UI in the fragment
-
-        socket.on("web_notification", new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-                sendBroadcast((new Intent().putExtra("type", "0")).setAction(AppConstants.NEW_NOTIFICATION_BROADCAST));
-            }
-        });
-        if (!socket.connected()) {
-            socket = new SocketIOManager().getWSocketInstance();
-        }
-        if (!mSocket.connected()) {
-            mSocket = new SocketIOManager().getMSocketInstance();
-        }
     }
 
     private void setupToolbar() {
@@ -967,17 +849,17 @@ public class Home extends AppCompatActivity implements
 //        tabLayout.getTabAt(0).setCustomView(tabOne);
 
         tabOne.setTextColor(Color.parseColor("#1483C9"));
-        tabOne.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_blue_24dp, 0);
+//        tabOne.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_blue_24dp, 0);
         tabLayout.getTabAt(0).setCustomView(tabOne);
 
         tabTwo = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
         tabTwo.setText("Breaking");
-        tabTwo.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_black_24dp, 0);
+//        tabTwo.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_black_24dp, 0);
         tabLayout.getTabAt(1).setCustomView(tabTwo);
 
         tabThree = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
         tabThree.setText("Following");
-        tabThree.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_black_24dp, 0);
+//        tabThree.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_black_24dp, 0);
         tabLayout.getTabAt(2).setCustomView(tabThree);
     }
 
@@ -996,33 +878,33 @@ public class Home extends AppCompatActivity implements
                 //  viewPager.setCurrentItem(tab.getPosition());
 
                 if (tab.getPosition() == 0) {
-                    tabOne.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_blue_24dp, 0);
+//                    tabOne.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_blue_24dp, 0);
                     tabOne.setTextColor(Color.parseColor("#1483C9"));
 
-                    tabTwo.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_black_24dp, 0);
+//                    tabTwo.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_black_24dp, 0);
                     tabTwo.setTextColor(Color.parseColor("#AAAAAA"));
 
-                    tabThree.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_black_24dp, 0);
+//                    tabThree.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_black_24dp, 0);
                     tabThree.setTextColor(Color.parseColor("#AAAAAA"));
 
                 } else if (tab.getPosition() == 1) {
-                    tabTwo.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_blue_24dp, 0);
+//                    tabTwo.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_blue_24dp, 0);
                     tabTwo.setTextColor(Color.parseColor("#1483C9"));
 
-                    tabOne.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_black_24dp, 0);
+//                    tabOne.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_black_24dp, 0);
                     tabOne.setTextColor(Color.parseColor("#AAAAAA"));
 
-                    tabThree.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_black_24dp, 0);
+//                    tabThree.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_black_24dp, 0);
                     tabThree.setTextColor(Color.parseColor("#AAAAAA"));
 
                 } else {
-                    tabThree.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_blue_24dp, 0);
+//                    tabThree.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_blue_24dp, 0);
                     tabThree.setTextColor(Color.parseColor("#1483C9"));
 
-                    tabTwo.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_black_24dp, 0);
+//                    tabTwo.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_black_24dp, 0);
                     tabTwo.setTextColor(Color.parseColor("#AAAAAA"));
 
-                    tabOne.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_black_24dp, 0);
+//                    tabOne.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_black_24dp, 0);
                     tabOne.setTextColor(Color.parseColor("#AAAAAA"));
                 }
 
@@ -1143,22 +1025,6 @@ public class Home extends AppCompatActivity implements
         }
     };
 
-    BroadcastReceiver reconnectSocketBroadcast = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (!socket.connected()) {
-                socket = new SocketIOManager().getWSocketInstance();
-//                Toast.makeText(context, "Web Socket Reconnected", Toast.LENGTH_LONG).show();
-            }
-            if (!mSocket.connected()) {
-                mSocket = new SocketIOManager().getMSocketInstance();
-//                Toast.makeText(context, "Message Socket Reconnected", Toast.LENGTH_LONG).show();
-            }
-            Log.d("Working", "Working");
-
-        }
-    };
-
     @Override
     public void onBackPressed() {
         if (JZVideoPlayer.backPress()) {
@@ -1183,10 +1049,7 @@ public class Home extends AppCompatActivity implements
     protected void onDestroy() {
         super.onDestroy();
         unregisterReceiver(broadcastReceiver);
-        unregisterReceiver(mReceiver);
-        socket.off("web_notification");
         Tools.dismissDialog();
-
     }
 
     @Override

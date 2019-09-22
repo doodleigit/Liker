@@ -33,7 +33,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
-                    android:hint="@string/account_setting"
+                    android:hint="@string/account_settings"
                     android:textColorHint="@color/colorWhite"
                     android:textSize="18sp" />
 

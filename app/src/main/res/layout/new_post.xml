@@ -158,9 +158,19 @@
 
                         <LinearLayout
                             android:visibility="gone"
+                            android:orientation="vertical"
                             android:id="@+id/linkScriptContainer"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content">
+
+                            <android.support.v7.widget.RecyclerView
+                                android:visibility="gone"
+                                android:id="@+id/rvLinkScript"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                                />
+
                             <include layout="@layout/post_link_script" />
                         </LinearLayout>
 

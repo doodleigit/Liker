@@ -100,6 +100,17 @@ public interface SettingService {
             @Field("fileds[]") ArrayList<String> fileds
     );
 
+    @POST(AppConstants.NOTIFICATION_ON_OFF)
+    @FormUrlEncoded
+    Call<String> setNotificationOnOff(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("user_id") String id,
+            @Field("type") String type,
+            @Field("status") boolean singleStatus
+    );
+
     @POST(AppConstants.SET_CONTRIBUTOR_CATEGORY)
     @FormUrlEncoded
     Call<String> setContributorCategory(

@@ -129,7 +129,7 @@ public class SearchActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (isUserLoadComplete) {
                     isUserLoadComplete = false;
-                    postLoadMoreProgress.setVisibility(View.VISIBLE);
+                    userLoadMoreProgress.setVisibility(View.VISIBLE);
                     String queryResult = App.getQueryResult();
                     Call<AdvanceSearches> call = webService.advanceSearchPaging(deviceId, profileId, token, mProfileId, queryResult, limit, offset, 1);
                     sendAdvanceSearchRequest(call);

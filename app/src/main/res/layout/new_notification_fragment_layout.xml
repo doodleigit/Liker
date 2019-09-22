@@ -33,7 +33,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
-                    android:hint="@string/contributor_settings"
+                    android:hint="@string/notification_settings"
                     android:textColorHint="@color/colorWhite"
                     android:textSize="18sp" />
 
@@ -43,71 +43,72 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.v4.widget.NestedScrollView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <LinearLayout
-            android:id="@+id/main_layout"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:focusableInTouchMode="true"
-            android:clickable="true"
-            android:focusable="true">
+            android:layout_height="50dp">
 
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:text="@string/please_select_any_category"
-                android:textSize="12sp" />
+                android:layout_centerInParent="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="15dp"
+                android:textSize="16sp"
+                android:textColor="@color/colorBlack"
+                android:text="@string/email_notification"/>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0.5dp"
-                android:background="@color/colorBorderBackground" />
-
-            <EditText
-                android:id="@+id/add_category"
-                android:layout_width="match_parent"
+            <Switch
+                android:id="@+id/email_notification_switch"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:background="@drawable/rectangle_corner_round_six"
-                android:clickable="true"
-                android:focusable="true"
-                android:hint="Add Category"
-                android:padding="10dp"
-                android:textSize="14sp" />
+                android:layout_centerInParent="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="15dp"
+                android:checked="true"/>
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/category_recycler_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+        </RelativeLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/colorBorderBackground"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp">
 
             <TextView
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:padding="10dp"
-                android:text="@string/selected_categories"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                android:layout_centerInParent="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="15dp"
+                android:textSize="16sp"
+                android:textColor="@color/colorBlack"
+                android:text="@string/push_notification"/>
 
-            <View
-                android:layout_width="match_parent"
-                android:layout_height="0.5dp"
-                android:background="@color/colorBorderBackground" />
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/selected_recycler_view"
-                android:layout_width="match_parent"
+            <Switch
+                android:id="@+id/push_notification_switch"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"/>
+                android:layout_centerInParent="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="15dp"
+                android:checked="true"/>
 
-        </LinearLayout>
+        </RelativeLayout>
 
-    </android.support.v4.widget.NestedScrollView>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:background="@color/colorBorderBackground"/>
+
+    </LinearLayout>
 
 </android.support.design.widget.CoordinatorLayout>
