@@ -20,16 +20,19 @@ import com.doodle.R;
 import com.doodle.Tool.AppConstants;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class LikeUserAdapter extends RecyclerView.Adapter<LikeUserAdapter.ViewHolder> {
 
     private Context context;
-    private ArrayList<LikeUser> arrayList;
+    private List<LikeUser> arrayList;
+    private String userId;
     private LikeUserClickListener likeUserClickListener;
 
-    public LikeUserAdapter(Context context, ArrayList<LikeUser> arrayList, LikeUserClickListener likeUserClickListener) {
+    public LikeUserAdapter(Context context, List<LikeUser> arrayList, String userId, LikeUserClickListener likeUserClickListener) {
         this.context = context;
         this.arrayList = arrayList;
+        this.userId = userId;
         this.likeUserClickListener = likeUserClickListener;
     }
 
@@ -53,10 +56,15 @@ public class LikeUserAdapter extends RecyclerView.Adapter<LikeUserAdapter.ViewHo
         viewHolder.likes.setText(likes + " " + context.getString(R.string.likes));
         viewHolder.stars.setText(stars + " " + context.getString(R.string.stars));
 
-        if (arrayList.get(i).getIsFollowed()) {
-            viewHolder.follow.setText(context.getString(R.string.unfollow));
+        if (arrayList.get(i).getId().equals(userId)) {
+            viewHolder.follow.setVisibility(View.GONE);
         } else {
-            viewHolder.follow.setText(context.getString(R.string.follow));
+            viewHolder.follow.setVisibility(View.VISIBLE);
+            if (arrayList.get(i).getIsFollowed()) {
+                viewHolder.follow.setText(context.getString(R.string.unfollow));
+            } else {
+                viewHolder.follow.setText(context.getString(R.string.follow));
+            }
         }
 
         Glide.with(App.getAppContext())

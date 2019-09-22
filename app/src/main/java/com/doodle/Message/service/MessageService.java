@@ -33,7 +33,8 @@ public interface MessageService {
             @Header("Security-Token") String token,
             @Field("user_id") String userIds,
             @Field("limit") int limit,
-            @Field("offset") int offset
+            @Field("offset") int offset,
+            @Field("search_value") String searchValue
     );
 
     @POST(AppConstants.CHAT_MESSAGES)

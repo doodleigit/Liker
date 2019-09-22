@@ -53,33 +53,21 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:background="@color/soft_grey_select_top"
+        android:focusableInTouchMode="true"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <RelativeLayout
+        <SearchView
+            android:id="@+id/search_messages"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_margin="10dp"
-            android:background="@drawable/rectangle_corner_round_four">
-
-            <ImageView
-                android:id="@+id/search_icon"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_alignParentStart="true"
-                android:layout_centerInParent="true"
-                android:layout_marginStart="5dp"
-                android:src="@drawable/search" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:layout_marginStart="5dp"
-                android:layout_toEndOf="@+id/search_icon"
-                android:text="@string/search_messages"
-                android:textSize="12sp" />
-
-        </RelativeLayout>
+            style="@style/AppSearchView"
+            android:layout_height="45dp"
+            android:layout_margin="5dp"
+            android:background="@drawable/rectangle_corner_round_four"
+            android:queryHint="@string/search_messages"
+            android:iconifiedByDefault="false"
+            android:searchIcon="@null"
+            android:queryBackground="@android:color/transparent"
+            />
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -108,7 +96,7 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentBottom="true"
                 android:layout_margin="15dp"
-                android:src="@drawable/edit" />
+                android:src="@drawable/ic_add_black_24dp" />
 
         </RelativeLayout>
 

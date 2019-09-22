@@ -14,6 +14,7 @@ import android.widget.Switch;
 import android.widget.Toast;
 
 import com.doodle.R;
+import com.doodle.Setting.model.UserInfo;
 import com.doodle.Setting.service.SettingService;
 import com.doodle.Tool.PrefManager;
 
@@ -42,6 +43,7 @@ public class NewNotificationSettingFragment extends Fragment {
         view = inflater.inflate(R.layout.new_notification_fragment_layout, container, false);
 
         initialComponent();
+        sendGetUserInfoRequest();
 
         return view;
     }
@@ -75,8 +77,6 @@ public class NewNotificationSettingFragment extends Fragment {
             public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
                 if (!isFirstTime) {
                     sendNotificationOnOffRequest("email", checked, emailNotificationSwitch);
-                } else {
-                    isFirstTime = false;
                 }
             }
         });
@@ -86,12 +86,39 @@ public class NewNotificationSettingFragment extends Fragment {
             public void onCheckedChanged(CompoundButton compoundButton, boolean checked) {
                 if (!isFirstTime) {
                     sendNotificationOnOffRequest("push", checked, pushNotificationSwitch);
-                } else {
-                    isFirstTime = false;
                 }
             }
         });
 
+    }
+
+    private void sendGetUserInfoRequest() {
+        progressDialog.setMessage(getString(R.string.loading));
+        progressDialog.show();
+        Call<UserInfo> call = settingService.getUserInfo(deviceId, token, userId, userId);
+        call.enqueue(new Callback<UserInfo>() {
+            @Override
+            public void onResponse(Call<UserInfo> call, Response<UserInfo> response) {
+                UserInfo userInfo = response.body();
+                if (userInfo != null) {
+                    emailNotificationSwitch.setChecked(userInfo.getEmailNotification().equals("1"));
+                    pushNotificationSwitch.setChecked(userInfo.getPushNotification().equals("1"));
+                } else {
+                    emailNotificationSwitch.setChecked(true);
+                    pushNotificationSwitch.setChecked(true);
+                }
+                isFirstTime = false;
+                progressDialog.dismiss();
+            }
+
+            @Override
+            public void onFailure(Call<UserInfo> call, Throwable t) {
+                emailNotificationSwitch.setChecked(true);
+                pushNotificationSwitch.setChecked(true);
+                isFirstTime = false;
+                progressDialog.dismiss();
+            }
+        });
     }
 
     private void sendNotificationOnOffRequest(String type, boolean notificationStatus, Switch notificationSwitch) {
@@ -108,20 +135,18 @@ public class NewNotificationSettingFragment extends Fragment {
                     if (status) {
 
                     } else {
-                        isFirstTime = true;
                         notificationSwitch.setChecked(!notificationStatus);
                         Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                progressDialog.hide();
+                progressDialog.dismiss();
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                progressDialog.hide();
-                isFirstTime = true;
+                progressDialog.dismiss();
                 notificationSwitch.setChecked(!notificationStatus);
                 Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
             }

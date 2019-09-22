@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 
 import com.doodle.Home.service.SocketIOManager;
 import com.doodle.Message.adapter.MessageListAdapter;
@@ -50,7 +51,8 @@ public class MessageListFragment extends Fragment {
     private View view;
     private Toolbar toolbar;
     private RecyclerView recyclerView;
-    FloatingActionButton fabNewMessage;
+    private SearchView svSearchMessages;
+    private FloatingActionButton fabNewMessage;
     private LinearLayoutManager layoutManager;
     private ProgressBar progressBar;
     private ProgressDialog progressDialog;
@@ -65,6 +67,7 @@ public class MessageListFragment extends Fragment {
     private String deviceId, profileId, token, userIds;
     int limit = 10;
     int offset = 0;
+    String searchKey = "";
     private boolean isScrolling;
     private int totalItems;
     private int scrollOutItems;
@@ -104,6 +107,7 @@ public class MessageListFragment extends Fragment {
         toolbar = view.findViewById(R.id.toolbar);
         fabNewMessage = view.findViewById(R.id.new_message);
         progressBar = view.findViewById(R.id.progress_bar);
+        svSearchMessages = view.findViewById(R.id.search_messages);
         recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(layoutManager);
 
@@ -135,6 +139,25 @@ public class MessageListFragment extends Fragment {
             }
         });
 
+        svSearchMessages.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (newText.isEmpty()) {
+                    searchKey = "";
+                    sendMessageListRequest();
+                } else if (newText.length() >= 2) {
+                    searchKey = newText;
+                    sendMessageListRequest();
+                }
+                return false;
+            }
+        });
+
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
@@ -163,8 +186,7 @@ public class MessageListFragment extends Fragment {
     private void getData() {
         if (networkOk) {
             progressDialog.show();
-            Call<Message> call = messageService.getMessageList(deviceId, profileId, token, userIds, limit, offset);
-            sendMessageListRequest(call);
+            sendMessageListRequest();
         } else {
             Tools.showNetworkDialog(getChildFragmentManager());
         }
@@ -173,8 +195,7 @@ public class MessageListFragment extends Fragment {
     private void getPagination() {
         if (networkOk) {
             progressBar.setVisibility(View.VISIBLE);
-            Call<Message> call = messageService.getMessageList(deviceId, profileId, token, userIds, limit, offset);
-            sendMessageListPaginationRequest(call);
+            sendMessageListPaginationRequest();
         }
     }
 
@@ -279,19 +300,20 @@ public class MessageListFragment extends Fragment {
         getActivity().sendBroadcast(intent);
     }
 
-    private void sendMessageListRequest(Call<Message> call) {
-
+    private void sendMessageListRequest() {
+        offset = 0;
+        Call<Message> call = messageService.getMessageList(deviceId, profileId, token, userIds, limit, offset, searchKey);
         call.enqueue(new Callback<Message>() {
 
             @Override
             public void onResponse(Call<Message> call, Response<Message> response) {
-
+                chatUsers.clear();
                 Message message = response.body();
                 if (message != null) {
                     chatUsers.addAll(message.getChatUsers());
-                    messageListAdapter.notifyDataSetChanged();
                     offset += 10;
                 }
+                messageListAdapter.notifyDataSetChanged();
                 progressDialog.hide();
             }
 
@@ -304,8 +326,8 @@ public class MessageListFragment extends Fragment {
 
     }
 
-    private void sendMessageListPaginationRequest(Call<Message> call) {
-
+    private void sendMessageListPaginationRequest() {
+        Call<Message> call = messageService.getMessageList(deviceId, profileId, token, userIds, limit, offset, searchKey);
         call.enqueue(new Callback<Message>() {
 
             @Override

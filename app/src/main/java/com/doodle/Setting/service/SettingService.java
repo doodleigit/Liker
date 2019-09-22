@@ -10,6 +10,7 @@ import com.doodle.Setting.model.PrivacyInfo;
 import com.doodle.Setting.model.PrivacyOnOff;
 import com.doodle.Setting.model.Social;
 import com.doodle.Setting.model.SocialLink;
+import com.doodle.Setting.model.UserInfo;
 import com.doodle.Tool.AppConstants;
 
 import java.util.ArrayList;
@@ -190,6 +191,15 @@ public interface SettingService {
             @Field("old_password") String oldPassword,
             @Field("new_password") String newPassword,
             @Field("new_password_confirm") String newPasswordConfirm
+    );
+
+    @POST(AppConstants.GET_USER_INFO)
+    @FormUrlEncoded
+    Call<UserInfo> getUserInfo(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String id
     );
 
     @POST(AppConstants.DEACTIVATED_ACCOUNT)

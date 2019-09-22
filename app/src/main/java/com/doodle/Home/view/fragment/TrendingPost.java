@@ -492,6 +492,7 @@ public class TrendingPost extends Fragment   {
     public void onPause() {
         super.onPause();
         shimmerFrameLayout.stopShimmer();
+        recyclerView.pausePlayer();
     }
 
 
@@ -543,6 +544,7 @@ public class TrendingPost extends Fragment   {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        recyclerView.releasePlayer();
         Objects.requireNonNull(getActivity()).unregisterReceiver(broadcastReceiver);
         Objects.requireNonNull(getActivity()).unregisterReceiver(postFooterChangeBroadcast);
     }

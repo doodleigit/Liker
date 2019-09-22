@@ -475,6 +475,7 @@ public class VideoPlayerRecyclerView extends RecyclerView {
 
     // Remove the old player
     private void removeVideoView(PlayerView videoView) {
+        videoView.getPlayer().stop();
         ViewGroup parent = (ViewGroup) videoView.getParent();
         if (parent == null) {
             return;
@@ -510,7 +511,6 @@ public class VideoPlayerRecyclerView extends RecyclerView {
     }
 
     public void releasePlayer() {
-
         if (videoPlayer != null) {
             videoPlayer.release();
             videoPlayer = null;
@@ -567,4 +567,11 @@ public class VideoPlayerRecyclerView extends RecyclerView {
     public void setMediaObjects(List<PostItem> mediaObjects) {
         this.mediaObjects = mediaObjects;
     }
+
+    public void pausePlayer() {
+        if (videoPlayer != null) {
+            videoPlayer.setPlayWhenReady(false);
+        }
+    }
+
 }

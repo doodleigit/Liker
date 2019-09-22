@@ -932,6 +932,7 @@ public class Home extends AppCompatActivity implements
         adapter.addFrag(new FollowingPost(), "Tab 3");
 
         viewPager.setAdapter(adapter);
+        viewPager.setOffscreenPageLimit(3);
     }
 
     private void setNotificationCount(int count) {
