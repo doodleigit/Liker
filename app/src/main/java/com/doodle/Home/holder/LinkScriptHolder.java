@@ -877,6 +877,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
                             Intent intent = new Intent(mContext, EditPost.class);
                             App.setPosition(position);
                             intent.putExtra(ITEM_KEY,(Parcelable) item);
+                            intent.putExtra("position", position);
                             mContext.startActivity(intent);
                             ((Activity) mContext ).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
                         }
@@ -1033,6 +1034,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
                             Intent intent = new Intent(mContext, EditPost.class);
                             App.setPosition(position);
                             intent.putExtra(ITEM_KEY,(Parcelable) item);
+                            intent.putExtra("position", position);
                             mContext.startActivity(intent);
                             ((Activity) mContext ).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
                         }

@@ -18,6 +18,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Parcelable;
 import android.os.PersistableBundle;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
@@ -59,6 +60,7 @@ import com.doodle.Home.model.PostFile;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.PostTextIndex;
 import com.doodle.Home.holder.TextHolder;
+import com.doodle.Home.service.HomeService;
 import com.doodle.Post.adapter.ChatAdapter;
 import com.doodle.Post.adapter.ImageAdapter;
 import com.doodle.Post.adapter.MediaAdapter;
@@ -143,6 +145,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
     private TextView tvPermission, tvAudience;
     private ImageView imgPermission;
     private PrefManager manager;
+    private HomeService homeService;
     private PostService webService, videoServices;
     private final String TAG = "PostNew";
     private boolean networkOk;
@@ -150,6 +153,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
     boolean isGrantGallery = false;
     boolean isGrantCamera = false;
 
+    int position;
     private String profileId;
     private String deviceId;
     private String userIds;
@@ -281,12 +285,14 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 
         editPostItem = new PostItem();
         editPostItem = getIntent().getExtras().getParcelable(TextHolder.ITEM_KEY);
+        position = getIntent().getIntExtra("position", -1);
 
         if (editPostItem == null) {
             throw new AssertionError("Null data item received!");
         }
 
         manager = new PrefManager(this);
+        homeService = HomeService.mRetrofit.create(HomeService.class);
         webService = PostService.mRetrofit.create(PostService.class);
         videoServices = PostService.videoRetrofit.create(PostService.class);
         networkOk = NetworkHelper.hasNetworkAccess(this);
@@ -1464,13 +1470,8 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                             boolean status = successObject.getBoolean("status");
                             //  boolean topContributorStatus = successObject.getBoolean("top_contributor_status");
                             //postId = successObject.getInt("post_id");
-
-
                             if (status) {
-
-                                startActivity(new Intent(EditPost.this, Home.class));
-                                finish();
-
+                                sendPostItemRequest(editPostId, position);
                             } else {
                                 if (contentType == 5) {
 
@@ -2812,6 +2813,30 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
             progressView.stopAnimation();
 
         }
+    }
+
+    private void sendPostItemRequest(String postId, int position) {
+        Call<PostItem> call = homeService.getSinglePostDetails(deviceId, profileId, token, profileId, postId);
+        call.enqueue(new Callback<PostItem>() {
+            @Override
+            public void onResponse(Call<PostItem> call, Response<PostItem> response) {
+                PostItem postItem = response.body();
+                if (postItem != null) {
+                    Intent returnIntent = new Intent();
+                    returnIntent.putExtra("post_item", (Parcelable) postItem);
+                    returnIntent.putExtra("position", position);
+                    returnIntent.putExtra("isFooterChange", false);
+                    returnIntent.setAction(AppConstants.POST_CHANGE_BROADCAST);
+                    sendBroadcast(returnIntent);
+                    finish();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PostItem> call, Throwable t) {
+                Log.d("MESSAGE: ", t.getMessage());
+            }
+        });
     }
 
     private void addedPostContributorRequest(Call<String> call) {
