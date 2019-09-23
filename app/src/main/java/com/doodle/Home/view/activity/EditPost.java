@@ -21,6 +21,7 @@ import android.os.Environment;
 import android.os.PersistableBundle;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
@@ -282,6 +283,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
     public VideoViewHolder.VideoListen videoListen;
    public MediaAdapter mediaAdapter;
     List<String> deleteMediaFiles;
+    private FloatingActionButton postButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -350,7 +352,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                 }
 
                 makeText(EditPost.this, "image delete", LENGTH_SHORT).show();
-                
+
             }
         };
         videoListen=new VideoViewHolder.VideoListen() {
@@ -367,8 +369,8 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                 makeText(EditPost.this, "video delete", LENGTH_SHORT).show();
             }
         };
-        
-        
+
+
         MimAdapter.RecyclerViewClickListener listener = (view, position) -> {
 
 
@@ -521,7 +523,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
         /** --- */
 
 
-     //   postButton = (Button) findViewById(R.id.post);
+        postButton = (FloatingActionButton) findViewById(R.id.post);
 
         previewAreaTitle = (TextView) findViewById(R.id.preview_area);
         postAreaTitle = (TextView) findViewById(R.id.post_area);
@@ -625,6 +627,8 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                     isAddContentTitle = true;
                     tvSubmitPost.setVisibility(View.VISIBLE);
                 }
+
+
 
             }
 
@@ -1084,14 +1088,14 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 
 
     private void initPostButton() {
-        tvSubmitPost.setOnClickListener(new View.OnClickListener() {
+        postButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
                 postAreaTitle.setVisibility(View.VISIBLE);
                 tvSubmitPost.setVisibility(View.VISIBLE);
                 previewAreaTitle.setVisibility(View.GONE);
-              //  postButton.setVisibility(View.GONE);
+                postButton.setVisibility(View.GONE);
                 tvSubmitPost.setEnabled(true);
 
                 /** Inflating the preview layout */
@@ -1132,12 +1136,12 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 
                 }
 
-                if (!currentTitle.equals(""))
+                if (!isNullOrEmpty(currentTitle))
                     titleTextView.setText(currentTitle);
                 else
                     titleTextView.setVisibility(View.GONE);
 
-                if (!currentDescription.equals(""))
+                if (!isNullOrEmpty(currentDescription))
                     descriptionTextView.setText(currentDescription);
                 else
                     descriptionTextView.setVisibility(View.GONE);
@@ -1296,7 +1300,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                 break;
             case R.id.tvSubmitPost:
 
-
+                makeText(this, "submit post..", LENGTH_SHORT).show();
                 checkContentType();
                 if (categoryId.isEmpty() && subCategoryId.isEmpty()) {
                     Tools.showCustomToast(EditPost.this, mView, "Please select your post’s audience.", Gravity.TOP);
@@ -2334,7 +2338,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                                     mediaRecyclerViewToggle();
                                     MediaAdapter mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos,imageListener,videoListen);
                                     mediaRecyclerView.setAdapter(mediaAdapter);
-                                    
+
                                 }
 
                            //     String message = "Add gallery successfully!";
@@ -2509,7 +2513,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
             noThumb = false;
             currentTitle = currentDescription = currentUrl = currentCannonicalUrl = "";
 
-            tvSubmitPost.setEnabled(true);
+            tvSubmitPost.setEnabled(false);
 
             /** Inflating the preview layout */
             mainView = getLayoutInflater().inflate(R.layout.main_view, null);
@@ -2554,8 +2558,8 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                 });
 
             } else {
-             //   postButton.setVisibility(View.VISIBLE);
-                tvSubmitPost.setVisibility(View.VISIBLE);
+                postButton.setVisibility(View.VISIBLE);
+              //  tvSubmitPost.setVisibility(View.VISIBLE);
                 currentImageSet = new Bitmap[sourceContent.getImages().size()];
 
                 /**
@@ -2577,7 +2581,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                         .findViewById(R.id.image_post_set);
 
                 // final TextView close = (TextView) titleWrap.findViewById(R.id.close);
-                final TextView close = (TextView) findViewById(R.id.close);
+                final FloatingActionButton close = (FloatingActionButton) findViewById(R.id.close);
                 final TextView titleTextView = (TextView) titleWrap
                         .findViewById(R.id.title);
                 final EditText titleEditText = (EditText) titleWrap
@@ -2746,7 +2750,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                 urlTextView.setText(sourceContent.getCannonicalUrl());
                 descriptionTextView.setText(sourceContent.getDescription());
 
-             //   postButton.setVisibility(View.VISIBLE);
+                postButton.setVisibility(View.VISIBLE);
             }
 
             currentTitle = sourceContent.getTitle();
@@ -2786,7 +2790,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
     private void releasePreviewArea() {
         tvSubmitPost.setEnabled(true);
         tvSubmitPost.setVisibility(View.VISIBLE);
-      //  postButton.setVisibility(View.GONE);
+        postButton.setVisibility(View.GONE);
         previewAreaTitle.setVisibility(View.GONE);
         dropPreview.removeAllViews();
     }

@@ -6,6 +6,11 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +22,7 @@ import android.widget.ProgressBar;
 import com.bumptech.glide.Glide;
 import com.doodle.App;
 import com.doodle.Home.model.PostFile;
+import com.doodle.Post.view.fragment.MediaFullViewFragment;
 import com.doodle.R;
 import com.doodle.Tool.AppConstants;
 import com.github.chrisbanes.photoview.PhotoView;
@@ -96,14 +102,14 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         holder.imageMedia.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                viewFullImage(item.getPostType(), postImages);
+                fullMediaView(item.getPostType(), postImages);
             }
         });
 
         holder.mediaVideoLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                viewFullImage(item.getPostType(), item.getVideoName());
+                fullMediaView(item.getPostType(), item.getVideoName());
             }
         });
 
@@ -160,45 +166,62 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         }
     };
 
-    private void viewFullImage(String postType, String url) {
-        Dialog dialog = new Dialog(mContext, R.style.Theme_Dialog);
-        dialog.setContentView(R.layout.image_full_view);
-
-        ImageView close = dialog.findViewById(R.id.close);
-        PhotoView photoView = dialog.findViewById(R.id.photo_view);
-        PlayerView videoView = dialog.findViewById(R.id.video_view);
-
-        if (postType.equals("2")) {
-            photoView.setVisibility(View.GONE);
-            videoView.setVisibility(View.VISIBLE);
-            // Setup Exoplayer instance
-            SimpleExoPlayer exoPlayerInstance = ExoPlayerFactory.newSimpleInstance(mContext);
-// Produces DataSource instances through which media data is loaded.
-            DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(mContext, Util.getUserAgent(mContext, "simpleExoPlayer"));
-            //Getting media from raw resource
-            MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
-                    .createMediaSource(Uri.parse(AppConstants.POST_VIDEOS + url));
-//Prepare the exoPlayerInstance with the source
-            exoPlayerInstance.prepare(videoSource);
-            videoView.setPlayer(exoPlayerInstance);
-        } else {
-            photoView.setVisibility(View.VISIBLE);
-            videoView.setVisibility(View.GONE);
+    private void fullMediaView(String postType, String url) {
+        FragmentTransaction ft = ((AppCompatActivity) mContext).getSupportFragmentManager().beginTransaction();
+        Fragment prev = ((AppCompatActivity) mContext).getSupportFragmentManager().findFragmentByTag("dialog");
+        if (prev != null) {
+            ft.remove(prev);
         }
+        ft.addToBackStack(null);
+        DialogFragment dialogFragment = new MediaFullViewFragment();
 
-        Glide.with(App.getAppContext())
-                .load(url)
-                .dontAnimate()
-                .into(photoView);
+        Bundle bundle = new Bundle();
+        bundle.putString("post_type", postType);
+        bundle.putString("url",url);
+        dialogFragment.setArguments(bundle);
 
-        close.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                dialog.dismiss();
-            }
-        });
-
-        dialog.show();
+        dialogFragment.show(ft, "dialog");
     }
+
+//    private void viewFullImage(String postType, String url) {
+//        Dialog dialog = new Dialog(mContext, R.style.Theme_Dialog);
+//        dialog.setContentView(R.layout.image_full_view);
+//
+//        ImageView close = dialog.findViewById(R.id.close);
+//        PhotoView photoView = dialog.findViewById(R.id.photo_view);
+//        PlayerView videoView = dialog.findViewById(R.id.video_view);
+//
+//        if (postType.equals("2")) {
+//            photoView.setVisibility(View.GONE);
+//            videoView.setVisibility(View.VISIBLE);
+//            // Setup Exoplayer instance
+//            SimpleExoPlayer exoPlayerInstance = ExoPlayerFactory.newSimpleInstance(mContext);
+//// Produces DataSource instances through which media data is loaded.
+//            DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(mContext, Util.getUserAgent(mContext, "simpleExoPlayer"));
+//            //Getting media from raw resource
+//            MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
+//                    .createMediaSource(Uri.parse(AppConstants.POST_VIDEOS + url));
+////Prepare the exoPlayerInstance with the source
+//            exoPlayerInstance.prepare(videoSource);
+//            videoView.setPlayer(exoPlayerInstance);
+//        } else {
+//            photoView.setVisibility(View.VISIBLE);
+//            videoView.setVisibility(View.GONE);
+//        }
+//
+//        Glide.with(App.getAppContext())
+//                .load(url)
+//                .dontAnimate()
+//                .into(photoView);
+//
+//        close.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                dialog.dismiss();
+//            }
+//        });
+//
+//        dialog.show();
+//    }
 
 }

@@ -196,7 +196,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
     //POST LINK SCRIPT
     private EditText editText, editTextTitlePost, editTextDescriptionPost;
     private Button submitButton,  randomButton;
-  //  private FloatingActionButton postButton;
+    private FloatingActionButton postButton;
     private TextView tvOk;
     private RecyclerView rvLinkScript;
     private Context context;
@@ -283,7 +283,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
     MultipleMediaFile mediaFile;
     private String mediaFive;
     private String base64md5;
-   List<String> mediaList;
+   Set<String> mediaList;
    List<String> videoList;
    List<LinkScriptItem> scriptItemList;
     @Override
@@ -298,7 +298,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
         networkOk = NetworkHelper.hasNetworkAccess(this);
         progressView = (CircularProgressView) findViewById(R.id.progress_view);
         mView = new View(this);
-        mediaList=new ArrayList<>();
+        mediaList=new HashSet<>();
         videoList=new ArrayList<>();
         scriptItemList=new ArrayList<>();
         mediaFile = new MultipleMediaFile();
@@ -319,7 +319,8 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
         findViewById(R.id.btnAttachment).setOnClickListener(this);
         tvSubmitPost = findViewById(R.id.tvSubmitPost);
-        tvOk = findViewById(R.id.tvOk);
+        postButton = (FloatingActionButton) findViewById(R.id.post);
+
         tvSubmitPost.setOnClickListener(this);
         findViewById(R.id.contentCategory).setOnClickListener(this);
         findViewById(R.id.imageCamera).setOnClickListener(this);
@@ -541,8 +542,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
 
         rvLinkScript=findViewById(R.id.rvLinkScript);
-  //      postButton = (FloatingActionButton) findViewById(R.id.post);
-        tvOk=(TextView)findViewById(R.id.tvOk);
+
 
 
         postAreaTitle = (TextView) findViewById(R.id.post_area);
@@ -597,9 +597,9 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
                 if (extractedUrls.size() == 0) {
                     isLinkScript = false;
-                    releasePreviewArea();
+                  /*  releasePreviewArea();
                     rvLinkScriptShow = false;
-                    linkScriptToggle();
+                    linkScriptToggle();*/
 
                     if (!isNullOrEmpty(contentTitle)) {
                         //  makeText(PostNew.this, "Button Enable-1!", LENGTH_SHORT).show();
@@ -610,8 +610,10 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                     rvMimToggle();
                     rvMediaShow = false;
                     mediaRecyclerViewToggle();
+
                     rvLinkScriptShow = true;
                     linkScriptToggle();
+
 
                     StringBuilder builder = new StringBuilder();
                     for (String temp : extractedUrls) {
@@ -634,6 +636,8 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                             // Not Valid youtube URL
                         }
                     }
+
+                  //  submitLink();
                 }
 
 
@@ -853,86 +857,88 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
 
     private void initPostButton() {
-        tvSubmitPost.setOnClickListener(new View.OnClickListener() {
+        postButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                postAreaTitle.setVisibility(View.VISIBLE);
-                tvSubmitPost.setVisibility(View.VISIBLE);
-
-             //   postButton.setVisibility(View.GONE);
-                tvSubmitPost.setEnabled(true);
-
-                /** Inflating the preview layout */
-                View mainView = getLayoutInflater().inflate(R.layout.main_view,
-                        null);
-
-                LinearLayout linearLayout = (LinearLayout) mainView
-                        .findViewById(R.id.external);
-
-                /**
-                 * Inflating the post content
-                 */
-                final View content = getLayoutInflater().inflate(
-                        R.layout.post_content, linearLayout);
-
-                /** Fullfilling the content layout */
-                final LinearLayout infoWrap = (LinearLayout) content
-                        .findViewById(R.id.info_wrap);
-
-                final TextView contentTextView = (TextView) content
-                        .findViewById(R.id.post_content);
-                final ImageView imageView = (ImageView) content
-                        .findViewById(R.id.image_post);
-                final TextView titleTextView = (TextView) content
-                        .findViewById(R.id.title);
-
-                final TextView urlTextView = (TextView) content
-                        .findViewById(R.id.url);
-                final TextView descriptionTextView = (TextView) content
-                        .findViewById(R.id.description);
-
-                contentTextView.setText(TextCrawler.extendedTrim(editPostMessage
-                        .getText().toString()));
-
-                if (currentImage != null && !noThumb) {
-                    imageView.setImageBitmap(currentImage);
-                } else {
-
-                }
-
-                if (!currentTitle.equals(""))
-                    titleTextView.setText(currentTitle);
-                else
-                    titleTextView.setVisibility(View.GONE);
-
-                if (!currentDescription.equals(""))
-                    descriptionTextView.setText(currentDescription);
-                else
-                    descriptionTextView.setVisibility(View.GONE);
-
-                urlTextView.setText(currentCannonicalUrl);
-
-                final String currentUrlLocal = currentUrl;
-
-
-
-                mainView.setOnClickListener(new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View arg0) {
-                        String url = currentUrlLocal;
-                        Intent i = new Intent(Intent.ACTION_VIEW);
-                        i.setData(Uri.parse(url));
-                        startActivity(i);
-                    }
-                });
-                dropPost.removeAllViews();
-                dropPost.addView(mainView, 0);
-                dropPreview.removeAllViews();
+                submitLink();
 
             }
         });
+    }
+
+    private void submitLink() {
+        postAreaTitle.setVisibility(View.VISIBLE);
+        tvSubmitPost.setVisibility(View.VISIBLE);
+        postButton.setVisibility(View.GONE);
+        tvSubmitPost.setEnabled(true);
+
+        /** Inflating the preview layout */
+        View mainView = getLayoutInflater().inflate(R.layout.main_view,
+                null);
+
+        LinearLayout linearLayout = (LinearLayout) mainView
+                .findViewById(R.id.external);
+
+        /**
+         * Inflating the post content
+         */
+        final View content = getLayoutInflater().inflate(
+                R.layout.post_content, linearLayout);
+
+        /** Fullfilling the content layout */
+        final LinearLayout infoWrap = (LinearLayout) content
+                .findViewById(R.id.info_wrap);
+
+        final TextView contentTextView = (TextView) content
+                .findViewById(R.id.post_content);
+        final ImageView imageView = (ImageView) content
+                .findViewById(R.id.image_post);
+        final TextView titleTextView = (TextView) content
+                .findViewById(R.id.title);
+
+        final TextView urlTextView = (TextView) content
+                .findViewById(R.id.url);
+        final TextView descriptionTextView = (TextView) content
+                .findViewById(R.id.description);
+
+        contentTextView.setText(TextCrawler.extendedTrim(editPostMessage
+                .getText().toString()));
+
+        if (currentImage != null && !noThumb) {
+            imageView.setImageBitmap(currentImage);
+        } else {
+
+        }
+
+        if (!currentTitle.equals(""))
+            titleTextView.setText(currentTitle);
+        else
+            titleTextView.setVisibility(View.GONE);
+
+        if (!currentDescription.equals(""))
+            descriptionTextView.setText(currentDescription);
+        else
+            descriptionTextView.setVisibility(View.GONE);
+
+        urlTextView.setText(currentCannonicalUrl);
+
+        final String currentUrlLocal = currentUrl;
+
+
+        mainView.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                String url = currentUrlLocal;
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
+            }
+        });
+        dropPost.removeAllViews();
+        dropPost.addView(mainView, 0);
+        dropPreview.removeAllViews();
     }
 
     @Override
@@ -1076,8 +1082,11 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                 if (categoryId.isEmpty() && subCategoryId.isEmpty()) {
                     Tools.showCustomToast(PostNew.this, mView, "Please select your post’s audience.", Gravity.TOP);
                 } else if (!isAddContentTitle) {
-                    Tools.showCustomToast(PostNew.this, mView, "you must add the post description!", Gravity.TOP);
-                } else {
+                    Tools.showCustomToast(PostNew.this, mView, "Cat’s got your tongue? Please write at least 8 characters in your post description.", Gravity.TOP);
+                }else if(contentTitle.length()<8){
+                    Tools.showCustomToast(PostNew.this, mView, "Cat’s got your tongue? Please write at least 8 characters in your post description.", Gravity.TOP);
+
+                } else{
                     createNewPost();
                 }
                 // Tools.showCustomToast(LikerSearch.this, mView, " Write Minimum Three Characters !", Gravity.TOP);
@@ -1707,6 +1716,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
         ClipData clipData = data.getClipData();
         if (clipData != null) {
+            ArrayList<String> tempMedia = new ArrayList<>();
             for (int i = 0; i < clipData.getItemCount(); i++) {
                 ClipData.Item videoItem = clipData.getItemAt(i);
                 Uri videoURI = videoItem.getUri();
@@ -1723,15 +1733,20 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                 if(videoList.size()==0){
                     Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "2", strMD5);
                     sendIsDuplicateVideoRequest(call);
-                    videoList.add(videoPath);
+                    tempMedia.add(videoPath);
                 }else {
+                    boolean hasAlready = false;
                     for (String temp:videoList) {
                         if(temp.equalsIgnoreCase(videoPath)){
+                            hasAlready = true;
                             Tools.toast(PostNew.this,"You have already add this!",R.drawable.ic_info_outline_blue_24dp);
-                        }else {
-                            Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "2", strMD5);
-                            sendIsDuplicateVideoRequest(call);
+                            break;
                         }
+                    }
+                    if (!hasAlready) {
+                        Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "2", strMD5);
+                        sendIsDuplicateVideoRequest(call);
+                        tempMedia.add(videoPath);
                     }
                 }
 
@@ -1749,6 +1764,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 //                Call<String> mediaCall = videoServices.uploadVideo(deviceId, profileId, token, fileToUpload, true);
 //                addPhotoRequest(mediaCall);
             }
+            videoList.addAll(tempMedia);
         } else {
             Uri videoURI = data.getData();
             videoFilePath = getPath(this, videoURI);
@@ -1879,6 +1895,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
         ClipData clipData = data.getClipData();
         if (clipData != null) {
+            ArrayList<String> tempMedia = new ArrayList<>();
             for (int i = 0; i < clipData.getItemCount(); i++) {
                 ClipData.Item videoItem = clipData.getItemAt(i);
                 Uri videoURI = videoItem.getUri();
@@ -1890,21 +1907,30 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
                 if(mediaList.size()==0){
                     Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "1", strMD5);
-                    sendIsDuplicateImageRequest(call);
-                    mediaList.add(imagePath);
+                    sendIsDuplicateImageRequest(call,imagePath);
+                    tempMedia.add(imagePath);
                 }else {
+                    boolean hasAlready = false;
                     for (String temp:mediaList) {
                         if(temp.equalsIgnoreCase(imagePath)){
+                            hasAlready = true;
                             Tools.toast(PostNew.this,"You have already add this!",R.drawable.ic_info_outline_blue_24dp);
-                        }else {
-                            Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "1", strMD5);
-                            sendIsDuplicateImageRequest(call);
+                            break;
                         }
+                    }
+                    if (!hasAlready) {
+                        Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "1", strMD5);
+                        sendIsDuplicateImageRequest(call, imagePath);
+                        tempMedia.add(imagePath);
                     }
                 }
 
+
             }
+            mediaList.addAll(tempMedia);
         } else {
+
+
             Uri videoURI = data.getData();
             imageFilePath = getPath(this, videoURI);
             String imagePath = "file://" + imageFilePath;
@@ -1914,7 +1940,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
             if(mediaList.size()==0){
                 Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "1", strMD5);
-                sendIsDuplicateImageRequest(call);
+                sendIsDuplicateImageRequest(call, imagePath);
                 mediaList.add(imagePath);
             }else {
                 for (String temp:mediaList) {
@@ -1922,7 +1948,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                         Tools.toast(PostNew.this,"You have already add this!",R.drawable.ic_info_outline_blue_24dp);
                     }else {
                         Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "1", strMD5);
-                        sendIsDuplicateImageRequest(call);
+                        sendIsDuplicateImageRequest(call, imagePath);
                     }
                 }
             }
@@ -1963,7 +1989,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
         return lastVal;
     }
 
-    private void sendIsDuplicateImageRequest(Call<String> call) {
+    private void sendIsDuplicateImageRequest(Call<String> call, String imagePath) {
         call.enqueue(new Callback<String>() {
 
 
@@ -1990,8 +2016,11 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                                     addPhotoRequest(mediaCall);
 
                                     progressDialog.show();
-                                    String imagePath = "file://" + imageFilePath;
-                                    postImages.add(new PostImage(imagePath, fileEncoded));
+//                                    for (String temp:mediaList) {
+//                                        postImages.add(new PostImage(temp));
+//                                    }
+                                  //  String imagePath = "file://" + imageFilePath;
+                                    postImages.add(new PostImage(imagePath));
                                     if (postImages.size() > 0)
 
                                         rvMediaShow = true;
@@ -2227,8 +2256,8 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
             noThumb = false;
             currentTitle = currentDescription = currentUrl = currentCannonicalUrl = "";
 
-          //  tvSubmitPost.setEnabled(false);
-            tvSubmitPost.setEnabled(true);
+            tvSubmitPost.setEnabled(false);
+//            tvSubmitPost.setEnabled(true);
 
             /** Inflating the preview layout */
             mainView = getLayoutInflater().inflate(R.layout.main_view, null);
@@ -2273,8 +2302,8 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                 });
 
             } else {
-             ////   postButton.setVisibility(View.VISIBLE);
-                tvSubmitPost.setVisibility(View.VISIBLE);
+                postButton.setVisibility(View.VISIBLE);
+              //  tvSubmitPost.setVisibility(View.VISIBLE);
                 currentImageSet = new Bitmap[sourceContent.getImages().size()];
 
                 /**
@@ -2296,7 +2325,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                         .findViewById(R.id.image_post_set);
 
                 // final TextView close = (TextView) titleWrap.findViewById(R.id.close);
-                final TextView close = (TextView) findViewById(R.id.close);
+                final FloatingActionButton close = (FloatingActionButton) findViewById(R.id.close);
                 final TextView titleTextView = (TextView) titleWrap
                         .findViewById(R.id.title);
                 final EditText titleEditText = (EditText) titleWrap
@@ -2465,7 +2494,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                 urlTextView.setText(sourceContent.getCannonicalUrl());
                 descriptionTextView.setText(sourceContent.getDescription());
 
-           ///     postButton.setVisibility(View.VISIBLE);
+               postButton.setVisibility(View.VISIBLE);
             }
 
             currentTitle = sourceContent.getTitle();
@@ -2510,8 +2539,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
     private void releasePreviewArea() {
         tvSubmitPost.setEnabled(true);
         tvSubmitPost.setVisibility(View.VISIBLE);
-       // postButton.setVisibility(View.GONE);
-
+        postButton.setVisibility(View.GONE);
         dropPreview.removeAllViews();
     }
 

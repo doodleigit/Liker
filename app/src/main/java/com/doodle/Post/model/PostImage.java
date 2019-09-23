@@ -18,6 +18,9 @@ public class PostImage implements Parcelable {
         this.imagePath = imagePath;
         this.mdFive = mdFive;
     }
+    public PostImage(String imagePath) {
+        this.imagePath = imagePath;
+    }
 
     public PostImage(String imagePath, String imageId,String mdFive) {
         this.imagePath = imagePath;

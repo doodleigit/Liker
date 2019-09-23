@@ -526,14 +526,7 @@ public class BreakingPost extends Fragment {
     public void onPause() {
         super.onPause();
         shimmerFrameLayout.stopShimmer();
-
-        /*
-        if (networkOk) {
-            Call<String> call = webService.postDelete(deviceId, profileId, token, userId, item.getPostId());
-            sendDeletePostRequest(call);
-        } else {
-            Tools.showNetworkDialog(getSupportFragmentManager());
-        }*/
+        recyclerView.pausePlayer();
     }
 
     private boolean isViewShown = false;
@@ -588,6 +581,7 @@ public class BreakingPost extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        recyclerView.releasePlayer();
         Objects.requireNonNull(getActivity()).unregisterReceiver(broadcastReceiver);
         Objects.requireNonNull(getActivity()).unregisterReceiver(postFooterChangeBroadcast);
     }

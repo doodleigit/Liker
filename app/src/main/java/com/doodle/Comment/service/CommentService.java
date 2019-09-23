@@ -5,6 +5,8 @@ import com.doodle.Comment.model.Comment_;
 import com.doodle.Comment.model.Reply;
 import com.doodle.Comment.model.ReportReason;
 import com.doodle.Tool.AppConstants;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -31,10 +33,14 @@ public interface CommentService {
             .writeTimeout(15, TimeUnit.SECONDS)
             .build();
 
+    Gson gson = new GsonBuilder()
+            .setLenient()
+            .create();
 
     Retrofit mRetrofit = new Retrofit.Builder()
             .baseUrl(AppConstants.BASE_URL)
             .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .addConverterFactory(ScalarsConverterFactory.create())
             .addConverterFactory(GsonConverterFactory.create())
             .build();

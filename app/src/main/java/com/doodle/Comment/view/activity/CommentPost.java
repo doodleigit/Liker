@@ -395,22 +395,21 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
 
                 }
 
-             /*   Reply reply = App.getReplyItem();
-                if (!isNullOrEmpty(reply.getCommentText())) {
-                    if (commentText.equalsIgnoreCase(reply.getCommentText())) {
-                        imageEditComment.setVisibility(View.GONE);
-                        imageSendComment.setVisibility(View.VISIBLE);
-                    } else {
-                        imageEditComment.setVisibility(View.VISIBLE);
-                        imageSendComment.setVisibility(View.GONE);
-                    }
-                } else {
-                    imageEditComment.setVisibility(View.GONE);
-                    imageSendComment.setVisibility(View.VISIBLE);
-                }
-*/
-                imageEditComment.setVisibility(View.GONE);
-                imageSendComment.setVisibility(View.VISIBLE);
+//                Reply reply = App.getReplyItem();
+//                if (!isNullOrEmpty(reply.getCommentText())) {
+//                    if (commentText.equalsIgnoreCase(reply.getCommentText())) {
+//                        imageEditComment.setVisibility(View.GONE);
+//                        imageSendComment.setVisibility(View.VISIBLE);
+//                    } else {
+//                        imageEditComment.setVisibility(View.VISIBLE);
+//                        imageSendComment.setVisibility(View.GONE);
+//                    }
+//                } else {
+//                    imageEditComment.setVisibility(View.GONE);
+//                    imageSendComment.setVisibility(View.VISIBLE);
+//                }
+//                imageEditComment.setVisibility(View.GONE);
+//                imageSendComment.setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -809,6 +808,8 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
             @Override
             public void onResponse(Call<Comment_> call, Response<Comment_> response) {
 
+
+
                 Comment_ commentItems = response.body();
                 int insertId = commentItems.getInsertId();
                 Log.d("Data", commentItems.toString());
@@ -834,7 +835,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
                     adapter.updateData(commentItem, position);
                     progressDialog.dismiss();
                     etComment.setText("");
-                    offset++;
+                    //offset++;
                     recyclerView.smoothScrollToPosition(0);
                     // App.setCommentCount(1);
                 }
@@ -1080,10 +1081,10 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
             public void onResponse(Call<Comment_> call, Response<Comment_> response) {
 
                 Comment_ commentItems = response.body();
-                int insertId = commentItems.getInsertId();
-                Log.d("Data", commentItems.toString());
-                if (insertId > 0) {
+                int newCommentId = Integer.parseInt(commentItems.getId());
 
+                if (newCommentId > 0) {
+/*
                     Comment_ commentItem = new Comment_();
                     commentItem.setId(String.valueOf(commentItems.getInsertId()));
                     commentItem.setCommentImage(commentItems.getCommentImage());
@@ -1105,8 +1106,8 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
                     commentItem.setUserSliverStars(userInfo.getSliverStars());
                     long seconds = System.currentTimeMillis() / 1000;
                     commentItem.setDateTime(String.valueOf(seconds));
-                    Log.d("comment: ", commentItem.toString());
-                    adapter.refreshData(commentItem);
+                    Log.d("comment: ", commentItem.toString());*/
+                    adapter.refreshData(commentItems);
                     progressDialog.dismiss();
                     etComment.setText("");
                     offset++;

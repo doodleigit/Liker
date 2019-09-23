@@ -161,6 +161,7 @@ public class AppConstants {
 
     public static final String STAR_LIST = "wallbadgelist";
     public static final String GET_USER_INFO_BY_USER_NAME = "getUserinfoByUserName";
+    public static final String GET_USER_INFO = "get_userinfo";
     public static final String UPLOAD_PROFILE_IMAGE = "updateProfilePicture";
     public static final String UPLOAD_COVER_IMAGE = "add_cover_photo";
     public static final String EMAIL_ADD = "email_add";

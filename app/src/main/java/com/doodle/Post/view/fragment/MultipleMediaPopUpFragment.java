@@ -17,6 +17,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.view.menu.MenuPopupHelper;
@@ -70,6 +71,7 @@ import com.doodle.Home.service.SingleVideoPlayerRecyclerView;
 import com.doodle.Home.view.activity.EditPost;
 import com.doodle.Home.view.activity.Home;
 import com.doodle.Home.view.activity.PostShare;
+import com.doodle.Home.view.fragment.LikerUserListFragment;
 import com.doodle.Post.model.Mim;
 import com.doodle.Post.service.DataProvider;
 import com.doodle.Post.view.activity.PostPopup;
@@ -493,6 +495,26 @@ public class MultipleMediaPopUpFragment extends Fragment {
         }
 
         setDataPostWise();
+
+        tvPostLikeCount.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag("dialog");
+                if (prev != null) {
+                    ft.remove(prev);
+                }
+                ft.addToBackStack(null);
+                DialogFragment dialogFragment = new LikerUserListFragment();
+
+                Bundle bundle = new Bundle();
+                bundle.putString("post_id", item.getPostId());
+                bundle.putString("total_likes", item.getPostFooter().getPostTotalLike());
+                dialogFragment.setArguments(bundle);
+
+                dialogFragment.show(ft, "dialog");
+            }
+        });
 
         imgLike.setOnClickListener(new View.OnClickListener() {
             @Override

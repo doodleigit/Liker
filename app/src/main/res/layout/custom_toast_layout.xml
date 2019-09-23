@@ -30,7 +30,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/_5sdp"
-        android:fontFamily="monospace"
+        android:fontFamily="sans-serif-condensed-medium"
         android:textColor="#333"
         android:layout_gravity="center_vertical"
         android:textSize="18sp" />

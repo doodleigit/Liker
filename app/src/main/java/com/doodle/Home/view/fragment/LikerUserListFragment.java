@@ -29,6 +29,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -47,7 +48,7 @@ public class LikerUserListFragment extends DialogFragment {
     private HomeService homeService;
     private PrefManager manager;
     private LikeUserAdapter likeUserAdapter;
-    private ArrayList<LikeUser> likeUsers;
+    private List<LikeUser> likeUsers;
     private String deviceId, postId, token, userId, totalLikes;
     int limit = 10;
     int offset = 0, current = 0;
@@ -104,7 +105,7 @@ public class LikerUserListFragment extends DialogFragment {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setNestedScrollingEnabled(false);
 
-        tvLikeUserCount.setText(totalLikes + " " + getString(R.string.people_liked_this_post));
+//        tvLikeUserCount.setText(totalLikes + " " + getString(R.string.people_liked_this_post));
 
         LikeUserClickListener likeUserClickListener = new LikeUserClickListener() {
             @Override
@@ -118,7 +119,7 @@ public class LikerUserListFragment extends DialogFragment {
             }
         };
 
-        likeUserAdapter = new LikeUserAdapter(getActivity(), likeUsers, likeUserClickListener);
+        likeUserAdapter = new LikeUserAdapter(getActivity(), likeUsers, userId, likeUserClickListener);
 
         recyclerView.setAdapter(likeUserAdapter);
 
@@ -155,7 +156,7 @@ public class LikerUserListFragment extends DialogFragment {
     }
 
     private void sendFriendListRequest() {
-        Call<LikeUsers> call = homeService.postLiker(deviceId, userId, token, userId, postId, limit, offset, current);
+        Call<LikeUsers> call = homeService.postLiker(deviceId, userId, token, userId, postId, offset, limit, current);
         call.enqueue(new Callback<LikeUsers>() {
             @Override
             public void onResponse(Call<LikeUsers> call, Response<LikeUsers> response) {
