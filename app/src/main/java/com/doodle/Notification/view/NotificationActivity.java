@@ -18,12 +18,14 @@ import android.widget.ProgressBar;
 import com.doodle.Home.model.Headers;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.service.SocketIOManager;
+import com.doodle.Home.view.activity.StarContributorActivity;
 import com.doodle.Notification.adapter.NotificationAdapter;
 import com.doodle.Notification.model.NotificationItem;
 import com.doodle.Notification.model.NotificationSeenParam;
 import com.doodle.Notification.service.NotificationClickListener;
 import com.doodle.Notification.service.NotificationService;
 import com.doodle.Post.view.activity.PostPopup;
+import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.R;
 import com.doodle.Tool.AppConstants;
 import com.doodle.Tool.NetworkHelper;
@@ -49,7 +51,6 @@ public class NotificationActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
 
     private Socket socket;
-    private Headers headers;
     private PrefManager manager;
     private boolean networkOk;
     private NotificationService webService;
@@ -107,6 +108,7 @@ public class NotificationActivity extends AppCompatActivity {
         recyclerView.setAdapter(notificationAdapter);
 
         getData();
+        checkIsPush();
 
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -168,6 +170,29 @@ public class NotificationActivity extends AppCompatActivity {
             sendNotificationItemPaginationRequest(call);
         } else {
             isPaginationComplete = true;
+        }
+    }
+
+    private void checkIsPush() {
+        if (getIntent().getBooleanExtra("is_pushed", false)) {
+            manager.setNotificationCountClear();
+            NotificationItem notificationItem = getIntent().getParcelableExtra("notification_item");
+            sendNotificationReadRequest(notificationItem.getData().getId());
+            executeAction(Tools.getNotificationTypeActionType(notificationItem.getData().getNotifType()), notificationItem);
+        }
+    }
+
+    private void executeAction(int actionType, NotificationItem notificationItem) {
+        if (actionType == 1) {
+            startActivity(new Intent(this, ProfileActivity.class).putExtra("user_id", notificationItem.getData().getFromUserId()).putExtra("user_name", notificationItem.getData().getUsername()));
+        } else if (actionType == 2) {
+            sendPostItemRequest(notificationItem.getData().getTypeId(), false);
+        } else if (actionType == 3) {
+            sendPostItemRequest(notificationItem.getData().getTypeId(), true);
+        } else if (actionType == 4) {
+            startActivity(new Intent(this, StarContributorActivity.class).putExtra("category_id", "").putExtra("category_name", ""));
+        } else if (actionType == 5) {
+            startActivity(new Intent(this, StarContributorActivity.class).putExtra("category_id", notificationItem.getData().getCategoryId()).putExtra("category_name", notificationItem.getData().getCategoryName()));
         }
     }
 

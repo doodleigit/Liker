@@ -159,6 +159,9 @@
     <string name="education">Education</string>
     <string name="email_notification">Email Notification</string>
     <string name="push_notification">Push Notification</string>
+    <string name="the_trending_feed_includes_the_hottest_posts">The Trending Feed includes the hottest posts in all of Liker, starting with the ones with the most likes in the past 24 hours.</string>
+    <string name="the_breaking_feed_includes_the_newest_posts">The Breaking Feed includes the newest posts in all of Liker, starting with the most recent.</string>
+    <string name="the_following_feed_includes_the_most_recent_posts">The following feed includes the most recent posts by your friends and those you are following, starting with the most recent.</string>
 
     <string name="audience">Audience</string>
     <string name="save">Save</string>

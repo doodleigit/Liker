@@ -21,6 +21,9 @@ public class SetUser implements Serializable, Parcelable
     @SerializedName("socket_id")
     @Expose
     private String socketId;
+    @SerializedName("is_apps")
+    @Expose
+    private boolean isApps;
     public final static Creator<SetUser> CREATOR = new Creator<SetUser>() {
 
 
@@ -43,6 +46,7 @@ public class SetUser implements Serializable, Parcelable
         this.headers = ((Headers) in.readValue((Headers.class.getClassLoader())));
         this.userId = ((String) in.readValue((String.class.getClassLoader())));
         this.socketId = ((String) in.readValue((String.class.getClassLoader())));
+        this.isApps = ((boolean) in.readValue((Boolean.class.getClassLoader())));
     }
 
     public SetUser() {
@@ -72,10 +76,19 @@ public class SetUser implements Serializable, Parcelable
         this.socketId = socketId;
     }
 
+    public boolean isApps() {
+        return isApps;
+    }
+
+    public void setApps(boolean apps) {
+        isApps = apps;
+    }
+
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeValue(headers);
         dest.writeValue(userId);
         dest.writeValue(socketId);
+        dest.writeValue(isApps);
     }
 
     public int describeContents() {

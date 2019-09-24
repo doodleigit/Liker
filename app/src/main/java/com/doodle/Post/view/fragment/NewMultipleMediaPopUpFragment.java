@@ -667,6 +667,7 @@ public class NewMultipleMediaPopUpFragment extends Fragment {
                         if (id == R.id.edit) {
                             Intent intent = new Intent(getContext(), EditPost.class);
                             intent.putExtra(ITEM_KEY, (Parcelable) item);
+                            intent.putExtra("position", -1);
                             startActivity(intent);
                             getActivity().overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
                         }

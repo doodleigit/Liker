@@ -7,7 +7,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -22,9 +21,6 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.TextView;
 
-import com.doodle.App;
-import com.doodle.Comment.model.Comment;
-import com.doodle.Comment.model.CommentItem;
 import com.doodle.Home.adapter.PostAdapter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.service.HomeService;
@@ -113,7 +109,7 @@ public class FollowingPost extends Fragment   {
         Objects.requireNonNull(getActivity()).registerReceiver(broadcastReceiver, intentFilter);
 
         IntentFilter postFooterIntentFilter = new IntentFilter();
-        postFooterIntentFilter.addAction(AppConstants.POST_FOOTER_CHANGE_BROADCAST);
+        postFooterIntentFilter.addAction(AppConstants.POST_CHANGE_BROADCAST);
         Objects.requireNonNull(getActivity()).registerReceiver(postFooterChangeBroadcast, postFooterIntentFilter);
 
         manager = new PrefManager(getActivity());
@@ -530,14 +526,26 @@ public class FollowingPost extends Fragment   {
         @Override
         public void onReceive(Context context, Intent intent) {
             PostItem postItem = (PostItem) intent.getSerializableExtra("post_item");
+            boolean isFooterChange = intent.getBooleanExtra("isFooterChange", true);
             int position = intent.getIntExtra("position", -1);
-            if (position != -1) {
-                if (postItemList.size() >= position + 1) {
-                    if (postItemList.get(position).getPostId().equals(postItem.getPostId())) {
-                        postItemList.get(position).getPostFooter().setPostTotalLike(postItem.getPostFooter().getPostTotalLike());
-                        postItemList.get(position).getPostFooter().setLikeUserStatus(postItem.getPostFooter().isLikeUserStatus());
-                        postItemList.get(position).setTotalComment(postItem.getTotalComment());
-                        adapter.notifyItemChanged(position);
+            if (isFooterChange) {
+                if (position != -1) {
+                    if (postItemList.size() >= position + 1) {
+                        if (postItemList.get(position).getPostId().equals(postItem.getPostId())) {
+                            postItemList.get(position).getPostFooter().setPostTotalLike(postItem.getPostFooter().getPostTotalLike());
+                            postItemList.get(position).getPostFooter().setLikeUserStatus(postItem.getPostFooter().isLikeUserStatus());
+                            postItemList.get(position).setTotalComment(postItem.getTotalComment());
+                            adapter.notifyItemChanged(position);
+                        }
+                    }
+                }
+            } else {
+                if (position != -1) {
+                    if (postItemList.size() >= position + 1) {
+                        if (postItemList.get(position).getPostId().equals(postItem.getPostId())) {
+                            postItemList.set(position, postItem);
+                            adapter.notifyItemChanged(position);
+                        }
                     }
                 }
             }

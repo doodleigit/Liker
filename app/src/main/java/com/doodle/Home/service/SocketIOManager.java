@@ -247,6 +247,7 @@ public class SocketIOManager {
             setUser.setSocketId(App.getSocketId());
             setUser.setUserId(userId);
             setUser.setHeaders(headers);
+            setUser.setApps(true);
             Gson gson = new Gson();
             String json = gson.toJson(setUser);
             wSocket.emit("set_user", json, new Ack() {
@@ -272,6 +273,7 @@ public class SocketIOManager {
             setUser.setSocketId(App.getmSocketId());
             setUser.setUserId(userId);
             setUser.setHeaders(headers);
+            setUser.setApps(true);
             Gson gson = new Gson();
             String json = gson.toJson(setUser);
             mSocket.emit("set_user", json, new Ack() {

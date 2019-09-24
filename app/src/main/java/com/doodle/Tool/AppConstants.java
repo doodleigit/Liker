@@ -82,6 +82,7 @@ public class AppConstants {
     public static final String ADDED_POST_CONTRIBUTOR = "addedPostContributor";
     public static final String IS_DUPLICATE_FILE = "isDuplicateFile";
     public static boolean IN_CHAT_MODE = false;
+    public static final int RESULT_BACK_NUMBER = 121;
 
 
     // http://192.168.0.77:8040/sites/likeropt/isDuplicateFile
@@ -129,7 +130,7 @@ public class AppConstants {
     public static final String RECONNECT_SOCKET_BROADCAST = "reconnect_socket_broadcast";
     public static final String CATEGORY_CHANGE_BROADCAST = "category_change_broadcast";
     public static final String PROFILE_PAGE_PAGINATION_BROADCAST = "profile_page_pagination_broadcast";
-    public static final String POST_FOOTER_CHANGE_BROADCAST = "post_footer_change_broadcast";
+    public static final String POST_CHANGE_BROADCAST = "post_change_broadcast";
 
     public static final String NOTIFICATION = "newNotification";
     public static final String CHAT_USERS = "get_chat_users";
