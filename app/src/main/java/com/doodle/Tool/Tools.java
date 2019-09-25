@@ -28,6 +28,7 @@ import android.text.TextPaint;
 import android.text.format.DateFormat;
 import android.text.method.LinkMovementMethod;
 import android.text.style.CharacterStyle;
+import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.text.style.URLSpan;
@@ -401,10 +402,10 @@ public class Tools {
     }
 
 
-    public static SpannableStringBuilder getSpannableStringBuilder(String likes, String followers, int totalStars, String categoryName) {
+    public static SpannableStringBuilder getSpannableStringBuilder(Context context, String catId, String likes, String followers, int totalStars, String categoryName) {
         if(!isNullOrEmpty(followers)){
 
-            headerInfo = String.format("%s Likes | %d Stars | %s Followers | %s", likes, totalStars, followers, categoryName);
+            headerInfo = String.format("%s Likes | %d Stars | %s Followers | ", likes, totalStars, followers);
         }else {
             headerInfo = String.format("%s Likes | %d Stars | %s", likes, totalStars, "");
         }
@@ -412,6 +413,18 @@ public class Tools {
         SpannableString spannableUserStr = new SpannableString(headerInfo);
         builder.append(spannableUserStr);
         SpannableString spannableCategory = new SpannableString(String.format(categoryName));
+        ClickableSpan clickableSpan = new ClickableSpan() {
+            @Override
+            public void onClick(View textView) {
+                context.sendBroadcast((new Intent().putExtra("category_id", catId)).setAction(AppConstants.POST_FILTER_CAT_BROADCAST));
+            }
+            @Override
+            public void updateDrawState(TextPaint ds) {
+                super.updateDrawState(ds);
+                ds.setUnderlineText(false);
+            }
+        };
+        spannableCategory.setSpan(clickableSpan, 0, categoryName.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(Color.parseColor("#60b2fc"));
         spannableCategory.setSpan(foregroundColorSpan, 0, categoryName.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         builder.append(spannableCategory);

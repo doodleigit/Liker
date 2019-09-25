@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Gradle: it.sephiroth.android.library.targettooltip:target-tooltip-library:2.0.3@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/f04a24105dfefcb8f628bbf1afec7a39/target-tooltip-library-2.0.3/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/f04a24105dfefcb8f628bbf1afec7a39/target-tooltip-library-2.0.3/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

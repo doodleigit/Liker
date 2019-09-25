@@ -437,7 +437,7 @@ public class MultipleMediaPopUpFragment extends Fragment {
         int totalStars = silverStar + goldStar;
         String categoryName = item.getCatName();
 
-        SpannableStringBuilder builder = getSpannableStringBuilder(likes, followers, totalStars, categoryName);
+        SpannableStringBuilder builder = getSpannableStringBuilder(getContext(), item.getCatId(), likes, followers, totalStars, categoryName);
 
         tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
         long myMillis = Long.parseLong(item.getDateTime()) * 1000;

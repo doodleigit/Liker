@@ -119,6 +119,8 @@ import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 
 import static android.widget.Toast.LENGTH_SHORT;
 import static android.widget.Toast.makeText;
@@ -151,7 +153,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
     private String toUserId;
     private String token;
     private CategoryItem categoryItem;
-    private TextView tvSubmitPost;
+    private TextView tvSubmitPost, intro;
 
     private MultipartBody.Part fileToUpload;
 
@@ -290,6 +292,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
         linkScriptContainer = findViewById(R.id.linkScriptContainer);
 
         findViewById(R.id.btnAttachment).setOnClickListener(this);
+        intro = findViewById(R.id.intro);
         tvSubmitPost = findViewById(R.id.tvSubmitPost);
         tvSubmitPost.setOnClickListener(this);
         findViewById(R.id.contentCategory).setOnClickListener(this);
@@ -565,6 +568,13 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                     tvSubmitPost.setVisibility(View.VISIBLE);
                 }
 
+                if (s.length() == 1) {
+                    if (manager.getNewPostIntro().equals("0")) {
+                        manager.setNewPostIntro("1");
+                        showIntroTooltip();
+                    }
+                }
+
             }
 
             @Override
@@ -582,6 +592,23 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
         });
 
 
+    }
+
+    private void showIntroTooltip() {
+        ShowcaseConfig config = new ShowcaseConfig();
+        config.setDelay(500); // half second between each showcase view
+
+        MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(this, "4");
+
+        sequence.setConfig(config);
+
+        sequence.addSequenceItem(intro,
+                getString(R.string.since_liker_is_the_smarter_social_network), getString(R.string.ok_i_got_it));
+
+        sequence.addSequenceItem(tvAudience,
+                getString(R.string.you_must_select_an_audience_for_each_post), getString(R.string.ok_i_got_it));
+
+        sequence.start();
     }
 
     private void mentionUsers() {

@@ -9,14 +9,16 @@ import android.content.SharedPreferences;
  */
 public class PrefManager {
 
-    public SharedPreferences pref;
-    SharedPreferences.Editor editor;
+    public SharedPreferences pref, introPref;
+    SharedPreferences.Editor editor, introEditor;
     Context _context;
     // shared pref mode
     int PRIVATE_MODE = 0;
 
     // Shared preferences file name
     private static final String PREF_NAME = "Liker";
+    private static final String INTRO_PREF_NAME = "IntroLiker";
+
     private static final String IS_FIRST_TIME_LAUNCH = "IsFirstTimeLaunch";
     private static final String IS_SECOND_TIME_LAUNCH = "IsSecondTimeLaunch";
     private static final String IS_VALIDATE_FIELD = "IsValidateField";
@@ -47,11 +49,16 @@ public class PrefManager {
     private static final String NEW_MESSAGE_NOTIFICATION = "new_message_notification";
     private static final String USER_INFO = "user_info";
 
-
+    private static final String POST_CATEGORY_INTRO = "post_category-intro";
+    private static final String POST_LIKE_INTRO = "user_info";
+    private static final String COMMENT_LIKE_INTRO = "user_info";
+    private static final String NEW_POST_INTRO = "new_post_intro";
+    private static final String NEW_POST_AUDIENCE_INTRO = "new_post_audience_intro";
 
     public PrefManager(Context context) {
         this._context = context;
         pref = _context.getSharedPreferences(PREF_NAME, PRIVATE_MODE);
+        introPref = _context.getSharedPreferences(INTRO_PREF_NAME, PRIVATE_MODE);
         editor = pref.edit();
     }
 
@@ -266,6 +273,35 @@ public class PrefManager {
         editor.apply();
     }
 
+    public void setPostCategoryIntro(String postCategoryIntro) {
+        introEditor = introPref.edit();
+        introEditor.putString(POST_CATEGORY_INTRO, postCategoryIntro);
+        introEditor.apply();
+    }
+
+    public void setPostLikeIntro(String postLikeIntro) {
+        introEditor = introPref.edit();
+        introEditor.putString(POST_LIKE_INTRO, postLikeIntro);
+        introEditor.apply();
+    }
+
+    public void setCommentLikeIntro(String commentLikeIntro) {
+        introEditor = introPref.edit();
+        introEditor.putString(COMMENT_LIKE_INTRO, commentLikeIntro);
+        introEditor.apply();
+    }
+
+    public void setNewPostIntro(String newPostIntro) {
+        introEditor = introPref.edit();
+        introEditor.putString(NEW_POST_INTRO, newPostIntro);
+        introEditor.apply();
+    }
+
+    public void setNewPostAudienceIntro(String newPostAudienceIntro) {
+        introEditor = introPref.edit();
+        introEditor.putString(NEW_POST_AUDIENCE_INTRO, newPostAudienceIntro);
+        introEditor.apply();
+    }
 
     public String getUserInfo() {
 
@@ -350,6 +386,26 @@ public class PrefManager {
     public String getTwitterBirthDay() {
 
         return pref.getString(TWITTER_BIRTH_DAY, "");
+    }
+
+    public String getPostCategoryIntro() {
+        return introPref.getString(POST_CATEGORY_INTRO, "0");
+    }
+
+    public String getPostLikeIntro() {
+        return introPref.getString(POST_LIKE_INTRO, "0");
+    }
+
+    public String getCommentLikeIntro() {
+        return introPref.getString(COMMENT_LIKE_INTRO, "0");
+    }
+
+    public String getNewPostIntro() {
+        return introPref.getString(NEW_POST_INTRO, "0");
+    }
+
+    public String getNewPostAudienceIntro() {
+        return introPref.getString(NEW_POST_AUDIENCE_INTRO, "0");
     }
 }
 //    public void setUserId(String userId){

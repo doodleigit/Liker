@@ -144,7 +144,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
     //Delete post
     public LinkScriptHolder.PostItemListener listener;
 
-    private ImageView imgLike;
+    public ImageView imgLike;
     private int postLikeNumeric;
     private String postLike;
     private int postTotalShare;
@@ -306,7 +306,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
             sharedUserProfileLike = itemSharedProfile.getUserProfileLikes();
             sharedPostText=item.getSharedPostText();
             sharedCategoryName=item.getCatName();
-            SpannableStringBuilder builder = getSpannableStringBuilder(sharedUserProfileLike, "", sharedTotalStar, sharedCategoryName);
+            SpannableStringBuilder builder = getSpannableStringBuilder(mContext, item.getCatId(), sharedUserProfileLike, "", sharedTotalStar, sharedCategoryName);
             long myMillis = Long.parseLong(sharedDateTime) * 1000;
             String postDate = Operation.getFormattedDateFromTimestamp(myMillis);
             //    tvSharePostTime.setText(chatDateCompare(mContext,myMillis));
@@ -519,7 +519,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
         String categoryName = item.getCatName();
 //
 
-        SpannableStringBuilder builder = getSpannableStringBuilder(likes, followers, totalStars, categoryName);
+        SpannableStringBuilder builder = getSpannableStringBuilder(mContext, item.getCatId(), likes, followers, totalStars, categoryName);
 
 
         tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));

@@ -163,6 +163,15 @@
     <string name="the_breaking_feed_includes_the_newest_posts">The Breaking Feed includes the newest posts in all of Liker, starting with the most recent.</string>
     <string name="the_following_feed_includes_the_most_recent_posts">The following feed includes the most recent posts by your friends and those you are following, starting with the most recent.</string>
 
+    <string name="take_control_of_your_feeds">Take control of your feeds by choosing as many of your favorite categories as you want. Give it a go!</string>
+    <string name="use_this_dropdown_to_quick_switch_back">Use this dropdown to quickly switch back and forth between all categories and your custom categories.</string>
+    <string name="please_like_posts_that_you_consider_to_be_of_high_quality">Please “like” posts that you consider to be of high quality. Liker tracks “likes” in order to rank the most popular posts and contributors in each category.</string>
+    <string name="please_like_comments_that_you_think_are_smart">Please “like” comments that you think are smart, thoughtful, relevant, funny, etc. On Liker, commenters with the most likes earn Top Commenter Badges.</string>
+    <string name="since_liker_is_the_smarter_social_network">Since Liker is the SMARTER social network, posts that have a good, insightful post description are more likely to get Likes from other users.</string>
+    <string name="you_must_select_an_audience_for_each_post">You must select an audience for each post. You can choose a main category or click on the dropdown to choose a subcategory.</string>
+    <string name="the_star_contributors_tab_ranks">The Star Contributors tab ranks the most popular expert contributors in all of Liker.</string>
+    <string name="ok_i_got_it">Ok, I got it</string>
+
     <string name="audience">Audience</string>
     <string name="save">Save</string>
     <string name="save_all">Save All</string>
