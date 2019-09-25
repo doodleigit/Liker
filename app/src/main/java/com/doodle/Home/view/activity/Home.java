@@ -37,6 +37,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.doodle.App;
 import com.doodle.Authentication.model.LoginInfo;
@@ -69,6 +70,7 @@ import com.doodle.Home.view.fragment.BreakingPost;
 import com.doodle.Home.view.fragment.FollowingPost;
 import com.doodle.Home.model.Headers;
 import com.doodle.Home.model.SetUser;
+import com.doodle.Home.view.fragment.PostPermissionSheet;
 import com.doodle.Home.view.fragment.TrendingPost;
 import com.doodle.Message.model.NewMessage;
 import com.doodle.Message.model.SenderData;
@@ -116,6 +118,7 @@ public class Home extends AppCompatActivity implements
         ReportLikerMessageSheet.BottomSheetListener,
         FollowSheet.BottomSheetListener,
         BlockUserDialog.BlockListener,
+        PostPermissionSheet.BottomSheetListener,
         NavigationView.OnNavigationItemSelectedListener {
 
     private DrawerLayout drawer;
@@ -1343,5 +1346,10 @@ public class Home extends AppCompatActivity implements
 
         drawer.closeDrawer(GravityCompat.END);
         return true;
+    }
+
+    @Override
+    public void postPermissionEnable(int image, String reasonId) {
+        Toast.makeText(this, "post permission enable..", Toast.LENGTH_SHORT).show();
     }
 }

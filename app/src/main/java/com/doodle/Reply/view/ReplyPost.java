@@ -1220,7 +1220,6 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
                             offset++;
                             recyclerView.smoothScrollToPosition(0);
 
-
                         }
 
 

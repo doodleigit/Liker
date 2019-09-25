@@ -129,6 +129,7 @@ import retrofit2.Response;
 import static android.widget.Toast.LENGTH_SHORT;
 import static android.widget.Toast.makeText;
 import static com.doodle.Tool.Tools.getMD5EncryptedString;
+import static com.doodle.Tool.Tools.isContain;
 import static com.doodle.Tool.Tools.isNullOrEmpty;
 
 public class PostNew extends AppCompatActivity implements View.OnClickListener,
@@ -195,7 +196,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
     //POST LINK SCRIPT
     private EditText editText, editTextTitlePost, editTextDescriptionPost;
-    private Button submitButton,  randomButton;
+    private Button submitButton, randomButton;
     private FloatingActionButton postButton;
     private TextView tvOk;
     private RecyclerView rvLinkScript;
@@ -283,9 +284,10 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
     MultipleMediaFile mediaFile;
     private String mediaFive;
     private String base64md5;
-   Set<String> mediaList;
-   List<String> videoList;
-   List<LinkScriptItem> scriptItemList;
+    Set<String> mediaList;
+    List<String> videoList;
+    List<LinkScriptItem> scriptItemList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -298,9 +300,9 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
         networkOk = NetworkHelper.hasNetworkAccess(this);
         progressView = (CircularProgressView) findViewById(R.id.progress_view);
         mView = new View(this);
-        mediaList=new HashSet<>();
-        videoList=new ArrayList<>();
-        scriptItemList=new ArrayList<>();
+        mediaList = new HashSet<>();
+        videoList = new ArrayList<>();
+        scriptItemList = new ArrayList<>();
         mediaFile = new MultipleMediaFile();
         mediaFiles = new ArrayList<>();
         progressDialog = new ProgressDialog(this);
@@ -348,15 +350,15 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                 mediaAdapter.deleteItem(position);
                 String mdFiveFile = postImage.getMdFive();
 //{"base_64_md5":"ded330ca6a57c3dbb81d292f4528d15a","file_type":"image","name":"5d861a0055159.jpg"}
-                for (int i = 0; i <mediaFiles.size() ; i++) {
+                for (int i = 0; i < mediaFiles.size(); i++) {
 
                     try {
-                        JSONObject ds=new JSONObject(mediaFiles.get(i).toString());
-                        base64md5=ds.getString("base_64_md5");
-                        if(base64md5.equalsIgnoreCase(mdFiveFile)){
+                        JSONObject ds = new JSONObject(mediaFiles.get(i).toString());
+                        base64md5 = ds.getString("base_64_md5");
+                        if (base64md5.equalsIgnoreCase(mdFiveFile)) {
                             mediaFiles.remove(i);
                         }
-                        Log.d("base64md5 ",base64md5+"");
+                        Log.d("base64md5 ", base64md5 + "");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -369,18 +371,18 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
             public void deleteVideo(PostVideo postVideo, int position) {
                 postVideos.remove(postVideo);
                 mediaAdapter.deleteItem(position);
-                String mdFiveFile=postVideo.getMdFive();
+                String mdFiveFile = postVideo.getMdFive();
 
 
-                for (int i = 0; i <mediaFiles.size() ; i++) {
+                for (int i = 0; i < mediaFiles.size(); i++) {
 
                     try {
-                        JSONObject ds=new JSONObject(mediaFiles.get(i).toString());
-                        base64md5=ds.getString("base_64_md5");
-                        if(base64md5.equalsIgnoreCase(mdFiveFile)){
+                        JSONObject ds = new JSONObject(mediaFiles.get(i).toString());
+                        base64md5 = ds.getString("base_64_md5");
+                        if (base64md5.equalsIgnoreCase(mdFiveFile)) {
                             mediaFiles.remove(i);
                         }
-                        Log.d("base64md5 ",base64md5+"");
+                        Log.d("base64md5 ", base64md5 + "");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -541,8 +543,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
         /** --- */
 
 
-        rvLinkScript=findViewById(R.id.rvLinkScript);
-
+        rvLinkScript = findViewById(R.id.rvLinkScript);
 
 
         postAreaTitle = (TextView) findViewById(R.id.post_area);
@@ -637,11 +638,11 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                         }
                     }
 
-                  //  submitLink();
+                    //  submitLink();
                 }
 
 
-                if (!contentTitle.isEmpty() && myUrl != null && contentTitle.length() > myUrl.length()) {
+                if (!contentTitle.isEmpty() && myUrl != null && contentTitle.length() >= myUrl.length() + 8) {
                     isAddContentTitle = true;
                     tvSubmitPost.setVisibility(View.VISIBLE);
 
@@ -1083,10 +1084,10 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                     Tools.showCustomToast(PostNew.this, mView, "Please select your post’s audience.", Gravity.TOP);
                 } else if (!isAddContentTitle) {
                     Tools.showCustomToast(PostNew.this, mView, "Cat’s got your tongue? Please write at least 8 characters in your post description.", Gravity.TOP);
-                }else if(contentTitle.length()<8){
+                } else if (contentTitle.length() < 8) {
                     Tools.showCustomToast(PostNew.this, mView, "Cat’s got your tongue? Please write at least 8 characters in your post description.", Gravity.TOP);
 
-                } else{
+                } else {
                     createNewPost();
                 }
                 // Tools.showCustomToast(LikerSearch.this, mView, " Write Minimum Three Characters !", Gravity.TOP);
@@ -1262,22 +1263,26 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
                         try {
                             JSONObject object = new JSONObject(response.body());
-                            JSONObject successObject = object.getJSONObject("success");
-                            boolean topContributorStatus = successObject.getBoolean("top_contributor_status");
-                            postId = successObject.getInt("post_id");
 
-                            if (topContributorStatus) {
-                                String msg;
-                                if (audience.isEmpty()) {
-                                    msg = categoryName + "-" + audience + " ?";
-                                } else {
-                                    msg = categoryName + "-" + audience + " ?";
-                                }
+
+                            JSONObject successObject = object.getJSONObject("success");
+
+                            if (successObject.length() > 0) {
+                                boolean topContributorStatus = successObject.getBoolean("top_contributor_status");
+                                postId = successObject.getInt("post_id");
+
+                                if (topContributorStatus) {
+                                    String msg;
+                                    if (audience.isEmpty()) {
+                                        msg = categoryName + "-" + audience + " ?";
+                                    } else {
+                                        msg = categoryName + "-" + audience + " ?";
+                                    }
 //                                ResendEmail resendEmail = ResendEmail.newInstance(msg);
 //                                resendEmail.show(getSupportFragmentManager(), "ResendEmail");
-                                ContributorStatus status = ContributorStatus.newInstance(msg);
-                                status.show(getSupportFragmentManager(), "ContributorStatus");
-                            } else {
+                                    ContributorStatus status = ContributorStatus.newInstance(msg);
+                                    status.show(getSupportFragmentManager(), "ContributorStatus");
+                                } else {
                              /*   if (contentType == 5) {
 
                                     Call<String> mediaCall = videoServices.uploadVideo(deviceId, profileId, token, fileToUpload, postId, true);
@@ -1286,10 +1291,20 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                                 } else {
 
                                 }*/
-                                startActivity(new Intent(PostNew.this, Home.class));
-                                finish();
+                                    startActivity(new Intent(PostNew.this, Home.class));
+                                    finish();
+
+                                }
 
                             }
+
+                            JSONObject errorObject = object.getJSONObject("errors");
+                            if (errorObject.length() > 0) {
+                                String post_duplicate = errorObject.getString("post_duplicate");
+                                Tools.toast(PostNew.this, post_duplicate, R.drawable.ic_warning_black_24dp);
+                            }
+
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -1730,16 +1745,16 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                 String strMD5 = getMD5EncryptedString(videoPath);
                 fileEncoded = strMD5;
 
-                if(videoList.size()==0){
+                if (videoList.size() == 0) {
                     Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "2", strMD5);
                     sendIsDuplicateVideoRequest(call);
                     tempMedia.add(videoPath);
-                }else {
+                } else {
                     boolean hasAlready = false;
-                    for (String temp:videoList) {
-                        if(temp.equalsIgnoreCase(videoPath)){
+                    for (String temp : videoList) {
+                        if (temp.equalsIgnoreCase(videoPath)) {
                             hasAlready = true;
-                            Tools.toast(PostNew.this,"You have already add this!",R.drawable.ic_info_outline_blue_24dp);
+                            Tools.toast(PostNew.this, "You have already add this!", R.drawable.ic_info_outline_blue_24dp);
                             break;
                         }
                     }
@@ -1749,7 +1764,6 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                         tempMedia.add(videoPath);
                     }
                 }
-
 
 
 //                Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "2", strMD5);
@@ -1778,22 +1792,20 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
             String strMD5 = getMD5EncryptedString(videoPath);
             fileEncoded = strMD5;
 
-            if(videoList.size()==0){
+            if (videoList.size() == 0) {
                 Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "2", strMD5);
                 sendIsDuplicateVideoRequest(call);
                 videoList.add(videoPath);
-            }else {
-                for (String temp:videoList) {
-                    if(temp.equalsIgnoreCase(videoPath)){
-                        Tools.toast(PostNew.this,"You have already add this!",R.drawable.ic_info_outline_blue_24dp);
-                    }else {
+            } else {
+                for (String temp : videoList) {
+                    if (temp.equalsIgnoreCase(videoPath)) {
+                        Tools.toast(PostNew.this, "You have already add this!", R.drawable.ic_info_outline_blue_24dp);
+                    } else {
                         Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "2", strMD5);
                         sendIsDuplicateVideoRequest(call);
                     }
                 }
             }
-
-
 
 
             File file = new File(videoFilePath);
@@ -1874,15 +1886,12 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
     }
 
-    public Set<String> findDuplicates(List<String> listContainingDuplicates)
-    {
+    public Set<String> findDuplicates(List<String> listContainingDuplicates) {
         final Set<String> setToReturn = new HashSet<>();
         final Set<String> set1 = new HashSet<>();
 
-        for (String yourInt : listContainingDuplicates)
-        {
-            if (!set1.add(yourInt))
-            {
+        for (String yourInt : listContainingDuplicates) {
+            if (!set1.add(yourInt)) {
                 setToReturn.add(yourInt);
             }
         }
@@ -1905,16 +1914,16 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                 String strMD5 = getMD5EncryptedString(imagePath);
                 fileEncoded = strMD5;
 
-                if(mediaList.size()==0){
+                if (mediaList.size() == 0) {
                     Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "1", strMD5);
-                    sendIsDuplicateImageRequest(call,imagePath);
+                    sendIsDuplicateImageRequest(call, imagePath);
                     tempMedia.add(imagePath);
-                }else {
+                } else {
                     boolean hasAlready = false;
-                    for (String temp:mediaList) {
-                        if(temp.equalsIgnoreCase(imagePath)){
+                    for (String temp : mediaList) {
+                        if (temp.equalsIgnoreCase(imagePath)) {
                             hasAlready = true;
-                            Tools.toast(PostNew.this,"You have already add this!",R.drawable.ic_info_outline_blue_24dp);
+                            Tools.toast(PostNew.this, "You have already add this!", R.drawable.ic_info_outline_blue_24dp);
                             break;
                         }
                     }
@@ -1938,15 +1947,15 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
             fileEncoded = strMD5;
             //   String strBase64 = getBase64(imageFilePath);
 
-            if(mediaList.size()==0){
+            if (mediaList.size() == 0) {
                 Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "1", strMD5);
                 sendIsDuplicateImageRequest(call, imagePath);
                 mediaList.add(imagePath);
-            }else {
-                for (String temp:mediaList) {
-                    if(temp.equalsIgnoreCase(imagePath)){
-                        Tools.toast(PostNew.this,"You have already add this!",R.drawable.ic_info_outline_blue_24dp);
-                    }else {
+            } else {
+                for (String temp : mediaList) {
+                    if (temp.equalsIgnoreCase(imagePath)) {
+                        Tools.toast(PostNew.this, "You have already add this!", R.drawable.ic_info_outline_blue_24dp);
+                    } else {
                         Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "1", strMD5);
                         sendIsDuplicateImageRequest(call, imagePath);
                     }
@@ -2019,7 +2028,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 //                                    for (String temp:mediaList) {
 //                                        postImages.add(new PostImage(temp));
 //                                    }
-                                  //  String imagePath = "file://" + imageFilePath;
+                                    //  String imagePath = "file://" + imageFilePath;
                                     postImages.add(new PostImage(imagePath));
                                     if (postImages.size() > 0)
 
@@ -2249,14 +2258,14 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
             currentImageSet = null;
             currentItem = 0;
 
-            tvSubmitPost.setVisibility(View.GONE);
+//            tvSubmitPost.setVisibility(View.GONE);
 
 
             currentImage = null;
             noThumb = false;
             currentTitle = currentDescription = currentUrl = currentCannonicalUrl = "";
 
-            tvSubmitPost.setEnabled(false);
+//            tvSubmitPost.setEnabled(false);
 //            tvSubmitPost.setEnabled(true);
 
             /** Inflating the preview layout */
@@ -2302,8 +2311,9 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                 });
 
             } else {
-                postButton.setVisibility(View.VISIBLE);
-              //  tvSubmitPost.setVisibility(View.VISIBLE);
+                //  postButton.setVisibility(View.VISIBLE);
+                postButton.setVisibility(View.GONE);
+                //  tvSubmitPost.setVisibility(View.VISIBLE);
                 currentImageSet = new Bitmap[sourceContent.getImages().size()];
 
                 /**
@@ -2494,7 +2504,8 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                 urlTextView.setText(sourceContent.getCannonicalUrl());
                 descriptionTextView.setText(sourceContent.getDescription());
 
-               postButton.setVisibility(View.VISIBLE);
+                //   postButton.setVisibility(View.VISIBLE);
+                postButton.setVisibility(View.GONE);
             }
 
             currentTitle = sourceContent.getTitle();
@@ -2511,9 +2522,9 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                 contentLinkImage = temp;
             }
 
-            LinkScriptItem scriptItem=new LinkScriptItem(currentImage,currentTitle,currentDescription,currentUrl);
+            LinkScriptItem scriptItem = new LinkScriptItem(currentImage, currentTitle, currentDescription, currentUrl);
             scriptItemList.add(scriptItem);
-            LinkScriptAdapter linkScriptAdapter=new LinkScriptAdapter(PostNew.this,scriptItemList);
+            LinkScriptAdapter linkScriptAdapter = new LinkScriptAdapter(PostNew.this, scriptItemList);
             rvLinkScript.setAdapter(linkScriptAdapter);
         }
     };

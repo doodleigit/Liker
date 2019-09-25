@@ -59,6 +59,7 @@ import com.doodle.Home.view.activity.EditPost;
 import com.doodle.Home.view.activity.Home;
 import com.doodle.Home.view.activity.PostShare;
 import com.doodle.Home.view.fragment.LikerUserListFragment;
+import com.doodle.Home.view.fragment.PostPermissionSheet;
 import com.doodle.Post.model.Mim;
 import com.doodle.Post.service.DataProvider;
 import com.doodle.Post.view.activity.PostPopup;
@@ -105,6 +106,7 @@ import static java.lang.Integer.parseInt;
 public class TextMimHolder extends RecyclerView.ViewHolder {
 
     public static final String ITEM_KEY = "item_key";
+    public static final String POST_ITEM_POSITION = "post_item_position";
     public TextView tvHeaderInfo, tvPostTime, tvPostUserName, tvImgShareCount, tvPostLikeCount, tvLinkScriptText, tvCommentCount;
     public CircleImageView imagePostUser;
     public ReadMoreTextView tvPostContent;
@@ -793,7 +795,12 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
             @Override
             public void onClick(View v) {
 
-                boolean isNotificationOff = item.isIsNotificationOff();
+
+                activity = (AppCompatActivity) v.getContext();
+                PostPermissionSheet reportReasonSheet = PostPermissionSheet.newInstance(item,position);
+                reportReasonSheet.show(activity.getSupportFragmentManager(), "ReportReasonSheet");
+
+        /*        boolean isNotificationOff = item.isIsNotificationOff();
                 String postUserId = item.getPostUserid();
                 popupMenu = new PopupMenu(mContext, v);
                 popupMenu.getMenuInflater().inflate(R.menu.post_permission_menu, popupMenu.getMenu());
@@ -939,7 +946,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                         }
                         return true;
                     }
-                });
+                });*/
 
             }
         });
@@ -1362,6 +1369,8 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                     Intent intent = new Intent(mContext, CommentPost.class);
                     intent.putExtra(COMMENT_KEY, (Parcelable) commentItem);
                     intent.putExtra(ITEM_KEY, (Parcelable) item);
+                    intent.putExtra(POST_ITEM_POSITION, position);
+
 
                     mContext.startActivity(intent);
 

@@ -9,7 +9,7 @@
     android:orientation="vertical"
     android:visibility="gone">
 
-
+    <include layout="@layout/list_item_post_header"/>
     <com.borjabravo.readmoretextview.ReadMoreTextView
 
         android:id="@+id/tvPostContentMim"

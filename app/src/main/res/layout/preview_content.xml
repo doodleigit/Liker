@@ -14,7 +14,6 @@
 
         <ImageView
             android:id="@+id/image_post_set"
-            android:layout_below="@id/close"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:contentDescription="empty"
@@ -25,23 +24,23 @@
             android:id="@+id/close"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_margin="@dimen/_5sdp"
             android:background="@drawable/common_button_blue"
             android:src="@drawable/ic_clear_black_24dp"
             android:textColor="@android:color/white"
-            android:layout_margin="16dp"
-            app:fabSize="mini"
-            android:visibility="visible" />
+            android:visibility="visible"
+            app:fabSize="mini" />
 
 
-
-<!--        <TextView
-        android:id="@+id/close"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignRight="@id/image_post_set"
-            android:padding="@dimen/_5sdp"
-        android:drawableRight="@drawable/ic_cancel_black_24dp"
-        android:gravity="right" />-->
+        <!--        <TextView
+                android:id="@+id/close"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignRight="@id/image_post_set"
+                    android:padding="@dimen/_5sdp"
+                android:drawableRight="@drawable/ic_cancel_black_24dp"
+                android:gravity="right" />-->
 
     </RelativeLayout>
 

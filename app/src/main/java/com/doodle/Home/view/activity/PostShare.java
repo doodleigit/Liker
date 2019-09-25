@@ -12,6 +12,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
 import android.text.style.ClickableSpan;
 import android.text.util.Linkify;
 import android.util.Log;
@@ -41,8 +42,10 @@ import com.doodle.Post.view.fragment.PostPermission;
 import com.doodle.R;
 import com.doodle.Tool.AppConstants;
 import com.doodle.Tool.NetworkHelper;
+import com.doodle.Tool.Operation;
 import com.doodle.Tool.PageTransformer;
 import com.doodle.Tool.PrefManager;
+import com.doodle.Tool.SingleLineTextView;
 import com.doodle.Tool.Tools;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 import com.google.gson.Gson;
@@ -73,7 +76,9 @@ import static com.doodle.Tool.Tools.extractMentionText;
 import static com.doodle.Tool.Tools.extractMentionUser;
 import static com.doodle.Tool.Tools.extractUrls;
 import static com.doodle.Tool.Tools.getDomainName;
+import static com.doodle.Tool.Tools.getSpannableStringBuilder;
 import static com.doodle.Tool.Tools.isNullOrEmpty;
+import static java.lang.Integer.parseInt;
 
 public class PostShare extends AppCompatActivity implements
         View.OnClickListener,
@@ -131,6 +136,13 @@ public class PostShare extends AppCompatActivity implements
     private PostShares postShares;
     private String imageUrl;
     private CircleImageView imgPostUser;
+
+    //Add Header
+    public CircleImageView imagePostUser;
+    public ImageView imagePostPermission,imagePermission, star1, star2, star3, star4, star5, star6, star7, star8,
+            star9, star10, star11, star12, star13, star14, star15, star16;
+    private SingleLineTextView tvPostUserName,tvPostTime;
+    private TextView tvHeaderInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -238,6 +250,8 @@ public class PostShare extends AppCompatActivity implements
 
 
 
+        //HEADER ID
+
 
 
         switch (viewType) {
@@ -272,7 +286,203 @@ public class PostShare extends AppCompatActivity implements
         }
 
 
+        //HEADER SET
+        initheader();
+        setHeader(item);
 
+
+
+    }
+
+    private void setHeader(PostShareItem item) {
+        String likes = item.getUserProfileLikes();
+        String followers = item.getUserTotalFollowers();
+        int silverStar = parseInt(item.getUserSilverStars());
+        int goldStar = parseInt(item.getUserGoldStars());
+
+        if (silverStar > 8) {
+            silverStar = 8;
+        }
+        switch (silverStar) {
+            case 1:
+                star9.setVisibility(View.VISIBLE);
+                break;
+            case 2:
+                star9.setVisibility(View.VISIBLE);
+                star10.setVisibility(View.VISIBLE);
+                break;
+            case 3:
+                star9.setVisibility(View.VISIBLE);
+                star10.setVisibility(View.VISIBLE);
+                star11.setVisibility(View.VISIBLE);
+                break;
+            case 4:
+                star9.setVisibility(View.VISIBLE);
+                star10.setVisibility(View.VISIBLE);
+                star11.setVisibility(View.VISIBLE);
+                star12.setVisibility(View.VISIBLE);
+                break;
+            case 5:
+                star9.setVisibility(View.VISIBLE);
+                star10.setVisibility(View.VISIBLE);
+                star11.setVisibility(View.VISIBLE);
+                star12.setVisibility(View.VISIBLE);
+                star13.setVisibility(View.VISIBLE);
+                break;
+            case 6:
+                star9.setVisibility(View.VISIBLE);
+                star10.setVisibility(View.VISIBLE);
+                star11.setVisibility(View.VISIBLE);
+                star12.setVisibility(View.VISIBLE);
+                star13.setVisibility(View.VISIBLE);
+                star14.setVisibility(View.VISIBLE);
+                break;
+            case 7:
+                star9.setVisibility(View.VISIBLE);
+                star10.setVisibility(View.VISIBLE);
+                star11.setVisibility(View.VISIBLE);
+                star12.setVisibility(View.VISIBLE);
+                star13.setVisibility(View.VISIBLE);
+                star14.setVisibility(View.VISIBLE);
+                star15.setVisibility(View.VISIBLE);
+                break;
+            case 8:
+                star9.setVisibility(View.VISIBLE);
+                star10.setVisibility(View.VISIBLE);
+                star11.setVisibility(View.VISIBLE);
+                star12.setVisibility(View.VISIBLE);
+                star13.setVisibility(View.VISIBLE);
+                star14.setVisibility(View.VISIBLE);
+                star15.setVisibility(View.VISIBLE);
+                star16.setVisibility(View.VISIBLE);
+                break;
+            case 0:
+                star9.setVisibility(View.GONE);
+                star10.setVisibility(View.GONE);
+                star11.setVisibility(View.GONE);
+                star12.setVisibility(View.GONE);
+                star13.setVisibility(View.GONE);
+                star14.setVisibility(View.GONE);
+                star15.setVisibility(View.GONE);
+                star16.setVisibility(View.GONE);
+                break;
+
+        }
+        if (goldStar > 8) {
+            goldStar = 8;
+        }
+        switch (goldStar) {
+            case 1:
+                star1.setVisibility(View.VISIBLE);
+                break;
+            case 2:
+                star1.setVisibility(View.VISIBLE);
+                star2.setVisibility(View.VISIBLE);
+                break;
+            case 3:
+                star1.setVisibility(View.VISIBLE);
+                star2.setVisibility(View.VISIBLE);
+                star3.setVisibility(View.VISIBLE);
+                break;
+            case 4:
+                star1.setVisibility(View.VISIBLE);
+                star2.setVisibility(View.VISIBLE);
+                star3.setVisibility(View.VISIBLE);
+                star4.setVisibility(View.VISIBLE);
+                break;
+            case 5:
+                star1.setVisibility(View.VISIBLE);
+                star2.setVisibility(View.VISIBLE);
+                star3.setVisibility(View.VISIBLE);
+                star4.setVisibility(View.VISIBLE);
+                star5.setVisibility(View.VISIBLE);
+                break;
+            case 6:
+                star1.setVisibility(View.VISIBLE);
+                star2.setVisibility(View.VISIBLE);
+                star3.setVisibility(View.VISIBLE);
+                star4.setVisibility(View.VISIBLE);
+                star5.setVisibility(View.VISIBLE);
+                star6.setVisibility(View.VISIBLE);
+                break;
+            case 7:
+                star1.setVisibility(View.VISIBLE);
+                star2.setVisibility(View.VISIBLE);
+                star3.setVisibility(View.VISIBLE);
+                star4.setVisibility(View.VISIBLE);
+                star5.setVisibility(View.VISIBLE);
+                star6.setVisibility(View.VISIBLE);
+                star7.setVisibility(View.VISIBLE);
+                break;
+            case 8:
+                star1.setVisibility(View.VISIBLE);
+                star2.setVisibility(View.VISIBLE);
+                star3.setVisibility(View.VISIBLE);
+                star4.setVisibility(View.VISIBLE);
+                star5.setVisibility(View.VISIBLE);
+                star6.setVisibility(View.VISIBLE);
+                star7.setVisibility(View.VISIBLE);
+                star8.setVisibility(View.VISIBLE);
+                break;
+            case 0:
+                star1.setVisibility(View.GONE);
+                star2.setVisibility(View.GONE);
+                star3.setVisibility(View.GONE);
+                star4.setVisibility(View.GONE);
+                star5.setVisibility(View.GONE);
+                star6.setVisibility(View.GONE);
+                star7.setVisibility(View.GONE);
+                star8.setVisibility(View.GONE);
+                break;
+
+        }
+
+        int totalStars = silverStar + goldStar;
+        String  categoryName = item.getCatName();
+
+        String userImageUrl = AppConstants.PROFILE_IMAGE + item.getUesrProfileImg();
+        Glide.with(App.getAppContext())
+                .load(userImageUrl)
+                .centerCrop()
+                .dontAnimate()
+//                .placeholder(R.drawable.loading_spinner)
+                //  .crossFade()
+                .into(imagePostUser);
+        SpannableStringBuilder builder = getSpannableStringBuilder(likes, followers, totalStars, categoryName);
+
+
+        tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
+        long myMillis = Long.parseLong(item.getDateTime()) * 1000;
+        String postDate = Operation.getFormattedDateFromTimestamp(myMillis);
+
+        tvPostTime.setText(postDate);
+        tvHeaderInfo.setText(builder);
+    }
+
+    private void initheader() {
+        tvHeaderInfo = findViewById(R.id.tvHeaderInfo);
+        tvPostUserName = findViewById(R.id.tvPostUserName);
+        tvPostTime = findViewById(R.id.tvPostTime);
+        imagePostPermission = findViewById(R.id.imagePostPermission);
+        imagePostUser = findViewById(R.id.imagePostUser);
+        imagePermission = findViewById(R.id.imagePermission);
+        star1 = findViewById(R.id.star1);
+        star2 = findViewById(R.id.star2);
+        star3 = findViewById(R.id.star3);
+        star4 = findViewById(R.id.star4);
+        star5 = findViewById(R.id.star5);
+        star6 = findViewById(R.id.star6);
+        star7 = findViewById(R.id.star7);
+        star8 = findViewById(R.id.star8);
+        star9 = findViewById(R.id.star9);
+        star10 = findViewById(R.id.star10);
+        star11 = findViewById(R.id.star11);
+        star12 = findViewById(R.id.star12);
+        star13 = findViewById(R.id.star13);
+        star14 = findViewById(R.id.star14);
+        star15 = findViewById(R.id.star15);
+        star16 = findViewById(R.id.star16);
+        imagePermission.setVisibility(View.GONE);
 
     }
 
@@ -507,6 +717,11 @@ public class PostShare extends AppCompatActivity implements
     }
 
     private void setText(PostShareItem item) {
+
+
+
+
+
 
         String text = item.getPostText();
         StringBuilder nameBuilder = new StringBuilder();

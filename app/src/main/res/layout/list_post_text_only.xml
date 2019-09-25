@@ -10,6 +10,8 @@
     android:orientation="vertical">
 
 
+
+
     <com.borjabravo.readmoretextview.ReadMoreTextView
 
         android:id="@+id/tvPostContent"

@@ -71,12 +71,14 @@ import com.doodle.Comment.view.fragment.ReportLikerMessageSheet;
 import com.doodle.Comment.view.fragment.ReportPersonMessageSheet;
 import com.doodle.Comment.view.fragment.ReportReasonSheet;
 import com.doodle.Comment.view.fragment.ReportSendCategorySheet;
+import com.doodle.Home.holder.TextHolder;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Post.adapter.MentionUserAdapter;
 import com.doodle.Post.model.MentionUser;
 import com.doodle.Post.model.PostImage;
 import com.doodle.Post.service.PostService;
 import com.doodle.R;
+import com.doodle.Tool.AppConstants;
 import com.doodle.Tool.NetworkHelper;
 import com.doodle.Tool.PageTransformer;
 import com.doodle.Tool.PrefManager;
@@ -92,6 +94,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -111,6 +114,8 @@ import static android.widget.Toast.makeText;
 
 import static com.doodle.Home.holder.TextHolder.COMMENT_KEY;
 import static com.doodle.Home.holder.TextHolder.ITEM_KEY;
+
+import static com.doodle.Home.holder.TextHolder.POST_ITEM_POSITION;
 import static com.doodle.Post.view.activity.PostNew.isExternalStorageDocument;
 import static com.doodle.Tool.MediaUtil.getDataColumn;
 import static com.doodle.Tool.MediaUtil.isDownloadsDocument;
@@ -264,6 +269,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         CommentItem commentItem = getIntent().getExtras().getParcelable(COMMENT_KEY);
         postItem = getIntent().getExtras().getParcelable(ITEM_KEY);
+        position=getIntent().getExtras().getInt(POST_ITEM_POSITION);
         //commentChild = getIntent().getExtras().getParcelable(COMMENT_CHILD_KEY);
         if (commentItem == null) {
             throw new AssertionError("Null data item received!");
@@ -810,36 +816,38 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
 
 
 
+                Log.d("dfvbjndfi",response.body()+"");
                 Comment_ commentItems = response.body();
+
+
                 int insertId = commentItems.getInsertId();
                 Log.d("Data", commentItems.toString());
                 if (insertId > 0) {
 
-                    Comment_ commentItem = new Comment_();
-                    commentItem.setCommentImage(commentItems.getCommentImage());
-                    commentItem.setUserPhoto(userInfo.getPhoto());
-                    commentItem.setCommentType(String.valueOf(commentType));
-                    commentItem.setCommentText(commentItems.getCommentText());
-                    commentItem.setHasMention(String.valueOf(hasMention));
-                    commentItem.setCommentTextIndex(commentItems.getCommentTextIndex());
-                    commentItem.setLinkData(commentItems.getLinkData());
-                    commentItem.setTotalLike("0");
-                    commentItem.setUserId(profileId);
-                    commentItem.setUserFirstName(userInfo.getFirstName());
-                    commentItem.setUserLastName(userInfo.getLastName());
-                    commentItem.setUserGoldStars(userInfo.getGoldStars());
-                    commentItem.setUserSliverStars(userInfo.getSliverStars());
-                    long seconds = System.currentTimeMillis() / 1000;
-                    commentItem.setDateTime(String.valueOf(seconds));
-                    Log.d("comment: ", commentItem.toString());
-                    adapter.updateData(commentItem, position);
+//                    Comment_ commentItem = new Comment_();
+//                    commentItem.setCommentImage(commentItems.getCommentImage());
+//                    commentItem.setUserPhoto(userInfo.getPhoto());
+//                    commentItem.setCommentType(String.valueOf(commentType));
+//                    commentItem.setCommentText(commentItems.getCommentText());
+//                    commentItem.setHasMention(String.valueOf(hasMention));
+//                    commentItem.setCommentTextIndex(commentItems.getCommentTextIndex());
+//                    commentItem.setLinkData(commentItems.getLinkData());
+//                    commentItem.setTotalLike("0");
+//                    commentItem.setUserId(profileId);
+//                    commentItem.setUserFirstName(userInfo.getFirstName());
+//                    commentItem.setUserLastName(userInfo.getLastName());
+//                    commentItem.setUserGoldStars(userInfo.getGoldStars());
+//                    commentItem.setUserSliverStars(userInfo.getSliverStars());
+//                    long seconds = System.currentTimeMillis() / 1000;
+//                    commentItem.setDateTime(String.valueOf(seconds));
+//                    Log.d("comment: ", commentItem.toString());
+                    adapter.updateData(commentItems, position);
                     progressDialog.dismiss();
                     etComment.setText("");
                     //offset++;
                     recyclerView.smoothScrollToPosition(0);
                     // App.setCommentCount(1);
                 }
-
 
             }
 
@@ -1073,7 +1081,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
                 .build(etComment);
     }
 
-    private void sendCommentItemRequest(Call<Comment_> call) {
+    private void sendCommentItemRequest(Call<Comment_> call ) {
 
         call.enqueue(new Callback<Comment_>() {
 
@@ -1084,6 +1092,9 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
                 int newCommentId = Integer.parseInt(commentItems.getId());
 
                 if (newCommentId > 0) {
+                    int totalComment=Integer.parseInt(postItem.getTotalComment())+1;
+                    postItem.setTotalComment(String.valueOf(totalComment));
+                    App.getAppContext().sendBroadcast((new Intent().putExtra("post_item", (Serializable) postItem).putExtra("position", position).putExtra("isFooterChange", true).setAction(AppConstants.POST_CHANGE_BROADCAST)));
 /*
                     Comment_ commentItem = new Comment_();
                     commentItem.setId(String.valueOf(commentItems.getInsertId()));

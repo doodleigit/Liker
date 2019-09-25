@@ -42,7 +42,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/_5sdp"
-                android:textColor="#333"
+                android:textColor="@color/colorPostText"
                 android:textSize="14sp"
                 app:colorClickableText="@android:color/holo_blue_light"
                 app:trimCollapsedText="Show less"
@@ -57,6 +57,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="@dimen/_5sdp"
+                android:textColor="@color/colorPostText"
                 android:background="@null"
                 android:imeOptions="actionSend"
                 android:inputType="textCapSentences|textMultiLine" />

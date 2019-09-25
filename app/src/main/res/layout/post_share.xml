@@ -162,7 +162,7 @@
                         android:layout_below="@+id/messageContainer"
                         android:orientation="vertical">
 
-
+                        <include layout="@layout/list_item_post_header"/>
                         <include layout="@layout/list_post_text_only"/>
                         <include layout="@layout/list_post_image_only"/>
                         <include layout="@layout/list_post_text_mim_only"/>
