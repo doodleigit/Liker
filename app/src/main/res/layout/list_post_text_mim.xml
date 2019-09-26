@@ -51,7 +51,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:text="Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.vHere is my first post.Here is my first post.Here is my first post. "
-                android:textColor="#333"
+                android:textColor="@color/colorPostText"
                 android:textSize="14sp"
                 app:colorClickableText="@android:color/holo_blue_light"
                 app:trimCollapsedText="Show less"
@@ -65,10 +65,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@null"
+                android:textColor="@color/colorPostText"
                 android:layout_margin="@dimen/_5sdp"
                 android:imeOptions="actionSend"
                 android:inputType="textCapSentences|textMultiLine" />
-
 
         </LinearLayout>
 

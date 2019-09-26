@@ -59,6 +59,7 @@ import com.doodle.Home.view.activity.EditPost;
 import com.doodle.Home.view.activity.Home;
 import com.doodle.Home.view.activity.PostShare;
 import com.doodle.Home.view.fragment.LikerUserListFragment;
+import com.doodle.Home.view.fragment.PostPermissionSheet;
 import com.doodle.Post.model.Mim;
 import com.doodle.Post.service.DataProvider;
 import com.doodle.Post.view.activity.PostPopup;
@@ -96,6 +97,7 @@ import static com.doodle.Tool.Tools.containsIllegalCharacters;
 import static com.doodle.Tool.Tools.delayLoadComment;
 import static com.doodle.Tool.Tools.dismissDialog;
 import static com.doodle.Tool.Tools.getSpannableStringBuilder;
+import static com.doodle.Tool.Tools.getSpannableStringShareHeader;
 import static com.doodle.Tool.Tools.isNullOrEmpty;
 import static com.doodle.Tool.Tools.sendNotificationRequest;
 import static com.doodle.Tool.Tools.showBlockUser;
@@ -104,6 +106,7 @@ import static java.lang.Integer.parseInt;
 public class TextMimHolder extends RecyclerView.ViewHolder {
 
     public static final String ITEM_KEY = "item_key";
+    public static final String POST_ITEM_POSITION = "post_item_position";
     public TextView tvHeaderInfo, tvPostTime, tvPostUserName, tvImgShareCount, tvPostLikeCount, tvLinkScriptText, tvCommentCount;
     public CircleImageView imagePostUser;
     public ReadMoreTextView tvPostContent;
@@ -313,7 +316,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
             sharedUserProfileLike = itemSharedProfile.getUserProfileLikes();
             sharedPostText=item.getSharedPostText();
             sharedCategoryName=item.getCatName();
-            SpannableStringBuilder builder = getSpannableStringBuilder(mContext, item.getCatId(), sharedUserProfileLike, "", sharedTotalStar, sharedCategoryName);
+            SpannableStringBuilder builder = getSpannableStringShareHeader(sharedUserProfileLike, "", sharedTotalStar, sharedCategoryName);
             long myMillis = Long.parseLong(sharedDateTime) * 1000;
             String postDate = Operation.getFormattedDateFromTimestamp(myMillis);
             //    tvSharePostTime.setText(chatDateCompare(mContext,myMillis));
@@ -625,7 +628,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
             @Override
             public void onClick(View v) {
                 if (userIds.equalsIgnoreCase(item.getPostUserid())) {
-                    Tools.toast(mContext, "On Liker, you can't like your own posts. That would be cheating ", R.drawable.ic_info_outline_blue_24dp);
+                    Tools.toast(mContext, "On Liker, you can't like your own posts. That would be cheating ", R.drawable.ic_insert_emoticon_black_24dp);
                 } else {
                     PostFooter postFooters = item.getPostFooter();
                     if (postFooters.isLikeUserStatus()) {
@@ -792,7 +795,12 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
             @Override
             public void onClick(View v) {
 
-                boolean isNotificationOff = item.isIsNotificationOff();
+
+                activity = (AppCompatActivity) v.getContext();
+                PostPermissionSheet reportReasonSheet = PostPermissionSheet.newInstance(item,position);
+                reportReasonSheet.show(activity.getSupportFragmentManager(), "ReportReasonSheet");
+
+        /*        boolean isNotificationOff = item.isIsNotificationOff();
                 String postUserId = item.getPostUserid();
                 popupMenu = new PopupMenu(mContext, v);
                 popupMenu.getMenuInflater().inflate(R.menu.post_permission_menu, popupMenu.getMenu());
@@ -938,7 +946,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                         }
                         return true;
                     }
-                });
+                });*/
 
             }
         });
@@ -1361,6 +1369,8 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                     Intent intent = new Intent(mContext, CommentPost.class);
                     intent.putExtra(COMMENT_KEY, (Parcelable) commentItem);
                     intent.putExtra(ITEM_KEY, (Parcelable) item);
+                    intent.putExtra(POST_ITEM_POSITION, position);
+
 
                     mContext.startActivity(intent);
 

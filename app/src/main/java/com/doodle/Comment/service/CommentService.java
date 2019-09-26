@@ -5,6 +5,8 @@ import com.doodle.Comment.model.Comment_;
 import com.doodle.Comment.model.Reply;
 import com.doodle.Comment.model.ReportReason;
 import com.doodle.Tool.AppConstants;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -18,6 +20,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.Header;
+import retrofit2.http.Headers;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
@@ -31,12 +34,16 @@ public interface CommentService {
             .writeTimeout(15, TimeUnit.SECONDS)
             .build();
 
+    Gson gson = new GsonBuilder()
+            .setLenient()
+            .create();
+
 
     Retrofit mRetrofit = new Retrofit.Builder()
             .baseUrl(AppConstants.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(ScalarsConverterFactory.create())
-            .addConverterFactory(GsonConverterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create(gson))
             .build();
 
 

@@ -606,7 +606,7 @@ public class CommentLinkScriptHolder extends RecyclerView.ViewHolder {
 
                             if (isContain(object, "error")) {
                                 if ("You could not liked your own post".equalsIgnoreCase(object.getString("error"))) {
-                                    Tools.toast(mContext, "You could not liked your own post", R.drawable.ic_info_outline_blue_24dp);
+                                    Tools.toast(mContext, "You could not liked your own post", R.drawable.ic_insert_emoticon_black_24dp);
                                 } else {
                                     Call<String> mCall = commentService.commentUnLike(deviceId, profileId, token, commentItem.getId(), profileId);
                                     sendCommentUnLikeRequest(mCall);
@@ -778,7 +778,7 @@ public class CommentLinkScriptHolder extends RecyclerView.ViewHolder {
 
                             if (isContain(object, "error")) {
                                 if("You could not liked your own post".equalsIgnoreCase(object.getString("error"))){
-                                    Tools.toast(mContext,"You could not liked your own post",R.drawable.ic_info_outline_blue_24dp);
+                                    Tools.toast(mContext,"You could not liked your own post",R.drawable.ic_insert_emoticon_black_24dp);
                                 }else {
                                     Call<String> mCall = commentService.commentUnLike(deviceId, profileId, token, commentItem.getId(), profileId);
                                     sendCommentUnLikeRequest(mCall);

@@ -71,6 +71,7 @@ public class StarFragment extends Fragment {
     int limit = 5;
     int offset = 0;
     private String catIds = "";
+    private TextView tvAlert;
 
     //Delete post item
     public static TextHolder.PostItemListener mCallback;
@@ -99,6 +100,14 @@ public class StarFragment extends Fragment {
         filter.addAction(AppConstants.PROFILE_PAGE_PAGINATION_BROADCAST);
         Objects.requireNonNull(getActivity()).registerReceiver(broadcastReceiver, filter);
 
+        IntentFilter postFooterIntentFilter = new IntentFilter();
+        postFooterIntentFilter.addAction(AppConstants.POST_CHANGE_BROADCAST);
+        Objects.requireNonNull(getActivity()).registerReceiver(postChangeBroadcast, postFooterIntentFilter);
+
+        IntentFilter permissionIntent = new IntentFilter();
+        permissionIntent.addAction(AppConstants.PERMISSION_CHANGE_BROADCAST);
+        Objects.requireNonNull(getActivity()).registerReceiver(permissionBroadcast, permissionIntent);
+
         postItemList = new ArrayList<>();
 
         progressDialog = new ProgressDialog(getContext());
@@ -113,6 +122,7 @@ public class StarFragment extends Fragment {
         userId = manager.getProfileId();
         arrayList = new ArrayList<>();
 
+        tvAlert = view.findViewById(R.id.alert);
         tvUserName = view.findViewById(R.id.user_name);
         layoutManager = new LinearLayoutManager(getContext());
         recyclerView = view.findViewById(R.id.recyclerView);
@@ -142,6 +152,7 @@ public class StarFragment extends Fragment {
 
             }
         };
+
         mimListener = new TextMimHolder.PostItemListener() {
             @Override
             public void deletePost(PostItem postItem, int position) {
@@ -186,6 +197,12 @@ public class StarFragment extends Fragment {
                 StarFragment.this.deletePost(deletePostItem, deletePosition);
             }
         };
+
+        adapter = new PostAdapter(getActivity(), postItemList, mCallback, mimListener, videoListener, youtubeListener, linkListener, imageListener, true);
+        feedRecyclerView.setMediaObjects(postItemList);
+        feedRecyclerView.setActivityContext(getActivity());
+        feedRecyclerView.setAdapter(adapter);
+        getData();
 
     }
 
@@ -239,8 +256,10 @@ public class StarFragment extends Fragment {
                             JSONObject object = new JSONObject(response.body());
                             boolean status = object.getBoolean("status");
                             if (status) {
-                                postItemList.remove(deletePostItem);
-                                adapter.deleteItem(deletePosition);
+                                postItemList.remove(deletePosition);
+                                adapter.notifyDataSetChanged();
+                                offset--;
+                                feedRecyclerView.smoothScrollToPosition(0);
                             }
 
                         } catch (JSONException e) {
@@ -279,14 +298,16 @@ public class StarFragment extends Fragment {
     }
 
     private void PostItemPagingRequest(Call<List<PostItem>> call) {
+
         call.enqueue(new Callback<List<PostItem>>() {
 
             @Override
             public void onResponse(Call<List<PostItem>> call, Response<List<PostItem>> response) {
 
-                postItemList = response.body();
+                List<PostItem> list = response.body();
 
-                if (postItemList != null) {
+                if (list != null) {
+                    postItemList.addAll(list);
                     String totalPostIDs;
                     List<String> postIdSet = new ArrayList<>();
                     for (PostItem temp : postItemList) {
@@ -306,44 +327,19 @@ public class StarFragment extends Fragment {
 
                     totalPostIDs = sb.substring(separator.length()).replaceAll("\\s+", "");
                     Log.d("friends", totalPostIDs);
-                    Call<CommentItem> mCall = profileService.getPostComments(deviceId, userId, token, "false", 1, 0, "DESC", totalPostIDs, userId);
-                    sendCommentItemPagingRequest(mCall);
-
-
+//                    Call<CommentItem> mCall = webService.getPostComments(deviceId, profileId, token, "false", limit, offset, "DESC", totalPostIDs, userIds);
+//                    sendCommentItemPagingRequest(mCall);
+                    offset += 5;
+                    onPostResponsePagination();
+                } else {
+                    onPostResponsePagination();
                 }
             }
 
             @Override
             public void onFailure(Call<List<PostItem>> call, Throwable t) {
                 Log.d("MESSAGE: ", t.getMessage());
-//                progressView.setVisibility(View.GONE);
-            }
-        });
-    }
-
-    private void sendCommentItemPagingRequest(Call<CommentItem> mCall) {
-
-        mCall.enqueue(new Callback<CommentItem>() {
-
-            @Override
-            public void onResponse(Call<CommentItem> mCall, Response<CommentItem> response) {
-
-                CommentItem commentItem = response.body();
-                //  comments = commentItem.getComments();
-                Log.d("commentItem", commentItem.toString());
-                if (postItemList != null) {
-                    adapter.addPagingData(postItemList);
-                    offset += 5;
-//                    progressView.setVisibility(View.GONE);
-                }
-                isScrolling = true;
-            }
-
-            @Override
-            public void onFailure(Call<CommentItem> mCall, Throwable t) {
-                Log.d("MESSAGE: ", t.getMessage());
-//                progressView.setVisibility(View.GONE);
-                isScrolling = true;
+                onPostResponsePagination();
             }
         });
     }
@@ -355,8 +351,10 @@ public class StarFragment extends Fragment {
             @Override
             public void onResponse(Call<List<PostItem>> call, Response<List<PostItem>> response) {
 
-                postItemList = response.body();
-                if (postItemList != null) {
+                List<PostItem> itemList = response.body();
+                if (itemList != null) {
+                    postItemList.clear();
+                    postItemList.addAll(itemList);
 
                     String totalPostIDs;
                     List<String> postIdSet = new ArrayList<>();
@@ -377,10 +375,12 @@ public class StarFragment extends Fragment {
 
                     totalPostIDs = sb.substring(separator.length()).replaceAll("\\s+", "");
                     Log.d("friends", totalPostIDs);
-                    Call<CommentItem> mCall = profileService.getPostComments(deviceId, userId, token, "false", 1, 0, "DESC", totalPostIDs, userId);
-                    sendCommentItemRequest(mCall);
+
+                    offset = limit;
+                    onPostResponse();
                 } else {
-                    progressDialog.hide();
+                    postItemList.clear();
+                    onPostResponseFailure();
                 }
 
             }
@@ -388,46 +388,37 @@ public class StarFragment extends Fragment {
             @Override
             public void onFailure(Call<List<PostItem>> call, Throwable t) {
                 Log.d("MESSAGE: ", t.getMessage());
-//                progressView.setVisibility(View.GONE);
-                progressDialog.hide();
-
+                postItemList.clear();
+                onPostResponseFailure();
             }
         });
 
     }
 
-    private void sendCommentItemRequest(Call<CommentItem> mCall) {
+    private void onPostResponse() {
+//        progressView.setVisibility(View.GONE);
+        adapter.notifyDataSetChanged();
+//        refreshLayout.setRefreshing(false);
+        tvAlert.setVisibility(View.GONE);
+        progressDialog.dismiss();
+        isScrolling = true;
+    }
 
-        mCall.enqueue(new Callback<CommentItem>() {
+    private void onPostResponsePagination() {
+//        progressView.setVisibility(View.GONE);
+        adapter.notifyDataSetChanged();
+//        refreshLayout.setRefreshing(false);
+        tvAlert.setVisibility(View.GONE);
+        isScrolling = true;
+    }
 
-            @Override
-            public void onResponse(Call<CommentItem> mCall, Response<CommentItem> response) {
-
-                CommentItem commentItem = response.body();
-                //  comments = commentItem.getComments();
-                Log.d("commentItem", commentItem.toString());
-                if (postItemList != null) {
-                    adapter = new PostAdapter(getActivity(), postItemList, mCallback, mimListener, videoListener, youtubeListener, linkListener, imageListener, true);
-                    offset += 5;
-                    progressDialog.hide();
-
-                    feedRecyclerView.setVisibility(View.VISIBLE);
-                    feedRecyclerView.setMediaObjects(postItemList);
-                    feedRecyclerView.setAdapter(adapter);
-                    //  Log.d("PostItem: ", categoryItem.toString() + "");
-//                    progressView.setVisibility(View.GONE);
-                }
-                isScrolling = true;
-            }
-
-            @Override
-            public void onFailure(Call<CommentItem> mCall, Throwable t) {
-                Log.d("MESSAGE: ", t.getMessage());
-                progressDialog.hide();
-//                progressView.setVisibility(View.GONE);
-                isScrolling = true;
-            }
-        });
+    private void onPostResponseFailure() {
+//        progressView.setVisibility(View.GONE);
+        adapter.notifyDataSetChanged();
+//        refreshLayout.setRefreshing(false);
+        tvAlert.setVisibility(View.VISIBLE);
+        progressDialog.dismiss();
+        isScrolling = true;
     }
 
     @Override
@@ -439,6 +430,7 @@ public class StarFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
+        feedRecyclerView.pausePlayer();
     }
 
     private boolean isViewShown = false;
@@ -470,9 +462,72 @@ public class StarFragment extends Fragment {
         }
     };
 
+    BroadcastReceiver postChangeBroadcast = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            PostItem postItem = (PostItem) intent.getSerializableExtra("post_item");
+            boolean isFooterChange = intent.getBooleanExtra("isFooterChange", true);
+            int position = intent.getIntExtra("position", -1);
+            if (isFooterChange) {
+                if (position != -1) {
+                    if (postItemList.size() >= position + 1) {
+                        if (postItemList.get(position).getPostId().equals(postItem.getPostId())) {
+                            postItemList.get(position).getPostFooter().setPostTotalLike(postItem.getPostFooter().getPostTotalLike());
+                            postItemList.get(position).getPostFooter().setLikeUserStatus(postItem.getPostFooter().isLikeUserStatus());
+                            postItemList.get(position).setTotalComment(postItem.getTotalComment());
+                            adapter.notifyItemChanged(position);
+                        }
+                    }
+                }
+            } else {
+                if (position != -1) {
+                    if (postItemList.size() >= position + 1) {
+                        if (postItemList.get(position).getPostId().equals(postItem.getPostId())) {
+                            postItemList.set(position, postItem);
+                            adapter.notifyItemChanged(position);
+                        }
+                    }
+                }
+            }
+
+        }
+    };
+
+    BroadcastReceiver permissionBroadcast = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            PostItem postItem = (PostItem) intent.getSerializableExtra("post_item");
+            int position = intent.getIntExtra("position", -1);
+            String type=intent.getStringExtra("type");
+
+            if (position != -1) {
+                if (postItemList.size() >= position + 1) {
+                    if (postItemList.get(position).getPostId().equals(postItem.getPostId())) {
+
+
+                        if("permission".equalsIgnoreCase(type)){
+                            postItemList.remove(position);
+                            postItemList.add(position, postItem);
+                            adapter.notifyItemChanged(position);
+                        }else {
+                            postItemList.remove(position);
+                            // adapter.notifyItemChanged(position);
+                            adapter.notifyDataSetChanged();
+                        }
+
+
+                    }
+                }
+            }
+        }
+    };
+
     @Override
     public void onDestroy() {
         super.onDestroy();
+        feedRecyclerView.releasePlayer();
         Objects.requireNonNull(getActivity()).unregisterReceiver(broadcastReceiver);
+        Objects.requireNonNull(getActivity()).unregisterReceiver(postChangeBroadcast);
+        Objects.requireNonNull(getActivity()).unregisterReceiver(permissionBroadcast);
     }
 }

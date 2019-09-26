@@ -60,6 +60,7 @@ public class App extends Application {
     private static boolean isBockComment;
     private static boolean isBockReply;
     private static boolean notificationStatus;
+    private static boolean notificationOff;
     private static boolean deleteStatus;
     private static int position;
     private static boolean isMimPopup;
@@ -81,6 +82,14 @@ public class App extends Application {
 
     public static void setDeleteMediaIds(List<String> deleteMediaIds) {
         App.deleteMediaIds = deleteMediaIds;
+    }
+
+    public static boolean isNotificationOff() {
+        return notificationOff;
+    }
+
+    public static void setNotificationOff(boolean notificationOff) {
+        App.notificationOff = notificationOff;
     }
 
     public static boolean isIsImagePopup() {

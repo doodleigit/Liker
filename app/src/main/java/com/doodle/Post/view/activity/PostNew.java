@@ -22,6 +22,7 @@ import android.os.Environment;
 import android.os.PersistableBundle;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
@@ -56,14 +57,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.doodle.App;
+import com.doodle.Home.holder.mediaHolder.ImageViewHolder;
+import com.doodle.Home.holder.mediaHolder.VideoViewHolder;
 import com.doodle.Home.view.activity.Home;
 import com.doodle.Post.adapter.ChatAdapter;
 import com.doodle.Post.adapter.ImageAdapter;
+import com.doodle.Post.adapter.LinkScriptAdapter;
 import com.doodle.Post.adapter.MediaAdapter;
 import com.doodle.Post.adapter.MentionUserAdapter;
 import com.doodle.Post.adapter.MimAdapter;
 import com.doodle.Post.model.Category;
 import com.doodle.Post.model.CategoryItem;
+import com.doodle.Post.model.LinkScriptItem;
 import com.doodle.Post.model.MentionUser;
 import com.doodle.Post.model.Mim;
 import com.doodle.Post.model.MultipleMediaFile;
@@ -106,6 +111,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -125,6 +131,7 @@ import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 import static android.widget.Toast.LENGTH_SHORT;
 import static android.widget.Toast.makeText;
 import static com.doodle.Tool.Tools.getMD5EncryptedString;
+import static com.doodle.Tool.Tools.isContain;
 import static com.doodle.Tool.Tools.isNullOrEmpty;
 
 public class PostNew extends AppCompatActivity implements View.OnClickListener,
@@ -191,10 +198,13 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
     //POST LINK SCRIPT
     private EditText editText, editTextTitlePost, editTextDescriptionPost;
-    private Button submitButton, postButton, randomButton;
+    private Button submitButton, randomButton;
+    private FloatingActionButton postButton;
+    private TextView tvOk;
+    private RecyclerView rvLinkScript;
     private Context context;
     private ViewGroup dropPreview, dropPost;
-    private TextView previewAreaTitle, postAreaTitle;
+    private TextView postAreaTitle;
     private String currentTitle, currentUrl, currentCannonicalUrl,
             currentDescription;
 
@@ -264,6 +274,22 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
     private CircleImageView imgPostUser;
     private String imageUrl;
 
+
+    //DELETE MEDIA
+    public ImageViewHolder.ImageListener imageListener;
+    public VideoViewHolder.VideoListen videoListen;
+
+    List<String> deleteMediaFiles;
+    MediaAdapter mediaAdapter;
+    List<MultipleMediaFile> multipleMediaFiles;
+    List<MultipleMediaFile> newMultipleMediaFiles;
+    MultipleMediaFile mediaFile;
+    private String mediaFive;
+    private String base64md5;
+    Set<String> mediaList;
+    List<String> videoList;
+    List<LinkScriptItem> scriptItemList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -276,11 +302,15 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
         networkOk = NetworkHelper.hasNetworkAccess(this);
         progressView = (CircularProgressView) findViewById(R.id.progress_view);
         mView = new View(this);
-
+        mediaList = new HashSet<>();
+        videoList = new ArrayList<>();
+        scriptItemList = new ArrayList<>();
+        mediaFile = new MultipleMediaFile();
         mediaFiles = new ArrayList<>();
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage(getString(R.string.checking));
-
+        multipleMediaFiles = new ArrayList<>();
+        newMultipleMediaFiles = new ArrayList<>();
         mediaProgress = findViewById(R.id.mediaProgress);
         mediaRecyclerView = findViewById(R.id.rvPostMedia);
         mimRecyclerView = (RecyclerView) findViewById(R.id.rvMim);
@@ -294,6 +324,8 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
         findViewById(R.id.btnAttachment).setOnClickListener(this);
         intro = findViewById(R.id.intro);
         tvSubmitPost = findViewById(R.id.tvSubmitPost);
+        postButton = (FloatingActionButton) findViewById(R.id.post);
+
         tvSubmitPost.setOnClickListener(this);
         findViewById(R.id.contentCategory).setOnClickListener(this);
         findViewById(R.id.imageCamera).setOnClickListener(this);
@@ -310,6 +342,57 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
         contentPostView = findViewById(R.id.contentPostView);
         messageContainer = findViewById(R.id.messageContainer);
         messageContainer.setOnClickListener(this);
+        deleteMediaFiles = new ArrayList<>();
+        mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos, imageListener, videoListen);
+        imageListener = new ImageViewHolder.ImageListener() {
+            @Override
+            public void deleteImage(PostImage postImage, int position) {
+
+
+                postImages.remove(postImage);
+                mediaAdapter.deleteItem(position);
+                String mdFiveFile = postImage.getMdFive();
+//{"base_64_md5":"ded330ca6a57c3dbb81d292f4528d15a","file_type":"image","name":"5d861a0055159.jpg"}
+                for (int i = 0; i < mediaFiles.size(); i++) {
+
+                    try {
+                        JSONObject ds = new JSONObject(mediaFiles.get(i).toString());
+                        base64md5 = ds.getString("base_64_md5");
+                        if (base64md5.equalsIgnoreCase(mdFiveFile)) {
+                            mediaFiles.remove(i);
+                        }
+                        Log.d("base64md5 ", base64md5 + "");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+        };
+        videoListen = new VideoViewHolder.VideoListen() {
+            @Override
+            public void deleteVideo(PostVideo postVideo, int position) {
+                postVideos.remove(postVideo);
+                mediaAdapter.deleteItem(position);
+                String mdFiveFile = postVideo.getMdFive();
+
+
+                for (int i = 0; i < mediaFiles.size(); i++) {
+
+                    try {
+                        JSONObject ds = new JSONObject(mediaFiles.get(i).toString());
+                        base64md5 = ds.getString("base_64_md5");
+                        if (base64md5.equalsIgnoreCase(mdFiveFile)) {
+                            mediaFiles.remove(i);
+                        }
+                        Log.d("base64md5 ", base64md5 + "");
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+        };
 
         MimAdapter.RecyclerViewClickListener listener = (view, position) -> {
 
@@ -378,15 +461,14 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
         deviceId = manager.getDeviceId();
         token = manager.getToken();
 
-
         chatAdapter = new ChatAdapter();
 
 
         rootView = findViewById(R.id.main_activity_root_view);
         emojiButton = findViewById(R.id.main_activity_emoji);
         final ImageView sendButton = findViewById(R.id.main_activity_send);
-        imgPostUser=findViewById(R.id.imgPostUser);
-        imageUrl=manager.getProfileImage();
+        imgPostUser = findViewById(R.id.imgPostUser);
+        imageUrl = manager.getProfileImage();
         if (!isNullOrEmpty(imageUrl)) {
             Picasso.with(this)
                     .load(imageUrl)
@@ -464,9 +546,9 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
         /** --- */
 
 
-        postButton = (Button) findViewById(R.id.post);
+        rvLinkScript = findViewById(R.id.rvLinkScript);
 
-        previewAreaTitle = (TextView) findViewById(R.id.preview_area);
+
         postAreaTitle = (TextView) findViewById(R.id.post_area);
 
         /** Where the previews will be dropped */
@@ -519,9 +601,9 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
                 if (extractedUrls.size() == 0) {
                     isLinkScript = false;
-                    releasePreviewArea();
+                  /*  releasePreviewArea();
                     rvLinkScriptShow = false;
-                    linkScriptToggle();
+                    linkScriptToggle();*/
 
                     if (!isNullOrEmpty(contentTitle)) {
                         //  makeText(PostNew.this, "Button Enable-1!", LENGTH_SHORT).show();
@@ -532,8 +614,10 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                     rvMimToggle();
                     rvMediaShow = false;
                     mediaRecyclerViewToggle();
+
                     rvLinkScriptShow = true;
                     linkScriptToggle();
+
 
                     StringBuilder builder = new StringBuilder();
                     for (String temp : extractedUrls) {
@@ -556,10 +640,12 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                             // Not Valid youtube URL
                         }
                     }
+
+                    //  submitLink();
                 }
 
 
-                if (!contentTitle.isEmpty() && myUrl != null && contentTitle.length() > myUrl.length()) {
+                if (!contentTitle.isEmpty() && myUrl != null && contentTitle.length() >= myUrl.length() + 8) {
                     isAddContentTitle = true;
                     tvSubmitPost.setVisibility(View.VISIBLE);
 
@@ -571,6 +657,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                 if (s.length() == 1) {
                     if (manager.getNewPostIntro().equals("0")) {
                         manager.setNewPostIntro("1");
+                        hideKeyboard(PostNew.this);
                         showIntroTooltip();
                     }
                 }
@@ -592,6 +679,17 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
         });
 
 
+    }
+
+    public void hideKeyboard(Activity activity) {
+        InputMethodManager imm = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        //Find the currently focused view, so we can grab the correct window token from it.
+        View view = activity.getCurrentFocus();
+        //If no view currently has focus, create a new one, just so we can grab a window token from it
+        if (view == null) {
+            view = new View(activity);
+        }
+        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
     private void showIntroTooltip() {
@@ -803,80 +901,84 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
             @Override
             public void onClick(View v) {
-                postAreaTitle.setVisibility(View.VISIBLE);
-                tvSubmitPost.setVisibility(View.VISIBLE);
-                previewAreaTitle.setVisibility(View.GONE);
-                postButton.setVisibility(View.GONE);
-                tvSubmitPost.setEnabled(true);
-
-                /** Inflating the preview layout */
-                View mainView = getLayoutInflater().inflate(R.layout.main_view,
-                        null);
-
-                LinearLayout linearLayout = (LinearLayout) mainView
-                        .findViewById(R.id.external);
-
-                /**
-                 * Inflating the post content
-                 */
-                final View content = getLayoutInflater().inflate(
-                        R.layout.post_content, linearLayout);
-
-                /** Fullfilling the content layout */
-                final LinearLayout infoWrap = (LinearLayout) content
-                        .findViewById(R.id.info_wrap);
-
-                final TextView contentTextView = (TextView) content
-                        .findViewById(R.id.post_content);
-                final ImageView imageView = (ImageView) content
-                        .findViewById(R.id.image_post);
-                final TextView titleTextView = (TextView) content
-                        .findViewById(R.id.title);
-
-                final TextView urlTextView = (TextView) content
-                        .findViewById(R.id.url);
-                final TextView descriptionTextView = (TextView) content
-                        .findViewById(R.id.description);
-
-                contentTextView.setText(TextCrawler.extendedTrim(editPostMessage
-                        .getText().toString()));
-
-                if (currentImage != null && !noThumb) {
-                    imageView.setImageBitmap(currentImage);
-                } else {
-
-                }
-
-                if (!currentTitle.equals(""))
-                    titleTextView.setText(currentTitle);
-                else
-                    titleTextView.setVisibility(View.GONE);
-
-                if (!currentDescription.equals(""))
-                    descriptionTextView.setText(currentDescription);
-                else
-                    descriptionTextView.setVisibility(View.GONE);
-
-                urlTextView.setText(currentCannonicalUrl);
-
-                final String currentUrlLocal = currentUrl;
-
-                mainView.setOnClickListener(new View.OnClickListener() {
-
-                    @Override
-                    public void onClick(View arg0) {
-                        String url = currentUrlLocal;
-                        Intent i = new Intent(Intent.ACTION_VIEW);
-                        i.setData(Uri.parse(url));
-                        startActivity(i);
-                    }
-                });
-                dropPost.removeAllViews();
-                dropPost.addView(mainView, 0);
-                dropPreview.removeAllViews();
+                submitLink();
 
             }
         });
+    }
+
+    private void submitLink() {
+        postAreaTitle.setVisibility(View.VISIBLE);
+        tvSubmitPost.setVisibility(View.VISIBLE);
+        postButton.setVisibility(View.GONE);
+        tvSubmitPost.setEnabled(true);
+
+        /** Inflating the preview layout */
+        View mainView = getLayoutInflater().inflate(R.layout.main_view,
+                null);
+
+        LinearLayout linearLayout = (LinearLayout) mainView
+                .findViewById(R.id.external);
+
+        /**
+         * Inflating the post content
+         */
+        final View content = getLayoutInflater().inflate(
+                R.layout.post_content, linearLayout);
+
+        /** Fullfilling the content layout */
+        final LinearLayout infoWrap = (LinearLayout) content
+                .findViewById(R.id.info_wrap);
+
+        final TextView contentTextView = (TextView) content
+                .findViewById(R.id.post_content);
+        final ImageView imageView = (ImageView) content
+                .findViewById(R.id.image_post);
+        final TextView titleTextView = (TextView) content
+                .findViewById(R.id.title);
+
+        final TextView urlTextView = (TextView) content
+                .findViewById(R.id.url);
+        final TextView descriptionTextView = (TextView) content
+                .findViewById(R.id.description);
+
+        contentTextView.setText(TextCrawler.extendedTrim(editPostMessage
+                .getText().toString()));
+
+        if (currentImage != null && !noThumb) {
+            imageView.setImageBitmap(currentImage);
+        } else {
+
+        }
+
+        if (!currentTitle.equals(""))
+            titleTextView.setText(currentTitle);
+        else
+            titleTextView.setVisibility(View.GONE);
+
+        if (!currentDescription.equals(""))
+            descriptionTextView.setText(currentDescription);
+        else
+            descriptionTextView.setVisibility(View.GONE);
+
+        urlTextView.setText(currentCannonicalUrl);
+
+        final String currentUrlLocal = currentUrl;
+
+
+        mainView.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                String url = currentUrlLocal;
+                Intent i = new Intent(Intent.ACTION_VIEW);
+                i.setData(Uri.parse(url));
+                startActivity(i);
+            }
+        });
+        dropPost.removeAllViews();
+        dropPost.addView(mainView, 0);
+        dropPreview.removeAllViews();
     }
 
     @Override
@@ -953,7 +1055,6 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
     }
 
 
-
     @Override
     public void onClick(View v) {
         int id = v.getId();
@@ -1019,9 +1120,12 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
                 checkContentType();
                 if (categoryId.isEmpty() && subCategoryId.isEmpty()) {
-                    Tools.showCustomToast(PostNew.this, mView, " Choose Audience !", Gravity.TOP);
+                    Tools.showCustomToast(PostNew.this, mView, "Please select your post’s audience.", Gravity.TOP);
                 } else if (!isAddContentTitle) {
-                    Tools.showCustomToast(PostNew.this, mView, " You must add description to your post !", Gravity.TOP);
+                    Tools.showCustomToast(PostNew.this, mView, "Cat’s got your tongue? Please write at least 8 characters in your post description.", Gravity.TOP);
+                } else if (contentTitle.length() < 8) {
+                    Tools.showCustomToast(PostNew.this, mView, "Cat’s got your tongue? Please write at least 8 characters in your post description.", Gravity.TOP);
+
                 } else {
                     createNewPost();
                 }
@@ -1198,22 +1302,26 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
                         try {
                             JSONObject object = new JSONObject(response.body());
-                            JSONObject successObject = object.getJSONObject("success");
-                            boolean topContributorStatus = successObject.getBoolean("top_contributor_status");
-                            postId = successObject.getInt("post_id");
 
-                            if (topContributorStatus) {
-                                String msg;
-                                if (audience.isEmpty()) {
-                                    msg = categoryName + "-" + audience + " ?";
-                                } else {
-                                    msg = categoryName + "-" + audience + " ?";
-                                }
+
+                            JSONObject successObject = object.getJSONObject("success");
+
+                            if (successObject.length() > 0) {
+                                boolean topContributorStatus = successObject.getBoolean("top_contributor_status");
+                                postId = successObject.getInt("post_id");
+
+                                if (topContributorStatus) {
+                                    String msg;
+                                    if (audience.isEmpty()) {
+                                        msg = categoryName + "-" + audience + " ?";
+                                    } else {
+                                        msg = categoryName + "-" + audience + " ?";
+                                    }
 //                                ResendEmail resendEmail = ResendEmail.newInstance(msg);
 //                                resendEmail.show(getSupportFragmentManager(), "ResendEmail");
-                                ContributorStatus status = ContributorStatus.newInstance(msg);
-                                status.show(getSupportFragmentManager(), "ContributorStatus");
-                            } else {
+                                    ContributorStatus status = ContributorStatus.newInstance(msg);
+                                    status.show(getSupportFragmentManager(), "ContributorStatus");
+                                } else {
                              /*   if (contentType == 5) {
 
                                     Call<String> mediaCall = videoServices.uploadVideo(deviceId, profileId, token, fileToUpload, postId, true);
@@ -1222,10 +1330,20 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                                 } else {
 
                                 }*/
-                                startActivity(new Intent(PostNew.this, Home.class));
-                                finish();
+                                    startActivity(new Intent(PostNew.this, Home.class));
+                                    finish();
+
+                                }
 
                             }
+
+                            JSONObject errorObject = object.getJSONObject("errors");
+                            if (errorObject.length() > 0) {
+                                String post_duplicate = errorObject.getString("post_duplicate");
+                                Tools.toast(PostNew.this, post_duplicate, R.drawable.ic_warning_black_24dp);
+                            }
+
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -1349,7 +1467,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
         } else {
             sendImageFromGallery();
-            makeText(this, R.string.grant, LENGTH_SHORT).show();
+            //     makeText(this, R.string.grant, LENGTH_SHORT).show();
             isGrantGallery = true;
         }
     }
@@ -1371,7 +1489,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
             }
         } else {
             sendVideoFroGallery();
-            makeText(this, R.string.grant, LENGTH_SHORT).show();
+            //  makeText(this, R.string.grant, LENGTH_SHORT).show();
         }
     }
 
@@ -1407,7 +1525,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
         } else {
 
             sendImageFromCamera();
-            makeText(this, R.string.grant, LENGTH_SHORT).show();
+            //  makeText(this, R.string.grant, LENGTH_SHORT).show();
             isGrantCamera = true;
         }
     }
@@ -1418,7 +1536,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
         switch (requestCode) {
             case REQUEST_TAKE_GALLERY_IMAGE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    makeText(this, R.string.gallery_granted, LENGTH_SHORT).show();
+                    //   makeText(this, R.string.gallery_granted, LENGTH_SHORT).show();
                     sendImageFromGallery();
                 } else {
                     makeText(this, R.string.request_permission, LENGTH_SHORT).show();
@@ -1426,7 +1544,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                 break;
             case REQUEST_TAKE_CAMERA:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    makeText(this, R.string.gallery_granted, LENGTH_SHORT).show();
+                    //     makeText(this, R.string.gallery_granted, LENGTH_SHORT).show();
                     sendImageFromCamera();
                 } else {
                     makeText(this, R.string.request_permission, LENGTH_SHORT).show();
@@ -1434,7 +1552,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                 break;
             case REQUEST_TAKE_GALLERY_VIDEO:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    makeText(this, R.string.gallery_granted, LENGTH_SHORT).show();
+                    //  makeText(this, R.string.gallery_granted, LENGTH_SHORT).show();
                     sendVideoFroGallery();
                 } else {
                     makeText(this, R.string.request_permission, LENGTH_SHORT).show();
@@ -1481,11 +1599,11 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                 addPhotoRequest(mediaCall);
 
                 progressDialog.show();
-                postImages.add(new PostImage("file://"+imagePath));
+                postImages.add(new PostImage("file://" + imagePath, fileEncoded));
                 if (postImages.size() > 0)
                     rvMediaShow = true;
                 mediaRecyclerViewToggle();
-                MediaAdapter mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos);
+                mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos, imageListener, videoListen);
                 mediaRecyclerView.setAdapter(mediaAdapter);
                 progressDialog.dismiss();
 
@@ -1558,10 +1676,12 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                             boolean mediaStatus = object.getBoolean("status");
                             imageFile = object.getString("filename");
                             uploadImageName.add(imageFile);
-                            MultipleMediaFile mediaFile = new MultipleMediaFile();
+                            //  MultipleMediaFile mediaFile = new MultipleMediaFile();
                             mediaFile.setBase64Md5(fileEncoded);
                             mediaFile.setFileType("image");
                             mediaFile.setName(imageFile);
+                            multipleMediaFiles.add(mediaFile);
+
                             Gson gson = new Gson();
                             String gsonString = gson.toJson(mediaFile);
                             mediaFiles.add(gsonString);
@@ -1650,6 +1770,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
         ClipData clipData = data.getClipData();
         if (clipData != null) {
+            ArrayList<String> tempMedia = new ArrayList<>();
             for (int i = 0; i < clipData.getItemCount(); i++) {
                 ClipData.Item videoItem = clipData.getItemAt(i);
                 Uri videoURI = videoItem.getUri();
@@ -1662,8 +1783,30 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                 Log.d("Extension: ", videoExtension);
                 String strMD5 = getMD5EncryptedString(videoPath);
                 fileEncoded = strMD5;
-                Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "2", strMD5);
-                sendIsDuplicateVideoRequest(call);
+
+                if (videoList.size() == 0) {
+                    Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "2", strMD5);
+                    sendIsDuplicateVideoRequest(call);
+                    tempMedia.add(videoPath);
+                } else {
+                    boolean hasAlready = false;
+                    for (String temp : videoList) {
+                        if (temp.equalsIgnoreCase(videoPath)) {
+                            hasAlready = true;
+                            Tools.toast(PostNew.this, "You have already add this!", R.drawable.ic_info_outline_blue_24dp);
+                            break;
+                        }
+                    }
+                    if (!hasAlready) {
+                        Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "2", strMD5);
+                        sendIsDuplicateVideoRequest(call);
+                        tempMedia.add(videoPath);
+                    }
+                }
+
+
+//                Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "2", strMD5);
+//                sendIsDuplicateVideoRequest(call);
 
                 //   result.add(new PostVideo(videoPath));
 
@@ -1674,6 +1817,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 //                Call<String> mediaCall = videoServices.uploadVideo(deviceId, profileId, token, fileToUpload, true);
 //                addPhotoRequest(mediaCall);
             }
+            videoList.addAll(tempMedia);
         } else {
             Uri videoURI = data.getData();
             videoFilePath = getPath(this, videoURI);
@@ -1686,8 +1830,21 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
             String strMD5 = getMD5EncryptedString(videoPath);
             fileEncoded = strMD5;
-            Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "2", strMD5);
-            sendIsDuplicateVideoRequest(call);
+
+            if (videoList.size() == 0) {
+                Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "2", strMD5);
+                sendIsDuplicateVideoRequest(call);
+                videoList.add(videoPath);
+            } else {
+                for (String temp : videoList) {
+                    if (temp.equalsIgnoreCase(videoPath)) {
+                        Tools.toast(PostNew.this, "You have already add this!", R.drawable.ic_info_outline_blue_24dp);
+                    } else {
+                        Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "2", strMD5);
+                        sendIsDuplicateVideoRequest(call);
+                    }
+                }
+            }
 
 
             File file = new File(videoFilePath);
@@ -1731,20 +1888,22 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                                     progressDialog.show();
 
                                     String videoPath = "file://" + videoFilePath;
-                                    postVideos.add(new PostVideo(videoPath));
+                                    PostVideo postVideo = new PostVideo();
+                                    postVideo.setVideoPath(videoPath);
+                                    postVideo.setMdFive(fileEncoded);
+                                    postVideos.add(postVideo);
                                     if (postVideos.size() > 0)
                                         rvMediaShow = true;
                                     mediaRecyclerViewToggle();
-                                    MediaAdapter mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos);
+                                    mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos, imageListener, videoListen);
                                     mediaRecyclerView.setAdapter(mediaAdapter);
-
 
 
                                 }
 
 
-                                String message = "Add gallery successfully!";
-                                Tools.showCustomToast(PostNew.this, mView, message, Gravity.CENTER);
+                                //     String message = "Add gallery successfully!";
+                                //     Tools.showCustomToast(PostNew.this, mView, message, Gravity.CENTER);
 
                             }
 
@@ -1766,12 +1925,25 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
     }
 
+    public Set<String> findDuplicates(List<String> listContainingDuplicates) {
+        final Set<String> setToReturn = new HashSet<>();
+        final Set<String> set1 = new HashSet<>();
+
+        for (String yourInt : listContainingDuplicates) {
+            if (!set1.add(yourInt)) {
+                setToReturn.add(yourInt);
+            }
+        }
+        return setToReturn;
+    }
+
     private List<PostImage> getSelectedImagesPath(int requestCode, Intent data) throws FileNotFoundException {
 
         List<PostImage> result = new ArrayList<>();
 
         ClipData clipData = data.getClipData();
         if (clipData != null) {
+            ArrayList<String> tempMedia = new ArrayList<>();
             for (int i = 0; i < clipData.getItemCount(); i++) {
                 ClipData.Item videoItem = clipData.getItemAt(i);
                 Uri videoURI = videoItem.getUri();
@@ -1780,20 +1952,54 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                 //     String strBase64 = getBase64(imagePath);
                 String strMD5 = getMD5EncryptedString(imagePath);
                 fileEncoded = strMD5;
-                Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "1", strMD5);
-                sendIsDuplicateImageRequest(call);
+
+                if (mediaList.size() == 0) {
+                    Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "1", strMD5);
+                    sendIsDuplicateImageRequest(call, imagePath);
+                    tempMedia.add(imagePath);
+                } else {
+                    boolean hasAlready = false;
+                    for (String temp : mediaList) {
+                        if (temp.equalsIgnoreCase(imagePath)) {
+                            hasAlready = true;
+                            Tools.toast(PostNew.this, "You have already add this!", R.drawable.ic_info_outline_blue_24dp);
+                            break;
+                        }
+                    }
+                    if (!hasAlready) {
+                        Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "1", strMD5);
+                        sendIsDuplicateImageRequest(call, imagePath);
+                        tempMedia.add(imagePath);
+                    }
+                }
+
 
             }
+            mediaList.addAll(tempMedia);
         } else {
+
+
             Uri videoURI = data.getData();
             imageFilePath = getPath(this, videoURI);
             String imagePath = "file://" + imageFilePath;
             String strMD5 = getMD5EncryptedString(imagePath);
             fileEncoded = strMD5;
             //   String strBase64 = getBase64(imageFilePath);
-            Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "1", strMD5);
-            sendIsDuplicateImageRequest(call);
 
+            if (mediaList.size() == 0) {
+                Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "1", strMD5);
+                sendIsDuplicateImageRequest(call, imagePath);
+                mediaList.add(imagePath);
+            } else {
+                for (String temp : mediaList) {
+                    if (temp.equalsIgnoreCase(imagePath)) {
+                        Tools.toast(PostNew.this, "You have already add this!", R.drawable.ic_info_outline_blue_24dp);
+                    } else {
+                        Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "1", strMD5);
+                        sendIsDuplicateImageRequest(call, imagePath);
+                    }
+                }
+            }
 
         }
 
@@ -1831,7 +2037,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
         return lastVal;
     }
 
-    private void sendIsDuplicateImageRequest(Call<String> call) {
+    private void sendIsDuplicateImageRequest(Call<String> call, String imagePath) {
         call.enqueue(new Callback<String>() {
 
 
@@ -1858,12 +2064,16 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                                     addPhotoRequest(mediaCall);
 
                                     progressDialog.show();
-                                    String imagePath = "file://" + imageFilePath;
+//                                    for (String temp:mediaList) {
+//                                        postImages.add(new PostImage(temp));
+//                                    }
+                                    //  String imagePath = "file://" + imageFilePath;
                                     postImages.add(new PostImage(imagePath));
                                     if (postImages.size() > 0)
+
                                         rvMediaShow = true;
                                     mediaRecyclerViewToggle();
-                                    MediaAdapter mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos);
+                                    mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos, imageListener, videoListen);
                                     mediaRecyclerView.setAdapter(mediaAdapter);
                                     progressView.setVisibility(View.GONE);
                                     progressView.stopAnimation();
@@ -1871,9 +2081,8 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                                 }
 
 
-
-                                String message = "Add gallery successfully!";
-                                Tools.showCustomToast(PostNew.this, mView, message, Gravity.CENTER);
+//                                String message = "Add gallery successfully!";
+//                                Tools.showCustomToast(PostNew.this, mView, message, Gravity.CENTER);
 
                             }
 
@@ -1911,13 +2120,16 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                             String image_name = object.getString("image_name");
                             String large_image_name = object.getString("large_image_name");
 
-                            MultipleMediaFile mediaFile = new MultipleMediaFile();
+                            //      MultipleMediaFile mediaFile = new MultipleMediaFile();
                             mediaFile.setBase64Md5(fileEncoded);
                             mediaFile.setDuration(duration);
                             mediaFile.setFileType("video");
                             mediaFile.setImageName(image_name);
                             mediaFile.setLargeImageName(large_image_name);
                             mediaFile.setName(video_name);
+                            multipleMediaFiles.add(mediaFile);
+                            PostVideo postVideo = new PostVideo();
+                            postVideo.setMultipleMediaFile(mediaFile);
                             Gson gson = new Gson();
                             String gsonString = gson.toJson(mediaFile);
                             mediaFiles.add(gsonString);
@@ -2085,14 +2297,15 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
             currentImageSet = null;
             currentItem = 0;
 
-            tvSubmitPost.setVisibility(View.GONE);
-            previewAreaTitle.setVisibility(View.VISIBLE);
+//            tvSubmitPost.setVisibility(View.GONE);
+
 
             currentImage = null;
             noThumb = false;
             currentTitle = currentDescription = currentUrl = currentCannonicalUrl = "";
 
-            tvSubmitPost.setEnabled(false);
+//            tvSubmitPost.setEnabled(false);
+//            tvSubmitPost.setEnabled(true);
 
             /** Inflating the preview layout */
             mainView = getLayoutInflater().inflate(R.layout.main_view, null);
@@ -2137,8 +2350,9 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                 });
 
             } else {
-                postButton.setVisibility(View.VISIBLE);
-
+                //  postButton.setVisibility(View.VISIBLE);
+                postButton.setVisibility(View.GONE);
+                //  tvSubmitPost.setVisibility(View.VISIBLE);
                 currentImageSet = new Bitmap[sourceContent.getImages().size()];
 
                 /**
@@ -2160,7 +2374,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                         .findViewById(R.id.image_post_set);
 
                 // final TextView close = (TextView) titleWrap.findViewById(R.id.close);
-                final TextView close = (TextView) findViewById(R.id.close);
+                final FloatingActionButton close = (FloatingActionButton) findViewById(R.id.close);
                 final TextView titleTextView = (TextView) titleWrap
                         .findViewById(R.id.title);
                 final EditText titleEditText = (EditText) titleWrap
@@ -2329,7 +2543,8 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                 urlTextView.setText(sourceContent.getCannonicalUrl());
                 descriptionTextView.setText(sourceContent.getDescription());
 
-                postButton.setVisibility(View.VISIBLE);
+                //   postButton.setVisibility(View.VISIBLE);
+                postButton.setVisibility(View.GONE);
             }
 
             currentTitle = sourceContent.getTitle();
@@ -2345,6 +2560,11 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
             ) {
                 contentLinkImage = temp;
             }
+
+            LinkScriptItem scriptItem = new LinkScriptItem(currentImage, currentTitle, currentDescription, currentUrl);
+            scriptItemList.add(scriptItem);
+            LinkScriptAdapter linkScriptAdapter = new LinkScriptAdapter(PostNew.this, scriptItemList);
+            rvLinkScript.setAdapter(linkScriptAdapter);
         }
     };
 
@@ -2370,7 +2590,6 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
         tvSubmitPost.setEnabled(true);
         tvSubmitPost.setVisibility(View.VISIBLE);
         postButton.setVisibility(View.GONE);
-        previewAreaTitle.setVisibility(View.GONE);
         dropPreview.removeAllViews();
     }
 
@@ -2514,4 +2733,6 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
     public void onNeutralResult(DialogFragment dlg) {
 
     }
+
+
 }

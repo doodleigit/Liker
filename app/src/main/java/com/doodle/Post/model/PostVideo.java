@@ -6,6 +6,9 @@ import android.os.Parcelable;
 public class PostVideo implements Parcelable {
     public String videoPath;
     public String videoId;
+    public String mdFive;
+    public MultipleMediaFile multipleMediaFile;
+
 
 
     public PostVideo(String videoPath, String videoId) {
@@ -21,10 +24,7 @@ public class PostVideo implements Parcelable {
         this.videoId = videoId;
     }
 
-    public PostVideo(String videoPath) {
-        this.videoPath = videoPath;
 
-    }
 
     public PostVideo() {
     }
@@ -33,6 +33,7 @@ public class PostVideo implements Parcelable {
         videoPath = in.readString();
 
     }
+
 
     public static final Creator<PostVideo> CREATOR = new Creator<PostVideo>() {
         @Override
@@ -45,6 +46,22 @@ public class PostVideo implements Parcelable {
             return new PostVideo[size];
         }
     };
+
+    public MultipleMediaFile getMultipleMediaFile() {
+        return multipleMediaFile;
+    }
+
+    public void setMultipleMediaFile(MultipleMediaFile multipleMediaFile) {
+        this.multipleMediaFile = multipleMediaFile;
+    }
+
+    public String getMdFive() {
+        return mdFive;
+    }
+
+    public void setMdFive(String mdFive) {
+        this.mdFive = mdFive;
+    }
 
     public String getVideoPath() {
         return videoPath;

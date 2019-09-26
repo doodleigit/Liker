@@ -96,8 +96,6 @@ import static com.twitter.sdk.android.core.Twitter.TAG;
 public class Tools {
 
 
-    private static String headerInfo;
-
     public static boolean isNetworkConnected(Context context) {
         ConnectivityManager mConnectManager = (ConnectivityManager) context
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -171,6 +169,7 @@ public class Tools {
         network.setCancelable(false);
         network.show(activity.getSupportFragmentManager(), "NetworkDialogFragment");
     }
+
     public static String extractMentionText(Reply replyItem) {
 
         String mentionString = replyItem.getCommentText();
@@ -190,7 +189,8 @@ public class Tools {
 
 
     }
-   public static void showBlockUser(View v) {
+
+    public static void showBlockUser(View v) {
         AppCompatActivity activity = (AppCompatActivity) v.getContext();
         BlockUserDialog blockUserDialog = new BlockUserDialog();
         // TODO: Use setCancelable() to make the dialog non-cancelable
@@ -206,17 +206,19 @@ public class Tools {
         blockUserDialog.show(activity.getSupportFragmentManager(), "DeletePostDialog");
     }
 
-    public  static void closeBlockUser(View view){
+    public static void closeBlockUser(View view) {
         BlockUserDialog blockUserDialog = new BlockUserDialog();
         // TODO: Use setCancelable() to make the dialog non-cancelable
         blockUserDialog.setCancelable(false);
 
     }
-    public static void dismissDialog(){
+
+    public static void dismissDialog() {
         BlockUserDialog prev = new BlockUserDialog();
         prev.setCancelable(true);
 
     }
+
     public static void stripUnderlines(EmojiTextView tvPostEmojiContent) {
 
         Spannable s = new SpannableString(tvPostEmojiContent.getText());
@@ -332,7 +334,6 @@ public class Tools {
     }
 
 
-
     public static class URLSpanNoUnderline extends URLSpan {
         public URLSpanNoUnderline(String url) {
             super(url);
@@ -403,12 +404,10 @@ public class Tools {
 
 
     public static SpannableStringBuilder getSpannableStringBuilder(Context context, String catId, String likes, String followers, int totalStars, String categoryName) {
-        if(!isNullOrEmpty(followers)){
 
-            headerInfo = String.format("%s Likes | %d Stars | %s Followers | ", likes, totalStars, followers);
-        }else {
-            headerInfo = String.format("%s Likes | %d Stars | %s", likes, totalStars, "");
-        }
+
+        String headerInfo = String.format("%s Likes | %d Stars | %s Followers | %s", likes, totalStars, followers,"");
+
         SpannableStringBuilder builder = new SpannableStringBuilder();
         SpannableString spannableUserStr = new SpannableString(headerInfo);
         builder.append(spannableUserStr);
@@ -433,7 +432,22 @@ public class Tools {
     }
 
 
-    public static String getMD5EncryptedString(String encTarget){
+    public static SpannableStringBuilder getSpannableStringShareHeader(String likes, String followers, int totalStars, String categoryName) {
+
+        String headerInfo = String.format("%s Likes | %d Stars | %s", likes, totalStars,"");
+
+        SpannableStringBuilder builder = new SpannableStringBuilder();
+        SpannableString spannableUserStr = new SpannableString(headerInfo);
+        builder.append(spannableUserStr);
+        SpannableString spannableCategory = new SpannableString(String.format(categoryName));
+        ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(Color.parseColor("#60b2fc"));
+        spannableCategory.setSpan(foregroundColorSpan, 0, categoryName.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+        builder.append(spannableCategory);
+        return builder;
+
+    }
+
+    public static String getMD5EncryptedString(String encTarget) {
         MessageDigest mdEnc = null;
         try {
             mdEnc = MessageDigest.getInstance("MD5");
@@ -443,37 +457,34 @@ public class Tools {
         } // Encryption algorithm
         mdEnc.update(encTarget.getBytes(), 0, encTarget.length());
         String md5 = new BigInteger(1, mdEnc.digest()).toString(16);
-        while ( md5.length() < 32 ) {
-            md5 = "0"+md5;
+        while (md5.length() < 32) {
+            md5 = "0" + md5;
         }
         return md5;
     }
 
 
-
     public static String extractMentionText(PostItem item) {
 
-            String mentionString = item.getPostText();
-            // String html = "<p>An <a href='http://example.com/'><b>example</b></a> link.</p>";
-            Document doc = Jsoup.parse(mentionString);
-            Element link = doc.select("a").first();
+        String mentionString = item.getPostText();
+        // String html = "<p>An <a href='http://example.com/'><b>example</b></a> link.</p>";
+        Document doc = Jsoup.parse(mentionString);
+        Element link = doc.select("a").first();
 
-            String text = doc.body().text(); // "An example link"
-            Log.d("Text", text);
+        String text = doc.body().text(); // "An example link"
+        Log.d("Text", text);
            /* String linkHref = link.attr("href"); // "http://example.com/"
             Log.d("URL: ", linkHref);
             String linkText = link.text(); // "example""
             String linkOuterH = link.outerHtml();
             // "<a href="http://example.com"><b>example</b></a>"
             String linkInnerH = link.html(); // "<b>example</b>"*/
-            return text;
-
-
+        return text;
 
 
     }
 
-        public static String extractMentionText(Comment_ item) {
+    public static String extractMentionText(Comment_ item) {
 
         String mentionString = item.getCommentText();
         // String html = "<p>An <a href='http://example.com/'><b>example</b></a> link.</p>";
@@ -491,10 +502,7 @@ public class Tools {
         return text;
 
 
-
-
     }
-
 
 
     public static String extractMentionText(PostShareItem item) {
@@ -655,8 +663,7 @@ public class Tools {
     }
 
 
-
-    public static void shareTwitter(String message,Context context) {
+    public static void shareTwitter(String message, Context context) {
         Intent tweetIntent = new Intent(Intent.ACTION_SEND);
         tweetIntent.putExtra(Intent.EXTRA_TEXT, "This is a Test.");
         tweetIntent.setType("text/plain");
@@ -813,7 +820,7 @@ public class Tools {
         int index;
         try {
             index = Integer.parseInt(month);
-            return new DateFormatSymbols().getMonths()[index-1];
+            return new DateFormatSymbols().getMonths()[index - 1];
         } catch (NumberFormatException e) {
             return "";
         }
@@ -928,11 +935,12 @@ public class Tools {
 
     /**
      * This method returns true if the objet is null.
+     *
      * @param object
      * @return true | false
      */
-    public static boolean isEmpty( Object object ){
-        if( object == null ){
+    public static boolean isEmpty(Object object) {
+        if (object == null) {
             return true;
         }
         return false;
@@ -953,7 +961,7 @@ public class Tools {
     }
 
     @SuppressWarnings("unused")
-    public static void displayProgressBar(boolean display,View view) {
+    public static void displayProgressBar(boolean display, View view) {
         if (display) {
             view.setVisibility(View.VISIBLE);
         } else {
@@ -966,8 +974,7 @@ public class Tools {
     }
 
 
-    public static void  sendNotificationRequest(Call<String> call) {
-
+    public static void sendNotificationRequest(Call<String> call) {
 
 
         call.enqueue(new Callback<String>() {
@@ -989,6 +996,7 @@ public class Tools {
                 }
 
             }
+
             @Override
             public void onFailure(Call<String> call, Throwable t) {
 
@@ -999,11 +1007,10 @@ public class Tools {
 
     }
 
-    public static boolean isContain(JSONObject jsonObject,String key){
+    public static boolean isContain(JSONObject jsonObject, String key) {
 
-        return jsonObject != null&& jsonObject.has(key) && !jsonObject.isNull(key) ? true:false;
+        return jsonObject != null && jsonObject.has(key) && !jsonObject.isNull(key) ? true : false;
     }
-
 
 
 }

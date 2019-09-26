@@ -2,7 +2,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tool="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_margin="5dp"
     android:baselineAligned="false"
     android:orientation="vertical"
     android:weightSum="3">
@@ -19,29 +21,13 @@
             android:contentDescription="empty"
             android:scaleType="centerCrop" />
 
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/close"
+        <TextView
+            android:id="@+id/tvClose"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_margin="@dimen/_5sdp"
-            android:background="@drawable/common_button_blue"
-            android:src="@drawable/ic_clear_black_24dp"
-            android:textColor="@android:color/white"
-            android:visibility="visible"
-            app:fabSize="mini" />
-
-
-        <!--        <TextView
-                android:id="@+id/close"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignRight="@id/image_post_set"
-                    android:padding="@dimen/_5sdp"
-                android:drawableRight="@drawable/ic_cancel_black_24dp"
-                android:gravity="right" />-->
-
+            android:layout_alignRight="@id/image_post_set"
+            android:drawableRight="@drawable/ic_cancel_black_24dp"
+            android:gravity="right" />
     </RelativeLayout>
 
     <LinearLayout
@@ -66,7 +52,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/title"
+                    android:id="@+id/tvTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
@@ -96,27 +82,24 @@
             <!--android:gravity="right" />-->
         </LinearLayout>
 
-
-
         <TextView
-            android:id="@+id/description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="5"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/url"
+            android:id="@+id/tvUrl"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:singleLine="true"
-            android:drawableLeft="@drawable/ic_language_black_24dp"
-            android:drawableTint="@color/colorIconText"
-            android:textColor="@color/colorIconText"
-            android:drawablePadding="@dimen/_5sdp"
+            android:text="URL"
+            android:textColor="@color/soft_grey_split"
             android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/tvDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="5"
+            android:text="DESCRIPTION"
+            android:textSize="16sp" />
 
         <EditText
             android:id="@+id/input_description"

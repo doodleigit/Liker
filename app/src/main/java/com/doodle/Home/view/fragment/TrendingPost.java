@@ -113,6 +113,13 @@ public class TrendingPost extends Fragment   {
         postFooterIntentFilter.addAction(AppConstants.POST_CHANGE_BROADCAST);
         Objects.requireNonNull(getActivity()).registerReceiver(postFooterChangeBroadcast, postFooterIntentFilter);
 
+
+
+        IntentFilter permissionIntent = new IntentFilter();
+        permissionIntent.addAction(AppConstants.PERMISSION_CHANGE_BROADCAST);
+        Objects.requireNonNull(getActivity()).registerReceiver(permissionBroadcast, permissionIntent);
+
+
         manager = new PrefManager(getActivity());
         deviceId = manager.getDeviceId();
         profileId = manager.getProfileId();
@@ -227,6 +234,7 @@ public class TrendingPost extends Fragment   {
 
         adapter = new PostAdapter(getActivity(), postItemList, mCallback, mimListener, videoListener, youtubeListener, linkListener, imageListener, true);
         recyclerView.setMediaObjects(postItemList);
+        recyclerView.setActivityContext(getActivity());
         recyclerView.setAdapter(adapter);
         getData();
 
@@ -555,7 +563,30 @@ public class TrendingPost extends Fragment   {
         recyclerView.releasePlayer();
         Objects.requireNonNull(getActivity()).unregisterReceiver(broadcastReceiver);
         Objects.requireNonNull(getActivity()).unregisterReceiver(postFooterChangeBroadcast);
+        Objects.requireNonNull(getActivity()).unregisterReceiver(permissionBroadcast);
     }
 
+
+    BroadcastReceiver permissionBroadcast = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            PostItem postItem = (PostItem) intent.getSerializableExtra("post_item");
+            int position = intent.getIntExtra("position", -1);
+            String type=intent.getStringExtra("type");
+            if (position != -1) {
+                if (postItemList.size() >= position + 1) {
+                    if("permission".equalsIgnoreCase(type)){
+                        postItemList.remove(position);
+                        postItemList.add(position, postItem);
+                        adapter.notifyItemChanged(position);
+                    }else {
+                        postItemList.remove(position);
+                        adapter.notifyDataSetChanged();
+                    }
+
+                }
+            }
+        }
+    };
 
 }

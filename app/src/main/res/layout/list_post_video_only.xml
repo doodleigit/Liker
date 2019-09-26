@@ -19,6 +19,8 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+
+
             <com.borjabravo.readmoretextview.ReadMoreTextView
 
                 android:id="@+id/tvPostContentVideo"

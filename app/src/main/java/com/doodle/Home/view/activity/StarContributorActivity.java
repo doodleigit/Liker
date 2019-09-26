@@ -113,7 +113,7 @@ public class StarContributorActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 ViewTooltip
-                        .on(StarContributorActivity.this, tvCategoryName)
+                        .on(StarContributorActivity.this, ivStarContributorInfo)
                         .autoHide(true, 2000)
                         .color(Color.WHITE)
                         .textColor(Color.parseColor("#1483c9"))

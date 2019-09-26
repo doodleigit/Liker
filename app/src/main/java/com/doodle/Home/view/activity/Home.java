@@ -36,6 +36,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.doodle.App;
 import com.doodle.Authentication.model.LoginInfo;
@@ -68,6 +69,7 @@ import com.doodle.Home.view.fragment.BreakingPost;
 import com.doodle.Home.view.fragment.FollowingPost;
 import com.doodle.Home.model.Headers;
 import com.doodle.Home.model.SetUser;
+import com.doodle.Home.view.fragment.PostPermissionSheet;
 import com.doodle.Home.view.fragment.TrendingPost;
 import com.doodle.Message.view.MessageActivity;
 import com.doodle.Notification.view.NotificationActivity;
@@ -112,6 +114,7 @@ public class Home extends AppCompatActivity implements
         ReportLikerMessageSheet.BottomSheetListener,
         FollowSheet.BottomSheetListener,
         BlockUserDialog.BlockListener,
+        PostPermissionSheet.BottomSheetListener,
         NavigationView.OnNavigationItemSelectedListener {
 
     private DrawerLayout drawer;
@@ -320,13 +323,16 @@ public class Home extends AppCompatActivity implements
         navLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LoginInfo loginInfo = new LoginInfo(manager.getUserInfo(), manager.getToken(), manager.getProfileName(), manager.getProfileImage(), manager.getProfileId(), manager.getUserName(), manager.getDeviceId());
-                Intent loginAgain = new Intent(Home.this, LoginAgain.class);
-                loginAgain.putExtra("login_info", loginInfo);
-                manager.pref.edit().clear().apply();
-                stopService(new Intent(Home.this, DataFetchingService.class));
-                startActivity(loginAgain);
-                finish();
+//                LoginInfo loginInfo = new LoginInfo(manager.getUserInfo(), manager.getToken(), manager.getProfileName(), manager.getProfileImage(), manager.getProfileId(), manager.getUserName(), manager.getDeviceId());
+//                Intent loginAgain = new Intent(Home.this, LoginAgain.class);
+//                loginAgain.putExtra("login_info", loginInfo);
+//                manager.pref.edit().clear().apply();
+//                stopService(new Intent(Home.this, DataFetchingService.class));
+//                startActivity(loginAgain);
+//                finish();
+
+                Call<String> call = webService.setLogout(deviceId, token, userId, userId);
+                sendLogoutRequest(call);
             }
         });
 
@@ -956,97 +962,100 @@ public class Home extends AppCompatActivity implements
     /**
      * Adding custom view to tab
      */
-    TextView tabOne, tabTwo, tabThree;
+    LinearLayout tabOne, tabTwo, tabThree;
+    TextView tabOneText, tabTwoText, tabThreeText;
+    ImageView tabOneInfo, tabTwoInfo, tabThreeInfo;
 
     private void setupTabIcons() {
 
-        tabOne = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
-        tabOne.setText("Trending");
-        tabOne.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_black_24dp, 0);
+        tabOne = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        tabOneText = tabOne.findViewById(R.id.tab);
+        tabOneInfo = tabOne.findViewById(R.id.tab_info);
+        tabOneText.setText("Trending");
+        tabOneText.setTextColor(Color.parseColor("#1483C9"));
+        tabOneInfo.setImageResource(R.drawable.ic_info_outline_blue_24dp);
         tabLayout.getTabAt(0).setCustomView(tabOne);
 
-        tabOne.setTextColor(Color.parseColor("#1483C9"));
-        tabOne.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_blue_24dp, 0);
-        tabLayout.getTabAt(0).setCustomView(tabOne);
-
-        tabTwo = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
-        tabTwo.setText("Breaking");
-        tabTwo.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_black_24dp, 0);
+        tabTwo = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        tabTwoText = tabTwo.findViewById(R.id.tab);
+        tabTwoInfo = tabTwo.findViewById(R.id.tab_info);
+        tabTwoText.setText("Breaking");
+        tabTwoInfo.setImageResource(R.drawable.ic_info_outline_black_24dp);
         tabLayout.getTabAt(1).setCustomView(tabTwo);
 
-        tabThree = (TextView) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
-        tabThree.setText("Following");
-        tabThree.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_black_24dp, 0);
+        tabThree = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.custom_tab, null);
+        tabThreeText = tabThree.findViewById(R.id.tab);
+        tabThreeInfo = tabThree.findViewById(R.id.tab_info);
+        tabThreeText.setText("Following");
+        tabThreeInfo.setImageResource(R.drawable.ic_info_outline_black_24dp);
         tabLayout.getTabAt(2).setCustomView(tabThree);
 
-        tabOne.setOnClickListener(new View.OnClickListener() {
+//        tabOne.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                viewPager.setCurrentItem(0);
+//            }
+//        });
+
+        tabOneInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                viewPager.setCurrentItem(0);
-            }
-        });
-
-        tabOne.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
                 ViewTooltip
-                        .on(Home.this, tabOne)
-                        .autoHide(true, 2000)
+                        .on(Home.this, tabOneInfo)
+                        .autoHide(true, 3000)
                         .color(Color.WHITE)
                         .textColor(Color.parseColor("#1483c9"))
                         .corner(30)
-                        .position(ViewTooltip.Position.BOTTOM)
+                        .position(ViewTooltip.Position.RIGHT)
                         .text(getString(R.string.the_trending_feed_includes_the_hottest_posts))
                         .show();
-                return false;
             }
         });
 
-        tabTwo.setOnClickListener(new View.OnClickListener() {
+//        tabTwo.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                viewPager.setCurrentItem(1);
+//            }
+//        });
+
+        tabTwoInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                viewPager.setCurrentItem(1);
-            }
-        });
-
-        tabTwo.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
                 ViewTooltip
-                        .on(Home.this, tabTwo)
-                        .autoHide(true, 2000)
+                        .on(Home.this, tabTwoInfo)
+                        .autoHide(true, 3000)
                         .color(Color.WHITE)
                         .textColor(Color.parseColor("#1483c9"))
                         .corner(30)
-                        .position(ViewTooltip.Position.BOTTOM)
+                        .position(ViewTooltip.Position.RIGHT)
                         .text(getString(R.string.the_breaking_feed_includes_the_newest_posts))
                         .show();
-                return false;
             }
         });
 
-        tabThree.setOnClickListener(new View.OnClickListener() {
+//        tabThree.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                viewPager.setCurrentItem(2);
+//            }
+//        });
+
+        tabThreeInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                viewPager.setCurrentItem(2);
-            }
-        });
-
-        tabThree.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
                 ViewTooltip
                         .on(Home.this, tabThree)
-                        .autoHide(true, 2000)
+                        .autoHide(true, 3000)
                         .color(Color.WHITE)
                         .textColor(Color.parseColor("#1483c9"))
                         .corner(30)
-                        .position(ViewTooltip.Position.BOTTOM)
+                        .position(ViewTooltip.Position.LEFT)
                         .text(getString(R.string.the_following_feed_includes_the_most_recent_posts))
                         .show();
-                return false;
             }
         });
+
     }
 
     private void setupViewPager() {
@@ -1064,34 +1073,32 @@ public class Home extends AppCompatActivity implements
                 //  viewPager.setCurrentItem(tab.getPosition());
 
                 if (tab.getPosition() == 0) {
-                    tabOne.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_blue_24dp, 0);
-                    tabOne.setTextColor(Color.parseColor("#1483C9"));
+                    tabOneInfo.setImageResource(R.drawable.ic_info_outline_blue_24dp);
+                    tabOneText.setTextColor(Color.parseColor("#1483C9"));
 
-                    tabTwo.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_black_24dp, 0);
-                    tabTwo.setTextColor(Color.parseColor("#AAAAAA"));
+                    tabTwoInfo.setImageResource(R.drawable.ic_info_outline_black_24dp);
+                    tabTwoText.setTextColor(Color.parseColor("#AAAAAA"));
 
-                    tabThree.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_black_24dp, 0);
-                    tabThree.setTextColor(Color.parseColor("#AAAAAA"));
-
+                    tabThreeInfo.setImageResource(R.drawable.ic_info_outline_black_24dp);
+                    tabThreeText.setTextColor(Color.parseColor("#AAAAAA"));
                 } else if (tab.getPosition() == 1) {
-                    tabTwo.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_blue_24dp, 0);
-                    tabTwo.setTextColor(Color.parseColor("#1483C9"));
+                    tabOneInfo.setImageResource(R.drawable.ic_info_outline_black_24dp);
+                    tabOneText.setTextColor(Color.parseColor("#AAAAAA"));
 
-                    tabOne.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_black_24dp, 0);
-                    tabOne.setTextColor(Color.parseColor("#AAAAAA"));
+                    tabTwoInfo.setImageResource(R.drawable.ic_info_outline_blue_24dp);
+                    tabTwoText.setTextColor(Color.parseColor("#1483C9"));
 
-                    tabThree.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_black_24dp, 0);
-                    tabThree.setTextColor(Color.parseColor("#AAAAAA"));
-
+                    tabThreeInfo.setImageResource(R.drawable.ic_info_outline_black_24dp);
+                    tabThreeText.setTextColor(Color.parseColor("#AAAAAA"));
                 } else {
-                    tabThree.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_blue_24dp, 0);
-                    tabThree.setTextColor(Color.parseColor("#1483C9"));
+                    tabOneInfo.setImageResource(R.drawable.ic_info_outline_black_24dp);
+                    tabOneText.setTextColor(Color.parseColor("#AAAAAA"));
 
-                    tabTwo.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_black_24dp, 0);
-                    tabTwo.setTextColor(Color.parseColor("#AAAAAA"));
+                    tabTwoInfo.setImageResource(R.drawable.ic_info_outline_black_24dp);
+                    tabTwoText.setTextColor(Color.parseColor("#AAAAAA"));
 
-                    tabOne.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_info_outline_black_24dp, 0);
-                    tabOne.setTextColor(Color.parseColor("#AAAAAA"));
+                    tabThreeInfo.setImageResource(R.drawable.ic_info_outline_blue_24dp);
+                    tabThreeText.setTextColor(Color.parseColor("#1483C9"));
                 }
 
             }
@@ -1407,6 +1414,41 @@ public class Home extends AppCompatActivity implements
         });
     }
 
+    private void sendLogoutRequest(Call<String> call) {
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        try {
+                            JSONObject object = new JSONObject(response.body());
+                            boolean status = object.getBoolean("status");
+                            if (status) {
+                                LoginInfo loginInfo = new LoginInfo(manager.getUserInfo(), manager.getToken(), manager.getProfileName(), manager.getProfileImage(), manager.getProfileId(), manager.getUserName(), manager.getDeviceId());
+                                Intent loginAgain = new Intent(Home.this, LoginAgain.class);
+                                loginAgain.putExtra("login_info", loginInfo);
+                                manager.pref.edit().clear().apply();
+                                stopService(new Intent(Home.this, DataFetchingService.class));
+                                startActivity(loginAgain);
+                                finish();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+//                        Tools.toast(Home.this, "Login Unsuccessfull", R.drawable.icon_unchecked);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.d("message", t.getMessage());
+            }
+        });
+    }
+
     @Override
     public void onCancelResult(DialogFragment dlg) {
         // Toast.makeText(this, "Neutral button", Toast.LENGTH_SHORT).show();
@@ -1462,5 +1504,10 @@ public class Home extends AppCompatActivity implements
 
         drawer.closeDrawer(GravityCompat.END);
         return true;
+    }
+
+    @Override
+    public void postPermissionEnable(int image, String reasonId) {
+        Toast.makeText(this, "post permission enable..", Toast.LENGTH_SHORT).show();
     }
 }

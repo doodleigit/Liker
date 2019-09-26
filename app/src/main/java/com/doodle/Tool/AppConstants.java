@@ -132,6 +132,7 @@ public class AppConstants {
     public static final String PROFILE_PAGE_PAGINATION_BROADCAST = "profile_page_pagination_broadcast";
     public static final String POST_CHANGE_BROADCAST = "post_change_broadcast";
     public static final String POST_FILTER_CAT_BROADCAST = "post_filter_cat_broadcast";
+    public static final String PERMISSION_CHANGE_BROADCAST = "permission_change_broadcast";
 
     public static final String NOTIFICATION = "newNotification";
     public static final String CHAT_USERS = "get_chat_users";
@@ -200,5 +201,6 @@ public class AppConstants {
     public static final String UNFOLLOW = "unfollow";
     public static final String GET_FOLLOWERS = "get_followers";
     public static final String GET_FOLLOWINGS = "get_followings";
+    public static final String LOGOUT = "logout";
 
 }

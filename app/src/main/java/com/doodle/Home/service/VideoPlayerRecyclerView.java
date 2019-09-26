@@ -68,6 +68,8 @@ public class VideoPlayerRecyclerView extends RecyclerView {
 
     private static final String TAG = "VideoPlayerRecyclerView";
 
+    private Activity activityContext;
+
     private enum VolumeState {ON, OFF}
     // ui
     private ImageView thumbnail, volumeControl, videoPlay, mediaVideoOneThumbnail, mediaVideoTwoThumbnail, mediaVideoThreeThumbnail, mediaVideoFourThumbnail, mediaVideoOneVolumeControl,
@@ -310,7 +312,7 @@ public class VideoPlayerRecyclerView extends RecyclerView {
             return;
         }
 
-        if (targetPosition == -4) {
+        if (targetPosition == 1) {
             if (manager.getPostLikeIntro().equals("0")) {
                 ImageView imageView = null;
                 RecyclerView.ViewHolder viewHolder = findViewHolderForAdapterPosition(targetPosition);
@@ -608,6 +610,10 @@ public class VideoPlayerRecyclerView extends RecyclerView {
         this.mediaObjects = mediaObjects;
     }
 
+    public void setActivityContext(Activity activityContext) {
+        this.activityContext = activityContext;
+    }
+
     public void pausePlayer() {
         if (videoPlayer != null) {
             videoPlayer.setPlayWhenReady(false);
@@ -615,7 +621,7 @@ public class VideoPlayerRecyclerView extends RecyclerView {
     }
 
     private void showLikeTooltip(ImageView imageView) {
-        new MaterialShowcaseView.Builder(((Home) context))
+        new MaterialShowcaseView.Builder(activityContext)
                 .setTarget(imageView)
                 .setDismissText(context.getString(R.string.ok_i_got_it))
                 .setContentText(context.getString(R.string.please_like_posts_that_you_consider_to_be_of_high_quality))

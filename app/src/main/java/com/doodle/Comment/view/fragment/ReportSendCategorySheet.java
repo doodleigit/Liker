@@ -26,7 +26,7 @@ import java.util.List;
 import static com.doodle.Tool.Tools.isEmpty;
 
 public class ReportSendCategorySheet extends BottomSheetDialogFragment implements View.OnClickListener {
-    public static String REPLY_key="reply_key";
+    public static String REPLY_key = "reply_key";
     private BottomSheetListener mListener;
     public static final String MESSAGE_key = "message_key";
     public static final String COMMENT_key = "comment_key";
@@ -91,12 +91,12 @@ public class ReportSendCategorySheet extends BottomSheetDialogFragment implement
 
 
         radioGroupSendCategory = (RadioGroup) root.findViewById(R.id.radioGroupSendCategory);
-        PostItem item = new PostItem();
-        item = App.getItem();
+
+        PostItem item = App.getItem();
         Reply replyItem = App.getReplyItem();
         if (!isEmpty(commentItem)) {
             reportPersonName = commentItem.getUserFirstName() + " " + commentItem.getUserLastName();
-        } else if (!isEmpty(commentItem)) {
+        } else if (!isEmpty(item)) {
 
             reportPersonName = item.getUserFirstName() + " " + item.getUserLastName();
         } else if (!isEmpty(replyItem)) {

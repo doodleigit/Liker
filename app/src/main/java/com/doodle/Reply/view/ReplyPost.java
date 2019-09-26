@@ -1179,9 +1179,9 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
                     if (response.body() != null) {
 
                         Reply reply = response.body();
-                        String insertId = reply.getId();
-
-                        if (insertId.length() > 0) {
+                     //   String insertId = reply.getId();
+                         int newReplyId=Integer.parseInt(reply.getId());
+                        if (newReplyId > 0) {
 
                          /*       Reply replyItem = new Reply();
                                 replyItem.setId(insertId);
@@ -1219,7 +1219,6 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
                             etComment.setText("");
                             offset++;
                             recyclerView.smoothScrollToPosition(0);
-
 
                         }
 
