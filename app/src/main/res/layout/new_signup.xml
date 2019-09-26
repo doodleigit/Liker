@@ -162,7 +162,10 @@
                     android:drawableEnd="@drawable/ic_cancel_black_24dp"
                     android:drawableRight="@drawable/ic_cancel_black_24dp"
                     android:hint="First Name"
+                    android:inputType="text"
+                    android:imeOptions="actionNext"
                     android:textSize="14sp"/>
+
             </android.support.design.widget.TextInputLayout>
 
             <android.support.design.widget.TextInputLayout
@@ -180,6 +183,8 @@
                     android:drawableEnd="@drawable/ic_cancel_black_24dp"
                     android:drawableRight="@drawable/ic_cancel_black_24dp"
                     android:hint="Last Name"
+                    android:inputType="text"
+                    android:imeOptions="actionNext"
                     android:textSize="14sp"/>
             </android.support.design.widget.TextInputLayout>
 
@@ -198,6 +203,8 @@
                     android:drawableEnd="@drawable/ic_cancel_black_24dp"
                     android:drawableRight="@drawable/ic_cancel_black_24dp"
                     android:hint="Email"
+                    android:inputType="text"
+                    android:imeOptions="actionSend"
                     android:textSize="14sp"/>
             </android.support.design.widget.TextInputLayout>
 

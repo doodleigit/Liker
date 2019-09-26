@@ -1,6 +1,7 @@
 package com.doodle.Authentication.view.activity;
 
 import android.app.ProgressDialog;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.StrictMode;
@@ -27,6 +28,7 @@ import com.doodle.Authentication.model.SocialInfo;
 import com.doodle.Authentication.model.UserInfo;
 import com.doodle.Authentication.service.AuthService;
 import com.doodle.Authentication.view.fragment.ResendEmail;
+import com.doodle.Authentication.viewmodel.SignupViewModel;
 import com.doodle.Home.view.activity.Home;
 import com.doodle.R;
 import com.doodle.Tool.AppConstants;
@@ -87,6 +89,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
     public static final int WEBVIEW_REQUEST_CODE = 100;
 
     private SocialInfo socialInfo;
+    private SignupViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,6 +123,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         mConsumerKey = getString(R.string.com_twitter_sdk_android_CONSUMER_KEY);
         mConsumerSecret = getString(R.string.com_twitter_sdk_android_CONSUMER_SECRET);
         mAuthVerifier = "oauth_verifier";
+        viewModel = ViewModelProviders.of(this).get(SignupViewModel.class);
 
         callbackManager = CallbackManager.Factory.create();
 
@@ -157,6 +161,16 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             }
         };*/
 
+
+     etEmail.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+         @Override
+         public void onFocusChange(View v, boolean hasFocus) {
+             if(!hasFocus){
+                 viewModel.validateLoginEmailField(etEmail);
+             }
+         }
+     });
+
         etEmail.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -166,9 +180,11 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 email = etEmail.getText().toString();
                 if (!TextUtils.isEmpty(password) & !TextUtils.isEmpty(email)) {
+
                     tvForgot.setTextColor(Color.parseColor("#1485CC"));
                     tvSignIn.setBackgroundResource(R.drawable.btn_round_outline);
                     tvSignIn.setEnabled(true);
+
                 } else {
                     tvSignIn.setBackgroundResource(R.drawable.btn_round_outline_disable);
                     tvForgot.setTextColor(Color.parseColor("#89C3E7"));
@@ -404,6 +420,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             switch (actionId) {
                 case EditorInfo.IME_ACTION_NEXT:
                     //  Toast.makeText(Login.this, "Next", Toast.LENGTH_SHORT).show();
+                    viewModel.validateLoginEmailField(etEmail);
                     break;
                 case EditorInfo.IME_ACTION_SEND:
                     if (networkOk) {

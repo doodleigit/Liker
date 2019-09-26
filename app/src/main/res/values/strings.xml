@@ -247,7 +247,7 @@
     <string name="next">Next</string>
     <string name="finish">Finish</string>
     <string name="continuing">Continue</string>
-    <string name="i_did_not_receive_the_email">I did not receive the email</string>
+    <string name="i_did_not_receive_the_email">I did not receive an email</string>
     <string name="all_field_required">All field required</string>
     <string name="enter_a_few_word_to_search">Enter a few word to search</string>
     <string name="nothing_to_show">Nothing to Show</string>
@@ -261,6 +261,7 @@
     <string name="menu_tools">Tools</string>
     <string name="menu_share">Share</string>
     <string name="menu_send">Send</string>
+    <string name="reset_password_success">Your password has successfully been changed.</string>
 
     <string-array name="string_array_alcohol">
         <item>Vodka</item>

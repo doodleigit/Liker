@@ -688,13 +688,14 @@ public class ForgotPasswords extends AppCompatActivity implements View.OnClickLi
                             //   mViewFlipper.setDisplayedChild(1);
                             // mViewFlipper.setDisplayedChild(mViewFlipper.indexOfChild(findViewById(R.id.loginContent)));
 
+                            Tools.toast(ForgotPasswords.this,getString(R.string.reset_password_success),R.drawable.ic_check_black_24dp);
                             startActivity(new Intent(ForgotPasswords.this, Login.class));
                             finish();
                         }
                         // startActivity(new Intent(ForgotPasswords.this, Liker.class));
 
                     } else {
-                        String message = "Failed to set password";
+                        String message = "" + "Reset password failed.";
                         showStatus(message);
                     }
                 } catch (JSONException e) {

@@ -346,6 +346,9 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
         recyclerView.setAdapter(adapter);
 
         userName.setText(String.format("%s %s", userInfo.getFirstName(), userInfo.getLastName()));
+        int totalStars=Integer.parseInt(userInfo.getGoldStars())+Integer.parseInt(userInfo.getSliverStars());
+        tvStarts.setText(String.valueOf(totalStars)+" Stars");
+        tvLikes.setText(userInfo.getTotalLikes()+" Likes");
         setUpEmojiPopup();
 
         etComment.addTextChangedListener(new TextWatcher() {
@@ -1247,7 +1250,8 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
         this.reply = reply;
         imageEditComment.setVisibility(View.VISIBLE);
         imageSendComment.setVisibility(View.GONE);
-        etComment.setText(reply.getCommentText());
+       // etComment.setText(reply.getCommentText());
+        etComment.append(reply.getCommentText());
         etComment.requestFocus();
         etComment.postDelayed(new Runnable() {
                                   @Override

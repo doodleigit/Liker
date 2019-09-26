@@ -208,6 +208,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
     private UserInfo userInfo;
     private String changeData;
 
+    private TextView tvLikes,tvStars;
     //Edit Comment
     Comment_ comment_Item, commentChild;
     Reply reply;
@@ -223,6 +224,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
     private AnimationItem[] mAnimationItems;
     private AnimationItem mSelectedItem;
     private final Handler mHandler = new Handler();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -317,7 +319,13 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
         adapter = new CommentAdapter(this, comment_list, postItem, this, this, this, this);
         recyclerView.setAdapter(adapter);
         postId = postItem.getSharedPostId();
+        tvLikes=findViewById(R.id.tvLikes);
+        tvStars=findViewById(R.id.tvStars);
+
         userName.setText(String.format("%s %s", userInfo.getFirstName(), userInfo.getLastName()));
+        int totalStars=Integer.parseInt(userInfo.getGoldStars())+Integer.parseInt(userInfo.getSliverStars());
+        tvStars.setText(String.valueOf(totalStars)+" Stars");
+        tvLikes.setText(userInfo.getTotalLikes()+" Likes");
         setUpEmojiPopup();
 
         etComment.addTextChangedListener(new TextWatcher() {
@@ -705,7 +713,6 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
 
                 }
 
-
             }
 
             @Override
@@ -789,7 +796,6 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
                     }
                 }
 
-
                 break;
 
             case R.id.imageEmoji:
@@ -798,7 +804,6 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
 
             case R.id.imageGallery:
                 if (isGrantGallery) {
-
                     sendImageFromGallery();
                 } else {
                     checkGalleryPermission();
@@ -816,13 +821,10 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
 
 
 
-                Log.d("dfvbjndfi",response.body()+"");
+
                 Comment_ commentItems = response.body();
-
-
-                int insertId = commentItems.getInsertId();
-                Log.d("Data", commentItems.toString());
-                if (insertId > 0) {
+                int editCommentId = Integer.parseInt(commentItems.getId());
+                if (editCommentId > 0) {
 
 //                    Comment_ commentItem = new Comment_();
 //                    commentItem.setCommentImage(commentItems.getCommentImage());
@@ -844,7 +846,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
                     adapter.updateData(commentItems, position);
                     progressDialog.dismiss();
                     etComment.setText("");
-                    //offset++;
+                    offset++;
                     recyclerView.smoothScrollToPosition(0);
                     // App.setCommentCount(1);
                 }
@@ -1147,7 +1149,8 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
         this.position = position;
         imageEditComment.setVisibility(View.VISIBLE);
         imageSendComment.setVisibility(View.GONE);
-        etComment.setText(commentItem.getCommentText());
+//        etComment.setText(commentItem.getCommentText());
+        etComment.append(commentItem.getCommentText());
         etComment.requestFocus();
         etComment.postDelayed(new Runnable() {
                                   @Override

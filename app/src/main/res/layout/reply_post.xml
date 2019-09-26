@@ -148,7 +148,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="5 likes"
-                        android:textColor="@android:color/darker_gray"
+                        android:textColor="@android:color/white"
                         android:textSize="12sp" />
 
                     <TextView
@@ -157,7 +157,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:text="8 Stars"
-                        android:textColor="@android:color/darker_gray"
+                        android:textColor="@android:color/white"
                         android:textSize="12sp" />
 
                 </LinearLayout>

@@ -21,11 +21,13 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -33,6 +35,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.Spinner;
+import android.widget.TabWidget;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
@@ -57,6 +60,7 @@ import com.doodle.Tool.ClearableEditText;
 import com.doodle.Authentication.service.AuthService;
 import com.doodle.Tool.NetworkHelper;
 import com.doodle.Tool.PrefManager;
+import com.doodle.Tool.Tools;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -89,6 +93,8 @@ import static com.doodle.Comment.holder.CommentTextHolder.COMMENT_ITEM_KEY;
 import static com.doodle.Comment.holder.CommentTextHolder.POST_ITEM_KEY;
 import static com.doodle.Comment.holder.CommentTextHolder.REPLY_KEY;
 import static com.doodle.Tool.Tools.isNullOrEmpty;
+import static com.doodle.Tool.Tools.showCustomToast;
+import static com.doodle.Tool.Tools.toast;
 
 public class Signup extends AppCompatActivity implements View.OnClickListener, ResendEmail.BottomSheetListener {
 
@@ -109,9 +115,8 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
 
     private String[] dayArr = {"Select", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31"};
     private String[] monthArr = {"Month", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
-    private String[] yearArr = {"Select Year", "2020", "2021", "2022", "2023", "2024", "2025", "2019", "2018", "2017", "2016", "2015", "2014", "2013", "2012", "2011", "2010", "2009", "2008", "2007", "2006", "2005", "2004", "2003", "2002", "2001", "2000", "1999", "1998", "1997", "1996", "1995", "1994", "1993", "1992", "1991", "1990", "1989", "1988", "1987", "1986", "1985", "1984", "1983", "1982", "1981", "1980", "1979", "1978", "1977", "1976", "1975", "1974", "1973", "1972", "1971", "1970"};
-    private String[] countryArr = {"Select Country", "Bangladesh", "Nepal", "Bhutan", "China"};
-    private String[] stateArr = {"Select State", "Dhaka", "Kathmandu", "Thimphu", "Beijing"};
+    private String[] yearArr = {"Select Year", "2003", "2002", "2001", "2000", "1999", "1998", "1997", "1996", "1995", "1994", "1993", "1992", "1991", "1990", "1989", "1988", "1987", "1986", "1985", "1984", "1983", "1982", "1981", "1980", "1979", "1978", "1977", "1976", "1975", "1974", "1973", "1972", "1971", "1970"};
+
 
     private TextView tvAcceptTerms, tvAcceptFinish, tvHeader, tvOr;
     private String originalText, originalTextFinish;
@@ -153,6 +158,8 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
     String mDeviceId;
     private PrefManager manager;
     private String fbProvider;
+    AuthService webService;
+
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -163,6 +170,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
         }
     };
     private String isApps = "true";
+    private boolean emailStatus;
 
     private void displayData() {
         //    countryNames.add("Select Country");
@@ -189,6 +197,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
     private String mConsumerKey = null, mConsumerSecret = null, mCallbackUrl = null, mTwitterVerifier = null, mAuthVerifier = null;
     private Twitter mTwitter = null;
     private RequestToken mRequestToken = null;
+    View mView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -199,21 +208,25 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
         mConsumerKey = getString(R.string.com_twitter_sdk_android_CONSUMER_KEY);
         mConsumerSecret = getString(R.string.com_twitter_sdk_android_CONSUMER_SECRET);
         mAuthVerifier = "oauth_verifier";
-
+        webService = AuthService.retrofitBase.create(AuthService.class);
         viewModel = ViewModelProviders.of(this).get(SignupViewModel.class);
         countryIds = new ArrayList<>();
         countryNames = new ArrayList<>();
         user = new User();
+        mView = new View(this);
         socialInfo = new SocialInfo();
         networkOk = NetworkHelper.hasNetworkAccess(this);
         manager = new PrefManager(this);
         mDeviceId = manager.getDeviceId();
         etFirstName = (ClearableEditText) findViewById(R.id.etFirstName);
         etFirstName.setOnClickListener(this);
+        etFirstName.setOnEditorActionListener(editorListener);
         etLastName = (ClearableEditText) findViewById(R.id.etLastName);
         etLastName.setOnClickListener(this);
+        etLastName.setOnEditorActionListener(editorListener);
         etEmail = (ClearableEditText) findViewById(R.id.etEmail);
         etEmail.setOnClickListener(this);
+        etEmail.setOnEditorActionListener(editorListener);
         etPassword = (EditText) findViewById(R.id.etPassword);
         etPassword.setOnClickListener(this);
         etConFirmPassword = (EditText) findViewById(R.id.etConFirmPassword);
@@ -226,7 +239,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
         fbSignUp = (ImageView) findViewById(R.id.fbSignUp);
         twitterSignUp.setOnClickListener(this);
         fbSignUp.setOnClickListener(this);
-        btnSignUp.setEnabled(false);
+        // btnSignUp.setEnabled(false);
 
         spinnerDay = findViewById(R.id.spinnerDay);
         spinnerMonth = findViewById(R.id.spinnerMonth);
@@ -397,7 +410,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
         spannableStr.setSpan(foregroundColorSpan, 46, originalText.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         tvAcceptTerms.setText(spannableStr);
 
-
+        btnSignUp.setBackgroundResource(R.drawable.btn_round_outline);
         final PinView pinView = findViewById(R.id.firstPinView);
         pinView.addTextChangedListener(new TextWatcher() {
             @Override
@@ -457,6 +470,14 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
             }
         });
 
+        etEmail.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(!hasFocus){
+                    viewModel.validateEmailField(etEmail);
+                }
+            }
+        });
         etEmail.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -470,19 +491,25 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
 
                 if (!TextUtils.isEmpty(email) & !TextUtils.isEmpty(firstName) & !TextUtils.isEmpty(lastName)) {
                     btnSignUp.setBackgroundResource(R.drawable.btn_round_outline);
-                    btnSignUp.setEnabled(true);
+                    //  btnSignUp.setEnabled(true);
 
 
                 } else {
-                    btnSignUp.setBackgroundResource(R.drawable.btn_round_outline_disable);
-                    btnSignUp.setEnabled(false);
+                //    btnSignUp.setBackgroundResource(R.drawable.btn_round_outline_disable);
+                    // btnSignUp.setEnabled(false);
 
                 }
+
+
+
+                  //  Call<String> call = webService.checkEmailExists(true, email);
+                  //  sendCheckEmailRequest(call);
+
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                viewModel.validateEmailField(etEmail);
+              //  viewModel.validateEmailField(etEmail);
             }
         });
 
@@ -516,6 +543,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
             }
         });
 
+
         etFirstName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -525,16 +553,15 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 firstName = etFirstName.getText().toString();
                 mFirstName = etFirstName.getText().toString();
-                if (!TextUtils.isEmpty(email) & !TextUtils.isEmpty(firstName) & !TextUtils.isEmpty(lastName)) {
-                    btnSignUp.setBackgroundResource(R.drawable.btn_round_outline);
-                    btnSignUp.setEnabled(true);
-
-
-                } else {
-                    btnSignUp.setBackgroundResource(R.drawable.btn_round_outline_disable);
-                    btnSignUp.setEnabled(false);
-
-                }
+//                if (!TextUtils.isEmpty(email) & !TextUtils.isEmpty(firstName) & !TextUtils.isEmpty(lastName)) {
+//                    btnSignUp.setBackgroundResource(R.drawable.btn_round_outline);
+//                    btnSignUp.setEnabled(true);
+//
+//                } else {
+//                    btnSignUp.setBackgroundResource(R.drawable.btn_round_outline_disable);
+//                    btnSignUp.setEnabled(false);
+//
+//                }
 
             }
 
@@ -554,15 +581,15 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 lastName = etLastName.getText().toString();
                 mlastName = etLastName.getText().toString();
-                if (!TextUtils.isEmpty(email) & !TextUtils.isEmpty(firstName) & !TextUtils.isEmpty(lastName)) {
-                    btnSignUp.setBackgroundResource(R.drawable.btn_round_outline);
-                    btnSignUp.setEnabled(true);
-
-                } else {
-                    btnSignUp.setBackgroundResource(R.drawable.btn_round_outline_disable);
-                    btnSignUp.setEnabled(false);
-
-                }
+//                if (!TextUtils.isEmpty(email) & !TextUtils.isEmpty(firstName) & !TextUtils.isEmpty(lastName)) {
+//                    btnSignUp.setBackgroundResource(R.drawable.btn_round_outline);
+//                    btnSignUp.setEnabled(true);
+//
+//                } else {
+//                    btnSignUp.setBackgroundResource(R.drawable.btn_round_outline_disable);
+//                    btnSignUp.setEnabled(false);
+//
+//                }
 
             }
 
@@ -608,6 +635,82 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
         setDate();
     }
 
+    private void sendCheckEmailRequest(Call<String> call) {
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                String data = response.body();
+
+                try {
+                    JSONObject object = new JSONObject(data);
+                    emailStatus = object.getBoolean("status");
+//                    App.setCheckEmail(emailStatus);
+                    if (emailStatus) {
+                        next();
+                    } else {
+                        etEmail.setError("It is a duplicate email");
+                    }
+                   // viewModel.validateEmailField(etEmail);
+                /*    if(emailStatus){
+//                        toast(Signup.this,"",R.drawable.ic_insert_emoticon_black_24dp);
+                       // toast(Signup.this,"Is not a duplicate email",R.drawable.ic_insert_emoticon_black_24dp);
+                    }else {
+                      //  toast(Signup.this,"It is a duplicate email",R.drawable.ic_insert_emoticon_black_24dp);
+                        showCustomToast(Signup.this,mView,"It is a duplicate email",Gravity.CENTER);
+
+                    }*/
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
+
+    }
+
+    private TextView.OnEditorActionListener editorListener = new TextView.OnEditorActionListener() {
+        @Override
+        public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+            switch (actionId) {
+                case EditorInfo.IME_ACTION_NEXT:
+                    //  Toast.makeText(Login.this, "Next", Toast.LENGTH_SHORT).show();
+                    break;
+                case EditorInfo.IME_ACTION_SEND:
+                    if (flipperId == 0) {
+                        if (viewModel.validateNameField(etFirstName) && viewModel.validateNameField(etLastName) && viewModel.validateEmailField(etEmail)) {
+                            flipperId++;
+                            mViewFlipper.setInAnimation(slideLeftIn);
+                            mViewFlipper.setOutAnimation(slideLeftOut);
+                            mViewFlipper.showNext();
+
+                            SpannableString spannableStr = new SpannableString(originalTextFinish);
+                            ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(Color.parseColor("#46ADE3"));
+                            spannableStr.setSpan(foregroundColorSpan, 46, originalTextFinish.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+                            tvAcceptFinish.setText(spannableStr);
+                        }
+                    }
+
+//                    if (networkOk) {
+//                        progressBar.setVisibility(View.VISIBLE);
+//                        mDeviceId = manager.getDeviceId();
+//                        loginDisable(true);
+//                        requestData(email, password, mDeviceId);
+//
+//                    } else {
+//                        Tools.showNetworkDialog(getSupportFragmentManager());
+//                        progressBar.setVisibility(View.GONE);
+//
+//                    }
+                    break;
+            }
+            return false;
+        }
+    };
+
     private void setDate() {
         mOauthId = socialInfo.getAuthId();
         mSocialName = socialInfo.getSocialName();
@@ -651,24 +754,19 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
             case R.id.btnSignUp:
                 Log.d(TAG, "onClick: " + flipperId);
                 if (flipperId == 0) {
-                    if (viewModel.validateNameField(etFirstName) && viewModel.validateNameField(etLastName) && viewModel.validateEmailField(etEmail)) {
-                        flipperId++;
-                        mViewFlipper.setInAnimation(slideLeftIn);
-                        mViewFlipper.setOutAnimation(slideLeftOut);
-                        mViewFlipper.showNext();
-
-                        SpannableString spannableStr = new SpannableString(originalTextFinish);
-                        ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(Color.parseColor("#46ADE3"));
-                        spannableStr.setSpan(foregroundColorSpan, 46, originalTextFinish.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
-                        tvAcceptFinish.setText(spannableStr);
+                    if (viewModel.validateNameField(etFirstName) && viewModel.validateNameField(etLastName)) {
+                        if (viewModel.validateEmailField(etEmail)) {
+                            Call<String> call = webService.checkEmailExists(true, etEmail.getText().toString());
+                            sendCheckEmailRequest(call);
+                        }
                     }
                 }
 
                 break;
 
             case R.id.btnFinish:
-                if (viewModel.validatePasswordField(etPassword) && viewModel.validateConfirmPasswordField(etConFirmPassword) && mGender.isEmpty() && mCountry.isEmpty() && mDay.isEmpty() && mMonth.isEmpty() &&
-                        mYear.isEmpty() && mCity.isEmpty() && mProvider.isEmpty() && mOauthId.isEmpty()) {
+                if (viewModel.validatePasswordField(etPassword) && viewModel.validateConfirmPasswordField(etConFirmPassword) && !mGender.isEmpty() && !mCountry.isEmpty() && !mDay.isEmpty() && !mMonth.isEmpty() &&
+                        !mYear.isEmpty() && !mCity.isEmpty()) {
                     if (networkOk) {
                         requestData(mFirstName, mlastName, mEmail, mPassword, mRetypePassword, mGender, mCountry, mDay, mMonth, mYear, mCity, mProvider, mOauthId, mToken, mSecret, mSocialName, isApps, mImgUrl);
                     } else {
@@ -728,10 +826,20 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
         }
     }
 
+    private void next() {
+        flipperId++;
+        mViewFlipper.setInAnimation(slideLeftIn);
+        mViewFlipper.setOutAnimation(slideLeftOut);
+        mViewFlipper.showNext();
+
+        SpannableString spannableStr = new SpannableString(originalTextFinish);
+        ForegroundColorSpan foregroundColorSpan = new ForegroundColorSpan(Color.parseColor("#46ADE3"));
+        spannableStr.setSpan(foregroundColorSpan, 46, originalTextFinish.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+        tvAcceptFinish.setText(spannableStr);
+    }
+
     private void requestForOTPLogin() {
 
-        AuthService webService =
-                AuthService.retrofitBase.create(AuthService.class);
         Call<String> call = webService.setOTPLogin(user.userId, mDeviceId, otp);
         sendOTPRequest(call);
 
@@ -768,7 +876,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
                     if (otpStatus) {
                         // startActivity(new Intent(Signup.this, Liker.class));
                         Intent intent = new Intent(Signup.this, Home.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK |Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(intent);
                     } else {
 
@@ -845,11 +953,12 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
 
 
     private void requestData(String mFirstName, String mlastName, String mEmail, String mPassword, String mRetypePassword, String mGender, String mCountry, String mDay, String mMonth, String mYear, String mCity, String mProvider, String mOauthId, String mToken, String mSecret, String mSocialName, String isApps, String mImgUrl) {
-        AuthService webService =
-                AuthService.retrofitBase.create(AuthService.class);
+
+
         Call<String> call = webService.registerUser(mFirstName, mlastName, mEmail, mPassword, mRetypePassword, mGender, mCountry, mDay, mMonth, mYear, mCity, mProvider, mOauthId, mToken, mSecret, mSecret, isApps, mImgUrl);
 //        Call<String> call = webService.registerUser(mFirstName, mlastName, mEmail, mPassword, mRetypePassword, "1", "1", "01", "02", "1987", "1", "", "", "", "", "", "");
         sendRequest(call);
+
     }
 
     boolean status;
@@ -960,8 +1069,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
     }
 
     public void requestCityData(int id) {
-        AuthService webService =
-                AuthService.retrofitForCity.create(AuthService.class);
+
         Call<City> call = webService.cities(id);
         sendCityRequest(call);
     }
@@ -1034,8 +1142,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
     }
 
     private void resendSignUpOTP(String userId) {
-        AuthService webService =
-                AuthService.retrofitBase.create(AuthService.class);
+
         Call<String> call = webService.resendSignUpOTP(userId);
         sendResendOTPRequest(call);
     }
@@ -1070,8 +1177,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
     }
 
     private void requestResendEmail() {
-        AuthService webService =
-                AuthService.retrofitBase.create(AuthService.class);
+
         Call<ResendStatus> call = webService.resendEmail(user.userId);
         sendEmailRequest(call);
 

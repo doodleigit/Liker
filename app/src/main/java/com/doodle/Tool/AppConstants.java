@@ -44,6 +44,7 @@ public class AppConstants {
     public static final String COUNTRY_LIST = "countrylists";
     public static final String RESEND = "main/resend";
     public static final String OTP = "reset_password_by_code";
+    public static final String CHECK_EMAIL_EXIST = "check_email_exists";
     public static final String RESET_PASSWORD = "reset_password";
     public static final String LOGIN_WITH_OTP_APPS = "login_with_otp_apps";
     public static final String SOCIAL_LOGIN_APPS = "social_login_apps";
