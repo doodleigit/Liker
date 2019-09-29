@@ -48,7 +48,7 @@ public class CertificationAdapter extends RecyclerView.Adapter<CertificationAdap
         certificateName = arrayList.get(i).getCertificationName();
         instituteName = arrayList.get(i).getInstituteName();
         instituteSite = arrayList.get(i).getCertificationUrl();
-        duration = Tools.getMonth(arrayList.get(i).getFromMonth()) + " " + arrayList.get(i).getFromYear() + " Licence " + arrayList.get(i).getLicenseNumber();
+        duration = Tools.getMonth(arrayList.get(i).getFromMonth()) + " " + arrayList.get(i).getFromYear() + " " + context.getString(R.string.licence) + " " + arrayList.get(i).getLicenseNumber();
 
         viewHolder.tvCertificateName.setText(certificateName);
         viewHolder.tvInstituteName.setText(instituteName);

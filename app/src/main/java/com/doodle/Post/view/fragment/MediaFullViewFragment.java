@@ -80,6 +80,7 @@ public class MediaFullViewFragment extends DialogFragment {
                     .createMediaSource(Uri.parse(AppConstants.POST_VIDEOS + url));
 //Prepare the exoPlayerInstance with the source
             exoPlayerInstance.prepare(videoSource);
+            exoPlayerInstance.setPlayWhenReady(true);
             videoView.setPlayer(exoPlayerInstance);
         } else {
             photoView.setVisibility(View.VISIBLE);

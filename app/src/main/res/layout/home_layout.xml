@@ -404,6 +404,7 @@
                             android:background="@color/colorAccent" />
 
                         <ImageView
+                            android:id="@+id/spinner_drop_down"
                             android:layout_width="25dp"
                             android:layout_height="25dp"
                             android:layout_toEndOf="@+id/spinnerCategoryType"

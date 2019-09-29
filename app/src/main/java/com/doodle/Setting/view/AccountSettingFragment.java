@@ -321,8 +321,10 @@ public class AccountSettingFragment extends Fragment {
             public void onResponse(Call<AllEmail> call, Response<AllEmail> response) {
                 AllEmail allEmail = response.body();
                 if (allEmail != null) {
-                    emails.addAll(allEmail.getEmails());
-                    emailAdapter.notifyDataSetChanged();
+                    if (allEmail.getEmails() != null) {
+                        emails.addAll(allEmail.getEmails());
+                        emailAdapter.notifyDataSetChanged();
+                    }
                 }
             }
 
@@ -348,7 +350,7 @@ public class AccountSettingFragment extends Fragment {
                         emailAdapter.notifyDataSetChanged();
 //                        recyclerView.getAdapter().notifyDataSetChanged();
                     } else {
-                        Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), getString(R.string.something_went_wrong), Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -477,7 +479,7 @@ public class AccountSettingFragment extends Fragment {
             @Override
             public void onFailure(Call<String> call, Throwable t) {
                 progressDialog.hide();
-                Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), getString(R.string.something_went_wrong), Toast.LENGTH_LONG).show();
             }
         });
     }

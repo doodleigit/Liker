@@ -388,7 +388,7 @@ public class PrivacyAndSecurityFragment extends Fragment {
             @Override
             public void onFailure(Call<PrivacyInfo> call, Throwable t) {
                 progressDialog.hide();
-                Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.something_went_wrong), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -405,9 +405,9 @@ public class PrivacyAndSecurityFragment extends Fragment {
                     boolean status = obj.getBoolean("status");
                     if (status) {
                         privacyIcon.setImageResource(resource);
-                        Toast.makeText(getContext(), "Privacy Updated", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), getString(R.string.privacy_updated), Toast.LENGTH_LONG).show();
                     } else {
-                        Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), getString(R.string.something_went_wrong), Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -418,7 +418,7 @@ public class PrivacyAndSecurityFragment extends Fragment {
             @Override
             public void onFailure(Call<String> call, Throwable t) {
                 progressDialog.hide();
-                Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.something_went_wrong), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -471,7 +471,7 @@ public class PrivacyAndSecurityFragment extends Fragment {
             @Override
             public void onFailure(Call<String> call, Throwable t) {
                 progressDialog.hide();
-                Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.something_went_wrong), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -490,7 +490,7 @@ public class PrivacyAndSecurityFragment extends Fragment {
             @Override
             public void onFailure(Call<String> call, Throwable t) {
                 progressDialog.hide();
-                Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.something_went_wrong), Toast.LENGTH_SHORT).show();
             }
         });
     }

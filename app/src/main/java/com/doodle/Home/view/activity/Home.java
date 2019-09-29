@@ -141,7 +141,7 @@ public class Home extends AppCompatActivity implements
     private ArrayList<CommonCategory> commonCategories;
     private CategoryTitleAdapter categoryTitleAdapter;
 
-    private ImageView navClose, imageNewPost, imageNotification, imageFriendRequest, imageStarContributor;
+    private ImageView navClose, imageNewPost, imageNotification, imageFriendRequest, imageStarContributor, spinnerDropDown;
     private TextView tvHome, navUserName, navLogout, newNotificationCount, newMessageNotificationCount, filterItem;
     private RecyclerView categoryRecyclerView;
 
@@ -231,6 +231,7 @@ public class Home extends AppCompatActivity implements
         imageFriendRequest.setOnClickListener(this);
         imageStarContributor = findViewById(R.id.imageStarContributor);
         imageStarContributor.setOnClickListener(this);
+        spinnerDropDown = findViewById(R.id.spinner_drop_down);
         profileImage = findViewById(R.id.profile_image);
         categorySpinner = findViewById(R.id.spinnerCategoryType);
         categorySpinner.setOnItemSelectedListener(this);
@@ -317,6 +318,13 @@ public class Home extends AppCompatActivity implements
             @Override
             public void onClick(View view) {
                 drawer.closeDrawer(Gravity.END);
+            }
+        });
+
+        spinnerDropDown.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                categorySpinner.performClick();
             }
         });
 

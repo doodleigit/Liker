@@ -324,9 +324,9 @@ public class AboutFragment extends Fragment {
         tvGender.setText(profileInfo.getSex().equals("1") ? "Male" : "Female");
         tvBirthDay.setText(profileInfo.getBirthDate() + " " + Tools.getMonth(profileInfo.getBirthMonth()));
         tvBirthYear.setText(profileInfo.getBirthYear());
-        tvAddress.setText(profileInfo.getAddress().isEmpty() ? "Not yet" : profileInfo.getAddress());
-        tvCity.setText(profileInfo.getCurrentCityCity().isEmpty() ? "Not yet" : profileInfo.getCurrentCityCity());
-        tvCountry.setText(profileInfo.getCurrentCityCountry().isEmpty() ? "Not yet" : profileInfo.getCurrentCityCountry());
+        tvAddress.setText(profileInfo.getAddress().isEmpty() ? getString(R.string.not_yet) : profileInfo.getAddress());
+        tvCity.setText(profileInfo.getCurrentCityCity().isEmpty() ? getString(R.string.not_yet) : profileInfo.getCurrentCityCity());
+        tvCountry.setText(profileInfo.getCurrentCityCountry().isEmpty() ? getString(R.string.not_yet) : profileInfo.getCurrentCityCountry());
     }
 
     private void getData() {
@@ -589,7 +589,7 @@ public class AboutFragment extends Fragment {
         if (!profileInfo.getCurrentCityCity().equals("")) {
             tvLivesInAddress.setText(profileInfo.getCurrentCityCity() + ", " + profileInfo.getCurrentCityCountry());
         } else {
-            tvLivesInAddress.setText("Not Yet");
+            tvLivesInAddress.setText(getString(R.string.not_yet));
         }
         genderSpinner.setSelection(Integer.valueOf(profileInfo.getSex()));
 
@@ -1132,7 +1132,7 @@ public class AboutFragment extends Fragment {
         btnRemove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String message = getString(R.string.are_you_sure) + " " + "education";
+                String message = getString(R.string.are_you_sure) + " " + getString(R.string.education);
                 Call<String> call = profileService.removeEducation(deviceId, token, userId, userId, educationId);
                 showAlert(message, call, dialog);
             }
@@ -1448,7 +1448,7 @@ public class AboutFragment extends Fragment {
         btnRemove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String message = getString(R.string.are_you_sure) + " " + "experience";
+                String message = getString(R.string.are_you_sure) + " " + getString(R.string.experience);
                 Call<String> call = profileService.removeExperience(deviceId, token, userId, userId, experienceId);
                 showAlert(message, call, dialog);
             }
@@ -1803,7 +1803,7 @@ public class AboutFragment extends Fragment {
         btnRemove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String message = getString(R.string.are_you_sure) + " " + "awards";
+                String message = getString(R.string.are_you_sure) + " " + getString(R.string.honors_and_awards);
                 Call<String> call = profileService.removeAwards(deviceId, token, userId, userId, awardsId);
                 showAlert(message, call, dialog);
             }
@@ -2114,7 +2114,7 @@ public class AboutFragment extends Fragment {
         btnRemove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String message = getString(R.string.are_you_sure) + " " + "certification";
+                String message = getString(R.string.are_you_sure) + " " + getString(R.string.certification);
                 Call<String> call = profileService.removeCertification(deviceId, token, userId, userId, certificateId);
                 showAlert(message, call, dialog);
             }
@@ -2336,7 +2336,7 @@ public class AboutFragment extends Fragment {
         btnRemove.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String message = getString(R.string.are_you_sure) + " " + "link";
+                String message = getString(R.string.are_you_sure) + " " + getString(R.string.link);
                 Call<String> call = profileService.removeSocialLinks(deviceId, token, userId, userId, etSiteAddress.getText().toString());
                 showAlert(message, call, dialog);
             }
@@ -2454,7 +2454,7 @@ public class AboutFragment extends Fragment {
                         getData();
                         dialog.dismiss();
                     } else {
-                        Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), getString(R.string.something_went_wrong), Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -2463,7 +2463,7 @@ public class AboutFragment extends Fragment {
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), getString(R.string.something_went_wrong), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -2480,7 +2480,7 @@ public class AboutFragment extends Fragment {
                         getData();
                         dialog.dismiss();
                     } else {
-                        Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), getString(R.string.something_went_wrong), Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -2489,7 +2489,7 @@ public class AboutFragment extends Fragment {
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), getString(R.string.something_went_wrong), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -2504,7 +2504,7 @@ public class AboutFragment extends Fragment {
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), getString(R.string.something_went_wrong), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -2523,7 +2523,7 @@ public class AboutFragment extends Fragment {
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), getString(R.string.something_went_wrong), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -2543,7 +2543,7 @@ public class AboutFragment extends Fragment {
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), getString(R.string.something_went_wrong), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -2562,7 +2562,7 @@ public class AboutFragment extends Fragment {
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), getString(R.string.something_went_wrong), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -2588,7 +2588,7 @@ public class AboutFragment extends Fragment {
             @Override
             public void onFailure(Call<String> call, Throwable t) {
                 progressDialog.hide();
-                Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), getString(R.string.something_went_wrong), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -2616,7 +2616,7 @@ public class AboutFragment extends Fragment {
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), getString(R.string.something_went_wrong), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -2639,7 +2639,7 @@ public class AboutFragment extends Fragment {
             @Override
             public void onFailure(Call<String> call, Throwable t) {
                 Log.d("MESSAGE: ", t.getMessage());
-                Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), getString(R.string.something_went_wrong), Toast.LENGTH_LONG).show();
                 progressDialog.hide();
             }
         });
@@ -2678,7 +2678,7 @@ public class AboutFragment extends Fragment {
                         emailAdapter.notifyDataSetChanged();
                         recyclerView.getAdapter().notifyDataSetChanged();
                     } else {
-                        Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), getString(R.string.something_went_wrong), Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -2737,7 +2737,7 @@ public class AboutFragment extends Fragment {
                         phoneAdapter.notifyDataSetChanged();
                         recyclerView.getAdapter().notifyDataSetChanged();
                     } else {
-                        Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), getString(R.string.something_went_wrong), Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

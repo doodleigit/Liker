@@ -74,7 +74,7 @@ public class SearchActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setTitle("Advance Search");
+        getSupportActionBar().setTitle(getString(R.string.advance_search));
 
         mUserList = new ArrayList<>();
         mPostList = new ArrayList<>();

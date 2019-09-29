@@ -28,9 +28,9 @@ public class Network extends DialogFragment {
         //TODO: Create an AlertDialog.Builder instance
         AlertDialog.Builder builder=new AlertDialog.Builder(getActivity());
         //TODO: Set builder properties
-          builder.setTitle("Network Error");
+          builder.setTitle(getString(R.string.network_error));
           builder.setIcon(R.drawable.ic_warning_black_24dp);
-          builder.setMessage("Your Internet connection might not be working at the moment. Please check and try again.");
+          builder.setMessage(getString(R.string.your_internet_connection_might_not_be_working_at_the_moment));
           builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
               @Override
               public void onClick(DialogInterface dialog, int which) {

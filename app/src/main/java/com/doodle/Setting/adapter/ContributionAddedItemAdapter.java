@@ -102,7 +102,7 @@ public class ContributionAddedItemAdapter extends RecyclerView.Adapter<Contribut
                         arrayList.remove(position);
                         notifyDataSetChanged();
                     } else {
-                        Toast.makeText(context, "Something went wrong", Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, context.getString(R.string.something_went_wrong), Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -113,7 +113,7 @@ public class ContributionAddedItemAdapter extends RecyclerView.Adapter<Contribut
             @Override
             public void onFailure(Call<String> call, Throwable t) {
                 progressDialog.hide();
-                Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, context.getString(R.string.something_went_wrong), Toast.LENGTH_SHORT).show();
             }
         });
     }

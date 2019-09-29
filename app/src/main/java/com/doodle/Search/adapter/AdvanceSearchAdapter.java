@@ -60,9 +60,9 @@ public class AdvanceSearchAdapter extends RecyclerView.Adapter<AdvanceSearchAdap
 
         public void populate(User user) {
             tvUserName.setText(user.getFullname());
-            tvLike.setText(user.getTotalLikes() + " Likes");
+            tvLike.setText(user.getTotalLikes() + " " + context.getString(R.string.likes));
             int totalStar = Integer.parseInt(user.getSliverStars()) + Integer.parseInt(user.getGoldStars());
-            tvStar.setText(String.valueOf(totalStar) + " Stars");
+            tvStar.setText(String.valueOf(totalStar) + " " + context.getString(R.string.stars));
             tvUserName.setText(user.getFullname());
             String imagePhoto = POST_IMAGES + user.getPhoto();
 

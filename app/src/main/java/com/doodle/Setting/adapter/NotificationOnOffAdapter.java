@@ -205,7 +205,7 @@ public class NotificationOnOffAdapter extends RecyclerView.Adapter<NotificationO
                         arrayList.get(position).setBrowser(browserStatus);
                         notifyItemChanged(position);
                     } else {
-                        Toast.makeText(context, "Something went wrong", Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, context.getString(R.string.something_went_wrong), Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -218,7 +218,7 @@ public class NotificationOnOffAdapter extends RecyclerView.Adapter<NotificationO
             @Override
             public void onFailure(Call<String> call, Throwable t) {
                 progressDialog.hide();
-                Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, context.getString(R.string.something_went_wrong), Toast.LENGTH_SHORT).show();
             }
         });
     }

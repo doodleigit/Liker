@@ -136,7 +136,7 @@ public class NewNotificationSettingFragment extends Fragment {
 
                     } else {
                         notificationSwitch.setChecked(!notificationStatus);
-                        Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), getString(R.string.something_went_wrong), Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -148,7 +148,7 @@ public class NewNotificationSettingFragment extends Fragment {
             public void onFailure(Call<String> call, Throwable t) {
                 progressDialog.dismiss();
                 notificationSwitch.setChecked(!notificationStatus);
-                Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.something_went_wrong), Toast.LENGTH_SHORT).show();
             }
         });
     }

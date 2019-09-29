@@ -147,7 +147,7 @@ public class ContributorCategoryAdapter extends RecyclerView.Adapter<Contributor
                             contributionAddListener.onContributionRemoveListener(catId, name);
                         }
                     } else {
-                        Toast.makeText(context, "Something went wrong", Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, context.getString(R.string.something_went_wrong), Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -158,7 +158,7 @@ public class ContributorCategoryAdapter extends RecyclerView.Adapter<Contributor
             @Override
             public void onFailure(Call<String> call, Throwable t) {
                 progressDialog.hide();
-                Toast.makeText(context, "Something went wrong", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, context.getString(R.string.something_went_wrong), Toast.LENGTH_SHORT).show();
             }
         });
     }

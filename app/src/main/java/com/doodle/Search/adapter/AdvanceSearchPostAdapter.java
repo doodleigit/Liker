@@ -76,9 +76,9 @@ public class AdvanceSearchPostAdapter extends RecyclerView.Adapter<AdvanceSearch
             long myMillis = Long.parseLong(post.getPostDate()) * 1000;
             String postDate = Operation.getFormattedDateFromTimestamp(myMillis);
             tvPostDuration.setText(postDate);
-            tvPostLike.setText(post.getTotalLike() + " Likes");
+            tvPostLike.setText(post.getTotalLike() + " " + context.getString(R.string.likes));
             int totalStar = Integer.parseInt(post.getSliverStars()) + Integer.parseInt(post.getGoldStars());
-            tvPostStar.setText(String.valueOf(totalStar) + " Stars");
+            tvPostStar.setText(String.valueOf(totalStar) + " " + context.getString(R.string.stars));
             postCategory.setText(post.getCategoryName());
             tvPostText.setText(post.getPostText());
             String imagePhoto = PROFILE_IMAGE + post.getPhoto();

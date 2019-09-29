@@ -121,7 +121,7 @@ public class LikerSearch extends AppCompatActivity implements View.OnClickListen
 
             search = (SearchView) menu.findItem(R.id.action_search).getActionView();
             search.setIconified(false);
-            search.setQueryHint("Search item...");
+            search.setQueryHint(getString(R.string.search_item));
 //            search.clearFocus();
             search.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
@@ -173,7 +173,7 @@ public class LikerSearch extends AppCompatActivity implements View.OnClickListen
                         listView.setVisibility(View.GONE);
                         tvShowSearchResult.setVisibility(View.GONE);
 
-                        Tools.showCustomToast(LikerSearch.this, mView, " Write Minimum Three Characters !", Gravity.TOP);
+                        Tools.showCustomToast(LikerSearch.this, mView, " " + getString(R.string.write_minimum_three_characters), Gravity.TOP);
 
                     }
 
@@ -293,7 +293,7 @@ public class LikerSearch extends AppCompatActivity implements View.OnClickListen
                 } else {
                     progressView.stopAnimation();
                     progressView.setVisibility(View.GONE);
-                    Tools.toast(LikerSearch.this, "We could not find anything for " + queryText, R.drawable.ic_info_outline_blue_24dp);
+                    Tools.toast(LikerSearch.this, getString(R.string.we_could_not_find_anything_for) + " " + queryText, R.drawable.ic_info_outline_blue_24dp);
 
                 }
 
@@ -430,7 +430,7 @@ public class LikerSearch extends AppCompatActivity implements View.OnClickListen
 
                     Tools.toast(LikerSearch.this, getString(R.string.nothing_to_show), R.drawable.ic_check_black_24dp);
                 } else {
-                    Tools.toast(LikerSearch.this, "Please wait.!", R.drawable.ic_info_outline_blue_24dp);
+                    Tools.toast(LikerSearch.this, getString(R.string.please_wait), R.drawable.ic_info_outline_blue_24dp);
 
                 }
                 progressView.setVisibility(View.GONE);

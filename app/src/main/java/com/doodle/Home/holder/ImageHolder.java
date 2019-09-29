@@ -19,6 +19,7 @@ import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
+import android.text.method.LinkMovementMethod;
 import android.text.style.UnderlineSpan;
 import android.text.util.Linkify;
 import android.util.Log;
@@ -630,6 +631,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
         String postDate = Operation.getFormattedDateFromTimestamp(myMillis);
         tvPostTime.setText(postDate);
         tvHeaderInfo.setText(builder);
+        tvHeaderInfo.setMovementMethod(LinkMovementMethod.getInstance());
 
         PostFooter postFooter = item.getPostFooter();
         postLike = postFooter.getPostTotalLike();

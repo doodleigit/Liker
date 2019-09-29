@@ -197,12 +197,12 @@ public class FacebookFriendsFragment extends Fragment {
             @Override
             public void onSuccess(Sharer.Result result) {
 
-                Toast.makeText(getContext(), "Share successFull", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.share_successful), Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onCancel() {
-                Toast.makeText(getContext(), "Share cancel", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), getString(R.string.share_cancel), Toast.LENGTH_SHORT).show();
             }
 
             @Override

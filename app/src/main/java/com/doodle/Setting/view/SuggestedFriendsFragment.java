@@ -200,7 +200,7 @@ public class SuggestedFriendsFragment extends Fragment {
                         peopleMayKnowAdapter.notifyItemChanged(position);
                         sendBrowserNotification(followUserId);
                     } else {
-                        Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), getString(R.string.something_went_wrong), Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -229,7 +229,7 @@ public class SuggestedFriendsFragment extends Fragment {
                         peopleMayKnows.get(position).getPrivacy().setIsFollowing(false);
                         peopleMayKnowAdapter.notifyItemChanged(position);
                     } else {
-                        Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), getString(R.string.something_went_wrong), Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

@@ -46,7 +46,7 @@ public class EducationAdapter extends RecyclerView.Adapter<EducationAdapter.View
         instituteName = arrayList.get(i).getInstituteName();
         instituteSite = arrayList.get(i).getWebsiteUrl();
         degree = arrayList.get(i).getDegreeName();
-        studyInfo = arrayList.get(i).getFieldStudyName() + " GPA-" + arrayList.get(i).getGrade() + " From " + arrayList.get(i).getStartYear() + " to " + arrayList.get(i).getEndYear();
+        studyInfo = arrayList.get(i).getFieldStudyName() + " " + context.getString(R.string.gpa_) + arrayList.get(i).getGrade() + " From " + arrayList.get(i).getStartYear() + " to " + arrayList.get(i).getEndYear();
         summary = arrayList.get(i).getDescription();
 
         viewHolder.tvInstituteName.setText(instituteName);

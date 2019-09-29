@@ -52,7 +52,7 @@ public class SearchUsersAd extends ArrayAdapter<SearchUser> {
         mName.setText(item.fullname);
 
         mLike.setText(item.totalLikes);
-        mStar.setText(totalaStar + " Stars");
+        mStar.setText(totalaStar + " " + context.getString(R.string.stars));
 
         if (image_url.length() > 0) {
             Picasso.with(App.getAppContext())

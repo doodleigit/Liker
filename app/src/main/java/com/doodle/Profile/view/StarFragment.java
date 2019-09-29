@@ -233,7 +233,7 @@ public class StarFragment extends Fragment {
     private void deletePost(PostItem deletePostItem, int deletePosition) {
         new AlertDialog.Builder(getActivity())
                 //  .setTitle("Delete entry")
-                .setMessage("Are you sure you want to delete this post? You will permanently lose this post !")
+                .setMessage(getString(R.string.are_you_sure_you_want_to_delete_this_post))
 
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {

@@ -212,7 +212,7 @@ public class FollowersFragment extends Fragment {
                         followersAdapter.notifyItemChanged(position);
                         sendBrowserNotification(followUserId);
                     } else {
-                        Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), getString(R.string.something_went_wrong), Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -241,7 +241,7 @@ public class FollowersFragment extends Fragment {
                         followers.get(position).setIsFollowed(false);
                         followersAdapter.notifyItemChanged(position);
                     } else {
-                        Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), getString(R.string.something_went_wrong), Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

@@ -12,11 +12,13 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -30,6 +32,17 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.doodle.App;
+import com.doodle.Comment.model.Comment_;
+import com.doodle.Comment.model.Reply;
+import com.doodle.Comment.service.CommentService;
+import com.doodle.Comment.view.fragment.BlockUserDialog;
+import com.doodle.Comment.view.fragment.FollowSheet;
+import com.doodle.Comment.view.fragment.ReportLikerMessageSheet;
+import com.doodle.Comment.view.fragment.ReportPersonMessageSheet;
+import com.doodle.Comment.view.fragment.ReportReasonSheet;
+import com.doodle.Comment.view.fragment.ReportSendCategorySheet;
+import com.doodle.Home.model.PostItem;
+import com.doodle.Home.view.fragment.PostPermissionSheet;
 import com.doodle.Profile.adapter.ViewPagerAdapter;
 import com.doodle.Profile.model.UserAllInfo;
 import com.doodle.Profile.service.ProfileService;
@@ -58,8 +71,15 @@ import retrofit2.Response;
 
 import static android.widget.Toast.LENGTH_SHORT;
 import static android.widget.Toast.makeText;
+import static com.doodle.Tool.Tools.isEmpty;
 
-public class ProfileActivity extends AppCompatActivity {
+public class ProfileActivity extends AppCompatActivity implements ReportReasonSheet.BottomSheetListener,
+        ReportSendCategorySheet.BottomSheetListener,
+        ReportPersonMessageSheet.BottomSheetListener,
+        ReportLikerMessageSheet.BottomSheetListener,
+        FollowSheet.BottomSheetListener,
+        BlockUserDialog.BlockListener,
+        PostPermissionSheet.BottomSheetListener {
 
     private TabLayout tabLayout;
     //    private ViewPager viewPager;
@@ -71,6 +91,7 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView tvUserName, tvTotalInfoCount, tvFollow;
 
     private ProfileService profileService;
+    private CommentService commentService;
     private ProgressDialog progressDialog;
 
     private PrefManager manager;
@@ -117,6 +138,7 @@ public class ProfileActivity extends AppCompatActivity {
 //        viewPager = findViewById(R.id.viewpager);
 
         profileService = ProfileService.mRetrofit.create(ProfileService.class);
+        commentService = CommentService.mRetrofit.create(CommentService.class);
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage(getString(R.string.loading));
         progressDialog.show();
@@ -240,16 +262,19 @@ public class ProfileActivity extends AppCompatActivity {
     private void selectImageSource(View view) {
         PopupMenu popup = new PopupMenu(this, view);
         //Inflating the Popup using xml file
-        popup.getMenuInflater().inflate(R.menu.image_source_menu, popup.getMenu());
-
+        if (uploadContentType == 0) {
+            popup.getMenuInflater().inflate(R.menu.image_source_menu, popup.getMenu());
+        } else {
+            popup.getMenuInflater().inflate(R.menu.cover_image_source_menu, popup.getMenu());
+        }
         //registering popup with OnMenuItemClickListener
         popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
-                    case R.id.select_profile_picture:
+                    case R.id.select_picture:
                         checkGalleryPermission();
                         return true;
-                    case R.id.capture_profile_picture:
+                    case R.id.capture_picture:
                         checkCameraPermission();
                         return true;
                     default:
@@ -335,7 +360,7 @@ public class ProfileActivity extends AppCompatActivity {
                     imageUri = result.getUri();
                     uploadImage();
                 } else {
-                    Toast.makeText(getApplicationContext(), "Somethings went wrong", LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), getString(R.string.something_went_wrong), LENGTH_SHORT).show();
                 }
             } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
                 Exception error = result.getError();
@@ -349,16 +374,18 @@ public class ProfileActivity extends AppCompatActivity {
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
-            } else {
-                Toast.makeText(this, "Cancel Gallery", Toast.LENGTH_SHORT).show();
             }
+//            else {
+//                Toast.makeText(this, "Cancel Gallery", Toast.LENGTH_SHORT).show();
+//            }
         }
         if (requestCode == REQUEST_TAKE_CAMERA) {
             if (resultCode == RESULT_OK) {
                 cropImage(imageUri);
-            } else {
-                Toast.makeText(this, "Cancel Camera Capture", Toast.LENGTH_SHORT).show();
             }
+//            else {
+//                Toast.makeText(this, "Cancel Camera Capture", Toast.LENGTH_SHORT).show();
+//            }
         }
     }
 
@@ -493,7 +520,7 @@ public class ProfileActivity extends AppCompatActivity {
                     if (status) {
                         tvFollow.setText(getString(R.string.unfollow));
                     } else {
-                        Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), getString(R.string.something_went_wrong), Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -521,7 +548,7 @@ public class ProfileActivity extends AppCompatActivity {
                     if (status) {
                         tvFollow.setText(getString(R.string.follow));
                     } else {
-                        Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), getString(R.string.something_went_wrong), Toast.LENGTH_LONG).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -567,11 +594,118 @@ public class ProfileActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                Toast.makeText(getApplicationContext(), "Something went wrong.", LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), getString(R.string.something_went_wrong), LENGTH_SHORT).show();
                 progressDialog.dismiss();
             }
         });
     }
 
+    private void sendBlockUserRequest(Call<String> call) {
 
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                if (response.isSuccessful()) {
+                    if (response.body() != null) {
+                        try {
+                            JSONObject object = new JSONObject(response.body());
+                            boolean status = object.getBoolean("status");
+                            if (status) {
+                                initialFragment(new PostFragment());
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.d("message", t.getMessage());
+            }
+        });
+    }
+
+    @Override
+    public void postPermissionEnable(int image, String reasonId) {
+        Toast.makeText(this, "post permission enable..", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onBlockResult(DialogFragment dlg) {
+        String blockUserId = "";
+        PostItem item = new PostItem();
+        item = App.getItem();
+        if (!isEmpty(item)) {
+            blockUserId = item.getPostUserid();
+        }
+
+
+        Call<String> call = commentService.blockedUser(deviceId, userId, token, blockUserId, userId);
+        sendBlockUserRequest(call);
+    }
+
+    @Override
+    public void onCancelResult(DialogFragment dlg) {
+
+    }
+
+    @Override
+    public void onUnfollowClicked(int image, String text) {
+
+    }
+
+    @Override
+    public void onReportLikerMessageClicked(int image, String text) {
+
+    }
+
+    @Override
+    public void onReportPersonMessageClicked(int image, String text) {
+
+    }
+
+    private String reportId;
+
+    @Override
+    public void onButtonClicked(int image, String reasonId) {
+        reportId = reasonId;
+        Comment_ commentChild = new Comment_();
+        commentChild = App.getCommentItem();
+        boolean isFollow = App.isIsFollow();
+        ReportSendCategorySheet reportSendCategorySheet = ReportSendCategorySheet.newInstance(reportId, commentChild, isFollow);
+        reportSendCategorySheet.show(getSupportFragmentManager(), "ReportSendCategorySheet");
+    }
+
+    @Override
+    public void onFollowClicked(int image, String text) {
+        String message = text;
+
+        Comment_ commentChild = new Comment_();
+        commentChild = App.getCommentItem();
+
+        FollowSheet followSheet = FollowSheet.newInstance(reportId, commentChild);
+        followSheet.show(getSupportFragmentManager(), "FollowSheet");
+    }
+
+    @Override
+    public void onReportLikerClicked(int image, String text) {
+        String message = text;
+        Comment_ commentChild = new Comment_();
+        commentChild = App.getCommentItem();
+        ReportLikerMessageSheet reportLikerMessageSheet = ReportLikerMessageSheet.newInstance(reportId, commentChild);
+        reportLikerMessageSheet.show(getSupportFragmentManager(), "ReportLikerMessageSheet");
+    }
+
+    @Override
+    public void onPersonLikerClicked(int image, String text) {
+        String message = text;
+        Comment_ commentChild = new Comment_();
+        commentChild = null;
+        Reply reply = new Reply();
+        reply=null;
+        ReportPersonMessageSheet reportPersonMessageSheet = ReportPersonMessageSheet.newInstance(reportId, commentChild, reply);
+        reportPersonMessageSheet.show(getSupportFragmentManager(), "ReportPersonMessageSheet");
+    }
 }
