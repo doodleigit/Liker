@@ -448,7 +448,7 @@ public class PostShare extends AppCompatActivity implements
 //                .placeholder(R.drawable.loading_spinner)
                 //  .crossFade()
                 .into(imagePostUser);
-        SpannableStringBuilder builder = getSpannableStringBuilder(likes, followers, totalStars, categoryName);
+        SpannableStringBuilder builder = getSpannableStringBuilder(getApplicationContext(), "", likes, followers, totalStars, categoryName);
 
 
         tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));

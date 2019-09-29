@@ -186,7 +186,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
 
     }
 
-    private ImageView imgLike;
+    public ImageView imgLike;
     private int postLikeNumeric;
 
 
@@ -598,7 +598,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
 //
 
 
-        SpannableStringBuilder builder = getSpannableStringBuilder(likes, followers, totalStars, categoryName);
+        SpannableStringBuilder builder = getSpannableStringBuilder(mContext, item.getCatId(), likes, followers, totalStars, categoryName);
 
         tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
         long myMillis = Long.parseLong(item.getDateTime()) * 1000;

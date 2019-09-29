@@ -167,31 +167,6 @@ public class BreakingPost extends Fragment {
                 scrollOutItems = layoutManager.findFirstVisibleItemPosition();
                 totalItems = layoutManager.getItemCount();
                 Log.d("findFirstComplete", layoutManager.findFirstCompletelyVisibleItemPosition() + "");
-//                if (layoutManager.findFirstCompletelyVisibleItemPosition() >= 0) {
-//                    if (layoutManager.findFirstCompletelyVisibleItemPosition() != currentPosition) {
-//                        if (videoPauseNotify) {
-//                            videoPauseNotify = false;
-//                            autoPlayListeners.get(previousPosition).onItemInVisible();
-//                        }
-//                        previousPosition = currentPosition;
-//                        currentPosition = layoutManager.findFirstCompletelyVisibleItemPosition();
-//                        handler.removeCallbacksAndMessages(null);
-//                        handler.postDelayed(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                videoPauseNotify = true;
-//                                autoPlayListeners.get(currentPosition).onItemVisible();
-//                            }
-//                        }, 500);
-//                    }
-//                } else {
-//                    if (videoPauseNotify) {
-//                        handler.removeCallbacksAndMessages(null);
-//                        videoPauseNotify = false;
-//                        currentPosition = -1;
-//                        autoPlayListeners.get(previousPosition).onItemInVisible();
-//                    }
-//                }
 
                 if (isScrolling && isPaginationDone && (currentItems + scrollOutItems == totalItems)) {
                     isScrolling = false;
@@ -202,7 +177,6 @@ public class BreakingPost extends Fragment {
 
             }
         });
-
 
         mCallback = new TextHolder.PostItemListener() {
             @Override
@@ -261,6 +235,7 @@ public class BreakingPost extends Fragment {
 
         adapter = new PostAdapter(getActivity(), postItemList, mCallback, mimListener, videoListener, youtubeListener, linkListener, imageListener, true);
         recyclerView.setMediaObjects(postItemList);
+        recyclerView.setActivityContext(getActivity());
         recyclerView.setAdapter(adapter);
         getData();
 
@@ -436,27 +411,6 @@ public class BreakingPost extends Fragment {
 
                     offset = limit;
                     onPostResponse();
-
-
-//                    Call<CommentItem> mCall = webService.getPostComments(deviceId, profileId, token, "false", limit, offset, "DESC", totalPostIDs, userIds);
-//                    sendCommentItemRequest(mCall);
-
-//             adapter = new PostAdapter(getActivity(), postItemList);
-//
-//                    new Handler().postDelayed(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            shimmerFrameLayout.stopShimmer();
-//                            shimmerFrameLayout.setVisibility(View.GONE);
-//
-//                            recyclerView.setVisibility(View.VISIBLE);
-//                            recyclerView.setAdapter(adapter);
-//                        }
-//                    }, 5000);
-//
-
-                    //  Log.d("PostItem: ", categoryItem.toString() + "");
-
                 } else {
                     postItemList.clear();
                     onPostResponseFailure();

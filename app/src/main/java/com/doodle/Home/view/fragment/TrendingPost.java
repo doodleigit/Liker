@@ -234,6 +234,7 @@ public class TrendingPost extends Fragment   {
 
         adapter = new PostAdapter(getActivity(), postItemList, mCallback, mimListener, videoListener, youtubeListener, linkListener, imageListener, true);
         recyclerView.setMediaObjects(postItemList);
+        recyclerView.setActivityContext(getActivity());
         recyclerView.setAdapter(adapter);
         getData();
 

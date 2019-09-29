@@ -2,6 +2,7 @@ package com.doodle.Home.view.activity;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.graphics.Color;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -24,6 +26,7 @@ import com.doodle.Home.service.HomeService;
 import com.doodle.Home.service.StarContributorCategoryListener;
 import com.doodle.R;
 import com.doodle.Tool.PrefManager;
+import com.github.florent37.viewtooltip.ViewTooltip;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,7 +44,8 @@ public class StarContributorActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     NestedScrollView scrollView;
     SearchView searchView;
-    TextView tvFilterItem, tvAlertText;
+    TextView tvFilterItem, tvAlertText, tvCategoryName;
+    ImageView ivStarContributorInfo;
     ProgressBar progressBar;
     private ProgressDialog progressDialog;
     private LinearLayoutManager layoutManager;
@@ -79,6 +83,8 @@ public class StarContributorActivity extends AppCompatActivity {
         searchView = findViewById(R.id.search_view);
         tvFilterItem = findViewById(R.id.filterItem);
         tvAlertText = findViewById(R.id.alertText);
+        tvCategoryName = findViewById(R.id.categoryName);
+        ivStarContributorInfo = findViewById(R.id.star_contributor_info);
         progressBar = findViewById(R.id.progress_bar);
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage(getString(R.string.loading));
@@ -100,6 +106,21 @@ public class StarContributorActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 finish();
+            }
+        });
+
+        ivStarContributorInfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ViewTooltip
+                        .on(StarContributorActivity.this, ivStarContributorInfo)
+                        .autoHide(true, 2000)
+                        .color(Color.WHITE)
+                        .textColor(Color.parseColor("#1483c9"))
+                        .corner(30)
+                        .position(ViewTooltip.Position.RIGHT)
+                        .text(getString(R.string.the_star_contributors_tab_ranks))
+                        .show();
             }
         });
 

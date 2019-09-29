@@ -240,4 +240,13 @@ public interface HomeService {
             @Field("follow_id") String followId
     );
 
+    @POST(AppConstants.LOGOUT)
+    @FormUrlEncoded
+    Call<String> setLogout(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String userIds
+    );
+
 }

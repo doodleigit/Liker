@@ -1,5 +1,6 @@
 package com.doodle.Home.service;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
 import android.net.Uri;
@@ -16,13 +17,24 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.bumptech.glide.RequestManager;
+import com.doodle.App;
 import com.doodle.Home.holder.ImageHolder;
+import com.doodle.Home.holder.LinkScriptHolder;
+import com.doodle.Home.holder.LinkScriptYoutubeHolder;
+import com.doodle.Home.holder.TextHolder;
+import com.doodle.Home.holder.TextMimHolder;
+import com.doodle.Home.holder.VideoHolder;
 import com.doodle.Home.model.MediaTrackingList;
 import com.doodle.Home.model.MediaViewObject;
 import com.doodle.Home.model.PostItem;
+import com.doodle.Home.view.activity.Home;
+import com.doodle.Post.adapter.MediaAdapter;
+import com.doodle.R;
 import com.doodle.Tool.AppConstants;
+import com.doodle.Tool.PrefManager;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.PlaybackParameters;
@@ -48,9 +60,15 @@ import com.google.android.exoplayer2.util.Util;
 import java.util.ArrayList;
 import java.util.List;
 
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
+import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
+
 public class VideoPlayerRecyclerView extends RecyclerView {
 
     private static final String TAG = "VideoPlayerRecyclerView";
+
+    private Activity activityContext;
 
     private enum VolumeState {ON, OFF}
     // ui
@@ -73,6 +91,7 @@ public class VideoPlayerRecyclerView extends RecyclerView {
     private int playPosition = -1;
     private boolean isVideoViewAdded;
     private RequestManager requestManager;
+    private PrefManager manager;
 
     // controlling playback state
     private VolumeState volumeState;
@@ -90,6 +109,7 @@ public class VideoPlayerRecyclerView extends RecyclerView {
 
     private void init(Context context) {
         this.context = context.getApplicationContext();
+        manager = new PrefManager(context);
         Display display = ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
         Point point = new Point();
         display.getSize(point);
@@ -290,6 +310,28 @@ public class VideoPlayerRecyclerView extends RecyclerView {
         View child = getChildAt(currentPosition);
         if (child == null) {
             return;
+        }
+
+        if (targetPosition == 1) {
+            if (manager.getPostLikeIntro().equals("0")) {
+                ImageView imageView = null;
+                RecyclerView.ViewHolder viewHolder = findViewHolderForAdapterPosition(targetPosition);
+                if (viewHolder instanceof TextHolder) {
+                    imageView = ((TextHolder) viewHolder).imgLike;
+                } else if (viewHolder instanceof TextMimHolder) {
+                    imageView = ((TextMimHolder) viewHolder).imgLike;
+                } else if (viewHolder instanceof ImageHolder) {
+                    imageView = ((ImageHolder) viewHolder).imgLike;
+                } else if (viewHolder instanceof LinkScriptHolder) {
+                    imageView = ((LinkScriptHolder) viewHolder).imgLike;
+                } else if (viewHolder instanceof LinkScriptYoutubeHolder) {
+                    imageView = ((LinkScriptYoutubeHolder) viewHolder).imgLike;
+                } else {
+                    imageView = ((VideoHolder) viewHolder).imageCommentLikeThumb;
+                }
+                showLikeTooltip(imageView);
+                return;
+            }
         }
 
 //        Log.d("videoautoplaycheck", "step 0 position = " + targetPosition);
@@ -568,10 +610,24 @@ public class VideoPlayerRecyclerView extends RecyclerView {
         this.mediaObjects = mediaObjects;
     }
 
+    public void setActivityContext(Activity activityContext) {
+        this.activityContext = activityContext;
+    }
+
     public void pausePlayer() {
         if (videoPlayer != null) {
             videoPlayer.setPlayWhenReady(false);
         }
+    }
+
+    private void showLikeTooltip(ImageView imageView) {
+        new MaterialShowcaseView.Builder(activityContext)
+                .setTarget(imageView)
+                .setDismissText(context.getString(R.string.ok_i_got_it))
+                .setContentText(context.getString(R.string.please_like_posts_that_you_consider_to_be_of_high_quality))
+                .setDelay(100) // optional but starting animations immediately in onCreate can make them choppy
+                .singleUse("3") // provide a unique ID used to ensure it is only shown once
+                .show();
     }
 
 }

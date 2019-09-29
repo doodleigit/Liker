@@ -149,7 +149,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
     //Delete post
     public LinkScriptYoutubeHolder.PostItemListener listener;
     private String postLike;
-    private ImageView imgLike;
+    public ImageView imgLike;
     private int postLikeNumeric;
     private int postTotalShare;
 
@@ -511,7 +511,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
         String categoryName = item.getCatName();
 //
 
-        SpannableStringBuilder builder = getSpannableStringBuilder(likes, followers, totalStars, categoryName);
+        SpannableStringBuilder builder = getSpannableStringBuilder(mContext, item.getCatId(), likes, followers, totalStars, categoryName);
 
 
         tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
