@@ -132,8 +132,8 @@
     <string name="uploading">Uploading…</string>
     <string name="select_profile_picture">Select Profile Picture</string>
     <string name="capture_profile_picture">Capture Profile Picture</string>
-    <string name="select_cover_picture">Select Profile Picture</string>
-    <string name="capture_cover_picture">Capture Profile Picture</string>
+    <string name="select_cover_picture">Select Cover Picture</string>
+    <string name="capture_cover_picture">Capture Cover Picture</string>
     <string name="select_year">Select Year</string>
     <string name="select_day">Select Day</string>
     <string name="are_you_sure">Are you sure you want to remove</string>
