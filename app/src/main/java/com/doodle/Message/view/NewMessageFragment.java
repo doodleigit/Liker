@@ -161,7 +161,7 @@ public class NewMessageFragment extends Fragment {
     }
 
     private void getData() {
-        if (networkOk) {
+        if (NetworkHelper.hasNetworkAccess(getContext())) {
             Call<AllFriends> call = messageService.getAllFriends(deviceId, token, userIds, profileId, userIds, limit, offset);
             sendSuggestedListRequest(call);
             progressDialog.show();
@@ -182,7 +182,7 @@ public class NewMessageFragment extends Fragment {
     }
 
     private void getPagination() {
-        if (networkOk) {
+        if (NetworkHelper.hasNetworkAccess(getContext())) {
             progressBar.setVisibility(View.VISIBLE);
             Call<AllFriends> call = messageService.getAllFriends(deviceId, token, userIds, profileId, userIds, limit, offset);
             sendSuggestedListPaginationRequest(call);

@@ -786,7 +786,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
                 //  mContext.startActivity(new Intent(mContext, CommentPost.class));
 //                FullBottomSheetDialogFragment postPermissions = new FullBottomSheetDialogFragment();
 //                postPermissions.show(activity.getSupportFragmentManager(), "PostPermission");
-                if (networkOk) {
+                if (NetworkHelper.hasNetworkAccess(mContext)) {
 
                     Call<CommentItem> call = commentService.getAllPostComments(deviceId, profileId, token, "false", limit, offset, "DESC", item.getPostId(), userIds);
                     sendAllCommentItemRequest(call);
@@ -975,7 +975,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
 //                            App.setItem(item);
 //                            activity = (AppCompatActivity) v.getContext();
-//                            if (networkOk) {
+//                            if (NetworkHelper.hasNetworkAccess(mContext)) {
 //                                Call<ReportReason> call = commentService.getReportReason(deviceId, profileId, token, item.getPostUserid(), "2", userIds);
 //                                sendReportReason(call);
 //                            } else {
@@ -985,7 +985,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
                         if (id == R.id.publics) {
 
                             activity = (AppCompatActivity) v.getContext();
-                            if (networkOk) {0
+                            if (NetworkHelper.hasNetworkAccess(mContext)) {0
                                 Call<String> call = webService.postPermission(deviceId, profileId, token, "0", item.getPostId());
                                 sendPostPermissionRequest(call);
                             } else {
@@ -996,7 +996,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
                         }
                         if (id == R.id.friends) {
                             activity = (AppCompatActivity) v.getContext();
-                            if (networkOk) {
+                            if (NetworkHelper.hasNetworkAccess(mContext)) {
                                 Call<String> call = webService.postPermission(deviceId, profileId, token, "2", item.getPostId());
                                 sendPostPermissionRequest(call);
                             } else {
@@ -1005,7 +1005,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
                         }
                         if (id == R.id.onlyMe) {
                             activity = (AppCompatActivity) v.getContext();
-                            if (networkOk) {
+                            if (NetworkHelper.hasNetworkAccess(mContext)) {
                                 Call<String> call = webService.postPermission(deviceId, profileId, token, "1", item.getPostId());
                                 sendPostPermissionRequest(call);
                             } else {
@@ -1143,7 +1143,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
                         if (id == R.id.reportedPost) {
                             App.setItem(item);
                             activity = (AppCompatActivity) v.getContext();
-                            if (networkOk) {
+                            if (NetworkHelper.hasNetworkAccess(mContext)) {
                                 Call<ReportReason> call = commentService.getReportReason(deviceId, profileId, token, item.getPostUserid(), "2", userIds);
                                 sendReportReason(call);
                             } else {
@@ -1153,7 +1153,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
                         if (id == R.id.publics) {
 
                             activity = (AppCompatActivity) v.getContext();
-                            if (networkOk) {
+                            if (NetworkHelper.hasNetworkAccess(mContext)) {
                                 Call<String> call = webService.postPermission(deviceId, profileId, token, "0", item.getPostId());
                                 sendPostPermissionRequest(call);
                             } else {
@@ -1164,7 +1164,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
                         }
                         if (id == R.id.friends) {
                             activity = (AppCompatActivity) v.getContext();
-                            if (networkOk) {
+                            if (NetworkHelper.hasNetworkAccess(mContext)) {
                                 Call<String> call = webService.postPermission(deviceId, profileId, token, "2", item.getPostId());
                                 sendPostPermissionRequest(call);
                             } else {
@@ -1173,7 +1173,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
                         }
                         if (id == R.id.onlyMe) {
                             activity = (AppCompatActivity) v.getContext();
-                            if (networkOk) {
+                            if (NetworkHelper.hasNetworkAccess(mContext)) {
                                 Call<String> call = webService.postPermission(deviceId, profileId, token, "1", item.getPostId());
                                 sendPostPermissionRequest(call);
                             } else {
@@ -1206,7 +1206,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
                             switch (postPermissions) {
                                 case "Turn off notifications":
                                     notificationOff = true;
-                                    if (networkOk) {
+                                    if (NetworkHelper.hasNetworkAccess(mContext)) {
                                         Call<String> call = webService.postNotificationTurnOff(deviceId, profileId, token, userIds, item.getPostId());
                                         sendNotificationRequest(call);
                                     } else {
@@ -1215,7 +1215,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
                                     break;
                                 case "Turn on notifications":
                                     notificationOff = false;
-                                    if (networkOk) {
+                                    if (NetworkHelper.hasNetworkAccess(mContext)) {
                                         Call<String> call = webService.postNotificationTurnOn(deviceId, profileId, token, userIds, item.getPostId());
                                         sendNotificationRequest(call);
                                     } else {

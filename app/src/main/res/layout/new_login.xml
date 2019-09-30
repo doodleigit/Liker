@@ -70,7 +70,7 @@
                 android:drawableEnd="@drawable/ic_cancel_black_24dp"
                 android:drawableRight="@drawable/ic_cancel_black_24dp"
                 android:hint="Email"
-                android:inputType="text"
+                android:inputType="textEmailAddress"
                 android:imeOptions="actionNext"
                 android:textSize="14sp"/>
 

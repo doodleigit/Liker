@@ -311,7 +311,7 @@ public class ReplyImageHolder extends RecyclerView.ViewHolder {
                     } else {
                         if (replyItem.isIsLikeReplied()) {
 
-                            if (networkOk) {
+                            if (NetworkHelper.hasNetworkAccess(mContext)) {
                                 Call<String> call = commentService.unLikeCommentReply(deviceId, profileId, token, replyItem.getCommentId(), replyItem.getId(), postItem.getPostId(), profileId);
                                 sendUnLikeCommentReplyRequest(call);
                             } else {
@@ -320,7 +320,7 @@ public class ReplyImageHolder extends RecyclerView.ViewHolder {
                             }
 
                         } else {
-                            if (networkOk) {
+                            if (NetworkHelper.hasNetworkAccess(mContext)) {
                                 Call<String> call = commentService.likeCommentReply(deviceId, profileId, token, replyItem.getCommentId(), replyItem.getId(), postItem.getPostId(), profileId);
                                 sendLikeCommentReplyRequest(call);
                             } else {
@@ -521,7 +521,7 @@ public class ReplyImageHolder extends RecyclerView.ViewHolder {
                             App.setReplyItem(replyItem);
                             App.setItem(postItem);
                             activity = (AppCompatActivity) v.getContext();
-                            if (networkOk) {
+                            if (NetworkHelper.hasNetworkAccess(mContext)) {
                                 Call<ReportReason> call = commentService.getReportReason(deviceId, profileId, token, replyItem.getUserId(), "2", userIds);
                                 sendReportReason(call);
                             } else {
@@ -572,7 +572,7 @@ public class ReplyImageHolder extends RecyclerView.ViewHolder {
 
                 String commentReply = commentItem.getTotalReply();
                 if (Integer.parseInt(commentReply) > 0) {
-                    if (networkOk) {
+                    if (NetworkHelper.hasNetworkAccess(mContext)) {
 
                         Call<List<Reply>> call = commentService.getPostCommentReplyList(deviceId, profileId, token, commentItem.getId(), "false", limit, offset, commentItem.getPostId(), userIds);
                         sendAllCommentReplyListRequest(call);

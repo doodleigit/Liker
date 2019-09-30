@@ -148,7 +148,6 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
     public PostService webService;
     public PrefManager manager;
     private String deviceId, profileId, token, userIds;
-    private Context mContext;
     private String postId;
     private boolean isAddContentTitle;
     //Emoji
@@ -491,7 +490,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
 
 
     private void mentionUsers() {
-        if (networkOk) {
+        if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
             progressView.setVisibility(View.VISIBLE);
 
             Call<List<MentionUser>> call = webService.searchMentionUser(deviceId, profileId, token, userQuery);
@@ -651,7 +650,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                if (networkOk) {
+                if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
 
                     Call<CommentItem> call = commentService.getAllPostComments(deviceId, profileId, token, "false", limit, offset, "DESC", postItem.getPostId(), userIds);
                     sendAllCommentItemRequest(call);
@@ -1171,7 +1170,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
         this.reply = reply;
         this.position = position;
 
-        if (networkOk) {
+        if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
 
             String commentId = commentItem.getId();
             String postId = commentItem.getPostId();
@@ -1276,7 +1275,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
     public void onBlockResult(DialogFragment dlg) {
         commentChild = App.getCommentItem();
         blockUserId = commentChild.getUserId();
-        if (networkOk) {
+        if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
             Call<String> call = commentService.blockedUser(deviceId, profileId, token, blockUserId, userIds);
             sendBlockUserRequest(call);
         } else {

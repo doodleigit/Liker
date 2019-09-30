@@ -98,7 +98,7 @@ public class LikerSearch extends AppCompatActivity implements View.OnClickListen
         mView = new View(this);
 
 
-        if (networkOk) {
+        if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
             progressView.setVisibility(View.VISIBLE);
             progressView.startAnimation();
             Call<List<SearchHistory>> call = webService.searchHistory(deviceId, profileId, token, mProfileId);
@@ -130,7 +130,7 @@ public class LikerSearch extends AppCompatActivity implements View.OnClickListen
 
                     App.setQueryResult(searchData);
 
-                    if (networkOk) {
+                    if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
                         progressView.setVisibility(View.VISIBLE);
                         progressView.startAnimation();
                         Call<AdvanceSearches> call = webService.advanceSearch(deviceId, profileId, token, mProfileId, searchData, 5, 0, 1, 1);
@@ -155,7 +155,7 @@ public class LikerSearch extends AppCompatActivity implements View.OnClickListen
                         findViewById(R.id.containerRecent).setVisibility(View.GONE);
                         queryText = s;
 
-                        if (networkOk) {
+                        if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
                             progressView.setVisibility(View.VISIBLE);
                             progressView.startAnimation();
                             Call<List<SearchUser>> call = webService.searchUser(deviceId, profileId, token, s);
@@ -224,7 +224,7 @@ public class LikerSearch extends AppCompatActivity implements View.OnClickListen
                     listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
                         public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
-                            if (networkOk) {
+                            if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
                                 progressView.setVisibility(View.VISIBLE);
                                 progressView.startAnimation();
                                 Call<AdvanceSearches> call = webService.advanceSearch(deviceId, profileId, token, mProfileId, searchHistoryList.get(position).searchText, 5, 0, 1, 1);
@@ -352,7 +352,7 @@ public class LikerSearch extends AppCompatActivity implements View.OnClickListen
         int id = v.getId();
         switch (id) {
             case R.id.tvClear:
-                if (networkOk) {
+                if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
                     progressView.setVisibility(View.VISIBLE);
                     progressView.startAnimation();
                     Call<Message> call = webService.clearHistory(deviceId, profileId, token, mProfileId);
@@ -366,7 +366,7 @@ public class LikerSearch extends AppCompatActivity implements View.OnClickListen
                 break;
 
             case R.id.tvShowSearchResult:
-                if (networkOk) {
+                if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
                     progressView.setVisibility(View.VISIBLE);
                     progressView.startAnimation();
                     Call<AdvanceSearches> call = webService.advanceSearch(deviceId, profileId, token, mProfileId, queryText, 5, 0, 1, 1);

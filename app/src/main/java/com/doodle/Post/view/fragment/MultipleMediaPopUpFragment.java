@@ -539,7 +539,7 @@ public class MultipleMediaPopUpFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 popup = new PopupMenu(getActivity(), v);
-                popup.getMenuInflater().inflate(R.menu.share_menu, popup.getMenu());
+                popup.getMenuInflater().inflate(R.menu.share_menu_popup, popup.getMenu());
 
 //                popup.show();
                 MenuPopupHelper menuHelper = new MenuPopupHelper(getActivity(), (MenuBuilder) popup.getMenu(), v);
@@ -668,7 +668,7 @@ public class MultipleMediaPopUpFragment extends Fragment {
                         }
                         if (id == R.id.reportedPost) {
                             App.setItem(item);
-                            if (networkOk) {
+                            if (NetworkHelper.hasNetworkAccess(getContext())) {
                                 Call<ReportReason> call = commentService.getReportReason(deviceId, profileId, token, item.getPostUserid(), "2", userIds);
                                 sendReportReason(call);
                             } else {
@@ -676,7 +676,7 @@ public class MultipleMediaPopUpFragment extends Fragment {
                             }
                         }
                         if (id == R.id.publics) {
-                            if (networkOk) {
+                            if (NetworkHelper.hasNetworkAccess(getContext())) {
                                 Call<String> call = webService.postPermission(deviceId, profileId, token, "0", item.getPostId());
                                 sendPostPermissionRequest(call);
                             } else {
@@ -684,7 +684,7 @@ public class MultipleMediaPopUpFragment extends Fragment {
                             }
                         }
                         if (id == R.id.friends) {
-                            if (networkOk) {
+                            if (NetworkHelper.hasNetworkAccess(getContext())) {
                                 Call<String> call = webService.postPermission(deviceId, profileId, token, "2", item.getPostId());
                                 sendPostPermissionRequest(call);
                             } else {
@@ -692,7 +692,7 @@ public class MultipleMediaPopUpFragment extends Fragment {
                             }
                         }
                         if (id == R.id.onlyMe) {
-                            if (networkOk) {
+                            if (NetworkHelper.hasNetworkAccess(getContext())) {
                                 Call<String> call = webService.postPermission(deviceId, profileId, token, "1", item.getPostId());
                                 sendPostPermissionRequest(call);
                             } else {
@@ -715,7 +715,7 @@ public class MultipleMediaPopUpFragment extends Fragment {
                             switch (postPermissions) {
                                 case "Turn off notifications":
                                     notificationOff = true;
-                                    if (networkOk) {
+                                    if (NetworkHelper.hasNetworkAccess(getContext())) {
                                         Call<String> call = webService.postNotificationTurnOff(deviceId, profileId, token, userIds, item.getPostId());
                                         sendNotificationRequest(call);
                                     } else {
@@ -724,7 +724,7 @@ public class MultipleMediaPopUpFragment extends Fragment {
                                     break;
                                 case "Turn on notifications":
                                     notificationOff = false;
-                                    if (networkOk) {
+                                    if (NetworkHelper.hasNetworkAccess(getContext())) {
                                         Call<String> call = webService.postNotificationTurnOn(deviceId, profileId, token, userIds, item.getPostId());
                                         sendNotificationRequest(call);
                                     } else {
@@ -750,7 +750,7 @@ public class MultipleMediaPopUpFragment extends Fragment {
 
     private void openCommentSection() {
         AppCompatActivity activity = (AppCompatActivity) getContext();
-        if (networkOk) {
+        if (NetworkHelper.hasNetworkAccess(getContext())) {
             Call<CommentItem> call = commentService.getAllPostComments(deviceId, profileId, token, "false", limit, offset, "DESC", item.getPostId(), userIds);
             sendAllCommentItemRequest(call);
             delayLoadComment(mProgressBar);
@@ -806,17 +806,8 @@ public class MultipleMediaPopUpFragment extends Fragment {
                 if (mimColor.startsWith("#")) {
                     postBodyLayer.setBackgroundColor(Color.parseColor(mimColor));
                     ViewGroup.LayoutParams params = postBodyLayer.getLayoutParams();
-                    if (App.isIsMimPopup()) {
-                        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-                        float dpHeight = displayMetrics.heightPixels / displayMetrics.density;
-                        int myMimHeight = (displayMetrics.heightPixels) * 75 / 100;
-                        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
 
-                        // params.height= (int) dpHeight;
-                        params.height = myMimHeight;
-                    } else {
-                        params.height = 350;
-                    }
+                    params.height = (int) getResources().getDimension(R.dimen._220sdp);
                     postBodyLayer.setLayoutParams(params);
                     postBodyLayer.setGravity(Gravity.CENTER);
                     tvPostContent.setGravity(Gravity.CENTER);
@@ -833,8 +824,8 @@ public class MultipleMediaPopUpFragment extends Fragment {
                     tvPostContent.setGravity(Gravity.CENTER);
                     tvPostEmojiContent.setGravity(Gravity.CENTER);
                     postBodyLayer.setBackground(mDrawable);
-                    tvPostContent.setHeight(150);
-                    tvPostEmojiContent.setHeight(150);
+                    tvPostContent.setHeight((int) getResources().getDimension(R.dimen._200sdp));
+                    tvPostEmojiContent.setHeight((int) getResources().getDimension(R.dimen._200sdp));
                     switch (mimColor) {
                         case "img_bg_birthday.png":
                             tvPostContent.setTextColor(Color.parseColor("#000000"));

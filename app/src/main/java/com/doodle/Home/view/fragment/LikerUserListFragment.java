@@ -105,7 +105,11 @@ public class LikerUserListFragment extends DialogFragment {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setNestedScrollingEnabled(false);
 
-//        tvLikeUserCount.setText(totalLikes + " " + getString(R.string.people_liked_this_post));
+        if (Integer.parseInt(totalLikes) > 1) {
+            tvLikeUserCount.setText(totalLikes + " " + getString(R.string.people) + " " + getString(R.string.people_liked_this_post));
+        } else {
+            tvLikeUserCount.setText(totalLikes + " " + getString(R.string.person) + " " + getString(R.string.people_liked_this_post));
+        }
 
         LikeUserClickListener likeUserClickListener = new LikeUserClickListener() {
             @Override

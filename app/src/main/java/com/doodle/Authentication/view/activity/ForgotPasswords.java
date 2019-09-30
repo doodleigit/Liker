@@ -373,7 +373,7 @@ public class ForgotPasswords extends AppCompatActivity implements View.OnClickLi
         public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
             switch (actionId) {
                 case EditorInfo.IME_ACTION_GO:
-                    if (networkOk) {
+                    if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
                         progressBar.setVisibility(View.VISIBLE);
                         loginDisable(true,btnContinue);
                         requestForgotPassword();
@@ -385,7 +385,7 @@ public class ForgotPasswords extends AppCompatActivity implements View.OnClickLi
                     }
                     break;
                 case EditorInfo.IME_ACTION_DONE:
-                    if (networkOk) {
+                    if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
                         progressBar.setVisibility(View.VISIBLE);
                         loginDisable(true,btnOTPContinue);
                         requestForOTP();
@@ -399,7 +399,7 @@ public class ForgotPasswords extends AppCompatActivity implements View.OnClickLi
                     break;
                 case EditorInfo.IME_ACTION_SEND:
 
-                    if (networkOk) {
+                    if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
                         progressBar.setVisibility(View.VISIBLE);
                         loginDisable(true,btnFinish);
                         requestNewPassword();
@@ -489,7 +489,7 @@ public class ForgotPasswords extends AppCompatActivity implements View.OnClickLi
 //                    mViewFlipper.setOutAnimation(slideLeftOut);
 //                    mViewFlipper.showNext();
 
-                    if (networkOk) {
+                    if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
                         progressBar.setVisibility(View.VISIBLE);
                         loginDisable(true,btnContinue);
                         requestForgotPassword();
@@ -504,7 +504,7 @@ public class ForgotPasswords extends AppCompatActivity implements View.OnClickLi
                 break;
             case R.id.btnOTPContinue:
                 if (flipperId == 1) {
-                    if (networkOk) {
+                    if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
                         progressBar.setVisibility(View.VISIBLE);
                         loginDisable(true,btnOTPContinue);
                         requestForOTP();
@@ -559,7 +559,7 @@ public class ForgotPasswords extends AppCompatActivity implements View.OnClickLi
 //                //finish();
 //                break;
             case R.id.btnFinish:
-                if (networkOk) {
+                if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
                     progressBar.setVisibility(View.VISIBLE);
                     loginDisable(true,btnFinish);
                     requestNewPassword();
@@ -595,7 +595,7 @@ public class ForgotPasswords extends AppCompatActivity implements View.OnClickLi
 //                break;
 
             case R.id.tvResendOTP:
-                if (networkOk) {
+                if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
                     progressBar.setVisibility(View.VISIBLE);
                     loginDisable(true,btnContinue);
                     requestResendForgotPassword();

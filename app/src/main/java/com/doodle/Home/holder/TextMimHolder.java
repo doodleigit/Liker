@@ -346,14 +346,12 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 Intent intent = new Intent(mContext, PostPopup.class);
                 intent.putExtra(ITEM_KEY, (Parcelable) item);
                 intent.putExtra("has_footer", true);
                 intent.putExtra("position", position);
                 mContext.startActivity(intent);
                 ((Activity) mContext).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
-
             }
         });
 
@@ -395,20 +393,8 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                 if (mimColor.startsWith("#")) {
                     postBodyLayer.setBackgroundColor(Color.parseColor(mimColor));
                     ViewGroup.LayoutParams params = postBodyLayer.getLayoutParams();
-                    if (App.isIsMimPopup()) {
 
-
-                        DisplayMetrics displayMetrics = mContext.getResources().getDisplayMetrics();
-                        float dpHeight = displayMetrics.heightPixels / displayMetrics.density;
-                        int myMimHeight = (displayMetrics.heightPixels) * 75 / 100;
-                        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-
-                        // params.height= (int) dpHeight;
-                        params.height = myMimHeight;
-                    } else {
-                        params.height = 350;
-                    }
-
+                    params.height = (int) mContext.getResources().getDimension(R.dimen._220sdp);
                     postBodyLayer.setLayoutParams(params);
                     postBodyLayer.setGravity(Gravity.CENTER);
                     tvPostContent.setGravity(Gravity.CENTER);
@@ -425,8 +411,8 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                     tvPostContent.setGravity(Gravity.CENTER);
                     tvPostEmojiContent.setGravity(Gravity.CENTER);
                     postBodyLayer.setBackground(mDrawable);
-                    tvPostContent.setHeight(150);
-                    tvPostEmojiContent.setHeight(150);
+                    tvPostContent.setHeight((int) mContext.getResources().getDimension(R.dimen._200sdp));
+                    tvPostEmojiContent.setHeight((int) mContext.getResources().getDimension(R.dimen._200sdp));
                     switch (mimColor) {
                         case "img_bg_birthday.png":
                             tvPostContent.setTextColor(Color.parseColor("#000000"));
@@ -686,6 +672,18 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                 dialogFragment.setArguments(bundle);
 
                 dialogFragment.show(ft, "dialog");
+            }
+        });
+
+        postBodyLayer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(mContext, PostPopup.class);
+                intent.putExtra(ITEM_KEY, (Parcelable) item);
+                intent.putExtra("has_footer", true);
+                intent.putExtra("position", position);
+                mContext.startActivity(intent);
+                ((Activity) mContext).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
             }
         });
 
@@ -1025,7 +1023,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                         if (id == R.id.reportedPost) {
                             App.setItem(item);
                             activity = (AppCompatActivity) v.getContext();
-                            if (networkOk) {
+                            if (NetworkHelper.hasNetworkAccess(mContext)) {
                                 Call<ReportReason> call = commentService.getReportReason(deviceId, profileId, token, item.getPostUserid(), "2", userIds);
                                 sendReportReason(call);
                             } else {
@@ -1035,7 +1033,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                         if (id == R.id.publics) {
 
                             activity = (AppCompatActivity) v.getContext();
-                            if (networkOk) {
+                            if (NetworkHelper.hasNetworkAccess(mContext)) {
                                 Call<String> call = webService.postPermission(deviceId, profileId, token, "0", item.getPostId());
                                 sendPostPermissionRequest(call);
                             } else {
@@ -1046,7 +1044,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                         }
                         if (id == R.id.friends) {
                             activity = (AppCompatActivity) v.getContext();
-                            if (networkOk) {
+                            if (NetworkHelper.hasNetworkAccess(mContext)) {
                                 Call<String> call = webService.postPermission(deviceId, profileId, token, "2", item.getPostId());
                                 sendPostPermissionRequest(call);
                             } else {
@@ -1055,7 +1053,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                         }
                         if (id == R.id.onlyMe) {
                             activity = (AppCompatActivity) v.getContext();
-                            if (networkOk) {
+                            if (NetworkHelper.hasNetworkAccess(mContext)) {
                                 Call<String> call = webService.postPermission(deviceId, profileId, token, "1", item.getPostId());
                                 sendPostPermissionRequest(call);
                             } else {
@@ -1082,7 +1080,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                             switch (postPermissions) {
                                 case "Turn off notifications":
                                     notificationOff = true;
-                                    if (networkOk) {
+                                    if (NetworkHelper.hasNetworkAccess(mContext)) {
                                         Call<String> call = webService.postNotificationTurnOff(deviceId, profileId, token, userIds, item.getPostId());
                                         sendNotificationRequest(call);
                                     } else {
@@ -1091,7 +1089,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                                     break;
                                 case "Turn on notifications":
                                     notificationOff = false;
-                                    if (networkOk) {
+                                    if (NetworkHelper.hasNetworkAccess(mContext)) {
                                         Call<String> call = webService.postNotificationTurnOn(deviceId, profileId, token, userIds, item.getPostId());
                                         sendNotificationRequest(call);
                                     } else {
@@ -1116,7 +1114,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                 //  mContext.startActivity(new Intent(mContext, CommentPost.class));
 //                FullBottomSheetDialogFragment postPermissions = new FullBottomSheetDialogFragment();
 //                postPermissions.show(activity.getSupportFragmentManager(), "PostPermission");
-                if (networkOk) {
+                if (NetworkHelper.hasNetworkAccess(mContext)) {
 
                     Call<CommentItem> call = commentService.getAllPostComments(deviceId, profileId, token, "false", limit, offset, "DESC", item.getPostId(), userIds);
                     sendAllCommentItemRequest(call);

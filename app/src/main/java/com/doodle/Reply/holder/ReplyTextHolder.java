@@ -309,7 +309,7 @@ public class ReplyTextHolder extends RecyclerView.ViewHolder {
                     } else {
                         if (replyItem.isIsLikeReplied()) {
 
-                            if (networkOk) {
+                            if (NetworkHelper.hasNetworkAccess(mContext)) {
                                 Call<String> call = commentService.unLikeCommentReply(deviceId, profileId, token, replyItem.getCommentId(), replyItem.getId(), postItem.getPostId(), profileId);
                                 sendUnLikeCommentReplyRequest(call);
                             } else {
@@ -318,7 +318,7 @@ public class ReplyTextHolder extends RecyclerView.ViewHolder {
                             }
 
                         } else {
-                            if (networkOk) {
+                            if (NetworkHelper.hasNetworkAccess(mContext)) {
                                 Call<String> call = commentService.likeCommentReply(deviceId, profileId, token, replyItem.getCommentId(), replyItem.getId(), postItem.getPostId(), profileId);
                                 sendLikeCommentReplyRequest(call);
                             } else {
@@ -629,7 +629,7 @@ public class ReplyTextHolder extends RecyclerView.ViewHolder {
                             App.setReplyItem(replyItem);
                             App.setItem(postItem);
                             activity = (AppCompatActivity) v.getContext();
-                            if (networkOk) {
+                            if (NetworkHelper.hasNetworkAccess(mContext)) {
                                 Call<ReportReason> call = commentService.getReportReason(deviceId, profileId, token, replyItem.getUserId(), "2", userIds);
                                 sendReportReason(call);
                             } else {

@@ -184,7 +184,7 @@ public class MessageListFragment extends Fragment {
     }
 
     private void getData() {
-        if (networkOk) {
+        if (NetworkHelper.hasNetworkAccess(getContext())) {
             progressDialog.show();
             sendMessageListRequest();
         } else {
@@ -193,7 +193,7 @@ public class MessageListFragment extends Fragment {
     }
 
     private void getPagination() {
-        if (networkOk) {
+        if (NetworkHelper.hasNetworkAccess(getContext())) {
             progressBar.setVisibility(View.VISIBLE);
             sendMessageListPaginationRequest();
         }

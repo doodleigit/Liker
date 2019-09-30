@@ -159,6 +159,7 @@
                     android:id="@+id/etFirstName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
                     android:drawableEnd="@drawable/ic_cancel_black_24dp"
                     android:drawableRight="@drawable/ic_cancel_black_24dp"
                     android:hint="First Name"
@@ -180,6 +181,7 @@
                     android:id="@+id/etLastName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
                     android:drawableEnd="@drawable/ic_cancel_black_24dp"
                     android:drawableRight="@drawable/ic_cancel_black_24dp"
                     android:hint="Last Name"
@@ -203,7 +205,7 @@
                     android:drawableEnd="@drawable/ic_cancel_black_24dp"
                     android:drawableRight="@drawable/ic_cancel_black_24dp"
                     android:hint="Email"
-                    android:inputType="text"
+                    android:inputType="textEmailAddress"
                     android:imeOptions="actionSend"
                     android:textSize="14sp"/>
             </android.support.design.widget.TextInputLayout>

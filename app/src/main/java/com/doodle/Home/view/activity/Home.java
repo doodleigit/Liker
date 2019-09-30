@@ -331,16 +331,16 @@ public class Home extends AppCompatActivity implements
         navLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                LoginInfo loginInfo = new LoginInfo(manager.getUserInfo(), manager.getToken(), manager.getProfileName(), manager.getProfileImage(), manager.getProfileId(), manager.getUserName(), manager.getDeviceId());
-//                Intent loginAgain = new Intent(Home.this, LoginAgain.class);
-//                loginAgain.putExtra("login_info", loginInfo);
-//                manager.pref.edit().clear().apply();
-//                stopService(new Intent(Home.this, DataFetchingService.class));
-//                startActivity(loginAgain);
-//                finish();
+                LoginInfo loginInfo = new LoginInfo(manager.getUserInfo(), manager.getToken(), manager.getProfileName(), manager.getProfileImage(), manager.getProfileId(), manager.getUserName(), manager.getDeviceId());
+                Intent loginAgain = new Intent(Home.this, LoginAgain.class);
+                loginAgain.putExtra("login_info", loginInfo);
+                manager.pref.edit().clear().apply();
+                stopService(new Intent(Home.this, DataFetchingService.class));
+                startActivity(loginAgain);
+                finish();
 
-                Call<String> call = webService.setLogout(deviceId, token, userId, userId);
-                sendLogoutRequest(call);
+//                Call<String> call = webService.setLogout(deviceId, token, userId, userId);
+//                sendLogoutRequest(call);
             }
         });
 
@@ -352,7 +352,7 @@ public class Home extends AppCompatActivity implements
         int newMessageCount = manager.getMessageNotificationCount();
         setMessageNotificationCount(newMessageCount);
         categories.add(new PostFilterCategory("1", "All Categories", new ArrayList<>()));
-        categories.add(new PostFilterCategory("2", "My Favourites", new ArrayList<>()));
+        categories.add(new PostFilterCategory("2", "My Favorites", new ArrayList<>()));
         categories.add(new PostFilterCategory("3", "Single Category", new ArrayList<>()));
         categories.add(new PostFilterCategory("4", "Everything Except", new ArrayList<>()));
         categoryFilter();
@@ -959,7 +959,7 @@ public class Home extends AppCompatActivity implements
                 if (Math.abs(verticalOffset) - appBarLayout.getTotalScrollRange() == 0) {
                     //  Collapsed
                     viewCategory.setVisibility(View.GONE);
-                } else if (Math.abs(verticalOffset) - appBarLayout.getTotalScrollRange() <= -200) {
+                } else if (Math.abs(verticalOffset) - appBarLayout.getTotalScrollRange() <= -220) {
                     //Expanded
                     viewCategory.setVisibility(View.VISIBLE);
                 }
@@ -1377,7 +1377,7 @@ public class Home extends AppCompatActivity implements
         }
 
 
-        if (networkOk) {
+        if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
             Call<String> call = commentService.blockedUser(deviceId, profileId, token, blockUserId, userId);
             sendBlockUserRequest(call);
         } else {

@@ -87,7 +87,7 @@ public class PostCategory extends AppCompatActivity {
         token = manager.getToken();
         activity = PostCategory.this;
 
-        if (networkOk) {
+        if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
             progressView.setVisibility(View.VISIBLE);
             progressView.startAnimation();
             Call<CategoryItem> call = webService.getCategories(deviceId, profileId, token);

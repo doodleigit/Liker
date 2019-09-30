@@ -203,7 +203,7 @@ public class PostFragment extends Fragment {
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
 
-                        if (networkOk) {
+                        if (NetworkHelper.hasNetworkAccess(getContext())) {
                             Call<String> call = profileService.postDelete(deviceId, userId, token, userId, deletePostItem.getPostId());
                             sendDeletePostRequest(call);
                         } else {
@@ -257,7 +257,7 @@ public class PostFragment extends Fragment {
     }
 
     private void getData() {
-        if (networkOk) {
+        if (NetworkHelper.hasNetworkAccess(getContext())) {
             progressView.setVisibility(View.VISIBLE);
             Call<List<PostItem>> call = profileService.feed(deviceId, userId, token, userId, limit, offset, catIds, profileUserName, false);
             sendPostItemRequest(call);
@@ -270,7 +270,7 @@ public class PostFragment extends Fragment {
     private void PerformPagination() {
         isScrolling = false;
         progressView.setVisibility(View.VISIBLE);
-        if (networkOk) {
+        if (NetworkHelper.hasNetworkAccess(getContext())) {
             Call<List<PostItem>> call = profileService.feed(deviceId, userId, token, userId, limit, offset, catIds, profileUserName, false);
             PostItemPagingRequest(call);
 

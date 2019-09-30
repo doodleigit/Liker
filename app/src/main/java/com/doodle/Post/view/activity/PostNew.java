@@ -410,7 +410,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                     editPostMessage.setTextAppearance(this, android.R.style.TextAppearance_Medium);
                     editPostMessage.setTextColor(Color.parseColor("#000000"));
                     ViewGroup.LayoutParams params = messageContainer.getLayoutParams();
-                    params.height = 300;
+                    params.height = (int) getResources().getDimension(R.dimen._220sdp);
                     messageContainer.setLayoutParams(params);
                 } else {
                     int mColor = Color.parseColor(mimColor);
@@ -419,7 +419,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                         editPostMessage.setTextColor(Color.parseColor("#000000"));
                     }
                     ViewGroup.LayoutParams params = messageContainer.getLayoutParams();
-                    params.height = 350;
+                    params.height = (int) getResources().getDimension(R.dimen._200sdp);
                     messageContainer.setLayoutParams(params);
                     messageContainer.setGravity(Gravity.CENTER);
                     editPostMessage.setGravity(Gravity.CENTER);
@@ -712,7 +712,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
     }
 
     private void mentionUsers() {
-        if (networkOk) {
+        if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
             progressView.setVisibility(View.VISIBLE);
             progressView.startAnimation();
 
@@ -1177,7 +1177,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
     }
 
     private void createNewPost() {
-        if (networkOk) {
+        if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
             progressView.setVisibility(View.VISIBLE);
             progressView.startAnimation();
             Call<String> call = webService.postAdded(
@@ -2652,7 +2652,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
     public void onPositiveResult(DialogFragment dlg) {
         makeText(PostNew.this, "positive button", LENGTH_SHORT).show();
         //addedPostContributor
-        if (networkOk) {
+        if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
             progressView.setVisibility(View.VISIBLE);
             progressView.startAnimation();
             Call<String> call = webService.addedPostContributor(deviceId, profileId, token, categoryId, subCategoryId, 5, userIds);
@@ -2718,7 +2718,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
     public void onNegativeResult(DialogFragment dlg) {
         makeText(PostNew.this, "Negative Button", LENGTH_SHORT).show();
 
-        if (networkOk) {
+        if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
             progressView.setVisibility(View.VISIBLE);
             progressView.startAnimation();
             Call<String> call = webService.addedPostContributor(deviceId, profileId, token, categoryId, subCategoryId, 6, userIds);

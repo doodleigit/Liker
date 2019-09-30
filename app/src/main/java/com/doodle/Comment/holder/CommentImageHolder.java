@@ -184,6 +184,7 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
 
         //All comment post
         commentService = CommentService.mRetrofit.create(CommentService.class);
+        webService = HomeService.mRetrofit.create(HomeService.class);
         networkOk = NetworkHelper.hasNetworkAccess(mContext);
 
         mProgressBar = (ProgressBar) itemView.findViewById(R.id.ProgressBar);
@@ -300,7 +301,7 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
 
                     if (commentItem.isLikeUserStatus()) {
 
-                        if (networkOk) {
+                        if (NetworkHelper.hasNetworkAccess(mContext)) {
                             Call<String> call = commentService.unLikeCommentReply(deviceId, profileId, token, commentItem.getCommentId(), commentItem.getReplyId(), commentItem.getPostId(), profileId);
                             sendUnLikeCommentReplyRequest(call);
                         } else {
@@ -308,7 +309,7 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
                         }
 
                     } else {
-                        if (networkOk) {
+                        if (NetworkHelper.hasNetworkAccess(mContext)) {
                             Call<String> call = commentService.likeCommentReply(deviceId, profileId, token, commentItem.getCommentId(), commentItem.getReplyId(), commentItem.getPostId(), profileId);
                             sendLikeCommentReplyRequest(call);
                         } else {
@@ -322,7 +323,7 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
 
                     if (commentItem.isLikeUserStatus()) {
 
-                        if (networkOk) {
+                        if (NetworkHelper.hasNetworkAccess(mContext)) {
 
                             Call<String> call = commentService.commentUnLike(deviceId, profileId, token, commentItem.getId(), profileId);
                             sendCommentUnLikeRequest(call);
@@ -332,7 +333,7 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
                         }
 
                     } else {
-                        if (networkOk) {
+                        if (NetworkHelper.hasNetworkAccess(mContext)) {
 
                             Call<String> call = commentService.commentLike(deviceId, profileId, token, commentItem.getId(), userIds);
                             sendCommentLikeRequest(call);
@@ -532,7 +533,7 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
 
                             App.setCommentItem(commentItem);
                             activity = (AppCompatActivity) v.getContext();
-                            if (networkOk) {
+                            if (NetworkHelper.hasNetworkAccess(mContext)) {
                                 Call<ReportReason> call = commentService.getReportReason(deviceId, profileId, token, commentItem.getUserId(), "2", userIds);
                                 sendReportReason(call);
                             } else {
@@ -598,7 +599,7 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
 
                 String commentReply = commentItem.getTotalReply();
                 if (Integer.parseInt(commentReply) > 0) {
-                    if (networkOk) {
+                    if (NetworkHelper.hasNetworkAccess(mContext)) {
 
                         Call<List<Reply>> call = commentService.getPostCommentReplyList(deviceId, profileId, token, commentItem.getId(), "false", limit, offset, commentItem.getPostId(), userIds);
                         sendAllCommentReplyListRequest(call);

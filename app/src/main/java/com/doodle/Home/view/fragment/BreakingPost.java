@@ -250,7 +250,7 @@ public class BreakingPost extends Fragment {
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
 
-                        if (networkOk) {
+                        if (NetworkHelper.hasNetworkAccess(getContext())) {
                             Call<String> call = webService.postDelete(deviceId, profileId, token, userIds, deletePostItem.getPostId());
                             sendDeletePostRequest(call);
                         } else {
@@ -309,7 +309,7 @@ public class BreakingPost extends Fragment {
 
     private void getData() {
         offset = 0;
-        if (networkOk) {
+        if (NetworkHelper.hasNetworkAccess(getContext())) {
             progressView.setVisibility(View.VISIBLE);
             progressView.startAnimation();
             Call<List<PostItem>> call = webService.feed(deviceId, profileId, token, userIds, limit, offset, "breaking", catIds, filter, false);
@@ -318,7 +318,7 @@ public class BreakingPost extends Fragment {
             Tools.showNetworkDialog(getActivity().getSupportFragmentManager());
             progressView.setVisibility(View.GONE);
             progressView.stopAnimation();
-
+            refreshLayout.setRefreshing(false);
         }
     }
 

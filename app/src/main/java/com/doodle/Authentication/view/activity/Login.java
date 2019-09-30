@@ -271,7 +271,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                 getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
                 break;
             case R.id.tvSignIn:
-                if (networkOk) {
+                if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
                     progressBar.setVisibility(View.VISIBLE);
                     mDeviceId = manager.getDeviceId();
                     loginDisable(true);
@@ -313,7 +313,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                if (networkOk) {
+                if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
                     loadUserProfile(loginResult.getAccessToken());
                 } else {
                     Toast.makeText(getApplicationContext(), getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
@@ -423,7 +423,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                     viewModel.validateLoginEmailField(etEmail);
                     break;
                 case EditorInfo.IME_ACTION_SEND:
-                    if (networkOk) {
+                    if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
                         progressBar.setVisibility(View.VISIBLE);
                         mDeviceId = manager.getDeviceId();
                         loginDisable(true);
@@ -578,6 +578,8 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                         } else if (loginUser.getBounceData().equalsIgnoreCase(String.valueOf(1)) || loginUser.getBounceData().equalsIgnoreCase(String.valueOf(2))) {
                             Toast.makeText(Login.this,  getString(R.string.email_is_invalid), Toast.LENGTH_SHORT).show();
                         }
+                    } else {
+                        Toast.makeText(Login.this,  getString(R.string.something_went_wrong), Toast.LENGTH_SHORT).show();
                     }
                 }
 
@@ -588,6 +590,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             @Override
             public void onFailure(Call<LoginUser> call, Throwable t) {
                 Log.d("message", t.getMessage());
+                Toast.makeText(Login.this,  getString(R.string.something_went_wrong), Toast.LENGTH_SHORT).show();
                 progressBar.setVisibility(View.GONE);
                 loginDisable(false);
             }
@@ -650,7 +653,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                 socialInfo.setProvider(getString(R.string.twitter));
                 Log.d("Description", user.getDescription());
 
-                if (networkOk) {
+                if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
                     String appSocialAccessCode = AppConstants.APP_SOCIAL_ACCESS_CODE;
                     String oauthProvider = AppConstants.OAUTH_PROVIDER_TWITTER;
                     String deviceId = manager.getDeviceId();

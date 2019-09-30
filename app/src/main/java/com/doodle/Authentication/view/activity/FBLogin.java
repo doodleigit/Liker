@@ -90,7 +90,7 @@ public class FBLogin extends AppCompatActivity {
 
                 } else {
 
-                    if (networkOk) {
+                    if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
 
                         String appSocialAccessCode = AppConstants.APP_SOCIAL_ACCESS_CODE;
                         String oauthProvider = AppConstants.OAUTH_PROVIDER_FB;

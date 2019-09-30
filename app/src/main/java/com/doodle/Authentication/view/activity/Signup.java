@@ -438,7 +438,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
         });
 
 
-        if (networkOk) {
+        if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
             Intent intent = new Intent(this, MyService.class);
             startService(intent);
         } else {
@@ -694,7 +694,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
                         }
                     }
 
-//                    if (networkOk) {
+//                    if (NetworkHelper.hasNetworkAccess(mContext)) {
 //                        progressBar.setVisibility(View.VISIBLE);
 //                        mDeviceId = manager.getDeviceId();
 //                        loginDisable(true);
@@ -767,7 +767,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
             case R.id.btnFinish:
                 if (viewModel.validatePasswordField(etPassword) && viewModel.validateConfirmPasswordField(etConFirmPassword) && !mGender.isEmpty() && !mCountry.isEmpty() && !mDay.isEmpty() && !mMonth.isEmpty() &&
                         !mYear.isEmpty() && !mCity.isEmpty()) {
-                    if (networkOk) {
+                    if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
                         requestData(mFirstName, mlastName, mEmail, mPassword, mRetypePassword, mGender, mCountry, mDay, mMonth, mYear, mCity, mProvider, mOauthId, mToken, mSecret, mSocialName, isApps, mImgUrl);
                     } else {
                         showSnackbar(getString(R.string.no_internet));
@@ -912,7 +912,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
     }
 
     public void goBrowser(String url) {
-        if (networkok) {
+        if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
             if (!url.startsWith("http://") && !url.startsWith("https://"))
                 url = "http://" + url;
             try {
@@ -1226,7 +1226,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
         LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                if (networkOk) {
+                if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
                     loadUserProfile(loginResult.getAccessToken());
                 } else {
                     Toast.makeText(getApplicationContext(), "no internet!", Toast.LENGTH_SHORT).show();

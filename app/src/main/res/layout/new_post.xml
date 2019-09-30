@@ -136,8 +136,7 @@
                             android:isScrollContainer="true"
                             android:hint="Speak your mind..."
                             android:imeOptions="actionSend"
-
-                            android:inputType="textCapSentences|textMultiLine" >
+                            android:inputType="text" >
                             <requestFocus />
                         </com.vanniktech.emoji.EmojiEditText>
 
