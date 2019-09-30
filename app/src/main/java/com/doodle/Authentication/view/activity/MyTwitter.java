@@ -98,7 +98,7 @@ public class MyTwitter extends AppCompatActivity implements View.OnClickListener
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-        getSupportActionBar().setTitle("Liker");
+        getSupportActionBar().setTitle(R.string.app_title);
 //        setSupportActionBar(toolbar);
         //  getSupportActionBar().show();
         mEditText = (EditText) findViewById(R.id.et);
@@ -129,7 +129,7 @@ public class MyTwitter extends AppCompatActivity implements View.OnClickListener
                 } else {
                     mSharedPreferences = getSharedPreferences(PREF_NAME, 0);
                     if (isAuthenticated()) {
-                        Toast.makeText(getApplicationContext(), "Success", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), getString(R.string.success), Toast.LENGTH_SHORT).show();
                         mtweet_layout.setVisibility(View.GONE);
                         mtwitter_login_layout.setVisibility(View.VISIBLE);
 
@@ -175,7 +175,7 @@ public class MyTwitter extends AppCompatActivity implements View.OnClickListener
         // this.mTwitterAuth = auth;
         mConsumerKey = getResources().getString(R.string.com_twitter_sdk_android_CONSUMER_KEY);
         mConsumerSecret = getResources().getString(R.string.com_twitter_sdk_android_CONSUMER_SECRET);
-        mAuthVerifier = "oauth_verifier";
+        mAuthVerifier = getString(R.string.oauth_verifier);
 
         if (TextUtils.isEmpty(mConsumerKey)
                 || TextUtils.isEmpty(mConsumerSecret)) {
@@ -383,10 +383,10 @@ public class MyTwitter extends AppCompatActivity implements View.OnClickListener
         if (mdialogBuilder == null) {
             mdialogBuilder = new AlertDialog.Builder(MyTwitter.this);
 
-            mdialogBuilder.setTitle("Alert");
-            mdialogBuilder.setMessage("No Network");
+            mdialogBuilder.setTitle(R.string.alert);
+            mdialogBuilder.setMessage(R.string.no_network);
 
-            mdialogBuilder.setPositiveButton("Enable",
+            mdialogBuilder.setPositiveButton(R.string.enable,
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             // launch setting Activity
@@ -418,7 +418,7 @@ public class MyTwitter extends AppCompatActivity implements View.OnClickListener
         protected void onPreExecute() {
             super.onPreExecute();
             mPostProgress = new ProgressDialog(MyTwitter.this);
-            mPostProgress.setMessage("Loading...");
+            mPostProgress.setMessage(getString(R.string.loading));
             mPostProgress.setCancelable(false);
             mPostProgress.show();
         }

@@ -226,8 +226,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginLeft="@dimen/_10sdp"
-                android:layout_marginRight="@dimen/_10sdp"
+                android:padding="@dimen/_5sdp"
                 android:tint="@color/colorThemeBlue"
                 app:srcCompat="@drawable/emoji_twitter_category_smileysandpeople" />
 

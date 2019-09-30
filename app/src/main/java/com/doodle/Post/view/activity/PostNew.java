@@ -351,6 +351,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
                 postImages.remove(postImage);
                 mediaAdapter.deleteItem(position);
+                mediaRecyclerView.scrollToPosition(position);
                 String mdFiveFile = postImage.getMdFive();
 //{"base_64_md5":"ded330ca6a57c3dbb81d292f4528d15a","file_type":"image","name":"5d861a0055159.jpg"}
                 for (int i = 0; i < mediaFiles.size(); i++) {
@@ -374,6 +375,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
             public void deleteVideo(PostVideo postVideo, int position) {
                 postVideos.remove(postVideo);
                 mediaAdapter.deleteItem(position);
+                mediaRecyclerView.scrollToPosition(position);
                 String mdFiveFile = postVideo.getMdFive();
 
 
@@ -1599,7 +1601,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                 addPhotoRequest(mediaCall);
 
                 progressDialog.show();
-                postImages.add(new PostImage("file://" + imagePath, fileEncoded));
+                postImages.add(new PostImage("file://" + imagePath,"", fileEncoded));
                 if (postImages.size() > 0)
                     rvMediaShow = true;
                 mediaRecyclerViewToggle();
@@ -2067,8 +2069,9 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 //                                    for (String temp:mediaList) {
 //                                        postImages.add(new PostImage(temp));
 //                                    }
-                                    //  String imagePath = "file://" + imageFilePath;
-                                    postImages.add(new PostImage(imagePath));
+                                     // String imagePath = "file://" + imageFilePath;
+                                    postImages.add(new PostImage(imagePath,"",fileEncoded ));
+
                                     if (postImages.size() > 0)
 
                                         rvMediaShow = true;

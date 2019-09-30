@@ -290,6 +290,26 @@
     <string name="menu_share">Share</string>
     <string name="menu_send">Send</string>
     <string name="reset_password_success">Your password has successfully been changed.</string>
+    <string name="successfully_set_password">successfully set password</string>
+    <string name="reset_password_fail">Reset password failed.</string>
+    <string name="successfully_set_code">successfully set code</string>
+    <string name="failed_to_set_code">Failed to set code</string>
+    <string name="login_success">login success!</string>
+    <string name="username_and_password_miss_match">Username and password miss match</string>
+    <string name="a_verification_email_has_been_sent_to_your_email_address">A verification email has been sent to your email address. Please confirm and complete your registration.</string>
+    <string name="email_is_invalid">Email is invalid</string>
+    <string name="password_request_send_to_your_email">Forgot password request send to your email address successfully. Please, check your email.</string>
+    <string name="invalid_email_address">Invalid email address</string>
+    <string name="oauth_verifier">oauth_verifier</string>
+    <string name="twitter">twitter</string>
+    <string name="facebook">facebook</string>
+    <string name="tv_forgot_enable_color">#1485CC</string>
+    <string name="tv_forgot_disable_color">#89C3E7</string>
+    <string name="app_title">Liker</string>
+    <string name="success">Success</string>
+    <string name="alert">Alert</string>
+    <string name="no_network">No Network</string>
+    <string name="enable">Enable</string>
 
     <string-array name="string_array_alcohol">
         <item>Vodka</item>
