@@ -99,7 +99,7 @@ public class FBLogin extends AppCompatActivity {
                         socialLogin(appSocialAccessCode, oauthProvider, oauthId, deviceId);
 
                     } else {
-                        Toast.makeText(FBLogin.this, "no internet!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(FBLogin.this, getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
 
                     }
 

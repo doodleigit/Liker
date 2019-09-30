@@ -14,10 +14,11 @@ public class PostImage implements Parcelable {
     public PostImage() {
     }
 
-    public PostImage(String imagePath,String mdFive) {
+    public PostImage(String imagePath,String imageId) {
         this.imagePath = imagePath;
-        this.mdFive = mdFive;
+        this.imageId = imageId;
     }
+
     public PostImage(String imagePath) {
         this.imagePath = imagePath;
     }

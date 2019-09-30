@@ -627,7 +627,7 @@ public class ForgotPasswords extends AppCompatActivity implements View.OnClickLi
                 forgotPassword = response.body();
                 boolean status = forgotPassword.isStatus();
                 if (status) {
-                    String message = "Forgot password request send to your email address successfully. Please, check your email.";
+                    String message =getString(R.string.password_request_send_to_your_email);
                     showStatus(message);
                 /*    flipperId++;
                     mViewFlipper.setInAnimation(slideLeftIn);
@@ -638,7 +638,7 @@ public class ForgotPasswords extends AppCompatActivity implements View.OnClickLi
                     String message = error.getEmail();
                     showStatus(message);
                 } else {
-                    String message = "Invalid email address";
+                    String message = getString(R.string.invalid_email_address);
                     showStatus(message);
                 }
 
@@ -673,7 +673,7 @@ public class ForgotPasswords extends AppCompatActivity implements View.OnClickLi
                     JSONObject object = new JSONObject(response.body());
                     status = object.getBoolean("status");
                     if (status) {
-                        String message = "successfully set password";
+                        String message = getString(R.string.successfully_set_password);
                         showStatus(message);
 
                         if (flipperId == 2) {
@@ -695,7 +695,7 @@ public class ForgotPasswords extends AppCompatActivity implements View.OnClickLi
                         // startActivity(new Intent(ForgotPasswords.this, Liker.class));
 
                     } else {
-                        String message = "" + "Reset password failed.";
+                        String message = getString(R.string.reset_password_fail);
                         showStatus(message);
                     }
                 } catch (JSONException e) {
@@ -745,10 +745,10 @@ public class ForgotPasswords extends AppCompatActivity implements View.OnClickLi
                         mViewFlipper.setInAnimation(slideLeftIn);
                         mViewFlipper.setOutAnimation(slideLeftOut);
                         mViewFlipper.showNext();
-                        String message = "successfully set code";
+                        String message = getString(R.string.successfully_set_code);
                         showStatus(message);
                     } else {
-                        String message = "Failed to set code";
+                        String message = getString(R.string.failed_to_set_code);
                         showStatus(message);
                     }
                 } catch (JSONException e) {
@@ -824,7 +824,7 @@ public class ForgotPasswords extends AppCompatActivity implements View.OnClickLi
                 if (status) {
                     String mToken = loginUser.getToken();
                     manager.setToken(mToken);
-                    showSnackbar("login success!");
+                    showSnackbar(getString(R.string.login_success));
                     UserInfo userInfo = loginUser.getUserInfo();
                     Gson gson = new Gson();
                     String json = gson.toJson(userInfo);
@@ -847,20 +847,20 @@ public class ForgotPasswords extends AppCompatActivity implements View.OnClickLi
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK |Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
                 } else {
-                    String msg = "Username and password miss match";
+                    String msg = getString(R.string.username_and_password_miss_match);
                     showStatus(msg);
 
                     if (loginUser.getIsVerified() != null && loginUser.getBounceData() != null) {
                         if (loginUser.getIsVerified().equalsIgnoreCase("0") && loginUser.getBounceData().equalsIgnoreCase("0")) {
                             userInfo = loginUser.getUserInfo();
                             if (userInfo != null) {
-                                String message = "A verification email has been sent to your email address. Please confirm and complete your registration.";
+                                String message = getString(R.string.a_verification_email_has_been_sent_to_your_email_address);
                                 ResendEmail resendEmail = ResendEmail.newInstance(message);
                                 resendEmail.show(getSupportFragmentManager(), "ResendEmail");
                             }
 
                         } else if (loginUser.getBounceData().equalsIgnoreCase(String.valueOf(1)) || loginUser.getBounceData().equalsIgnoreCase(String.valueOf(2))) {
-                            Toast.makeText(ForgotPasswords.this, "Email is invalid", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ForgotPasswords.this, getString(R.string.email_is_invalid), Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
@@ -936,7 +936,7 @@ public class ForgotPasswords extends AppCompatActivity implements View.OnClickLi
                 forgotPassword = response.body();
                 boolean status = forgotPassword.isStatus();
                 if (status) {
-                    String message = "Forgot password request send to your email address successfully. Please, check your email.";
+                    String message = getString(R.string.password_request_send_to_your_email);
                     showStatus(message);
                     flipperId++;
                     mViewFlipper.setInAnimation(slideLeftIn);
@@ -947,7 +947,7 @@ public class ForgotPasswords extends AppCompatActivity implements View.OnClickLi
                     String message = error.getEmail();
                     showStatus(message);
                 } else {
-                    String message = "Invalid email address";
+                    String message = getString(R.string.invalid_email_address);
                     showStatus(message);
                 }
 
@@ -965,19 +965,19 @@ public class ForgotPasswords extends AppCompatActivity implements View.OnClickLi
 
     }
 
-    public void mySnackbar() {
-        final Snackbar snackbar = Snackbar.make(findViewById(R.id.signupContainer), "This is a SnackBar", Snackbar.LENGTH_SHORT);
-        snackbar.setAction("Set Action", new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(ForgotPasswords.this, "Tap Action Button!", Toast.LENGTH_SHORT).show();
-                snackbar.dismiss();
-            }
-        });
-
-        snackbar.setActionTextColor(Color.RED);
-        snackbar.show();
-    }
+//    public void mySnackbar() {
+//        final Snackbar snackbar = Snackbar.make(findViewById(R.id.signupContainer), "This is a SnackBar", Snackbar.LENGTH_SHORT);
+//        snackbar.setAction("Set Action", new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Toast.makeText(ForgotPasswords.this, "Tap Action Button!", Toast.LENGTH_SHORT).show();
+//                snackbar.dismiss();
+//            }
+//        });
+//
+//        snackbar.setActionTextColor(Color.RED);
+//        snackbar.show();
+//    }
 
     private void showSnackbars(String message) {
         Snackbar snackbar = Snackbar

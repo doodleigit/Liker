@@ -195,8 +195,8 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
     private RecyclerView mediaRecyclerView;
     boolean rvMediaShow;
 
-    private List<PostImage> postImages = new ArrayList<>();
-    private List<PostVideo> postVideos = new ArrayList<>();
+    private List<PostImage> postImages   = new ArrayList<>();
+    private List<PostVideo> postVideos  = new ArrayList<>(); ;
 
 
     //POST LINK SCRIPT
@@ -309,7 +309,6 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
         networkOk = NetworkHelper.hasNetworkAccess(this);
         progressView = (CircularProgressView) findViewById(R.id.progress_view);
         mView = new View(this);
-
         imageList = new ArrayList<>();
         videoList = new ArrayList<>();
         mediaFiles = new ArrayList<>();
@@ -349,15 +348,20 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
             @Override
             public void deleteImage(PostImage postImage, int position) {
 
+
+
+
                 postImages.remove(postImage);
                 mediaAdapter.deleteItem(position);
+                mediaRecyclerView.scrollToPosition(position);
+
                 String mediaId = postImage.getImageId();
                 if (!isNullOrEmpty(mediaId)) {
                     deleteMediaFiles.add(mediaId);
                     App.setDeleteMediaIds(deleteMediaFiles);
                 }
 
-                makeText(EditPost.this, "image delete", LENGTH_SHORT).show();
+             //   makeText(EditPost.this, "image delete", LENGTH_SHORT).show();
 
             }
         };
@@ -366,16 +370,18 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
             public void deleteVideo(PostVideo postVideo, int position) {
                 postVideos.remove(postVideo);
                 mediaAdapter.deleteItem(position);
+                mediaRecyclerView.scrollToPosition(position);
                 String mediaId = postVideo.getVideoId();
                 if (!isNullOrEmpty(mediaId)) {
                     deleteMediaFiles.add(mediaId);
                     App.setDeleteMediaIds(deleteMediaFiles);
                 }
 
-                makeText(EditPost.this, "video delete", LENGTH_SHORT).show();
+            //    makeText(EditPost.this, "video delete", LENGTH_SHORT).show();
             }
         };
 
+       // mediaRecyclerView.setAdapter(mediaAdapter);
 
         MimAdapter.RecyclerViewClickListener listener = (view, position) -> {
 
@@ -583,7 +589,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                     mentionUsers();
                 }
 
-                if (extractedUrls.size() == 0) {
+           /*     if (extractedUrls.size() == 0) {
                     isLinkScript = false;
                     releasePreviewArea();
                     rvLinkScriptShow = false;
@@ -592,7 +598,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                     if (!isNullOrEmpty(contentTitle)) {
                         //  makeText(PostNew.this, "Button Enable-1!", LENGTH_SHORT).show();
                     }
-                }
+                }*/
                 if (extractedUrls.size() > 0) {
                     rvMimShow = false;
                     rvMimToggle();
@@ -1306,7 +1312,6 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                 break;
             case R.id.tvSubmitPost:
 
-                makeText(this, "submit post..", LENGTH_SHORT).show();
                 checkContentType();
                 if (categoryId.isEmpty() && subCategoryId.isEmpty()) {
                     Tools.showCustomToast(EditPost.this, mView, "Please select your post’s audience.", Gravity.TOP);
@@ -1512,23 +1517,34 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                         try {
                             JSONObject object = new JSONObject(response.body());
                             JSONObject successObject = object.getJSONObject("success");
-                            boolean status = successObject.getBoolean("status");
-                            //  boolean topContributorStatus = successObject.getBoolean("top_contributor_status");
-                            //postId = successObject.getInt("post_id");
-                            if (status) {
-                                sendPostItemRequest(editPostId, position);
-                            } else {
-                                if (contentType == 5) {
-
-                                    Call<String> mediaCall = videoServices.uploadVideo(deviceId, profileId, token, fileToUpload, postId, true);
-                                    sendVideoRequest(mediaCall);
-
+                            if(successObject.length()>0){
+                                boolean status = successObject.getBoolean("status");
+                                //  boolean topContributorStatus = successObject.getBoolean("top_contributor_status");
+                                //postId = successObject.getInt("post_id");
+                                if (status) {
+                                    sendPostItemRequest(editPostId, position);
                                 } else {
-                                    startActivity(new Intent(EditPost.this, Home.class));
-                                    finish();
-                                }
+                                    if (contentType == 5) {
 
+                                        Call<String> mediaCall = videoServices.uploadVideo(deviceId, profileId, token, fileToUpload, postId, true);
+                                        sendVideoRequest(mediaCall);
+
+                                    } else {
+                                        startActivity(new Intent(EditPost.this, Home.class));
+                                        finish();
+                                    }
+
+                                }
                             }
+
+
+
+                            JSONObject errorObject = object.getJSONObject("errors");
+                            if (errorObject.length() > 0) {
+                                String post_duplicate = errorObject.getString("post_duplicate");
+                                Tools.toast(EditPost.this, post_duplicate, R.drawable.ic_warning_black_24dp);
+                            }
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -2507,14 +2523,14 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
             currentImageSet = null;
             currentItem = 0;
 
-            tvSubmitPost.setVisibility(View.GONE);
+         //   tvSubmitPost.setVisibility(View.GONE);
             previewAreaTitle.setVisibility(View.VISIBLE);
 
             currentImage = null;
             noThumb = false;
             currentTitle = currentDescription = currentUrl = currentCannonicalUrl = "";
 
-            tvSubmitPost.setEnabled(false);
+          //  tvSubmitPost.setEnabled(false);
 
             /** Inflating the preview layout */
             mainView = getLayoutInflater().inflate(R.layout.main_view, null);
@@ -2559,7 +2575,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                 });
 
             } else {
-                postButton.setVisibility(View.VISIBLE);
+              //  postButton.setVisibility(View.VISIBLE);
               //  tvSubmitPost.setVisibility(View.VISIBLE);
                 currentImageSet = new Bitmap[sourceContent.getImages().size()];
 
@@ -2751,7 +2767,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                 urlTextView.setText(sourceContent.getCannonicalUrl());
                 descriptionTextView.setText(sourceContent.getDescription());
 
-                postButton.setVisibility(View.VISIBLE);
+              //  postButton.setVisibility(View.VISIBLE);
             }
 
             currentTitle = sourceContent.getTitle();

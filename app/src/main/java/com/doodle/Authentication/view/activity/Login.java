@@ -122,7 +122,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
 
         mConsumerKey = getString(R.string.com_twitter_sdk_android_CONSUMER_KEY);
         mConsumerSecret = getString(R.string.com_twitter_sdk_android_CONSUMER_SECRET);
-        mAuthVerifier = "oauth_verifier";
+        mAuthVerifier = getString(R.string.oauth_verifier);
         viewModel = ViewModelProviders.of(this).get(SignupViewModel.class);
 
         callbackManager = CallbackManager.Factory.create();
@@ -181,13 +181,13 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                 email = etEmail.getText().toString();
                 if (!TextUtils.isEmpty(password) & !TextUtils.isEmpty(email)) {
 
-                    tvForgot.setTextColor(Color.parseColor("#1485CC"));
+                    tvForgot.setTextColor(Color.parseColor(getString(R.string.tv_forgot_enable_color)));
                     tvSignIn.setBackgroundResource(R.drawable.btn_round_outline);
                     tvSignIn.setEnabled(true);
 
                 } else {
                     tvSignIn.setBackgroundResource(R.drawable.btn_round_outline_disable);
-                    tvForgot.setTextColor(Color.parseColor("#89C3E7"));
+                    tvForgot.setTextColor(Color.parseColor(getString(R.string.tv_forgot_disable_color)));
                     tvSignIn.setEnabled(false);
                 }
             }
@@ -208,13 +208,13 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 password = etPassword.getText().toString();
                 if (!TextUtils.isEmpty(password) & !TextUtils.isEmpty(email)) {
-                    tvForgot.setTextColor(Color.parseColor("#1485CC"));
+                    tvForgot.setTextColor(Color.parseColor(getString(R.string.tv_forgot_enable_color)));
                     tvSignIn.setBackgroundResource(R.drawable.btn_round_outline);
                     tvSignIn.setEnabled(true);
 
                 } else {
                     tvSignIn.setBackgroundResource(R.drawable.btn_round_outline_disable);
-                    tvForgot.setTextColor(Color.parseColor("#89C3E7"));
+                    tvForgot.setTextColor(Color.parseColor(getString(R.string.tv_forgot_disable_color)));
                     tvSignIn.setEnabled(false);
                 }
 
@@ -316,7 +316,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                 if (networkOk) {
                     loadUserProfile(loginResult.getAccessToken());
                 } else {
-                    Toast.makeText(getApplicationContext(), "no internet!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -394,7 +394,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                     socialInfo.setEmail(email);
                     socialInfo.setSocialName(name);
                     socialInfo.setImage(image_url);
-                    socialInfo.setProvider("facebook");
+                    socialInfo.setProvider(getString(R.string.facebook));
 
                     String appSocialAccessCode = AppConstants.APP_SOCIAL_ACCESS_CODE;
                     String oauthProvider = AppConstants.OAUTH_PROVIDER_FB;
@@ -543,7 +543,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                 boolean status = loginUser.isStatus();
                 if (status) {
                     String mToken = loginUser.getToken();
-                    showSnackbar("login success!");
+                    showSnackbar(getString(R.string.login_success));
                     UserInfo userInfo = loginUser.getUserInfo();
                     Gson gson = new Gson();
                     String json = gson.toJson(userInfo);
@@ -563,20 +563,20 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK |Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
                 } else {
-                    String msg = "Username and password miss match";
+                    String msg = getString(R.string.username_and_password_miss_match);
                     showStatus(msg);
 
                     if (loginUser.getIsVerified() != null && loginUser.getBounceData() != null) {
                         if (loginUser.getIsVerified().equalsIgnoreCase("0") && loginUser.getBounceData().equalsIgnoreCase("0")) {
                             userInfo = loginUser.getUserInfo();
                             if (userInfo != null) {
-                                String message = "A verification email has been sent to your email address. Please confirm and complete your registration.";
+                                String message = getString(R.string.a_verification_email_has_been_sent_to_your_email_address);
                                 ResendEmail resendEmail = ResendEmail.newInstance(message);
                                 resendEmail.show(getSupportFragmentManager(), "ResendEmail");
                             }
 
                         } else if (loginUser.getBounceData().equalsIgnoreCase(String.valueOf(1)) || loginUser.getBounceData().equalsIgnoreCase(String.valueOf(2))) {
-                            Toast.makeText(Login.this, "Email is invalid", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(Login.this,  getString(R.string.email_is_invalid), Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
@@ -647,7 +647,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                 socialInfo.setLastName(username);
                 socialInfo.setSocialName(username);
                 socialInfo.setEmail("");
-                socialInfo.setProvider("twitter");
+                socialInfo.setProvider(getString(R.string.twitter));
                 Log.d("Description", user.getDescription());
 
                 if (networkOk) {
@@ -657,7 +657,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
                     String oauthId = socialInfo.getAuthId();
                     socialLoginTwitter(appSocialAccessCode, oauthProvider, oauthId, deviceId);
                 } else {
-                    Toast.makeText(getApplicationContext(), "no internet!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), getString(R.string.no_internet), Toast.LENGTH_SHORT).show();
                 }
 
             } catch (Exception e) {

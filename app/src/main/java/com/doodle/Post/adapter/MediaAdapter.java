@@ -73,6 +73,7 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
+
         if (viewHolder instanceof ImageViewHolder) {
             ((ImageViewHolder) viewHolder).populate(postImages.get(position), position);
         }
@@ -113,14 +114,10 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     public void deleteItem(int position) {
 
-/*
-        PostImage postImage = postImages.get(position);
-        String mediaId = postImage.getImageId();
-        if (!isNullOrEmpty(mediaId)) {
-            deleteMediaFiles.add(mediaId);
-            App.setDeleteMediaIds(deleteMediaFiles);
-        }*/
 
-        notifyDataSetChanged();
+        notifyItemRemoved(position);
+
     }
+
+
 }
