@@ -24,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.borjabravo.readmoretextview.ReadMoreTextView;
 import com.bumptech.glide.Glide;
@@ -60,6 +61,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static com.doodle.Tool.AppConstants.LINK_IMAGES;
+import static com.doodle.Tool.Tools.containsIllegalCharacters;
 import static com.doodle.Tool.Tools.delayLoadComment;
 import static com.doodle.Tool.Tools.dismissDialog;
 import static com.doodle.Tool.Tools.getDomainName;
@@ -94,7 +96,7 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
     private String commentPostId;
 
     private String commentText, commentUserName, commentUserImage, commentImage, commentTime;
-    public EmojiTextView tvCommentMessage;
+    public ReadMoreTextView tvCommentMessage;
     public ImageView imagePostCommenting, imageCommentSettings,imgCommentLike;
 
     public TextView tvCommentUserName, tvCommentTime,  tvCommentReply, tvCountCommentLike,tvLinkHost,tvDescription;
@@ -236,10 +238,15 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
         tvCommentUserName.setText(commentUserName);
         if (!isNullOrEmpty(commentText)) {
             tvCommentMessage.setVisibility(View.VISIBLE);
-            tvCommentMessage.setText(commentText);
-        } else {
-            tvCommentMessage.setVisibility(View.GONE);
+            tvCommentMessage.setText(commentItem.getCommentText());
+            Linkify.addLinks(tvCommentMessage, Linkify.ALL);
+            //set user name in blue color and remove underline from the textview
+            Tools.stripUnderlines(tvCommentMessage);
+            Toast.makeText(mContext, "text:"+tvCommentMessage.getText(), Toast.LENGTH_SHORT).show();
         }
+
+
+
         tvCommentTime.setText(Tools.chatDateCompare(mContext, Long.valueOf(commentTime)));
 
         LinkData linkItem = commentItem.getLinkData();
@@ -609,7 +616,12 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
         });
 
         if (!isNullOrEmpty(commentItem.getTotalReply()) && Integer.parseInt(commentItem.getTotalReply()) > 0) {
-            tvCommentReply.setText(String.format("%s Reply", commentItem.getTotalReply()));
+            if( Integer.parseInt(commentItem.getTotalReply())==1){
+
+                tvCommentReply.setText(String.format("%s Reply", commentItem.getTotalReply()));
+            }else {
+                tvCommentReply.setText(String.format("%s Replies", commentItem.getTotalReply()));
+            }
         }
 
         tvCommentReply.setOnClickListener(new View.OnClickListener() {

@@ -39,6 +39,7 @@ import android.transition.Fade;
 import android.transition.Transition;
 import android.transition.TransitionManager;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -75,6 +76,7 @@ import com.doodle.Post.adapter.MentionUserAdapter;
 import com.doodle.Post.model.MentionUser;
 import com.doodle.Post.model.PostImage;
 import com.doodle.Post.service.PostService;
+import com.doodle.Post.view.activity.PostNew;
 import com.doodle.R;
 import com.doodle.Reply.adapter.ReplyAdapter;
 import com.doodle.Reply.holder.ReplyImageHolder;
@@ -250,7 +252,7 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
     int silverStar;
     private String commentUserImage, commentTime;
     private TextView tvLikes, tvStarts;
-
+    private View mView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -264,6 +266,7 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
                 onBackPressed();
             }
         });
+        mView=new View(this);
 //        toolbar.setNavigationIcon(R.drawable.ic_people_black_24dp);
 //        toolbar.setNavigationIcon(mDrawable);
 //        getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -286,6 +289,7 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
         userInfo = gson.fromJson(json, UserInfo.class);
 
         imageSendComment = findViewById(R.id.imageSendComment);
+        imageSendComment.setVisibility(View.GONE);
         imageEditComment = findViewById(R.id.imageEditComment);
         tvLikes = findViewById(R.id.tvLikes);
         tvStarts = findViewById(R.id.tvStars);
@@ -363,10 +367,17 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
                 extractedUrls = Tools.extractUrls(s.toString());
                 /// if(uploadImageName.)
                 commentText = s.toString().trim();
+                if (!isNullOrEmpty(commentText)){
+                    imageSendComment.setVisibility(View.VISIBLE);
+                }else {
+                    imageSendComment.setVisibility(View.GONE);
+                }
 
                 for (String st : commentText.split(" ")) {
                     if (st.startsWith("@")) {
                         userQuery = st;
+                    }else {
+                        userQuery="";
                     }
                 }
 
@@ -379,6 +390,10 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
                     rvMentionUserShow = true;
                     mentionUserToggle();
                     mentionUsers();
+                } else if (isFirstTimeShowMention && isNullOrEmpty(userQuery)) {
+                    rvMentionUserShow = false;
+                    mentionUserToggle();
+
                 }
 
                 if (extractedUrls.size() == 0) {
@@ -797,6 +812,10 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
                     commentType = 1;
                 }
 
+            /*     if (commentText.length() < 8) {
+                    Tools.showCustomToast(ReplyPost.this, mView, "Cat’s got your tongue? Please write at least 8 characters in your post description.", Gravity.TOP);
+
+                }*/
 
                 Call<Reply> call = commentService.addedCommentReply(deviceId, profileId, token, commentId, fileToUpload, commentText, commentType, mention, linkUrl, repLiesUserId, postId, userIds);
                 sendCommentItemRequest(call);

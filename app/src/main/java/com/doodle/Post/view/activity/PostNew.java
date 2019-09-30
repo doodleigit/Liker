@@ -583,6 +583,8 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                 for (String st : contentTitle.split(" ")) {
                     if (st.startsWith("@")) {
                         userQuery = st;
+                    }else {
+                        userQuery="";
                     }
                 }
 
@@ -599,6 +601,9 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                     rvMentionUserShow = true;
                     mentionUserToggle();
                     mentionUsers();
+                }else if (isFirstTimeShowMention && isNullOrEmpty(userQuery)) {
+                    rvMentionUserShow = false;
+                    mentionUserToggle();
                 }
 
                 if (extractedUrls.size() == 0) {

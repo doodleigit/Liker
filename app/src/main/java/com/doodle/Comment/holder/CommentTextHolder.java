@@ -348,7 +348,12 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
         });
 
         if (!isNullOrEmpty(commentItem.getTotalReply()) && Integer.parseInt(commentItem.getTotalReply()) > 0) {
-            tvCommentReply.setText(String.format("%s Reply", commentItem.getTotalReply()));
+            if( Integer.parseInt(commentItem.getTotalReply())==1){
+
+                tvCommentReply.setText(String.format("%s Reply", commentItem.getTotalReply()));
+            }else {
+                tvCommentReply.setText(String.format("%s Replies", commentItem.getTotalReply()));
+            }
         }
 
         tvCommentReply.setOnClickListener(new View.OnClickListener() {
