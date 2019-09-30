@@ -67,6 +67,7 @@ public class App extends Application {
     private static boolean isImagePopup;
     private static List<String> deleteMediaIds;
     private static boolean isPostShare;
+    private static boolean checkEmail;
 
     public static boolean isIsPostShare() {
         return isPostShare;
@@ -82,6 +83,14 @@ public class App extends Application {
 
     public static void setDeleteMediaIds(List<String> deleteMediaIds) {
         App.deleteMediaIds = deleteMediaIds;
+    }
+
+    public static boolean isCheckEmail() {
+        return checkEmail;
+    }
+
+    public static void setCheckEmail(boolean checkEmail) {
+        App.checkEmail = checkEmail;
     }
 
     public static boolean isNotificationOff() {

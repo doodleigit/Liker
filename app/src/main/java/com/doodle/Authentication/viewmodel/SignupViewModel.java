@@ -13,6 +13,9 @@ import com.doodle.Authentication.service.AuthService;
 import com.doodle.Tool.PrefManager;
 import com.raywenderlich.android.validatetor.ValidateTor;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -40,7 +43,7 @@ public class SignupViewModel extends AndroidViewModel {
     }
 
     public boolean validateNameField(EditText edt_text) {
-        String str = edt_text.getText().toString();
+        String str = edt_text.getText().toString().trim();
 
         if (validateTor.isEmpty(str)) {
             edt_text.setError("Field is empty!");
@@ -48,9 +51,7 @@ public class SignupViewModel extends AndroidViewModel {
         }
         if (validateTor.isAtleastLength(str, 2)
                 && validateTor.isAtMostLength(str, 24)
-                && validateTor.isAlpha(str)
-
-        ) {
+               /* && validateTor.isAlpha(str)*/) {
             return true;
         } else {
             edt_text.setError("Be between 2-24 letters" + "\n" + "Letters only");
@@ -70,8 +71,59 @@ public class SignupViewModel extends AndroidViewModel {
             edt_email.setError("Invalid Email entered!");
             return false;
         } else {
+//            AuthService webService = AuthService.retrofitBase.create(AuthService.class);
+//            Call<String> call = webService.checkEmailExists(true, str);
+//            sendCheckEmailRequest(call, edt_email);
             return true;
         }
+
+    }
+
+    public boolean validateLoginEmailField(EditText edt_email) {
+        String str = edt_email.getText().toString();
+
+        if (validateTor.isEmpty(str)) {
+            edt_email.setError("Field is empty!");
+            return false;
+        }
+
+        if (!validateTor.isEmail(str)) {
+            edt_email.setError("Invalid Email entered!");
+            return false;
+        } else {
+            return true;
+        }
+
+    }
+
+    private void sendCheckEmailRequest(Call<String> call, EditText edt_email) {
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                String data = response.body();
+
+                try {
+                    JSONObject object = new JSONObject(data);
+                    boolean emailStatus = object.getBoolean("status");
+                    //App.setCheckEmail(emailStatus);
+                    if (emailStatus) {
+
+                    } else {
+                        edt_email.setError("It is a duplicate email");
+
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
+
     }
 
     String password, confirmPassword;

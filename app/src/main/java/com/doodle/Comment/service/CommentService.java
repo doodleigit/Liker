@@ -25,6 +25,8 @@ import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
 
+import static com.doodle.Tool.RestAdapter.getUnsafeOkHttpClient;
+
 public interface CommentService {
 
 
@@ -34,16 +36,16 @@ public interface CommentService {
             .writeTimeout(15, TimeUnit.SECONDS)
             .build();
 
-    Gson gson = new GsonBuilder()
-            .setLenient()
-            .create();
+//    Gson gson = new GsonBuilder()
+//            .setLenient()
+//            .create();
 
 
     Retrofit mRetrofit = new Retrofit.Builder()
             .baseUrl(AppConstants.BASE_URL)
-            .client(okHttpClient)
+            .client(getUnsafeOkHttpClient().build())
             .addConverterFactory(ScalarsConverterFactory.create())
-            .addConverterFactory(GsonConverterFactory.create(gson))
+            .addConverterFactory(GsonConverterFactory.create())
             .build();
 
 
@@ -154,7 +156,6 @@ user_id	28827
             @Part("mention") String mention,
             @Part("post_id") String postId,
             @Part("user_id") String userIds
-
 
     );
 

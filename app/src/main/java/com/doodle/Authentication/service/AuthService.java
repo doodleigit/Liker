@@ -146,6 +146,13 @@ public interface AuthService {
 
     @GET("{number}")
     Call<String> trivia(@Path("number") String number);
+//https://www.stg.liker.com/check_email_exists
 
+    @POST(AppConstants.CHECK_EMAIL_EXIST)
+    @FormUrlEncoded
+    Call<String> checkEmailExists(
+            @Field("edp_email_info") boolean edpEmailInfo,
+            @Field("email") String email
+    );
 
 }

@@ -38,26 +38,25 @@
                     android:textStyle="bold" />
 
                 <LinearLayout
-                    android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/likes"
+                        android:id="@+id/tvLikes"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="5 likes"
-                        android:textColor="@android:color/darker_gray"
+                        android:textColor="@android:color/white"
                         android:textSize="12sp" />
 
                     <TextView
-                        android:id="@+id/stars"
+                        android:id="@+id/tvStars"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:text="8 Stars"
-                        android:textColor="@android:color/darker_gray"
+                        android:textColor="@android:color/white"
                         android:textSize="12sp" />
 
                 </LinearLayout>
