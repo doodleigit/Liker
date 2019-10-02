@@ -92,6 +92,7 @@
     <string name="likes">Likes</string>
     <string name="stars">Stars</string>
     <string name="search_messages">Search Messages</string>
+    <string name="search_category_">Search Category…</string>
     <string name="to">To</string>
     <string name="today">Today</string>
     <string name="few_second_ago">A few seconds</string>
@@ -161,8 +162,8 @@
     <string name="honors_and_awards">Honors &amp; Awards</string>
     <string name="experience">Experience</string>
     <string name="education">Education</string>
-    <string name="email_notification">Email Notification</string>
-    <string name="push_notification">Push Notification</string>
+    <string name="email_notifications">Email Notifications</string>
+    <string name="push_notifications">Push Notifications</string>
     <string name="the_trending_feed_includes_the_hottest_posts">The Trending Feed includes the hottest posts in all of Liker, starting with the ones with the most likes in the past 24 hours.</string>
     <string name="the_breaking_feed_includes_the_newest_posts">The Breaking Feed includes the newest posts in all of Liker, starting with the most recent.</string>
     <string name="the_following_feed_includes_the_most_recent_posts">The following feed includes the most recent posts by your friends and those you are following, starting with the most recent.</string>
@@ -192,6 +193,9 @@
     <string name="write_minimum_three_characters">Write Minimum Three Characters !</string>
     <string name="we_could_not_find_anything_for">We could not find anything for</string>
     <string name="please_wait">Please wait.!</string>
+    <string name="forward_">Forward</string>
+    <string name="share_to_other_app">Share to other app</string>
+    <string name="refresh_page">Refresh page</string>
 
     <string name="audience">Audience</string>
     <string name="save">Save</string>

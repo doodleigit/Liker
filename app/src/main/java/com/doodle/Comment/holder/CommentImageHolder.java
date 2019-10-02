@@ -93,7 +93,7 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
 
     private String commentText, commentUserName, commentUserImage, commentImage, commentTime;
     public EmojiTextView tvCommentMessage;
-    public ImageView imagePostCommenting, imageCommentSettings,imgCommentLike;
+    public ImageView imagePostCommenting, imageCommentSettings, imgCommentLike;
 
     public TextView tvCommentUserName, tvCommentTime, tvCommentReply, tvCountCommentLike;
     private String userPostId;
@@ -510,7 +510,7 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
                 if (userIds.equalsIgnoreCase(commentUserId)) {
                     popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(false);
                     popupCommentMenu.getMenu().findItem(R.id.blockUser).setVisible(false);
-                    popupCommentMenu.getMenu().findItem(R.id.editComment).setVisible(false);
+                    popupCommentMenu.getMenu().findItem(R.id.editComment).setVisible(true);
                     popupCommentMenu.getMenu().findItem(R.id.deleteComment).setVisible(true);
                 } else {
                     popupCommentMenu.getMenu().findItem(R.id.reportComment).setVisible(true);
@@ -590,7 +590,12 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
             }
         });
         if (!isNullOrEmpty(commentItem.getTotalReply()) && Integer.parseInt(commentItem.getTotalReply()) > 0) {
-            tvCommentReply.setText(String.format("%s Reply", commentItem.getTotalReply()));
+            if (Integer.parseInt(commentItem.getTotalReply()) == 1) {
+
+                tvCommentReply.setText(String.format("%s Reply", commentItem.getTotalReply()));
+            } else {
+                tvCommentReply.setText(String.format("%s Replies", commentItem.getTotalReply()));
+            }
         }
         tvCommentReply.setOnClickListener(new View.OnClickListener() {
             @Override

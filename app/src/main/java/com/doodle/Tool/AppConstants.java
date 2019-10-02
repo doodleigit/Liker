@@ -28,12 +28,16 @@ public class AppConstants {
     public static final String BASE_URL_LOCATION = "https://www.stg.liker.com/";
 
     //=======================LIVE SERVER=============================
-    //    public static final String BASE_URL = "https://www.liker.com/";
-    //    public static final String BASE_URL_MEDIA = "https://www.cdn-liker.com/";
+//        public static final String BASE_URL = "https://www.api.liker.com/";
+//        public static final String BASE_URL_MEDIA = "https://www.cdn-liker.com/";
+//    public static final String BASE_URL_IMAGES = "https://www.cdn-liker.com/";
 //    public static final String SOCKET_WEB = "https://node.liker.com:7800";
 //    public static final String SOCKET_MESSAGE = "https://node.liker.com:7801";
 //    public static final String SOCKET_VIDEO = "https://node.liker.com:7806";
-   // public static final String BASE_URL_LOCATION = "https://www.api.liker.com/";
+//    public static final String FACEBOOK_SHARE = "https://www.api.liker.com/public/posts/";
+//    public static final String LINK_IMAGES = "https://www.cdn-liker.com/uploads/link_images/";
+//    public static final String FACEBOOK_INVITATION = "https://www.liker.com/settings/fbinvite/";
+//    public static final String BASE_URL_LOCATION = "https://www.api.liker.com/";
 
     public static final String API_KEY = "cd662c2e9b2e49fc9d4d763089597ea8";
     public static final String NEWS_FEED = "top-headlines?country=us&apiKey=" + API_KEY;
@@ -113,6 +117,9 @@ public class AppConstants {
     public static final String ADD_SHARED_POST = "addSharedpost";
     public static final String SEND_BROWSER_NOTIFICATION = "send_browser_notification";
     public static final String GET_FILTER_CATEGORIES = "get_categories";
+    public static final String GET_POST_FILTERS = "get_postfilters";
+    public static final String GET_SINGLE_POST_FILTERS = "get_single_post_filter";
+    public static final String ADDED_FILTER = "added_filter";
     public static final String GET_USER_RANKINGS = "getUserRankings";
     public static final String POST_PERMISSION = "post_permission";
     public static final String POST_NOTIFICATION_TURN_OFF = "post_notification_turn_off";

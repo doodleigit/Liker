@@ -55,10 +55,13 @@ import com.doodle.Home.adapter.CategoryTitleAdapter;
 import com.doodle.Home.adapter.SubCategoryAdapter;
 import com.doodle.Home.adapter.ViewPagerAdapter;
 import com.doodle.Home.model.CommonCategory;
+import com.doodle.Home.model.FilterList;
 import com.doodle.Home.model.PostFilterCategory;
 import com.doodle.Home.model.PostFilterItem;
 import com.doodle.Home.model.PostFilterSubCategory;
+import com.doodle.Home.model.PostFilters;
 import com.doodle.Home.model.PostItem;
+import com.doodle.Home.model.SinglePostFilters;
 import com.doodle.Home.model.TopContributorStatus;
 import com.doodle.Home.service.CategoryRemoveListener;
 import com.doodle.Home.service.FilterClickListener;
@@ -92,6 +95,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import cn.jzvd.JZVideoPlayer;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -122,6 +126,8 @@ public class Home extends AppCompatActivity implements
     private TabLayout tabLayout;
     private ViewPager viewPager;
     private Toolbar toolbar;
+    public CollapsingToolbarLayout collapsingToolbar;
+    public AppBarLayout appBarLayout;
     private CircleImageView profileImage, navProfileImage;
     private Spinner categorySpinner;
     private ProgressDialog progressDialog;
@@ -416,33 +422,7 @@ public class Home extends AppCompatActivity implements
         CategoryRemoveListener categoryRemoveListener = new CategoryRemoveListener() {
             @Override
             public void onCategoryRemove(CommonCategory commonCategory) {
-                for (int i = 0; i < categories.get(categoryPosition).getPostFilterSubCategories().size(); i++) {
-                    if (categories.get(categoryPosition).getPostFilterSubCategories().get(i).getSubCatId().equals(commonCategory.getCatId())) {
-                        categories.get(categoryPosition).getPostFilterSubCategories().get(i).setSelectedAll(false);
-                        break;
-                    }
-                    for (int j = 0; j < categories.get(categoryPosition).getPostFilterSubCategories().get(i).getPostFilterItems().size(); j++) {
-                        if (categories.get(categoryPosition).getPostFilterSubCategories().get(i).getPostFilterItems().get(j).getItemId().equals(commonCategory.getCatId())) {
-                            categories.get(categoryPosition).getPostFilterSubCategories().get(i).getPostFilterItems().remove(j);
-                            break;
-                        }
-                    }
-                }
-
-                if (categoryPosition == 3) {
-                    for (int i = 0; i < exceptMultipleSubCategories.size(); i++) {
-                        if (exceptMultipleSubCategories.get(i).getSubCatId().equals(commonCategory.getCatId())) {
-                            exceptMultipleSubCategories.get(i).setSelectedAll(false);
-                            break;
-                        }
-                        for (int j = 0; j < exceptMultipleSubCategories.get(i).getPostFilterItems().size(); j++) {
-                            if (exceptMultipleSubCategories.get(i).getPostFilterItems().get(j).getItemId().equals(commonCategory.getCatId())) {
-                                exceptMultipleSubCategories.get(i).getPostFilterItems().get(j).setSelected(false);
-                                break;
-                            }
-                        }
-                    }
-                } else {
+                if (categoryPosition == 1) {
                     for (int i = 0; i < multipleSubCategories.size(); i++) {
                         if (multipleSubCategories.get(i).getSubCatId().equals(commonCategory.getCatId())) {
                             multipleSubCategories.get(i).setSelectedAll(false);
@@ -455,21 +435,22 @@ public class Home extends AppCompatActivity implements
                             }
                         }
                     }
-                }
-
-                ArrayList<String> arrayList = new ArrayList<>();
-                commonCategories.clear();
-                for (PostFilterSubCategory postFilterSubCategory : categories.get(categoryPosition).getPostFilterSubCategories()) {
-                    if (postFilterSubCategory.isSelectedAll()) {
-                        arrayList.add(postFilterSubCategory.getSubCatId());
-                        commonCategories.add(new CommonCategory(postFilterSubCategory.getSubCatId(), postFilterSubCategory.getSubCatName()));
+                    filterSubCategory(multipleSubCategories, "1", true);
+                } else {
+                    for (int i = 0; i < exceptMultipleSubCategories.size(); i++) {
+                        if (exceptMultipleSubCategories.get(i).getSubCatId().equals(commonCategory.getCatId())) {
+                            exceptMultipleSubCategories.get(i).setSelectedAll(false);
+                            break;
+                        }
+                        for (int j = 0; j < exceptMultipleSubCategories.get(i).getPostFilterItems().size(); j++) {
+                            if (exceptMultipleSubCategories.get(i).getPostFilterItems().get(j).getItemId().equals(commonCategory.getCatId())) {
+                                exceptMultipleSubCategories.get(i).getPostFilterItems().get(j).setSelected(false);
+                                break;
+                            }
+                        }
                     }
-                    for (PostFilterItem postFilterItem : postFilterSubCategory.getPostFilterItems()) {
-                        arrayList.add(postFilterItem.getItemId());
-                        commonCategories.add(new CommonCategory(postFilterItem.getItemId(), postFilterItem.getItemName()));
-                    }
+                    filterSubCategory(exceptMultipleSubCategories, "8", true);
                 }
-                sendBroadcast((new Intent().putExtra("category_ids", Tools.setCategoryIds(arrayList)).putExtra("filter", (categoryPosition == 3 ? 8 : 1))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
             }
 
             @Override
@@ -523,92 +504,99 @@ public class Home extends AppCompatActivity implements
         @Override
         public void onReceive(Context context, Intent intent) {
             isCatSelectFromPost = true;
+            appBarLayout.setExpanded(true);
             String catId = intent.getStringExtra("category_id");
-            categoryPosition = 2;
-            for (int i = 0; i < subCategories.size(); i++) {
-                subCategories.get(i).setSelectedAll(false);
-                for (int j = 0; j < subCategories.get(i).getPostFilterItems().size(); j++) {
-                    subCategories.get(i).getPostFilterItems().get(j).setSelected(false);
-                }
-            }
-            for (PostFilterSubCategory subCategory : subCategories) {
-                if (subCategory.getSubCatId().equals(catId)) {
-                    subCategory.setSelectedAll(true);
-
-                    String categoryId, subCatId, subCatName;
-                    boolean isSelectedAll;
-                    categoryId = subCategory.getCatId();
-                    subCatId = subCategory.getSubCatId();
-                    subCatName= subCategory.getSubCatName();
-                    isSelectedAll = subCategory.isSelectedAll();
-                    ArrayList<PostFilterItem> postFilterItems = new ArrayList<>();
-                    for (PostFilterItem postFilterItem :subCategory.getPostFilterItems()) {
-                        postFilterItems.add(postFilterItem);
-                    }
-                    PostFilterSubCategory postFilterSubCategory = new PostFilterSubCategory(categoryId, subCatId, subCatName, isSelectedAll, postFilterItems);
-                    categories.get(categoryPosition).getPostFilterSubCategories().clear();
-                    categories.get(categoryPosition).getPostFilterSubCategories().add(postFilterSubCategory);
-                    for (int i = 0; i < subCategory.getPostFilterItems().size(); i++) {
-                        postFilterSubCategory.getPostFilterItems().get(i).setSelected(true);
-                    }
-                    ArrayList<String> arrayList = new ArrayList<>();
-                    commonCategories.clear();
-
-                    for (PostFilterSubCategory filterSubCategory : categories.get(categoryPosition).getPostFilterSubCategories()) {
-                        if (filterSubCategory.isSelectedAll()) {
-                            arrayList.add(filterSubCategory.getSubCatId());
-                            commonCategories.add(new CommonCategory(filterSubCategory.getSubCatId(), filterSubCategory.getSubCatName()));
-                        }
-                        for (PostFilterItem postFilterItem : filterSubCategory.getPostFilterItems()) {
-                            arrayList.add(postFilterItem.getItemId());
-                            commonCategories.add(new CommonCategory(postFilterItem.getItemId(), postFilterItem.getItemName()));
-                        }
-                    }
-                    updateCategoryTitles();
-
-                    selectedCategory = postFilterSubCategory.getSubCatName();
-                    filterItem.setText(selectedCategory);
-                    categorySpinner.setSelection(2);
-                    sendBroadcast((new Intent().putExtra("category_ids", Tools.setCategoryIds(arrayList)).putExtra("filter", (categoryPosition == 3 ? 8 : 1))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
-                    break;
-                } else {
-                    for (PostFilterItem postFilterItem : subCategory.getPostFilterItems()) {
-                        if (postFilterItem.getItemId().equals(catId)) {
-//                            selectChangeListener.onSelectClear();
-                            postFilterItem.setSelected(true);
-                            ArrayList<PostFilterItem> postFilterItems = new ArrayList<>();
-                            String categoryId, subCategoryId, itemId, itemName;
-                            boolean isSelected;
-                            categoryId = "";
-                            subCategoryId =postFilterItem.getSubCatId();
-                            itemId = postFilterItem.getItemId();
-                            itemName = postFilterItem.getItemName();
-                            isSelected = postFilterItem.isSelected();
-                            PostFilterItem item = new PostFilterItem(categoryId, subCategoryId, itemId, itemName, isSelected);
-                            postFilterItems.add(item);
-
-                            PostFilterSubCategory postFilterSubCategory = new PostFilterSubCategory(subCategory.getCatId(), subCategory.getSubCatId(), subCategory.getSubCatName(), subCategory.isSelectedAll(), postFilterItems);
-                            categories.get(categoryPosition).getPostFilterSubCategories().clear();
-                            categories.get(categoryPosition).getPostFilterSubCategories().add(postFilterSubCategory);
-                            ArrayList<String> arrayList = new ArrayList<>();
-                            commonCategories.clear();
-                            for (PostFilterSubCategory filterSubCategory : categories.get(categoryPosition).getPostFilterSubCategories()) {
-                                for (PostFilterItem filterItem : filterSubCategory.getPostFilterItems()) {
-                                    arrayList.add(filterItem.getItemId());
-                                    commonCategories.add(new CommonCategory(filterItem.getItemId(), filterItem.getItemName()));
-                                }
-                            }
-                            updateCategoryTitles();
-
-                            selectedCategory = itemName;
-                            filterItem.setText(selectedCategory);
-                            categorySpinner.setSelection(2);
-                            sendBroadcast((new Intent().putExtra("category_ids", Tools.setCategoryIds(arrayList)).putExtra("filter", (categoryPosition == 3 ? 8 : 1))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
-                            break;
-                        }
-                    }
-                }
-            }
+//            ArrayList<String> arrayList = new ArrayList<>();
+//            arrayList.add(postFilterSubCategory.getSubCatId());
+//            for (PostFilterItem postFilterItem : postFilterSubCategory.getPostFilterItems()) {
+//                arrayList.add(postFilterItem.getItemId());
+//            }
+            addedFilters(catId, "7", false);
+//            categorySpinner.setSelection(2);
+//            for (int i = 0; i < subCategories.size(); i++) {
+//                subCategories.get(i).setSelectedAll(false);
+//                for (int j = 0; j < subCategories.get(i).getPostFilterItems().size(); j++) {
+//                    subCategories.get(i).getPostFilterItems().get(j).setSelected(false);
+//                }
+//            }
+//            for (PostFilterSubCategory subCategory : subCategories) {
+//                if (subCategory.getSubCatId().equals(catId)) {
+//                    subCategory.setSelectedAll(true);
+//
+//                    String categoryId, subCatId, subCatName;
+//                    boolean isSelectedAll;
+//                    categoryId = subCategory.getCatId();
+//                    subCatId = subCategory.getSubCatId();
+//                    subCatName= subCategory.getSubCatName();
+//                    isSelectedAll = subCategory.isSelectedAll();
+//                    ArrayList<PostFilterItem> postFilterItems = new ArrayList<>();
+//                    for (PostFilterItem postFilterItem :subCategory.getPostFilterItems()) {
+//                        postFilterItems.add(postFilterItem);
+//                    }
+//                    PostFilterSubCategory postFilterSubCategory = new PostFilterSubCategory(categoryId, subCatId, subCatName, isSelectedAll, postFilterItems);
+//                    categories.get(categoryPosition).getPostFilterSubCategories().clear();
+//                    categories.get(categoryPosition).getPostFilterSubCategories().add(postFilterSubCategory);
+//                    for (int i = 0; i < subCategory.getPostFilterItems().size(); i++) {
+//                        postFilterSubCategory.getPostFilterItems().get(i).setSelected(true);
+//                    }
+//                    ArrayList<String> arrayList = new ArrayList<>();
+//                    commonCategories.clear();
+//
+//                    for (PostFilterSubCategory filterSubCategory : categories.get(categoryPosition).getPostFilterSubCategories()) {
+//                        if (filterSubCategory.isSelectedAll()) {
+//                            arrayList.add(filterSubCategory.getSubCatId());
+//                            commonCategories.add(new CommonCategory(filterSubCategory.getSubCatId(), filterSubCategory.getSubCatName()));
+//                        }
+//                        for (PostFilterItem postFilterItem : filterSubCategory.getPostFilterItems()) {
+//                            arrayList.add(postFilterItem.getItemId());
+//                            commonCategories.add(new CommonCategory(postFilterItem.getItemId(), postFilterItem.getItemName()));
+//                        }
+//                    }
+//                    updateCategoryTitles();
+//
+//                    selectedCategory = postFilterSubCategory.getSubCatName();
+//                    filterItem.setText(selectedCategory);
+//                    categorySpinner.setSelection(2);
+//                    sendBroadcast((new Intent().putExtra("category_ids", Tools.setCategoryIds(arrayList)).putExtra("filter", (categoryPosition == 3 ? 8 : 1))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
+//                    break;
+//                } else {
+//                    for (PostFilterItem postFilterItem : subCategory.getPostFilterItems()) {
+//                        if (postFilterItem.getItemId().equals(catId)) {
+////                            selectChangeListener.onSelectClear();
+//                            postFilterItem.setSelected(true);
+//                            ArrayList<PostFilterItem> postFilterItems = new ArrayList<>();
+//                            String categoryId, subCategoryId, itemId, itemName;
+//                            boolean isSelected;
+//                            categoryId = "";
+//                            subCategoryId =postFilterItem.getSubCatId();
+//                            itemId = postFilterItem.getItemId();
+//                            itemName = postFilterItem.getItemName();
+//                            isSelected = postFilterItem.isSelected();
+//                            PostFilterItem item = new PostFilterItem(categoryId, subCategoryId, itemId, itemName, isSelected);
+//                            postFilterItems.add(item);
+//
+//                            PostFilterSubCategory postFilterSubCategory = new PostFilterSubCategory(subCategory.getCatId(), subCategory.getSubCatId(), subCategory.getSubCatName(), subCategory.isSelectedAll(), postFilterItems);
+//                            categories.get(categoryPosition).getPostFilterSubCategories().clear();
+//                            categories.get(categoryPosition).getPostFilterSubCategories().add(postFilterSubCategory);
+//                            ArrayList<String> arrayList = new ArrayList<>();
+//                            commonCategories.clear();
+//                            for (PostFilterSubCategory filterSubCategory : categories.get(categoryPosition).getPostFilterSubCategories()) {
+//                                for (PostFilterItem filterItem : filterSubCategory.getPostFilterItems()) {
+//                                    arrayList.add(filterItem.getItemId());
+//                                    commonCategories.add(new CommonCategory(filterItem.getItemId(), filterItem.getItemName()));
+//                                }
+//                            }
+//                            updateCategoryTitles();
+//
+//                            selectedCategory = itemName;
+//                            filterItem.setText(selectedCategory);
+//                            categorySpinner.setSelection(2);
+//                            sendBroadcast((new Intent().putExtra("category_ids", Tools.setCategoryIds(arrayList)).putExtra("filter", (categoryPosition == 3 ? 8 : 1))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
+//                            break;
+//                        }
+//                    }
+//                }
+//            }
         }
     };
 
@@ -617,107 +605,31 @@ public class Home extends AppCompatActivity implements
         dialog.setContentView(R.layout.single_post_category_filter_layout);
 
         Toolbar toolbar = dialog.findViewById(R.id.toolbar);
-        TextView tvCategoryName, tvFilterItemName;
         RecyclerView recyclerView;
-        tvCategoryName = dialog.findViewById(R.id.categoryName);
-        tvFilterItemName = dialog.findViewById(R.id.filterItem);
         recyclerView = dialog.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        tvCategoryName.setText(categories.get(categoryPosition).getCatName());
-        if (categoryPosition == 2) {
-            tvFilterItemName.setText(selectedCategory.isEmpty() ? getString(R.string.select_category) : selectedCategory);
-        } else {
-            tvFilterItemName.setText(getString(R.string.select_categories));
-        }
-
         FilterClickListener filterClickListener = new FilterClickListener() {
             @Override
-            public void onSingleSubCategorySelect(PostFilterSubCategory filterSubCategory) {
-                categories.get(categoryPosition).getPostFilterSubCategories().clear();
-                categories.get(categoryPosition).getPostFilterSubCategories().add(filterSubCategory);
-                ArrayList<String> arrayList = new ArrayList<>();
-                commonCategories.clear();
-                for (PostFilterSubCategory postFilterSubCategory : categories.get(categoryPosition).getPostFilterSubCategories()) {
-                    if (postFilterSubCategory.isSelectedAll()) {
-                        arrayList.add(postFilterSubCategory.getSubCatId());
-                        commonCategories.add(new CommonCategory(postFilterSubCategory.getSubCatId(), postFilterSubCategory.getSubCatName()));
-                    }
-                    for (PostFilterItem postFilterItem : postFilterSubCategory.getPostFilterItems()) {
-                        arrayList.add(postFilterItem.getItemId());
-                        commonCategories.add(new CommonCategory(postFilterItem.getItemId(), postFilterItem.getItemName()));
-                    }
-                }
+            public void onSingleSubCategorySelect(PostFilterSubCategory postFilterSubCategory) {
                 dialog.dismiss();
-
-                updateCategoryTitles();
-
-                selectedCategory = filterSubCategory.getSubCatName();
-                filterItem.setText(selectedCategory);
-                sendBroadcast((new Intent().putExtra("category_ids", Tools.setCategoryIds(arrayList)).putExtra("filter", (categoryPosition == 3 ? 8 : 1))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
-
+                filterSubCategory(subCategories, "7", false);
             }
 
             @Override
             public void onSingleSubCategoryDeselect(PostFilterSubCategory postFilterSubCategory) {
-//                for (int i = 0; i < categories.get(categoryPosition).getPostFilterSubCategories().size(); i++) {
-//                    if (categories.get(categoryPosition).getPostFilterSubCategories().get(i).getSubCatId().equals(postFilterSubCategory.getSubCatId())) {
-//                        categories.get(categoryPosition).getPostFilterSubCategories().remove(i);
-//                        break;
-//                    }
-//                }
+
             }
 
             @Override
-            public void onSingleFilterItemSelect(PostFilterSubCategory filterSubCategory) {
-                categories.get(categoryPosition).getPostFilterSubCategories().clear();
-                categories.get(categoryPosition).getPostFilterSubCategories().add(filterSubCategory);
-                ArrayList<String> arrayList = new ArrayList<>();
-                commonCategories.clear();
-                for (PostFilterSubCategory postFilterSubCategory : categories.get(categoryPosition).getPostFilterSubCategories()) {
-                    if (postFilterSubCategory.isSelectedAll()) {
-                        arrayList.add(postFilterSubCategory.getSubCatId());
-                        commonCategories.add(new CommonCategory(postFilterSubCategory.getSubCatId(), postFilterSubCategory.getSubCatName()));
-                    }
-                    for (PostFilterItem postFilterItem : postFilterSubCategory.getPostFilterItems()) {
-                        arrayList.add(postFilterItem.getItemId());
-                        commonCategories.add(new CommonCategory(postFilterItem.getItemId(), postFilterItem.getItemName()));
-                    }
-                }
+            public void onSingleFilterItemSelect(PostFilterSubCategory postFilterSubCategory) {
                 dialog.dismiss();
-
-                updateCategoryTitles();
-
-                selectedCategory = filterSubCategory.getSubCatName();
-                filterItem.setText(selectedCategory);
-                sendBroadcast((new Intent().putExtra("category_ids", Tools.setCategoryIds(arrayList)).putExtra("filter", (categoryPosition == 3 ? 8 : 1))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
-                //Api Request
-                //Progress Dialog
-
-
-//                for (int i = 0; i < categories.get(categoryPosition).getPostFilterSubCategories().size(); i++) {
-//                    if (categories.get(categoryPosition).getPostFilterSubCategories().get(i).getSubCatId().equals(postFilterItem.getSubCatId())) {
-//                        categories.get(categoryPosition).getPostFilterSubCategories().get(i).getPostFilterItems().clear();
-//                        categories.get(categoryPosition).getPostFilterSubCategories().get(i).getPostFilterItems().add(postFilterItem);
-//                        break;
-//                    }
-//                }
+                filterSubCategory(subCategories, "7", false);
             }
 
             @Override
             public void onSingleFilterItemDeselect(PostFilterSubCategory postFilterSubCategory) {
-//                for (int i = 0; i < categories.get(categoryPosition).getPostFilterSubCategories().size(); i++) {
-//                    if (categories.get(categoryPosition).getPostFilterSubCategories().get(i).getSubCatId().equals(postFilterSubCategory.getSubCatId())) {
-//                        categories.get(categoryPosition).getPostFilterSubCategories().get(i).setSelectedAll(false);
-//                        for (int j = 0; j < categories.get(categoryPosition).getPostFilterSubCategories().get(i).getPostFilterItems().size(); j++) {
-//                            if (categories.get(categoryPosition).getPostFilterSubCategories().get(i).getPostFilterItems().get(j).getItemId().equals(postFilterSubCategory.getPostFilterItems().get(0).getItemId())) {
-//                                categories.get(categoryPosition).getPostFilterSubCategories().get(i).getPostFilterItems().remove(j);
-//                                break;
-//                            }
-//                        }
-//                        break;
-//                    }
-//                }
+
             }
         };
 
@@ -738,93 +650,51 @@ public class Home extends AppCompatActivity implements
         Dialog dialog = new Dialog(this, R.style.Theme_Dialog);
         dialog.setContentView(R.layout.multiple_post_category_filter_layout);
 
-        int pos = categoryPosition == 0 || categoryPosition == 1 ? 1 : 3;
         SubCategoryAdapter subCategoryAdapter;
 
         Toolbar toolbar = dialog.findViewById(R.id.toolbar);
-        TextView tvCategoryName, tvFilterItemName;
         FloatingActionButton done, clear;
         RecyclerView recyclerView;
-        tvCategoryName = dialog.findViewById(R.id.categoryName);
-        tvFilterItemName = dialog.findViewById(R.id.filterItem);
         done = dialog.findViewById(R.id.done);
         clear = dialog.findViewById(R.id.clear);
         recyclerView = dialog.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        tvCategoryName.setText(categories.get(categoryPosition).getCatName());
-        if (categoryPosition == 2) {
-            tvFilterItemName.setText(getString(R.string.select_category));
-        } else {
-            tvFilterItemName.setText(getString(R.string.select_categories));
-        }
-
         FilterClickListener filterClickListener = new FilterClickListener() {
             @Override
             public void onSingleSubCategorySelect(PostFilterSubCategory postFilterSubCategory) {
-                categories.get(pos).getPostFilterSubCategories().add(postFilterSubCategory);
+                if (categoryPosition == 3) {
+                    filterSubCategory(exceptMultipleSubCategories, "8", false);
+                } else {
+                    filterSubCategory(multipleSubCategories, "1", false);
+                }
             }
 
             @Override
             public void onSingleSubCategoryDeselect(PostFilterSubCategory postFilterSubCategory) {
-                for (int i = 0; i < categories.get(pos).getPostFilterSubCategories().size(); i++) {
-                    if (categories.get(pos).getPostFilterSubCategories().get(i).getSubCatId().equals(postFilterSubCategory.getSubCatId())) {
-                        categories.get(pos).getPostFilterSubCategories().remove(i);
-                        break;
-                    }
+                if (categoryPosition == 3) {
+                    filterSubCategory(exceptMultipleSubCategories, "8", false);
+                } else {
+                    filterSubCategory(multipleSubCategories, "1", false);
                 }
             }
 
             @Override
             public void onSingleFilterItemSelect(PostFilterSubCategory postFilterSubCategory) {
-                boolean isNotExist = true;
-//                for (int i = 0; i < categories.get(categoryPosition).getPostFilterSubCategories().size(); i++) {
-//                    if (categories.get(categoryPosition).getPostFilterSubCategories().get(i).getSubCatId().equals(postFilterItem.getSubCatId())) {
-//                        categories.get(categoryPosition).getPostFilterSubCategories().get(i).getPostFilterItems().add(postFilterItem);
-//                        isNotExist = false;
-//                        break;
-//                    }
-//                }
-
-                for (int i = 0; i < categories.get(pos).getPostFilterSubCategories().size(); i++) {
-                    if (categories.get(pos).getPostFilterSubCategories().get(i).getSubCatId().equals(postFilterSubCategory.getSubCatId())) {
-                        categories.get(pos).getPostFilterSubCategories().get(i).getPostFilterItems().add(postFilterSubCategory.getPostFilterItems().get(0));
-                        isNotExist = false;
-                        break;
-                    }
-                }
-                if (isNotExist) {
-                    categories.get(pos).getPostFilterSubCategories().add(postFilterSubCategory);
+                if (categoryPosition == 3) {
+                    filterSubCategory(exceptMultipleSubCategories, "8", false);
+                } else {
+                    filterSubCategory(multipleSubCategories, "1", false);
                 }
             }
 
             @Override
             public void onSingleFilterItemDeselect(PostFilterSubCategory postFilterSubCategory) {
-                for (int i = 0; i < categories.get(pos).getPostFilterSubCategories().size(); i++) {
-                    if (categories.get(pos).getPostFilterSubCategories().get(i).getSubCatId().equals(postFilterSubCategory.getSubCatId())) {
-                        categories.get(pos).getPostFilterSubCategories().get(i).setSelectedAll(false);
-                        for (int j = 0; j < categories.get(pos).getPostFilterSubCategories().get(i).getPostFilterItems().size(); j++) {
-                            if (categories.get(pos).getPostFilterSubCategories().get(i).getPostFilterItems().get(j).getItemId().equals(postFilterSubCategory.getPostFilterItems().get(0).getItemId())) {
-                                categories.get(pos).getPostFilterSubCategories().get(i).getPostFilterItems().remove(j);
-                                break;
-                            }
-                        }
-                        break;
-                    }
+                if (categoryPosition == 3) {
+                    filterSubCategory(exceptMultipleSubCategories, "8", false);
+                } else {
+                    filterSubCategory(multipleSubCategories, "1", false);
                 }
-
-
-//                for (int i = 0; i < categories.get(categoryPosition).getPostFilterSubCategories().size(); i++) {
-//                    if (categories.get(categoryPosition).getPostFilterSubCategories().get(i).getSubCatId().equals(postFilterItem.getSubCatId())) {
-//                        for (int j = 0; j < categories.get(categoryPosition).getPostFilterSubCategories().get(i).getPostFilterItems().size(); j++) {
-//                            if (categories.get(categoryPosition).getPostFilterSubCategories().get(i).getPostFilterItems().get(j).getItemId().equals(postFilterItem.getItemId())) {
-//                                categories.get(categoryPosition).getPostFilterSubCategories().get(i).getPostFilterItems().remove(j);
-//                                break;
-//                            }
-//                        }
-//                        break;
-//                    }
-//                }
             }
         };
 
@@ -847,28 +717,25 @@ public class Home extends AppCompatActivity implements
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (categoryPosition == 0) {
-                    categorySpinner.setSelection(1);
-                    categoryPosition = 1;
-                }
-                ArrayList<String> arrayList = new ArrayList<>();
-                commonCategories.clear();
-                for (PostFilterSubCategory postFilterSubCategory : categories.get(categoryPosition).getPostFilterSubCategories()) {
-                    if (postFilterSubCategory.isSelectedAll()) {
-                        arrayList.add(postFilterSubCategory.getSubCatId());
-                        commonCategories.add(new CommonCategory(postFilterSubCategory.getSubCatId(), postFilterSubCategory.getSubCatName()));
-                    }
-                    for (PostFilterItem postFilterItem : postFilterSubCategory.getPostFilterItems()) {
-                        arrayList.add(postFilterItem.getItemId());
-                        commonCategories.add(new CommonCategory(postFilterItem.getItemId(), postFilterItem.getItemName()));
-                    }
+                switch (categoryPosition) {
+                    case 0:
+                        categorySpinner.setSelection(1);
+                        break;
+                    case 1:
+                        filterItem.setText(getString(R.string.select_categories));
+                        getPostFilters("1", false);
+                        break;
+                    case 2:
+                        filterItem.setText(selectedCategory.isEmpty() ? getString(R.string.select_category) : selectedCategory);
+                        categoryRecyclerView.setVisibility(View.GONE);
+                        getSinglePostFilters("4", false);
+                        break;
+                    case 3:
+                        filterItem.setText(getString(R.string.select_categories));
+                        getPostFilters("8", false);
+                        break;
                 }
                 dialog.dismiss();
-
-                updateCategoryTitles();
-
-                filterItem.setText(getString(R.string.select_categories));
-                sendBroadcast((new Intent().putExtra("category_ids", Tools.setCategoryIds(arrayList)).putExtra("filter", (categoryPosition == 3 ? 8 : 1))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
             }
         });
 
@@ -876,24 +743,13 @@ public class Home extends AppCompatActivity implements
             @Override
             public void onClick(View view) {
                 if (categoryPosition == 3) {
-                    for (int i = 0; i < exceptMultipleSubCategories.size(); i++) {
-                        exceptMultipleSubCategories.get(i).setSelectedAll(false);
-                        for (int j = 0; j < exceptMultipleSubCategories.get(i).getPostFilterItems().size(); j ++) {
-                            exceptMultipleSubCategories.get(i).getPostFilterItems().get(j).setSelected(false);
-                        }
-                    }
+                    addedFilters("", "8", true);
+                    clearSubCategories(exceptMultipleSubCategories, subCategoryAdapter);
                 } else {
-                    for (int i = 0; i < multipleSubCategories.size(); i++) {
-                        multipleSubCategories.get(i).setSelectedAll(false);
-                        for (int j = 0; j < multipleSubCategories.get(i).getPostFilterItems().size(); j ++) {
-                            multipleSubCategories.get(i).getPostFilterItems().get(j).setSelected(false);
-                        }
-                    }
+                    clearSubCategories(multipleSubCategories, subCategoryAdapter);
+                    addedFilters("", "1", true);
                 }
-                categories.get(categoryPosition).getPostFilterSubCategories().clear();
-                commonCategories.clear();
-                categoryTitleAdapter.notifyDataSetChanged();
-                subCategoryAdapter.notifyDataSetChanged();
+                dialog.dismiss();
             }
         });
 
@@ -948,9 +804,9 @@ public class Home extends AppCompatActivity implements
     }
 
     private void setupCollapsingToolbar() {
-        final CollapsingToolbarLayout collapsingToolbar = findViewById(R.id.collapse_toolbar);
+        collapsingToolbar = findViewById(R.id.collapse_toolbar);
         LinearLayout viewCategory = findViewById(R.id.viewCategory);
-        final AppBarLayout appBarLayout = findViewById(R.id.app_bar_layout);
+        appBarLayout = findViewById(R.id.app_bar_layout);
         collapsingToolbar.setTitleEnabled(false);
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
@@ -959,7 +815,7 @@ public class Home extends AppCompatActivity implements
                 if (Math.abs(verticalOffset) - appBarLayout.getTotalScrollRange() == 0) {
                     //  Collapsed
                     viewCategory.setVisibility(View.GONE);
-                } else if (Math.abs(verticalOffset) - appBarLayout.getTotalScrollRange() <= -220) {
+                } else if (Math.abs(verticalOffset) - appBarLayout.getTotalScrollRange() <= -190) {
                     //Expanded
                     viewCategory.setVisibility(View.VISIBLE);
                 }
@@ -973,6 +829,16 @@ public class Home extends AppCompatActivity implements
     LinearLayout tabOne, tabTwo, tabThree;
     TextView tabOneText, tabTwoText, tabThreeText;
     ImageView tabOneInfo, tabTwoInfo, tabThreeInfo;
+    ViewTooltip.TooltipView viewTooltipOne, viewTooltipTwo, viewTooltipThree;
+
+    private void tooltipClose(ViewTooltip.TooltipView one, ViewTooltip.TooltipView two) {
+        if (one != null) {
+            one.close();
+        }
+        if (two != null) {
+            two.close();
+        }
+    }
 
     private void setupTabIcons() {
 
@@ -1008,15 +874,21 @@ public class Home extends AppCompatActivity implements
         tabOneInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ViewTooltip
-                        .on(Home.this, tabOneInfo)
-                        .autoHide(true, 3000)
-                        .color(Color.WHITE)
-                        .textColor(Color.parseColor("#1483c9"))
-                        .corner(30)
-                        .position(ViewTooltip.Position.RIGHT)
-                        .text(getString(R.string.the_trending_feed_includes_the_hottest_posts))
-                        .show();
+                if (viewTooltipOne != null) {
+                    viewTooltipOne.close();
+                    viewTooltipOne = null;
+                } else {
+                    viewTooltipOne = ViewTooltip
+                            .on(Home.this, tabOneInfo)
+                            .autoHide(true, 3000)
+                            .color(Color.WHITE)
+                            .textColor(Color.parseColor("#1483c9"))
+                            .corner(30)
+                            .position(ViewTooltip.Position.RIGHT)
+                            .text(getString(R.string.the_trending_feed_includes_the_hottest_posts))
+                            .show();
+                }
+                tooltipClose(viewTooltipTwo, viewTooltipThree);
             }
         });
 
@@ -1030,15 +902,22 @@ public class Home extends AppCompatActivity implements
         tabTwoInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ViewTooltip
-                        .on(Home.this, tabTwoInfo)
-                        .autoHide(true, 3000)
-                        .color(Color.WHITE)
-                        .textColor(Color.parseColor("#1483c9"))
-                        .corner(30)
-                        .position(ViewTooltip.Position.RIGHT)
-                        .text(getString(R.string.the_breaking_feed_includes_the_newest_posts))
-                        .show();
+                if (viewTooltipTwo != null) {
+                    viewTooltipTwo.close();
+                    viewTooltipTwo = null;
+                } else {
+                    viewTooltipTwo = ViewTooltip
+                            .on(Home.this, tabTwoInfo)
+                            .autoHide(true, 3000)
+                            .color(Color.WHITE)
+                            .textColor(Color.parseColor("#1483c9"))
+                            .corner(30)
+                            .position(ViewTooltip.Position.BOTTOM)
+                            .text(getString(R.string.the_breaking_feed_includes_the_newest_posts))
+                            .show();
+                }
+                tooltipClose(viewTooltipOne, viewTooltipThree);
+
             }
         });
 
@@ -1052,15 +931,21 @@ public class Home extends AppCompatActivity implements
         tabThreeInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ViewTooltip
-                        .on(Home.this, tabThree)
-                        .autoHide(true, 3000)
-                        .color(Color.WHITE)
-                        .textColor(Color.parseColor("#1483c9"))
-                        .corner(30)
-                        .position(ViewTooltip.Position.LEFT)
-                        .text(getString(R.string.the_following_feed_includes_the_most_recent_posts))
-                        .show();
+                if (viewTooltipThree != null) {
+                    viewTooltipThree.close();
+                    viewTooltipThree = null;
+                } else {
+                    viewTooltipThree = ViewTooltip
+                            .on(Home.this, tabThree)
+                            .autoHide(true, 3000)
+                            .color(Color.WHITE)
+                            .textColor(Color.parseColor("#1483c9"))
+                            .corner(30)
+                            .position(ViewTooltip.Position.LEFT)
+                            .text(getString(R.string.the_following_feed_includes_the_most_recent_posts))
+                            .show();
+                }
+                tooltipClose(viewTooltipOne, viewTooltipTwo);
             }
         });
 
@@ -1258,46 +1143,69 @@ public class Home extends AppCompatActivity implements
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         ((TextView) parent.getChildAt(0)).setTextColor(Color.WHITE);
-        if (!isCatSelectFromPost) {
-            categoryPosition = position;
-            if (position == 1 || position == 3) {
-                categoryRecyclerView.setVisibility(View.VISIBLE);
-            } else {
-                categoryRecyclerView.setVisibility(View.GONE);
-            }
-            if (position == 2) {
-                if (selectedCategory.isEmpty()) {
-                    showSingleFilterDialog();
-                }
-                filterItem.setText(selectedCategory.isEmpty() ? getString(R.string.select_category) : selectedCategory);
-            } else {
-                if (position == 1 || position == 3) {
-                    if (categories.get(categoryPosition).getPostFilterSubCategories().size() == 0) {
-                        showMultipleFilterDialog();
-                    }
-                } else if (position == 0) {
-                    categories.get(categoryPosition).getPostFilterSubCategories().clear();
-                }
+        categoryPosition = position;
+//        if (!isCatSelectFromPost) {
+//            categoryPosition = position;
+//            if (position == 1 || position == 3) {
+//                categoryRecyclerView.setVisibility(View.VISIBLE);
+//            } else {
+//                categoryRecyclerView.setVisibility(View.GONE);
+//            }
+//            if (position == 2) {
+//                if (selectedCategory.isEmpty()) {
+//                    showSingleFilterDialog();
+//                }
+//                filterItem.setText(selectedCategory.isEmpty() ? getString(R.string.select_category) : selectedCategory);
+//            } else {
+//                if (position == 1 || position == 3) {
+//                    if (categories.get(categoryPosition).getPostFilterSubCategories().size() == 0) {
+//                        showMultipleFilterDialog();
+//                    }
+//                } else if (position == 0) {
+//                    categories.get(categoryPosition).getPostFilterSubCategories().clear();
+//                }
+//                filterItem.setText(getString(R.string.select_categories));
+//            }
+//            ArrayList<String> arrayList = new ArrayList<>();
+//            commonCategories.clear();
+//            for (PostFilterSubCategory postFilterSubCategory : categories.get(categoryPosition).getPostFilterSubCategories()) {
+//                if (postFilterSubCategory.isSelectedAll()) {
+//                    arrayList.add(postFilterSubCategory.getSubCatId());
+//                    commonCategories.add(new CommonCategory(postFilterSubCategory.getSubCatId(), postFilterSubCategory.getSubCatName()));
+//                }
+//                for (PostFilterItem postFilterItem : postFilterSubCategory.getPostFilterItems()) {
+//                    arrayList.add(postFilterItem.getItemId());
+//                    commonCategories.add(new CommonCategory(postFilterItem.getItemId(), postFilterItem.getItemName()));
+//                }
+//            }
+//
+//            updateCategoryTitles();
+//
+//            sendBroadcast((new Intent().putExtra("category_ids", Tools.setCategoryIds(arrayList)).putExtra("filter", (categoryPosition == 3 ? 8 : 1))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
+//        } else {
+//            isCatSelectFromPost = false;
+//        }
+
+        switch (position) {
+            case 0:
                 filterItem.setText(getString(R.string.select_categories));
-            }
-            ArrayList<String> arrayList = new ArrayList<>();
-            commonCategories.clear();
-            for (PostFilterSubCategory postFilterSubCategory : categories.get(categoryPosition).getPostFilterSubCategories()) {
-                if (postFilterSubCategory.isSelectedAll()) {
-                    arrayList.add(postFilterSubCategory.getSubCatId());
-                    commonCategories.add(new CommonCategory(postFilterSubCategory.getSubCatId(), postFilterSubCategory.getSubCatName()));
-                }
-                for (PostFilterItem postFilterItem : postFilterSubCategory.getPostFilterItems()) {
-                    arrayList.add(postFilterItem.getItemId());
-                    commonCategories.add(new CommonCategory(postFilterItem.getItemId(), postFilterItem.getItemName()));
-                }
-            }
-
-            updateCategoryTitles();
-
-            sendBroadcast((new Intent().putExtra("category_ids", Tools.setCategoryIds(arrayList)).putExtra("filter", (categoryPosition == 3 ? 8 : 1))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
-        } else {
-            isCatSelectFromPost = false;
+                categoryRecyclerView.setVisibility(View.GONE);
+                getPostFilters("1", true);
+                sendBroadcast((new Intent().putExtra("category_ids", "").putExtra("filter", 1)).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
+                break;
+            case 1:
+                filterItem.setText(getString(R.string.select_categories));
+                getPostFilters("1", false);
+                break;
+            case 2:
+                filterItem.setText(selectedCategory.isEmpty() ? getString(R.string.select_category) : selectedCategory);
+                categoryRecyclerView.setVisibility(View.GONE);
+                getSinglePostFilters("4", false);
+                break;
+            case 3:
+                filterItem.setText(getString(R.string.select_categories));
+                getPostFilters("8", false);
+                break;
         }
     }
 
@@ -1345,7 +1253,7 @@ public class Home extends AppCompatActivity implements
         Comment_ commentChild = new Comment_();
         commentChild = null;
         Reply reply = new Reply();
-        reply=null;
+        reply = null;
         ReportPersonMessageSheet reportPersonMessageSheet = ReportPersonMessageSheet.newInstance(reportId, commentChild, reply);
         reportPersonMessageSheet.show(getSupportFragmentManager(), "ReportPersonMessageSheet");
     }
@@ -1420,6 +1328,206 @@ public class Home extends AppCompatActivity implements
                 Log.d("message", t.getMessage());
             }
         });
+    }
+
+    private void addedFilters(String catIds, String filter, boolean isReload) {
+        Call<String> call = webService.addedFilter(deviceId, userId, token, userId, catIds, filter);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                try {
+                    JSONObject object = new JSONObject(response.body());
+                    String status = object.getString("status");
+                    if (status.equals("1")) {
+                        if (filter.equals("7")) {
+                            if (categoryPosition == 2) {
+                                filterItem.setText(selectedCategory.isEmpty() ? getString(R.string.select_category) : selectedCategory);
+                                categoryRecyclerView.setVisibility(View.GONE);
+                                getSinglePostFilters("4", false);
+                            } else {
+                                categorySpinner.setSelection(2);
+                            }
+                        } else {
+                            if (isReload) {
+                                sendBroadcast((new Intent().putExtra("category_ids", catIds).putExtra("filter", (categoryPosition == 3 ? 8 : 1))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
+                            }
+                        }
+
+                    }
+                } catch (JSONException ignored) {
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private void getSinglePostFilters(String filter, boolean isAllCategory) {
+        showProgressBar();
+        Call<SinglePostFilters> call = webService.sendSinglePostFilters(deviceId, userId, token, userId);
+        call.enqueue(new Callback<SinglePostFilters>() {
+            @Override
+            public void onResponse(Call<SinglePostFilters> call, Response<SinglePostFilters> response) {
+                SinglePostFilters postFilters = response.body();
+                if (postFilters != null && postFilters.getCategoryInfo() != null) {
+                    if (postFilters.getCategoryInfo().getFilterList().size() == 0) {
+                        switch (filter) {
+                            case "1":
+                            case "8":
+                                if (!isAllCategory)
+                                    showMultipleFilterDialog();
+                                break;
+                            case "4":
+                                showSingleFilterDialog();
+                                break;
+                        }
+                        categoryRecyclerView.setVisibility(View.GONE);
+                        hideProgressBar();
+                    } else {
+                        switch (filter) {
+                            case "1":
+                                setPostFilterCategories(postFilters.getCategoryInfo().getFilterList(), multipleSubCategories, filter, isAllCategory);
+                                if (!isAllCategory)
+                                    categoryRecyclerView.setVisibility(View.VISIBLE);
+                                break;
+                            case "4":
+                                setPostFilterCategories(postFilters.getCategoryInfo().getFilterList(), subCategories, filter, isAllCategory);
+                                categoryRecyclerView.setVisibility(View.GONE);
+                                break;
+                            case "8":
+                                setPostFilterCategories(postFilters.getCategoryInfo().getFilterList(), exceptMultipleSubCategories, filter, isAllCategory);
+                                categoryRecyclerView.setVisibility(View.VISIBLE);
+                                break;
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SinglePostFilters> call, Throwable t) {
+                hideProgressBar();
+            }
+        });
+    }
+
+    private void getPostFilters(String filter, boolean isAllCategory) {
+        showProgressBar();
+        Call<PostFilters> call = webService.sendPostFilters(deviceId, userId, token, userId, filter);
+        call.enqueue(new Callback<PostFilters>() {
+            @Override
+            public void onResponse(Call<PostFilters> call, Response<PostFilters> response) {
+                PostFilters postFilters = response.body();
+                if (postFilters != null && postFilters.getFilterList() != null) {
+                    if (postFilters.getFilterList().size() == 0) {
+                        switch (filter) {
+                            case "1":
+                            case "8":
+                                if (!isAllCategory)
+                                    showMultipleFilterDialog();
+                                break;
+                            case "4":
+                                showSingleFilterDialog();
+                                break;
+                        }
+                        categoryRecyclerView.setVisibility(View.GONE);
+                        hideProgressBar();
+                    } else {
+                        switch (filter) {
+                            case "1":
+                                setPostFilterCategories(postFilters.getFilterList(), multipleSubCategories, filter, isAllCategory);
+                                if (!isAllCategory)
+                                    categoryRecyclerView.setVisibility(View.VISIBLE);
+                                break;
+                            case "4":
+                                setPostFilterCategories(postFilters.getFilterList(), subCategories, filter, isAllCategory);
+                                categoryRecyclerView.setVisibility(View.GONE);
+                                break;
+                            case "8":
+                                setPostFilterCategories(postFilters.getFilterList(), exceptMultipleSubCategories, filter, isAllCategory);
+                                categoryRecyclerView.setVisibility(View.VISIBLE);
+                                break;
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PostFilters> call, Throwable t) {
+                hideProgressBar();
+            }
+        });
+    }
+
+    private void setPostFilterCategories(List<FilterList> filterLists, ArrayList<PostFilterSubCategory> subCategories, String filter, boolean isAllCategory) {
+        commonCategories.clear();
+        ArrayList<String> arrayList = new ArrayList<>();
+        clearSubCategories(subCategories, null);
+
+        for (FilterList filterList : filterLists) {
+            for (int i = 0; i < subCategories.size(); i++) {
+                if (subCategories.get(i).getSubCatId().equals(filterList.getCatId())) {
+                    if (!filterList.getSubCatId().equals("0")) {
+                        for (int j = 0; j < subCategories.get(i).getPostFilterItems().size(); j++) {
+                            if (subCategories.get(i).getPostFilterItems().get(j).getItemId().equals(filterList.getSubCatId())) {
+                                if (filter.equals("4"))
+                                    selectedCategory = subCategories.get(i).getPostFilterItems().get(j).getItemName();
+                                subCategories.get(i).getPostFilterItems().get(j).setSelected(true);
+                                break;
+                            }
+                        }
+                    } else {
+                        if (filter.equals("4"))
+                            selectedCategory = subCategories.get(i).getSubCatName();
+                        subCategories.get(i).setSelectedAll(true);
+                    }
+                    break;
+                }
+            }
+            if (!filterList.getSubCatId().equals("0")) {
+                arrayList.add(filterList.getSubCatId());
+                commonCategories.add(new CommonCategory(filterList.getSubCatId(), filterList.getSubCatName()));
+            } else {
+                arrayList.add(filterList.getCatId());
+                commonCategories.add(new CommonCategory(filterList.getCatId(), filterList.getCatName()));
+            }
+        }
+        if (filter.equals("4"))
+            filterItem.setText(selectedCategory);
+        if (!isAllCategory) {
+            updateCategoryTitles();
+            sendBroadcast((new Intent().putExtra("category_ids", Tools.setCategoryIds(arrayList)).putExtra("filter", (categoryPosition == 3 ? 8 : 1))).setAction(AppConstants.CATEGORY_CHANGE_BROADCAST));
+        } else {
+            hideProgressBar();
+        }
+    }
+
+    private void filterSubCategory(ArrayList<PostFilterSubCategory> subCategories, String filter, boolean isReload) {
+        ArrayList<String> arrayList = new ArrayList<>();
+        for (PostFilterSubCategory postFilterSubCategory : subCategories) {
+            if (postFilterSubCategory.isSelectedAll()) {
+                arrayList.add(postFilterSubCategory.getSubCatId());
+            }
+            for (PostFilterItem postFilterItem : postFilterSubCategory.getPostFilterItems()) {
+                if (postFilterItem.isSelected()) {
+                    arrayList.add(postFilterItem.getItemId());
+                }
+            }
+        }
+        addedFilters(Tools.setCategoryIds(arrayList), filter, isReload);
+    }
+
+    private void clearSubCategories(ArrayList<PostFilterSubCategory> subCategories, SubCategoryAdapter subCategoryAdapter) {
+        for (int i = 0; i < subCategories.size(); i++) {
+            subCategories.get(i).setSelectedAll(false);
+            for (int j = 0; j < subCategories.get(i).getPostFilterItems().size(); j++) {
+                subCategories.get(i).getPostFilterItems().get(j).setSelected(false);
+            }
+        }
+        if (subCategoryAdapter != null)
+            subCategoryAdapter.notifyDataSetChanged();
     }
 
     private void sendLogoutRequest(Call<String> call) {

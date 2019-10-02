@@ -61,7 +61,7 @@
                 android:layout_marginStart="15dp"
                 android:textSize="16sp"
                 android:textColor="@color/colorBlack"
-                android:text="@string/email_notification"/>
+                android:text="@string/email_notifications"/>
 
             <Switch
                 android:id="@+id/email_notification_switch"
@@ -91,7 +91,7 @@
                 android:layout_marginStart="15dp"
                 android:textSize="16sp"
                 android:textColor="@color/colorBlack"
-                android:text="@string/push_notification"/>
+                android:text="@string/push_notifications"/>
 
             <Switch
                 android:id="@+id/push_notification_switch"

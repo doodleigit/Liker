@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     xmlns:tools="http://schemas.android.com/tools">
 
@@ -160,7 +161,7 @@
         android:layout_marginTop="@dimen/_5sdp"
         android:layout_toRightOf="@+id/imageCommentUser"
         android:orientation="vertical"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
         <LinearLayout
@@ -181,19 +182,22 @@
                 android:textStyle="bold"
                 android:textColor="@color/colorAccent"
                 tools:text="User Comment full name" />
-            <com.vanniktech.emoji.EmojiTextView
-                android:id="@+id/tvCommentMessage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start|center"
-                android:paddingStart="15dp"
-                android:paddingTop="5dp"
-                android:paddingEnd="10dp"
-                android:paddingBottom="7dp"
-                android:textColor="@color/colorBlack"
-                android:textSize="14sp"
-                tools:text="Hellodddd" />
+
+
         </LinearLayout>
+        <com.borjabravo.readmoretextview.ReadMoreTextView
+            android:id="@+id/tvCommentMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_5sdp"
+            android:textColor="#333"
+            android:textSize="14sp"
+            app:colorClickableText="@android:color/holo_blue_light"
+            app:trimCollapsedText="Show less"
+            app:trimExpandedText="Show more"
+            app:trimLength="200"
+            app:trimMode="trimModeLength"
+            tools:text="Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.vHere is my first post.Here is my first post.Here is my first post. " />
 
 
     </LinearLayout>

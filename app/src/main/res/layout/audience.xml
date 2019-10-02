@@ -18,7 +18,7 @@
     </TextView>
 
     <RelativeLayout
-        android:visibility="gone"
+        android:visibility="visible"
         android:id="@+id/rl_search"
         android:layout_width="match_parent"
         android:layout_height="60dp"
@@ -26,7 +26,6 @@
         android:background="#EFEFF4">
 
         <EditText
-
             android:id="@+id/et_search"
             android:layout_width="match_parent"
             android:layout_height="40dp"
@@ -34,7 +33,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:background="@drawable/drawable_search"
-            android:drawableLeft="@android:drawable/ic_menu_search"
+            android:drawableLeft="@drawable/ic_search_black_24dp"
             android:drawablePadding="10dp"
             android:hint="Search"
             android:paddingLeft="10dp"

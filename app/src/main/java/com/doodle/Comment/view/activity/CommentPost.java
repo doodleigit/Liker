@@ -207,7 +207,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
     private UserInfo userInfo;
     private String changeData;
 
-    private TextView tvLikes,tvStars;
+    private TextView tvLikes, tvStars;
     //Edit Comment
     Comment_ comment_Item, commentChild;
     Reply reply;
@@ -223,6 +223,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
     private AnimationItem[] mAnimationItems;
     private AnimationItem mSelectedItem;
     private final Handler mHandler = new Handler();
+    private String queryText;
 
 
     @Override
@@ -270,7 +271,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         CommentItem commentItem = getIntent().getExtras().getParcelable(COMMENT_KEY);
         postItem = getIntent().getExtras().getParcelable(ITEM_KEY);
-        position=getIntent().getExtras().getInt(POST_ITEM_POSITION);
+        position = getIntent().getExtras().getInt(POST_ITEM_POSITION);
         //commentChild = getIntent().getExtras().getParcelable(COMMENT_CHILD_KEY);
         if (commentItem == null) {
             throw new AssertionError("Null data item received!");
@@ -318,13 +319,13 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
         adapter = new CommentAdapter(this, comment_list, postItem, this, this, this, this);
         recyclerView.setAdapter(adapter);
         postId = postItem.getSharedPostId();
-        tvLikes=findViewById(R.id.tvLikes);
-        tvStars=findViewById(R.id.tvStars);
+        tvLikes = findViewById(R.id.tvLikes);
+        tvStars = findViewById(R.id.tvStars);
 
         userName.setText(String.format("%s %s", userInfo.getFirstName(), userInfo.getLastName()));
-        int totalStars=Integer.parseInt(userInfo.getGoldStars())+Integer.parseInt(userInfo.getSliverStars());
-        tvStars.setText(String.valueOf(totalStars)+" Stars");
-        tvLikes.setText(userInfo.getTotalLikes()+" Likes");
+        int totalStars = Integer.parseInt(userInfo.getGoldStars()) + Integer.parseInt(userInfo.getSliverStars());
+        tvStars.setText(String.valueOf(totalStars) + " Stars");
+        tvLikes.setText(userInfo.getTotalLikes() + " Likes");
         setUpEmojiPopup();
 
         etComment.addTextChangedListener(new TextWatcher() {
@@ -347,8 +348,11 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
                 for (String st : commentText.split(" ")) {
                     if (st.startsWith("@")) {
                         userQuery = st;
+                    }else {
+                        userQuery = "";
                     }
                 }
+
 
 
                 if (!isNullOrEmpty(userQuery) && userQuery.length() > 1) {
@@ -359,6 +363,9 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
                     rvMentionUserShow = true;
                     mentionUserToggle();
                     mentionUsers();
+                }else if(isFirstTimeShowMention && isNullOrEmpty(userQuery)){
+                    rvMentionUserShow = false;
+                    mentionUserToggle();
                 }
 
                 if (extractedUrls.size() == 0) {
@@ -451,7 +458,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
 
                 if (isScrolling && (currentItems + scrollOutItems == totalItems)) {
                     isScrolling = false;
-                    PerformPagination();
+                   // PerformPagination();
                 }
 
 
@@ -466,10 +473,8 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
     }
 
 
-
-
     private AnimationItem[] getAnimationItems() {
-        return new AnimationItem[] {
+        return new AnimationItem[]{
                 new AnimationItem("Fall down", R.anim.layout_animation_fall_down),
                 new AnimationItem("Slide from right", R.anim.layout_animation_from_right),
                 new AnimationItem("Slide from bottom", R.anim.layout_animation_from_bottom)
@@ -819,8 +824,6 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
             public void onResponse(Call<Comment_> call, Response<Comment_> response) {
 
 
-
-
                 Comment_ commentItems = response.body();
                 int editCommentId = Integer.parseInt(commentItems.getId());
                 if (editCommentId > 0) {
@@ -1082,7 +1085,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
                 .build(etComment);
     }
 
-    private void sendCommentItemRequest(Call<Comment_> call ) {
+    private void sendCommentItemRequest(Call<Comment_> call) {
 
         call.enqueue(new Callback<Comment_>() {
 
@@ -1093,7 +1096,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
                 int newCommentId = Integer.parseInt(commentItems.getId());
 
                 if (newCommentId > 0) {
-                    int totalComment=Integer.parseInt(postItem.getTotalComment())+1;
+                    int totalComment = Integer.parseInt(postItem.getTotalComment()) + 1;
                     postItem.setTotalComment(String.valueOf(totalComment));
                     App.getAppContext().sendBroadcast((new Intent().putExtra("post_item", (Serializable) postItem).putExtra("position", position).putExtra("isFooterChange", true).setAction(AppConstants.POST_CHANGE_BROADCAST)));
 /*
@@ -1196,8 +1199,13 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
 
                             if (status) {
 
+                                int totalComment = Integer.parseInt(postItem.getTotalComment()) - 1;
+                                postItem.setTotalComment(String.valueOf(totalComment));
+                                App.getAppContext().sendBroadcast((new Intent().putExtra("post_item", (Serializable) postItem).putExtra("position", position).putExtra("isFooterChange", true).setAction(AppConstants.POST_CHANGE_BROADCAST)));
+
                                 comment_list.remove(comment_Item);
                                 adapter.deleteItem(position);
+                                recyclerView.scrollToPosition(position);
                                 // adapter.notifyDataSetChanged();
 
                             }

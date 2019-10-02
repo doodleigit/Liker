@@ -9,9 +9,12 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
@@ -58,7 +61,7 @@ public class StarContributorActivity extends AppCompatActivity {
     private int limit = 20, offset = 0;
     private boolean isScrolling = true;
 
-    private ArrayList<PostFilterSubCategory> subCategories;
+    private ArrayList<PostFilterSubCategory> subCategories, allCategories;
     private ArrayList<StarContributor> starContributors;
 
     @Override
@@ -95,6 +98,7 @@ public class StarContributorActivity extends AppCompatActivity {
         userId = manager.getProfileId();
         token = manager.getToken();
         subCategories = new ArrayList<>();
+        allCategories = new ArrayList<>();
         starContributors = new ArrayList<>();
 
         starContributorsAdapter = new StarContributorsAdapter(this, starContributors);
@@ -196,13 +200,12 @@ public class StarContributorActivity extends AppCompatActivity {
         dialog.setContentView(R.layout.single_post_category_filter_layout);
 
         Toolbar toolbar = dialog.findViewById(R.id.toolbar);
-        TextView tvFilterItemName;
+        EditText etSearchCategory;
         RecyclerView recyclerView;
-        tvFilterItemName = dialog.findViewById(R.id.filterItem);
+        etSearchCategory = dialog.findViewById(R.id.search_category);
         recyclerView = dialog.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        tvFilterItemName.setText(selectedCategoryName);
+        etSearchCategory.setVisibility(View.VISIBLE);
 
         StarContributorCategoryListener starContributorCategoryListener = new StarContributorCategoryListener() {
             @Override
@@ -216,8 +219,55 @@ public class StarContributorActivity extends AppCompatActivity {
             }
         };
 
+        subCategories.addAll(allCategories);
+
         StarContributorSubCategoryAdapter subCategoryAdapter = new StarContributorSubCategoryAdapter(this, subCategories, starContributorCategoryListener, selectedCategory);
         recyclerView.setAdapter(subCategoryAdapter);
+
+        etSearchCategory.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String key = etSearchCategory.getText().toString();
+                subCategories.clear();
+                if (key.isEmpty()) {
+                    subCategories.addAll(allCategories);
+                } else {
+                    for (PostFilterSubCategory category : allCategories) {
+                        ArrayList<PostFilterItem> arrayList = new ArrayList<>();
+                        PostFilterSubCategory postFilterSubCategory = new PostFilterSubCategory();
+                        for (PostFilterItem postFilterItem : category.getPostFilterItems()) {
+                            if (postFilterItem.getItemName().toLowerCase().contains(key.toLowerCase())) {
+                                arrayList.add(postFilterItem);
+                            }
+                        }
+                        postFilterSubCategory.setCatId(category.getCatId());
+                        postFilterSubCategory.setSubCatId(category.getSubCatId());
+                        postFilterSubCategory.setSubCatName(category.getSubCatName());
+                        postFilterSubCategory.setSelectedAll(category.isSelectedAll());
+                        postFilterSubCategory.setPostFilterItems(arrayList);
+
+                        if (postFilterSubCategory.getSubCatName().toLowerCase().contains(key.toLowerCase())) {
+                            subCategories.add(postFilterSubCategory);
+                        } else {
+                            if (arrayList.size() != 0) {
+                                subCategories.add(postFilterSubCategory);
+                            }
+                        }
+                    }
+                }
+                subCategoryAdapter.notifyDataSetChanged();
+            }
+        });
 
         toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -316,11 +366,11 @@ public class StarContributorActivity extends AppCompatActivity {
                                     singleArrayList.add(new PostFilterItem("", subCatId, itemId, itemName, false));
                                     multipleArrayList.add(new PostFilterItem("", subCatId, itemId, itemName, false));
                                 }
-                                subCategories.add(new PostFilterSubCategory("", subCatId, subCatName, false, singleArrayList));
+                                allCategories.add(new PostFilterSubCategory("", subCatId, subCatName, false, singleArrayList));
                             }
-                            if (subCategories.size() > 0) {
-                                subCategories.get(0).setSubCatId("0");
-                                subCategories.get(0).setSubCatName("All Category");
+                            if (allCategories.size() > 0) {
+                                allCategories.get(0).setSubCatId("0");
+                                allCategories.get(0).setSubCatName("All Category");
                             }
                             sendUserRankingRequest();
                         } catch (JSONException e) {

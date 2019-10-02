@@ -212,7 +212,7 @@ public class ProfileActivity extends AppCompatActivity implements ReportReasonSh
             isOwnProfile = false;
             ivChangeProfileImage.setVisibility(View.INVISIBLE);
             ivChangeCoverImage.setVisibility(View.INVISIBLE);
-            followLayout.setVisibility(View.VISIBLE);
+            followLayout.setVisibility(View.INVISIBLE);
         }
     }
 

@@ -133,9 +133,10 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             case 2:
                 return VIEW_TYPE_TEXT_IMAGE;
             case 3:
-                return VIEW_TYPE_TEXT_LINK_SCRIPT;
+            return VIEW_TYPE_TEXT_IMAGE;
             case 4:
-                return VIEW_TYPE_TEXT_LINK_SCRIPT_YOUTUBE;
+//                return VIEW_TYPE_TEXT_LINK_SCRIPT;
+            return VIEW_TYPE_TEXT_LINK_SCRIPT_YOUTUBE;
             default:
                 return -1;
         }
@@ -201,10 +202,10 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
        // comment_list.remove(position);
        // comment_list.remove(position);
 
-     //   comment_list.remove(position);
-        size = comment_list.size();
+       // comment_list.remove(position);
      //   notifyItemRemoved(position);
-       notifyDataSetChanged();
+        size = comment_list.size();
+        notifyItemRemoved(position);
 
     }
 

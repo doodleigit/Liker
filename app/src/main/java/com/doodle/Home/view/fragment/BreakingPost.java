@@ -81,7 +81,7 @@ public class BreakingPost extends Fragment {
     private int scrollOutItems;
     private int currentItems;
     private boolean isScrolling, isPaginationDone = true;
-    int limit = 5;
+    int limit = 15;
     int offset = 0;
     private String catIds = "";
     private ShimmerFrameLayout shimmerFrameLayout;
@@ -361,7 +361,7 @@ public class BreakingPost extends Fragment {
                     Log.d("friends", totalPostIDs);
 //                    Call<CommentItem> mCall = webService.getPostComments(deviceId, profileId, token, "false", limit, offset, "DESC", totalPostIDs, userIds);
 //                    sendCommentItemPagingRequest(mCall);
-                    offset += 5;
+                    offset += 15;
                     onPostResponsePagination();
                 } else {
                     onPostResponsePagination();
@@ -509,6 +509,7 @@ public class BreakingPost extends Fragment {
         @Override
         public void onReceive(Context context, Intent intent) {
             ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadInitial();
+            recyclerView.scrollToPosition(0);
             catIds = intent.getStringExtra("category_ids");
             filter = intent.getIntExtra("filter", 1);
             getData();

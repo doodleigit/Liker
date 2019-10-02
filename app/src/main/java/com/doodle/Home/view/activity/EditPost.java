@@ -571,6 +571,8 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                 for (String st : contentTitle.split(" ")) {
                     if (st.startsWith("@")) {
                         userQuery = st;
+                    }else {
+                        userQuery="";
                     }
                 }
 
@@ -587,6 +589,10 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                     rvMentionUserShow = true;
                     mentionUserToggle();
                     mentionUsers();
+                } else if (isFirstTimeShowMention && isNullOrEmpty(userQuery)) {
+                    rvMentionUserShow = false;
+                    mentionUserToggle();
+
                 }
 
            /*     if (extractedUrls.size() == 0) {
@@ -1522,7 +1528,9 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                                 //  boolean topContributorStatus = successObject.getBoolean("top_contributor_status");
                                 //postId = successObject.getInt("post_id");
                                 if (status) {
+
                                     sendPostItemRequest(editPostId, position);
+
                                 } else {
                                     if (contentType == 5) {
 
