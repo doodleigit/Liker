@@ -18,6 +18,16 @@ public class CommentTextIndex implements Serializable, Parcelable
     @SerializedName("type")
     @Expose
     private String type;
+
+    @SerializedName("user_id")
+    @Expose
+    private String userId;
+
+    @SerializedName("user_name")
+    @Expose
+    private String userName;
+
+
     public final static Creator<CommentTextIndex> CREATOR = new Creator<CommentTextIndex>() {
 
 
@@ -39,9 +49,27 @@ public class CommentTextIndex implements Serializable, Parcelable
     protected CommentTextIndex(Parcel in) {
         this.text = ((String) in.readValue((String.class.getClassLoader())));
         this.type = ((String) in.readValue((String.class.getClassLoader())));
+        this.userId = ((String) in.readValue((String.class.getClassLoader())));
+        this.userName = ((String) in.readValue((String.class.getClassLoader())));
     }
 
     public CommentTextIndex() {
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    public String getUsername() {
+        return userName;
+    }
+
+    public void setUser_name(String userName) {
+        this.userName = userName;
     }
 
     public String getText() {
@@ -65,6 +93,8 @@ public class CommentTextIndex implements Serializable, Parcelable
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeValue(text);
         dest.writeValue(type);
+        dest.writeValue(userId);
+        dest.writeValue(userName);
     }
 
     public int describeContents() {

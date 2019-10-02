@@ -6,7 +6,19 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
-
+    <com.borjabravo.readmoretextview.ReadMoreTextView
+        android:id="@+id/tvSharePostContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_5sdp"
+        android:textColor="#333"
+        android:textSize="14sp"
+        app:colorClickableText="@android:color/holo_blue_light"
+        app:trimCollapsedText="Show less"
+        app:trimExpandedText="Show more"
+        app:trimLength="200"
+        app:trimMode="trimModeLength"
+        tools:text="Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.vHere is my first post.Here is my first post.Here is my first post. " />
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -77,36 +89,10 @@
 
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/imageSharePermission"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerInParent="true"
-            android:src="@drawable/ic_more_vert_black_24dp"
-            android:tint="#8596A3" />
+
 
     </RelativeLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#EDF0F1" />
-
-
-    <com.borjabravo.readmoretextview.ReadMoreTextView
-        android:id="@+id/tvSharePostContent"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/_5sdp"
-        android:textColor="#333"
-        android:textSize="14sp"
-        app:colorClickableText="@android:color/holo_blue_light"
-        app:trimCollapsedText="Show less"
-        app:trimExpandedText="Show more"
-        app:trimLength="200"
-        app:trimMode="trimModeLength"
-        tools:text="Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.vHere is my first post.Here is my first post.Here is my first post. " />
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"

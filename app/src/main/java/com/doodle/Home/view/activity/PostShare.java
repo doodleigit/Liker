@@ -28,7 +28,14 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.danikula.videocache.HttpProxyCacheServer;
 import com.doodle.App;
+import com.doodle.Home.adapter.PostAdapter;
+import com.doodle.Home.holder.ImageHolder;
+import com.doodle.Home.holder.LinkScriptHolder;
+import com.doodle.Home.holder.LinkScriptYoutubeHolder;
+import com.doodle.Home.holder.TextMimHolder;
+import com.doodle.Home.holder.VideoHolder;
 import com.doodle.Home.model.Headers;
+import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.postshare.PostShareItem;
 import com.doodle.Home.model.postshare.PostShares;
 import com.doodle.Home.model.postshare.PostTextIndex;
@@ -58,6 +65,7 @@ import com.vanniktech.emoji.EmojiTextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,7 +90,14 @@ import static java.lang.Integer.parseInt;
 
 public class PostShare extends AppCompatActivity implements
         View.OnClickListener,
-        PostPermission.BottomSheetListener {
+        PostPermission.BottomSheetListener,
+        TextHolder.PostItemListener,
+        TextMimHolder.PostItemListener,
+        VideoHolder.PostItemListener,
+        LinkScriptYoutubeHolder.PostItemListener,
+        LinkScriptHolder.PostItemListener,
+        ImageHolder.PostItemListener
+{
 
     private final String TAG = "PostShares";
     private TextView tvAudience;
@@ -139,22 +154,26 @@ public class PostShare extends AppCompatActivity implements
 
     //Add Header
     public CircleImageView imagePostUser;
-    public ImageView imagePostPermission,imagePermission, star1, star2, star3, star4, star5, star6, star7, star8,
+    public ImageView imagePostPermission, imagePermission, star1, star2, star3, star4, star5, star6, star7, star8,
             star9, star10, star11, star12, star13, star14, star15, star16;
-    private SingleLineTextView tvPostUserName,tvPostTime;
+    private SingleLineTextView tvPostUserName, tvPostTime;
     private TextView tvHeaderInfo;
+    private RecyclerView sharedRecyclerview;
+    PostAdapter adapter;
+    public List<PostItem> postItemList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.post_share);
 
-        PostShareItem item = getIntent().getExtras().getParcelable(TextHolder.ITEM_KEY);
+        PostItem item = getIntent().getExtras().getParcelable(TextHolder.ITEM_KEY);
         if (item == null) {
             throw new AssertionError("Null data item received!");
         }
         socket = SocketIOManager.wSocket;
         headers = new Headers();
+        sharedRecyclerview = findViewById(R.id.sharedRecyclerview);
         postShares = new PostShares();
         networkOk = NetworkHelper.hasNetworkAccess(this);
         chatAdapter = new ChatAdapter();
@@ -167,10 +186,10 @@ public class PostShare extends AppCompatActivity implements
         editPostMessage = findViewById(R.id.editPostMessage);
         tvSubmitPost = findViewById(R.id.tvSubmitPost);
         tvSubmitPost.setOnClickListener(this);
+        postItemList = new ArrayList<>();
 
-
-        imgPostUser=findViewById(R.id.imgPostUser);
-        imageUrl=manager.getProfileImage();
+        imgPostUser = findViewById(R.id.imgPostUser);
+        imageUrl = manager.getProfileImage();
         if (!isNullOrEmpty(imageUrl)) {
             Picasso.with(this)
                     .load(imageUrl)
@@ -182,6 +201,10 @@ public class PostShare extends AppCompatActivity implements
                     .into(imgPostUser);
         }
 
+        App.setSharePostfooter(true);
+        postItemList.add(item);
+        adapter = new PostAdapter(this, postItemList, this, this, this, this, this, this, true);
+        sharedRecyclerview.setAdapter(adapter);
 
         //HEADER
         profileId = manager.getProfileId();
@@ -249,47 +272,44 @@ public class PostShare extends AppCompatActivity implements
         int mimId = Integer.parseInt(hasMim);
 
 
-
         //HEADER ID
 
-
-
-        switch (viewType) {
-            case 1:
-                if (mimId > 0) {
-                    onlyMim.setVisibility(View.VISIBLE);
-                    setMim(item);
-                    break;
-                } else {
-                    onlyText.setVisibility(View.VISIBLE);
-                    setText(item);
-                    break;
-                }
-
-            case 2:
-                onlyImage.setVisibility(View.VISIBLE);
-                setImage(item);
-                break;
-            case 3:
-                onlyLinkScript.setVisibility(View.VISIBLE);
-                setLinkScript(item);
-                break;
-            case 4:
-                onlyLinkScriptYoutube.setVisibility(View.VISIBLE);
-                setLinkScriptYoutube(item);
-                break;
-            case 5:
-                onlyVideo.setVisibility(View.VISIBLE);
-                setVideo(item);
-                break;
-
-        }
+//
+//        switch (viewType) {
+//            case 1:
+//                if (mimId > 0) {
+//                    onlyMim.setVisibility(View.VISIBLE);
+//                    setMim(item);
+//                    break;
+//                } else {
+//                    onlyText.setVisibility(View.VISIBLE);
+//                    setText(item);
+//                    break;
+//                }
+//
+//            case 2:
+//                onlyImage.setVisibility(View.VISIBLE);
+//                setImage(item);
+//                break;
+//            case 3:
+//                onlyLinkScript.setVisibility(View.VISIBLE);
+//                setLinkScript(item);
+//                break;
+//            case 4:
+//                onlyLinkScriptYoutube.setVisibility(View.VISIBLE);
+//                setLinkScriptYoutube(item);
+//                break;
+//            case 5:
+//                onlyVideo.setVisibility(View.VISIBLE);
+//                setVideo(item);
+//                break;
+//
+//        }
 
 
         //HEADER SET
-        initheader();
-        setHeader(item);
-
+       // initheader();
+        //setHeader(item);
 
 
     }
@@ -438,7 +458,7 @@ public class PostShare extends AppCompatActivity implements
         }
 
         int totalStars = silverStar + goldStar;
-        String  categoryName = item.getCatName();
+        String categoryName = item.getCatName();
 
         String userImageUrl = AppConstants.PROFILE_IMAGE + item.getUesrProfileImg();
         Glide.with(App.getAppContext())
@@ -719,10 +739,6 @@ public class PostShare extends AppCompatActivity implements
     private void setText(PostShareItem item) {
 
 
-
-
-
-
         String text = item.getPostText();
         StringBuilder nameBuilder = new StringBuilder();
         List<String> mentionUrl = extractUrls(item.getPostText());
@@ -860,7 +876,8 @@ public class PostShare extends AppCompatActivity implements
                 emojiPopup.toggle();
                 break;
             case R.id.imageCancelPost:
-               finish();
+                App.setSharePostfooter(false);
+                finish();
                 break;
             case R.id.tvSubmitPost:
                 final String text = editPostMessage.getText().toString().trim();
@@ -880,6 +897,12 @@ public class PostShare extends AppCompatActivity implements
         }
 
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        App.setSharePostfooter(false);
     }
 
     private void shareAsPost() {
@@ -1050,6 +1073,11 @@ public class PostShare extends AppCompatActivity implements
 
 
         }
+
+    }
+
+    @Override
+    public void deletePost(PostItem postItem, int position) {
 
     }
 }

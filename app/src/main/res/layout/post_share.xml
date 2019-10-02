@@ -158,17 +158,25 @@
                     <LinearLayout
                         android:id="@+id/shareContent"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_below="@+id/messageContainer"
                         android:orientation="vertical">
 
-                        <include layout="@layout/list_item_post_header"/>
-                        <include layout="@layout/list_post_text_only"/>
+                        <include
+                          android:visibility="gone"
+                            layout="@layout/list_item_post_header"/>
+                        <android.support.v7.widget.RecyclerView
+                            android:id="@+id/sharedRecyclerview"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            app:layoutManager="android.support.v7.widget.LinearLayoutManager"
+                            />
+                  <!--      <include layout="@layout/list_post_text_only"/>
                         <include layout="@layout/list_post_image_only"/>
                         <include layout="@layout/list_post_text_mim_only"/>
                         <include layout="@layout/list_post_link_script_only"/>
                         <include layout="@layout/list_post_link_script_youtube_only"/>
-                        <include layout="@layout/list_post_video_only"/>
+                        <include layout="@layout/list_post_video_only"/>-->
 
 
 

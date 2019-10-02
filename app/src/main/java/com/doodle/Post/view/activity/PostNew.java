@@ -2655,7 +2655,6 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
     @Override
     public void onPositiveResult(DialogFragment dlg) {
-        makeText(PostNew.this, "positive button", LENGTH_SHORT).show();
         //addedPostContributor
         if (networkOk) {
             progressView.setVisibility(View.VISIBLE);
@@ -2694,7 +2693,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                                     intent.putExtra("STATUS", status);
                                     startActivity(intent);
                                     String message = "You are now a contributor to the Hobby & Leisure - Airplanes category and your post has been added to your profile.";
-                                    Tools.showCustomToast(PostNew.this, mView, message, Gravity.CENTER);
+                                  //  Tools.showCustomToast(PostNew.this, mView, message, Gravity.CENTER);
                                 }
 
                             } else {
@@ -2721,7 +2720,6 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
     @Override
     public void onNegativeResult(DialogFragment dlg) {
-        makeText(PostNew.this, "Negative Button", LENGTH_SHORT).show();
 
         if (networkOk) {
             progressView.setVisibility(View.VISIBLE);

@@ -3,10 +3,12 @@ package com.doodle.Comment.view.activity;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.ClipData;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -100,6 +102,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import okhttp3.MediaType;
@@ -302,6 +305,9 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
 //            reportReasonSheet.show(getSupportFragmentManager(), "ReportReasonSheet");
 //        }
 
+        IntentFilter replyBroadcastIntent = new IntentFilter();
+        replyBroadcastIntent.addAction(AppConstants.REPLY_CHANGE_BROADCAST);
+        Objects.requireNonNull(this).registerReceiver(replyBroadcast, replyBroadcastIntent);
 
         manager = new PrefManager(this);
         networkOk = NetworkHelper.hasNetworkAccess(this);
@@ -317,6 +323,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
         commentService = CommentService.mRetrofit.create(CommentService.class);
         webService = PostService.mRetrofit.create(PostService.class);
         //  Picasso.with(App.getInstance()).load(imageUrl).into(target);
+        App.setRvCommentHeader(false);
         adapter = new CommentAdapter(this, comment_list, postItem, this, this, this, this);
         recyclerView.setAdapter(adapter);
         postId = postItem.getSharedPostId();
@@ -328,7 +335,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
         tvStars.setText(String.valueOf(totalStars) + " Stars");
         tvLikes.setText(userInfo.getTotalLikes() + " Likes");
         setUpEmojiPopup();
-
+        imageSendComment.setVisibility(View.GONE);
         etComment.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -343,6 +350,12 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
                 /// if(uploadImageName.)
                 commentText = s.toString().trim();
 
+
+                if(commentText.length()>0){
+                    imageSendComment.setVisibility(View.VISIBLE);
+                }else {
+                    imageSendComment.setVisibility(View.GONE);
+                }
 
                 //  String s = "my very long string to test";
 
@@ -1123,6 +1136,8 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
                     long seconds = System.currentTimeMillis() / 1000;
                     commentItem.setDateTime(String.valueOf(seconds));
                     Log.d("comment: ", commentItem.toString());*/
+
+
                     adapter.refreshData(commentItems);
                     progressDialog.dismiss();
                     etComment.setText("");
@@ -1355,11 +1370,50 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
         super.onPause();
 
     }
+    BroadcastReceiver replyBroadcast = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Comment_ commentItem = (Comment_) intent.getSerializableExtra("comment_item");
+            int position = intent.getIntExtra("comment_position", -1);
+            //  String type=intent.getStringExtra("type");
 
+            if (position != -1) {
+             //   Log.d("Cbndklfj ",commentItem.toString());
+
+                comment_list.remove(position);
+                comment_list.add(position, commentItem);
+                adapter.notifyItemChanged(position);
+
+              /*  if (postItemList.size() >= position + 1) {
+                    if (postItemList.get(position).getPostId().equals(postItem.getPostId())) {
+
+
+                        if("permission".equalsIgnoreCase(type)){
+                            postItemList.remove(position);
+                            postItemList.add(position, postItem);
+                            adapter.notifyItemChanged(position);
+                        }else {
+                            postItemList.remove(position);
+                            // adapter.notifyItemChanged(position);
+                            adapter.notifyDataSetChanged();
+                        }
+
+
+                    }
+                }*/
+            }
+        }
+    };
     @Override
     protected void onDestroy() {
         super.onDestroy();
         Tools.dismissDialog();
         mHandler.removeCallbacksAndMessages(null);
+        Objects.requireNonNull(this).unregisterReceiver(replyBroadcast);
     }
+
+
+
+
+
 }

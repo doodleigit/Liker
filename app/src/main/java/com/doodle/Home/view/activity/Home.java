@@ -158,6 +158,7 @@ public class Home extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         startService(new Intent(Home.this, DataFetchingService.class));
+
         initialComponent();
 
         if (topContributorStatus != null) {

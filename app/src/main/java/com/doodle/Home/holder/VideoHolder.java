@@ -167,7 +167,7 @@ public class VideoHolder extends RecyclerView.ViewHolder {
 
     private LinearLayout containerHeaderShare;
     private CircleImageView imageSharePostUser;
-    private ImageView imageSharePermission,imageSharePostPermission;
+    private ImageView imageSharePostPermission;
     private TextView tvSharePostUserName, tvSharePostTime,tvShareHeaderInfo,tvSharePostContent;
 
 
@@ -262,7 +262,6 @@ public class VideoHolder extends RecyclerView.ViewHolder {
         tvSharePostUserName = itemView.findViewById(R.id.tvSharePostUserName);
         tvSharePostTime = itemView.findViewById(R.id.tvSharePostTime);
         tvShareHeaderInfo = itemView.findViewById(R.id.tvShareHeaderInfo);
-        imageSharePermission = itemView.findViewById(R.id.imageSharePermission);
         imageSharePostPermission = itemView.findViewById(R.id.imageSharePostPermission);
         tvSharePostContent = itemView.findViewById(R.id.tvSharePostContent);
 
