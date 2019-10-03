@@ -15,18 +15,15 @@
         android:layout_marginStart="15dp"
         />
 
-    <LinearLayout
-        android:id="@+id/messageContainer"
-        android:layout_marginBottom="@dimen/_5sdp"
-        android:layout_marginTop="@dimen/_5sdp"
-        android:layout_toRightOf="@+id/imageCommentUser"
-        android:orientation="vertical"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
+
+
         <LinearLayout
+            android:id="@+id/commentText"
             android:background="@drawable/rectangle_corner_round_two"
             android:orientation="vertical"
             android:layout_marginBottom="@dimen/_2sdp"
+            android:layout_toRightOf="@+id/imageCommentUser"
+            android:layout_toLeftOf="@+id/imageCommentSettings"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -71,7 +68,11 @@
 
         </LinearLayout>
         <LinearLayout
+            android:layout_below="@id/commentText"
+            android:layout_marginTop="@dimen/_5sdp"
             android:orientation="vertical"
+            android:layout_toRightOf="@+id/imageCommentUser"
+            android:layout_toLeftOf="@id/imageCommentSettings"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -136,8 +137,18 @@
 
 
             </LinearLayout>
+            <TextView
+                android:id="@+id/tvSeeReply"
+                android:padding="@dimen/_5sdp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorPostText"
+                android:textStyle="bold"
+                tools:text="See 3 more replies"/>
         </LinearLayout>
-    </LinearLayout>
+
+
+
 
 
 

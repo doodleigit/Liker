@@ -87,7 +87,7 @@
                                     android:id="@+id/cover_image"
                                     android:layout_width="match_parent"
                                     android:layout_height="100dp"
-                                    android:src="@color/com_facebook_blue" />
+                                    android:src="@color/colorAccent" />
 
                                 <de.hdodenhof.circleimageview.CircleImageView
                                     android:id="@+id/change_cover_image"
@@ -150,14 +150,14 @@
                                     <ImageView
                                         android:layout_width="12dp"
                                         android:layout_height="12dp"
-                                        android:src="@drawable/friend_requests" />
+                                        android:src="@drawable/ic_check_circle_white_24dp" />
 
                                     <TextView
                                         android:id="@+id/follow"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginStart="5dp"
-                                        android:text="Follow"
+                                        android:text="@string/follow"
                                         android:textColor="@color/colorWhite"
                                         android:textSize="10sp" />
 

@@ -92,7 +92,7 @@ public class ReplyYoutubeHolder extends RecyclerView.ViewHolder {
     //Comment
     Comment_ commentItem;
 
-    private String commentPostId;
+
 
     private String commentText, commentUserName, commentUserImage, commentImage, commentTime;
     public EmojiTextView tvCommentMessage;
@@ -147,7 +147,6 @@ public class ReplyYoutubeHolder extends RecyclerView.ViewHolder {
         profileId = manager.getProfileId();
         token = manager.getToken();
         userIds = manager.getProfileId();
-        replyItem = new Reply();
         replyList = new ArrayList<>();
 
         //tvPostContent = (ReadMoreTextView) itemView.findViewById(R.id.tvPostContent);
@@ -226,16 +225,14 @@ public class ReplyYoutubeHolder extends RecyclerView.ViewHolder {
         this.position = position;
         this.reply = reply;
         //  userPostId = item.getPostId();
-        commentPostId = commentItem.getPostId();
 
-        commentText = commentItem.getCommentText();
-        commentUserName = commentItem.getUserFirstName() + " " + commentItem.getUserLastName();
-        commentUserImage = commentItem.getUserPhoto();
-        commentImage = commentItem.getCommentImage();
-        commentTime = commentItem.getDateTime();
-        goldStar = Integer.parseInt(commentItem.getUserGoldStars());
-        silverStar = parseInt(commentItem.getUserSliverStars());
-
+//        commentText = commentItem.getCommentText();
+        commentUserName = replyItem.getFirstName() + " " + replyItem.getLastName();
+        commentUserImage = replyItem.getUserPhoto();
+        commentImage = replyItem.getCommentImage();
+        commentTime = replyItem.getDateTime();
+        goldStar = Integer.parseInt(replyItem.getUserGoldStars());
+        silverStar = parseInt(replyItem.getUserSliverStars());
 
         tvCommentUserName.setText(commentUserName);
         if (!isNullOrEmpty(commentText)) {
@@ -246,7 +243,7 @@ public class ReplyYoutubeHolder extends RecyclerView.ViewHolder {
         }
         tvCommentTime.setText(Tools.chatDateCompare(mContext, Long.valueOf(commentTime)));
 
-        LinkData linkItem = commentItem.getLinkData();
+        LinkData linkItem = replyItem.getLinkData();
         if (!isEmpty(linkItem)) {
             String imageName = linkItem.getImageName();
             String linkFullUrl = linkItem.getLinkFullUrl();
@@ -286,11 +283,11 @@ public class ReplyYoutubeHolder extends RecyclerView.ViewHolder {
         }
 
 
-        if (!isNullOrEmpty(commentItem.getReplyId())) {
-            commentLike = commentItem.getTotalReplyLike();
+        commentLike = replyItem.getTotalLike();
+      /*  if (!isNullOrEmpty(replyItem.getId())) {
         } else {
             commentLike = commentItem.getTotalLike();
-        }
+        }*/
 
 
         if ("0".equalsIgnoreCase(commentLike)) {
@@ -578,9 +575,9 @@ public class ReplyYoutubeHolder extends RecyclerView.ViewHolder {
             }
         });
 
-        if (!isNullOrEmpty(commentItem.getTotalReply()) && Integer.parseInt(commentItem.getTotalReply()) > 0) {
-            tvCommentReply.setText(String.format("%s Reply", commentItem.getTotalReply()));
-        }
+//        if (!isNullOrEmpty(commentItem.getTotalReply()) && Integer.parseInt(commentItem.getTotalReply()) > 0) {
+//            tvCommentReply.setText(String.format("%s Reply", commentItem.getTotalReply()));
+//        }
 
     /*    tvCommentReply.setOnClickListener(new View.OnClickListener() {
             @Override

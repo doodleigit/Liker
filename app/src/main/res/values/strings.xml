@@ -189,7 +189,7 @@
     <string name="privacy_updated">Privacy Updated</string>
     <string name="network_error">Network Error</string>
     <string name="advance_search">Advance Search</string>
-    <string name="search_item">Search item…</string>
+    <string name="search_item">Search…</string>
     <string name="write_minimum_three_characters">Write Minimum Three Characters !</string>
     <string name="we_could_not_find_anything_for">We could not find anything for</string>
     <string name="please_wait">Please wait.!</string>

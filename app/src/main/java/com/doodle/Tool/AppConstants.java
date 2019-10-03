@@ -141,6 +141,7 @@ public class AppConstants {
     public static final String POST_CHANGE_BROADCAST = "post_change_broadcast";
     public static final String POST_FILTER_CAT_BROADCAST = "post_filter_cat_broadcast";
     public static final String PERMISSION_CHANGE_BROADCAST = "permission_change_broadcast";
+    public static final String REPLY_CHANGE_BROADCAST = "reply_change_broadcast";
 
     public static final String NOTIFICATION = "newNotification";
     public static final String CHAT_USERS = "get_chat_users";
@@ -186,6 +187,7 @@ public class AppConstants {
     public static final String PHONE_REMOVE = "phone_remove";
     public static final String ITEM_KEY = "item_key";
     public static final String COMMENT_KEY = "comment_item_key";
+    public static final String IS_FRIEND_STATUS = "isFriendStatus";
 
     public static final String PRIVACY_VIEW = "privacy_view";
     public static final String PRIVACY_UPDATE_PERMISSION = "privacy_update_permission";

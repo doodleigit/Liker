@@ -33,10 +33,12 @@ import com.doodle.App;
 import com.doodle.Comment.model.CommentItem;
 import com.doodle.Comment.model.CommentTextIndex;
 import com.doodle.Comment.model.Comment_;
+import com.doodle.Comment.model.MentionItem;
 import com.doodle.Comment.model.Reason;
 import com.doodle.Comment.model.Reply;
 import com.doodle.Comment.model.ReportReason;
 import com.doodle.Comment.service.CommentService;
+import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.Reply.view.ReplyPost;
 import com.doodle.Comment.view.fragment.ReportReasonSheet;
 import com.doodle.Home.model.PostItem;
@@ -138,7 +140,8 @@ public class ReplyTextHolder extends RecyclerView.ViewHolder {
     public static final String REASON_KEY = "reason_key";
     private String commentLike;
     private int commentLikeNumeric;
-
+    private List<MentionItem> mentionNameList;
+    private ClickableSpan clickableSpan;
 
     public interface ReplyListener {
 
@@ -160,7 +163,7 @@ public class ReplyTextHolder extends RecyclerView.ViewHolder {
         token = manager.getToken();
         userIds = manager.getProfileId();
         webService = HomeService.mRetrofit.create(HomeService.class);
-
+        mentionNameList=new ArrayList<>();
         //tvPostContent = (ReadMoreTextView) itemView.findViewById(R.id.tvPostContent);
 
         star1 = itemView.findViewById(R.id.star1);
@@ -494,6 +497,9 @@ public class ReplyTextHolder extends RecyclerView.ViewHolder {
             String postType = temp.getType();
             if (postType.equalsIgnoreCase("mention")) {
                 String mentionUserName = extractMentionUser(temp.getText());
+                String userName=temp.getUsername();
+                String userId=temp.getUserId();
+                mentionNameList.add(new MentionItem(mentionUserName,userName,userId));
                 nameBuilder.append(mentionUserName);
                 nameBuilder.append(" ");
             }
@@ -528,12 +534,26 @@ public class ReplyTextHolder extends RecyclerView.ViewHolder {
 
                 for (int k = 0; k < mList.size(); k++) {
                     int val = full_text.indexOf(mList.get(k));
-                    ClickableSpan clickableSpan = new ClickableSpan() {
-                        @Override
-                        public void onClick(View view) {
-                            Toast.makeText(App.getAppContext(), "\"You click the text.\"", Toast.LENGTH_SHORT).show();
+                    String name=mList.get(k);
+                    for (MentionItem temp:mentionNameList) {
+
+                        if(temp.getMentionFullName().contains(name)){
+                            clickableSpan = new ClickableSpan() {
+                                @Override
+                                public void onClick(View view) {
+
+                                    mContext.startActivity(new Intent(mContext, ProfileActivity.class).putExtra("user_id", temp.getMentionUserId()).putExtra("user_name", temp.getMentionUserName()));
+                                }
+
+                                @Override
+                                public void updateDrawState(TextPaint ds) {
+
+                                    ds.setColor(ds.linkColor);    // you can use custom color
+                                    ds.setUnderlineText(false);    // this remove the underline
+                                }
+                            };
                         }
-                    };
+                    }
                     if (val >= 0) {
                         str.setSpan(clickableSpan, val, val + mList.get(k).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     }
@@ -565,18 +585,26 @@ public class ReplyTextHolder extends RecyclerView.ViewHolder {
 
                 for (int k = 0; k < mList.size(); k++) {
                     int val = full_text.indexOf(mList.get(k));
-                    ClickableSpan clickableSpan = new ClickableSpan() {
-                        @Override
-                        public void onClick(View view) {
-                            Toast.makeText(App.getAppContext(), "\"You click the text.\"", Toast.LENGTH_SHORT).show();
-                        }
+                    String name=mList.get(k);
+                    for (MentionItem temp:mentionNameList) {
 
-                        @Override
-                        public void updateDrawState(TextPaint ds) {
-                            ds.setColor(ds.linkColor);    // you can use custom color
-                            ds.setUnderlineText(false);    // this remove the underline
+                        if(temp.getMentionFullName().contains(name)){
+                            clickableSpan = new ClickableSpan() {
+                                @Override
+                                public void onClick(View view) {
+
+                                    mContext.startActivity(new Intent(mContext, ProfileActivity.class).putExtra("user_id", temp.getMentionUserId()).putExtra("user_name", temp.getMentionUserName()));
+                                }
+
+                                @Override
+                                public void updateDrawState(TextPaint ds) {
+
+                                    ds.setColor(ds.linkColor);    // you can use custom color
+                                    ds.setUnderlineText(false);    // this remove the underline
+                                }
+                            };
                         }
-                    };
+                    }
                     if (val >= 0) {
                         str.setSpan(clickableSpan, val, val + mList.get(k).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 //                        str.setSpan(new MyClickableSpan("mystring"), val, val + mList.get(k).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);

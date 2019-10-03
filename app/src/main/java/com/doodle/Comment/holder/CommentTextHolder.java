@@ -33,10 +33,12 @@ import com.doodle.App;
 import com.doodle.Comment.model.CommentItem;
 import com.doodle.Comment.model.CommentTextIndex;
 import com.doodle.Comment.model.Comment_;
+import com.doodle.Comment.model.MentionItem;
 import com.doodle.Comment.model.Reason;
 import com.doodle.Comment.model.Reply;
 import com.doodle.Comment.model.ReportReason;
 import com.doodle.Comment.service.CommentService;
+import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.Reply.view.ReplyPost;
 import com.doodle.Comment.view.fragment.ReportReasonSheet;
 import com.doodle.Home.model.PostItem;
@@ -76,6 +78,7 @@ import static java.lang.Integer.parseInt;
 public class CommentTextHolder extends RecyclerView.ViewHolder {
 
 
+    public static final String COMMENT_ITEM_POSITION_KEY = "comment_item_position_key";
     public CircleImageView imagePostUser;
     public ReadMoreTextView tvPostContent;
 
@@ -89,7 +92,7 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
     public PrefManager manager;
     private String deviceId, profileId, token, userIds;
     private Context mContext;
-
+    List<Integer> mentionLengthList=new ArrayList<>();
 
     //Comment
     Comment_ commentItem;
@@ -99,7 +102,7 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
     public EmojiTextView tvPostEmojiContent;
     public ImageView imageCommentSettings, imgCommentLike;
 
-    public TextView tvCommentUserName, tvCommentTime, tvCommentReply, tvCountCommentLike;
+    public TextView tvCommentUserName, tvCommentTime, tvCommentReply, tvCountCommentLike,tvSeeReply;
 
     private PopupMenu popupCommentMenu;
 
@@ -139,7 +142,9 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
     public static final String REASON_KEY = "reason_key";
     private String commentLike;
     private int commentLikeNumeric;
-
+    private int j;
+    private List<MentionItem> mentionNameList;
+    private ClickableSpan clickableSpan;
 
     public interface CommentListener {
 
@@ -191,6 +196,7 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
         tvCommentTime = itemView.findViewById(R.id.tvCommentTime);
         imgCommentLike = itemView.findViewById(R.id.imgCommentLike);
         tvCommentReply = itemView.findViewById(R.id.tvCommentReply);
+        tvSeeReply = itemView.findViewById(R.id.tvSeeReply);
         tvCountCommentLike = itemView.findViewById(R.id.tvCountCommentLike);
         tvCountCommentLike.setVisibility(View.GONE);
 
@@ -205,7 +211,8 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
         //mention
         mentions = new ArrayList<>();
         mList = new ArrayList<>();
-
+        mentionLengthList=new ArrayList<>();
+        mentionNameList=new ArrayList<>();
         //commentAllReply
         mProgressBar = itemView.findViewById(R.id.ProgressBar);
         replyItem = new ArrayList<>();
@@ -348,14 +355,56 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
             }
         });
 
+        if(App.isRvCommentHeader()){
+            tvSeeReply.setVisibility(View.GONE);
+            tvCommentReply.setVisibility(View.GONE);
+        }
         if (!isNullOrEmpty(commentItem.getTotalReply()) && Integer.parseInt(commentItem.getTotalReply()) > 0) {
             if( Integer.parseInt(commentItem.getTotalReply())==1){
-
-                tvCommentReply.setText(String.format("%s Reply", commentItem.getTotalReply()));
+                tvSeeReply.setText(String.format("View %s reply", commentItem.getTotalReply()));
+               // tvCommentReply.setText(String.format("%s Reply", commentItem.getTotalReply()));
             }else {
-                tvCommentReply.setText(String.format("%s Replies", commentItem.getTotalReply()));
+               // tvCommentReply.setText(String.format("%s Replies", commentItem.getTotalReply()));
+                tvSeeReply.setText(String.format("View %s replies", commentItem.getTotalReply()));
             }
         }
+
+        tvSeeReply.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AppCompatActivity activity = (AppCompatActivity) v.getContext();
+
+                String commentReply = commentItem.getTotalReply();
+
+                if (!isNullOrEmpty(commentReply)) {
+                    if (Integer.parseInt(commentReply) > 0) {
+                        if (networkOk) {
+
+                            Call<List<Reply>> call = commentService.getPostCommentReplyList(deviceId, profileId, token, commentItem.getId(), "false", limit, offset, commentItem.getPostId(), userIds);
+                            sendAllCommentReplyListRequest(call);
+                            delayLoadComment(mProgressBar);
+                        } else {
+                            Tools.showNetworkDialog(activity.getSupportFragmentManager());
+
+                        }
+                    } else if (Integer.parseInt(commentReply) == 0) {
+                        Intent intent = new Intent(mContext, ReplyPost.class);
+                        intent.putExtra(COMMENT_ITEM_KEY, (Parcelable) commentItem);
+                        intent.putExtra(POST_ITEM_KEY, (Parcelable) postItem);
+                        intent.putParcelableArrayListExtra(REPLY_KEY, (ArrayList<? extends Parcelable>) replyItem);
+                        mContext.startActivity(intent);
+                    }
+                } else {
+                    Intent intent = new Intent(mContext, ReplyPost.class);
+                    intent.putExtra(COMMENT_ITEM_KEY, (Parcelable) commentItem);
+                    intent.putExtra(POST_ITEM_KEY, (Parcelable) postItem);
+                    intent.putParcelableArrayListExtra(REPLY_KEY, (ArrayList<? extends Parcelable>) replyItem);
+                    mContext.startActivity(intent);
+                }
+
+
+            }
+        });
 
         tvCommentReply.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -552,6 +601,9 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
             String postType = temp.getType();
             if (postType.equalsIgnoreCase("mention")) {
                 String mentionUserName = extractMentionUser(temp.getText());
+                String userName=temp.getUsername();
+                String userId=temp.getUserId();
+                mentionNameList.add(new MentionItem(mentionUserName,userName,userId));
                 nameBuilder.append(mentionUserName);
                 nameBuilder.append(" ");
             }
@@ -586,12 +638,26 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
 
                 for (int k = 0; k < mList.size(); k++) {
                     int val = full_text.indexOf(mList.get(k));
-                    ClickableSpan clickableSpan = new ClickableSpan() {
-                        @Override
-                        public void onClick(View view) {
-                            Toast.makeText(App.getAppContext(), "\"You click the text.\"", Toast.LENGTH_SHORT).show();
+                    String name=mList.get(k);
+                    for (MentionItem temp:mentionNameList) {
+
+                        if(temp.getMentionFullName().contains(name)){
+                            clickableSpan = new ClickableSpan() {
+                                @Override
+                                public void onClick(View view) {
+
+                                    mContext.startActivity(new Intent(mContext, ProfileActivity.class).putExtra("user_id", temp.getMentionUserId()).putExtra("user_name", temp.getMentionUserName()));
+                                }
+
+                                @Override
+                                public void updateDrawState(TextPaint ds) {
+
+                                    ds.setColor(ds.linkColor);    // you can use custom color
+                                    ds.setUnderlineText(false);    // this remove the underline
+                                }
+                            };
                         }
-                    };
+                    }
                     if (val >= 0) {
                         str.setSpan(clickableSpan, val, val + mList.get(k).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     }
@@ -622,26 +688,41 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
                 //make the words bold
 
                 for (int k = 0; k < mList.size(); k++) {
-                    int val = full_text.indexOf(mList.get(k));
-                    ClickableSpan clickableSpan = new ClickableSpan() {
-                        @Override
-                        public void onClick(View view) {
-                            Toast.makeText(App.getAppContext(), "\"You click the text.\"", Toast.LENGTH_SHORT).show();
-                        }
 
-                        @Override
-                        public void updateDrawState(TextPaint ds) {
-                            ds.setColor(ds.linkColor);    // you can use custom color
-                            ds.setUnderlineText(false);    // this remove the underline
+                    String name=mList.get(k);
+                    int val = full_text.indexOf(mList.get(k));
+
+                    for (MentionItem temp:mentionNameList) {
+
+                        if(temp.getMentionFullName().contains(name)){
+                             clickableSpan = new ClickableSpan() {
+                                @Override
+                                public void onClick(View view) {
+
+                                    mContext.startActivity(new Intent(mContext, ProfileActivity.class).putExtra("user_id", temp.getMentionUserId()).putExtra("user_name", temp.getMentionUserName()));
+                                }
+
+                                @Override
+                                public void updateDrawState(TextPaint ds) {
+
+                                    ds.setColor(ds.linkColor);    // you can use custom color
+                                    ds.setUnderlineText(false);    // this remove the underline
+                                }
+                            };
                         }
-                    };
+                    }
+
                     if (val >= 0) {
                         str.setSpan(clickableSpan, val, val + mList.get(k).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+                        mentionLengthList.add(val+ mList.get(k).length());
+                        Log.d("mention length:",mentionLengthList.size()+"");
 //                        str.setSpan(new MyClickableSpan("mystring"), val, val + mList.get(k).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
                     }
 
                 }
+
                 text = str.toString();
                 tvPostContent.setText(str);
 
@@ -1075,6 +1156,7 @@ public class CommentTextHolder extends RecyclerView.ViewHolder {
                     Intent intent = new Intent(mContext, ReplyPost.class);
                     intent.putExtra(COMMENT_ITEM_KEY, (Parcelable) commentItem);
                     intent.putExtra(POST_ITEM_KEY, (Parcelable) postItem);
+                    intent.putExtra(COMMENT_ITEM_POSITION_KEY, position);
 
                     intent.putParcelableArrayListExtra(REPLY_KEY, (ArrayList<? extends Parcelable>) replyItem);
                     mContext.startActivity(intent);

@@ -83,6 +83,16 @@ public interface HomeService {
 
     @POST(AppConstants.GET_POST_DETAILS)
     @FormUrlEncoded
+    Call<PostItem> getPostDetail(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("user_id") String userIds,
+            @Field("post_id") String postId
+    );
+
+    @POST(AppConstants.GET_POST_DETAILS)
+    @FormUrlEncoded
     Call<PostItem> getSinglePostDetails(
             @Header("Device-Id") String deviceId,
             @Header("User-Id") String userId,

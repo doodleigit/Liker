@@ -164,6 +164,7 @@ public class Home extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         startService(new Intent(Home.this, DataFetchingService.class));
+
         initialComponent();
 
         if (topContributorStatus != null) {
@@ -767,16 +768,17 @@ public class Home extends AppCompatActivity implements
     private void showIntroTooltip() {
         ShowcaseConfig config = new ShowcaseConfig();
         config.setDelay(500); // half second between each showcase view
+        categorySpinner.performClick();
 
         MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(this, "1");
 
         sequence.setConfig(config);
 
-        sequence.addSequenceItem(filterItem,
-                getString(R.string.take_control_of_your_feeds), getString(R.string.ok_i_got_it));
-
         sequence.addSequenceItem(categorySpinner,
                 getString(R.string.use_this_dropdown_to_quick_switch_back), getString(R.string.ok_i_got_it));
+
+        sequence.addSequenceItem(filterItem,
+                getString(R.string.take_control_of_your_feeds), getString(R.string.ok_i_got_it));
 
         sequence.start();
     }
@@ -803,6 +805,8 @@ public class Home extends AppCompatActivity implements
 // getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
+    int range = -180;
+
     private void setupCollapsingToolbar() {
         collapsingToolbar = findViewById(R.id.collapse_toolbar);
         LinearLayout viewCategory = findViewById(R.id.viewCategory);
@@ -811,11 +815,16 @@ public class Home extends AppCompatActivity implements
         appBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
             @Override
             public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                if ((Math.abs(verticalOffset) - appBarLayout.getTotalScrollRange()) < range) {
+                    range = (Math.abs(verticalOffset) - appBarLayout.getTotalScrollRange());
+                }
+
+                Log.d("sxrollPosition", "" + range);
 
                 if (Math.abs(verticalOffset) - appBarLayout.getTotalScrollRange() == 0) {
                     //  Collapsed
                     viewCategory.setVisibility(View.GONE);
-                } else if (Math.abs(verticalOffset) - appBarLayout.getTotalScrollRange() <= -190) {
+                } else if (Math.abs(verticalOffset) - appBarLayout.getTotalScrollRange() <= range) {
                     //Expanded
                     viewCategory.setVisibility(View.VISIBLE);
                 }

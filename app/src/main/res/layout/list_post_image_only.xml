@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/onlyImage"
-    android:visibility="gone"
+    android:visibility="visible"
     android:layout_marginBottom="@dimen/_8sdp">
 
     <RelativeLayout
@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-            <include layout="@layout/list_item_post_header"/>
+            <!--<include layout="@layout/list_item_post_header"/>-->
             <com.borjabravo.readmoretextview.ReadMoreTextView
 
                 android:id="@+id/tvPostContentImage"

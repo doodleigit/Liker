@@ -25,6 +25,7 @@ import android.text.util.Linkify;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -169,10 +170,10 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
 
     private LinearLayout containerHeaderShare;
     private CircleImageView imageSharePostUser;
-    private ImageView imageSharePermission,imageSharePostPermission;
+    private ImageView imageSharePostPermission;
     private TextView tvSharePostUserName, tvSharePostTime,tvShareHeaderInfo,tvSharePostContent;
-
-
+   private ViewGroup tvLikeShare;
+    private TextView tvShared,tvPostShareUserName;
     public interface PostItemListener {
         void deletePost(PostItem postItem, int position);
     }
@@ -206,6 +207,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
         tvPostEmojiContent = (EmojiTextView) itemView.findViewById(R.id.tvPostEmojiContent);
         postBodyLayer = (LinearLayout) itemView.findViewById(R.id.postBodyLayer);
         tvCommentCount = itemView.findViewById(R.id.tvCommentCount);
+        tvLikeShare = itemView.findViewById(R.id.tvLikeShare);
 
 
         star1 = itemView.findViewById(R.id.star1);
@@ -256,10 +258,10 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
         tvSharePostUserName = itemView.findViewById(R.id.tvSharePostUserName);
         tvSharePostTime = itemView.findViewById(R.id.tvSharePostTime);
         tvShareHeaderInfo = itemView.findViewById(R.id.tvShareHeaderInfo);
-        imageSharePermission = itemView.findViewById(R.id.imageSharePermission);
         imageSharePostPermission = itemView.findViewById(R.id.imageSharePostPermission);
         tvSharePostContent = itemView.findViewById(R.id.tvSharePostContent);
-
+        tvPostShareUserName = (TextView) itemView.findViewById(R.id.tvPostShareUserName);
+        tvShared = (TextView) itemView.findViewById(R.id.tvShared);
 
     }
 
@@ -286,9 +288,18 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
 
         isShared = item.getIsShared();
 
+        if(App.isSharePostfooter()){
+            tvLikeShare.setVisibility(View.GONE);
+            imagePermission.setVisibility(View.GONE);
+        }else {
+            tvLikeShare.setVisibility(View.VISIBLE);
+            imagePermission.setVisibility(View.VISIBLE);
+        }
+
+
         if ("1".equalsIgnoreCase(isShared)) {
             containerHeaderShare.setVisibility(View.VISIBLE);
-            imagePermission.setVisibility(View.GONE);
+
 
             SharedProfile itemSharedProfile = item.getSharedProfile();
             sharedFirstName = itemSharedProfile.getUserFirstName();
@@ -324,7 +335,11 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
 
         } else {
             containerHeaderShare.setVisibility(View.GONE);
-            imagePermission.setVisibility(View.VISIBLE);
+            if(App.isSharePostfooter()){
+                imagePermission.setVisibility(View.GONE);
+            }else {
+                imagePermission.setVisibility(View.VISIBLE);
+            }
         }
 
 
@@ -513,9 +528,15 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
 //
 
         SpannableStringBuilder builder = getSpannableStringBuilder(mContext, item.getCatId(), likes, followers, totalStars, categoryName);
+        if("1".equalsIgnoreCase(isShared)){
+            tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
+            tvShared.setVisibility(View.VISIBLE);
+            tvPostShareUserName.setText(String.format("%s  %s %s", sharedFullName,"'s"," post"));
+        }else {
+            tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
+        }
 
-
-        tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
+      //  tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
         long myMillis = Long.parseLong(item.getDateTime()) * 1000;
         String postDate = Operation.getFormattedDateFromTimestamp(myMillis);
         tvPostTime.setText(postDate);
@@ -701,7 +722,8 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
 
                         if (id == R.id.shareAsPost) {
                             String postId = item.getSharedPostId();
-                            Call<PostShareItem> call = webService.getPostDetails(deviceId, profileId, token, userIds, postId);
+                         //   Call<PostShareItem> call = webService.getPostDetails(deviceId, profileId, token, userIds, postId);
+                            Call<PostItem> call = webService.getPostDetail(deviceId, profileId, token, userIds, postId);
                             sendShareItemRequest(call);
 
                         }
@@ -913,159 +935,6 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
                         return true;
                     }
                 });*/
-
-            }
-        });
-        imageSharePermission.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("RestrictedApi")
-            @Override
-            public void onClick(View v) {
-
-                boolean isNotificationOff = item.isIsNotificationOff();
-                String postUserId = item.getPostUserid();
-                popupMenu = new PopupMenu(mContext, v);
-                popupMenu.getMenuInflater().inflate(R.menu.post_permission_menu, popupMenu.getMenu());
-
-
-                if (userIds.equalsIgnoreCase(postUserId)) {
-                    popupMenu.getMenu().findItem(R.id.blockedUser).setVisible(false);
-                    popupMenu.getMenu().findItem(R.id.reportedPost).setVisible(false);
-                    popupMenu.getMenu().findItem(R.id.publics).setVisible(true);
-                    popupMenu.getMenu().findItem(R.id.friends).setVisible(true);
-                    popupMenu.getMenu().findItem(R.id.onlyMe).setVisible(true);
-                    popupMenu.getMenu().findItem(R.id.edit).setVisible(true);
-                    popupMenu.getMenu().findItem(R.id.delete).setVisible(true);
-                    // popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(true);
-                } else {
-                    popupMenu.getMenu().findItem(R.id.blockedUser).setVisible(true);
-                    popupMenu.getMenu().findItem(R.id.reportedPost).setVisible(true);
-                    popupMenu.getMenu().findItem(R.id.publics).setVisible(false);
-                    popupMenu.getMenu().findItem(R.id.friends).setVisible(false);
-                    popupMenu.getMenu().findItem(R.id.onlyMe).setVisible(false);
-                    popupMenu.getMenu().findItem(R.id.edit).setVisible(false);
-                    popupMenu.getMenu().findItem(R.id.delete).setVisible(false);
-                    // popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(true);
-                }
-
-
-                if (App.isNotificationStatus()) {
-
-                    if (notificationOff) {
-                        popupMenu.getMenu().add(1, R.id.turnOffNotification, 1, "Turn on notifications").setIcon(R.drawable.ic_notifications_black_24dp);
-                    } else {
-                        popupMenu.getMenu().add(1, R.id.turnOffNotification, 1, "Turn off notifications").setIcon(R.drawable.ic_notifications_off_black_24dp);
-
-                    }
-
-
-                } else {
-                    if (isNotificationOff) {
-                        popupMenu.getMenu().add(1, R.id.turnOffNotification, 1, "Turn on notifications").setIcon(R.drawable.ic_notifications_black_24dp);
-
-                    } else {
-                        popupMenu.getMenu().add(1, R.id.turnOffNotification, 1, "Turn off notifications").setIcon(R.drawable.ic_notifications_off_black_24dp);
-
-                    }
-                }
-
-
-//                popup.show();
-                MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popupMenu.getMenu(), v);
-                menuHelper.setForceShowIcon(true);
-                menuHelper.show();
-
-                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem menuItem) {
-                        int id = menuItem.getItemId();
-                        postPermissions = menuItem.getTitle().toString();
-                        if (id == R.id.blockedUser) {
-                            if (!((Activity) mContext).isFinishing()) {
-                                App.setItem(item);
-                                showBlockUser(v);
-                            } else {
-                                dismissDialog();
-                            }
-                        }
-                        if (id == R.id.reportedPost) {
-                            App.setItem(item);
-                            activity = (AppCompatActivity) v.getContext();
-                            if (NetworkHelper.hasNetworkAccess(mContext)) {
-                                Call<ReportReason> call = commentService.getReportReason(deviceId, profileId, token, item.getPostUserid(), "2", userIds);
-                                sendReportReason(call);
-                            } else {
-                                Tools.showNetworkDialog(activity.getSupportFragmentManager());
-                            }
-                        }
-                        if (id == R.id.publics) {
-
-                            activity = (AppCompatActivity) v.getContext();
-                            if (NetworkHelper.hasNetworkAccess(mContext)) {
-                                Call<String> call = webService.postPermission(deviceId, profileId, token, "0", item.getPostId());
-                                sendPostPermissionRequest(call);
-                            } else {
-                                Tools.showNetworkDialog(activity.getSupportFragmentManager());
-                            }
-
-
-                        }
-                        if (id == R.id.friends) {
-                            activity = (AppCompatActivity) v.getContext();
-                            if (NetworkHelper.hasNetworkAccess(mContext)) {
-                                Call<String> call = webService.postPermission(deviceId, profileId, token, "2", item.getPostId());
-                                sendPostPermissionRequest(call);
-                            } else {
-                                Tools.showNetworkDialog(activity.getSupportFragmentManager());
-                            }
-                        }
-                        if (id == R.id.onlyMe) {
-                            activity = (AppCompatActivity) v.getContext();
-                            if (NetworkHelper.hasNetworkAccess(mContext)) {
-                                Call<String> call = webService.postPermission(deviceId, profileId, token, "1", item.getPostId());
-                                sendPostPermissionRequest(call);
-                            } else {
-                                Tools.showNetworkDialog(activity.getSupportFragmentManager());
-                            }
-
-                        }
-
-                        if (id == R.id.edit) {
-                            Intent intent = new Intent(mContext, EditPost.class);
-                            App.setPosition(position);
-                            intent.putExtra(ITEM_KEY, (Parcelable) item);
-                            intent.putExtra("position", position);
-                            mContext.startActivity(intent);
-                            ((Activity) mContext).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
-                        }
-                        if (id == R.id.delete) {
-                            listener.deletePost(item, position);
-                        }
-                        if (id == R.id.turnOffNotification) {
-                            activity = (AppCompatActivity) v.getContext();
-                            switch (postPermissions) {
-                                case "Turn off notifications":
-                                    notificationOff = true;
-                                    if (NetworkHelper.hasNetworkAccess(mContext)) {
-                                        Call<String> call = webService.postNotificationTurnOff(deviceId, profileId, token, userIds, item.getPostId());
-                                        sendNotificationRequest(call);
-                                    } else {
-                                        Tools.showNetworkDialog(activity.getSupportFragmentManager());
-                                    }
-                                    break;
-                                case "Turn on notifications":
-                                    notificationOff = false;
-                                    if (NetworkHelper.hasNetworkAccess(mContext)) {
-                                        Call<String> call = webService.postNotificationTurnOn(deviceId, profileId, token, userIds, item.getPostId());
-                                        sendNotificationRequest(call);
-                                    } else {
-                                        Tools.showNetworkDialog(activity.getSupportFragmentManager());
-                                    }
-                                    break;
-                            }
-                        }
-                        return true;
-                    }
-                });
 
             }
         });
@@ -1304,15 +1173,15 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
 
     }
 
-    private void sendShareItemRequest(Call<PostShareItem> call) {
+    private void sendShareItemRequest(Call<PostItem> call) {
 
 
-        call.enqueue(new Callback<PostShareItem>() {
+        call.enqueue(new Callback<PostItem>() {
 
             @Override
-            public void onResponse(Call<PostShareItem> call, Response<PostShareItem> response) {
+            public void onResponse(Call<PostItem> call, Response<PostItem> response) {
 
-                PostShareItem postShareItem = response.body();
+                PostItem postShareItem = response.body();
                 Log.d("Data", postShareItem.toString());
                 if (postShareItem != null) {
                     //   adapter = new PostAdapter(getActivity(), postItemList);
@@ -1326,7 +1195,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
             }
 
             @Override
-            public void onFailure(Call<PostShareItem> call, Throwable t) {
+            public void onFailure(Call<PostItem> call, Throwable t) {
                 Log.d("MESSAGE: ", t.getMessage());
 
             }

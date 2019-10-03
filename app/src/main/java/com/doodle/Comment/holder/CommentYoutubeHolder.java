@@ -96,10 +96,10 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
     private String commentPostId;
 
     private String commentText, commentUserName, commentUserImage, commentImage, commentTime;
-    public ReadMoreTextView tvCommentMessage;
+    public EmojiTextView tvCommentMessage;
     public ImageView imagePostCommenting, imageCommentSettings,imgCommentLike;
 
-    public TextView tvCommentUserName, tvCommentTime,  tvCommentReply, tvCountCommentLike,tvLinkHost,tvDescription;
+    public TextView tvCommentUserName, tvCommentTime,  tvCommentReply,tvSeeReply, tvCountCommentLike,tvLinkHost,tvDescription;
     private String userPostId;
     private PopupMenu popupCommentMenu;
 
@@ -184,6 +184,7 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
         imgCommentLike = itemView.findViewById(R.id.imgCommentLike);
         tvCommentReply = itemView.findViewById(R.id.tvCommentReply);
         tvCountCommentLike = itemView.findViewById(R.id.tvCountCommentLike);
+        tvSeeReply = itemView.findViewById(R.id.tvSeeReply);
 
         tvCountCommentLike.setVisibility(View.GONE);
 
@@ -243,10 +244,15 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
             Linkify.addLinks(tvCommentMessage, Linkify.ALL);
             //set user name in blue color and remove underline from the textview
             Tools.stripUnderlines(tvCommentMessage);
-            Toast.makeText(mContext, "text:"+tvCommentMessage.getText(), Toast.LENGTH_SHORT).show();
+           // Toast.makeText(mContext, "text:"+tvCommentMessage.getText(), Toast.LENGTH_SHORT).show();
         }
 
 
+
+        if(App.isRvCommentHeader()){
+            tvSeeReply.setVisibility(View.GONE);
+            tvCommentReply.setVisibility(View.GONE);
+        }
 
         tvCommentTime.setText(Tools.chatDateCompare(mContext, Long.valueOf(commentTime)));
 
@@ -254,11 +260,11 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
         if(!isEmpty(linkItem)){
             String imageName=linkItem.getImageName();
             String linkFullUrl=linkItem.getLinkFullUrl();
-            String linkTitle=linkItem.getLinkTitle();
-            tvCommentMessage.setText(linkFullUrl);
-            Linkify.addLinks(tvCommentMessage, Linkify.ALL);
-            //set user name in blue color and remove underline from the textview
-            Tools.stripUnderlines(tvCommentMessage);
+           String linkTitle=linkItem.getLinkTitle();
+//            tvCommentMessage.setText(linkFullUrl);
+//            Linkify.addLinks(tvCommentMessage, Linkify.ALL);
+//            //set user name in blue color and remove underline from the textview
+//            Tools.stripUnderlines(tvCommentMessage);
             try {
                 if(!isNullOrEmpty(linkFullUrl)){
                     String domainName = getDomainName(linkFullUrl);
@@ -310,14 +316,6 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
             tvCountCommentLike.setVisibility(View.VISIBLE);
             tvCountCommentLike.setText(content);
         }
-
-
-
-
-
-
-
-
 
         imgCommentLike.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -618,10 +616,11 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
 
         if (!isNullOrEmpty(commentItem.getTotalReply()) && Integer.parseInt(commentItem.getTotalReply()) > 0) {
             if( Integer.parseInt(commentItem.getTotalReply())==1){
-
-                tvCommentReply.setText(String.format("%s Reply", commentItem.getTotalReply()));
+                tvSeeReply.setText(String.format("View %s reply", commentItem.getTotalReply()));
+                // tvCommentReply.setText(String.format("%s Reply", commentItem.getTotalReply()));
             }else {
-                tvCommentReply.setText(String.format("%s Replies", commentItem.getTotalReply()));
+                // tvCommentReply.setText(String.format("%s Replies", commentItem.getTotalReply()));
+                tvSeeReply.setText(String.format("View %s replies", commentItem.getTotalReply()));
             }
         }
 
@@ -633,6 +632,33 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
                 String commentReply = commentItem.getTotalReply();
                 if (Integer.parseInt(commentReply) > 0) {
                     if (NetworkHelper.hasNetworkAccess(mContext)) {
+
+                        Call<List<Reply>> call = commentService.getPostCommentReplyList(deviceId, profileId, token, commentItem.getId(), "false", limit, offset, commentItem.getPostId(), userIds);
+                        sendAllCommentReplyListRequest(call);
+                        delayLoadComment(mProgressBar);
+                    } else {
+                        Tools.showNetworkDialog(activity.getSupportFragmentManager());
+
+                    }
+                } else {
+                    Intent intent = new Intent(mContext, ReplyPost.class);
+                    intent.putExtra(COMMENT_ITEM_KEY, (Parcelable) commentItem);
+                    intent.putExtra(POST_ITEM_KEY, (Parcelable) postItem);
+
+                    intent.putParcelableArrayListExtra(REPLY_KEY, (ArrayList<? extends Parcelable>) replyItem);
+
+                    mContext.startActivity(intent);
+                }
+            }
+        });
+        tvSeeReply.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AppCompatActivity activity = (AppCompatActivity) v.getContext();
+
+                String commentReply = commentItem.getTotalReply();
+                if (Integer.parseInt(commentReply) > 0) {
+                    if (networkOk) {
 
                         Call<List<Reply>> call = commentService.getPostCommentReplyList(deviceId, profileId, token, commentItem.getId(), "false", limit, offset, commentItem.getPostId(), userIds);
                         sendAllCommentReplyListRequest(call);

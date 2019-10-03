@@ -102,7 +102,7 @@ public class ProfileActivity extends AppCompatActivity implements ReportReasonSh
     private final int REQUEST_TAKE_GALLERY_IMAGE = 102;
     private int uploadContentType = 0;
     private String deviceId, userId, token, profileUserName, fullName, userImage, coverImage, allCountInfo;
-    private boolean isOwnProfile;
+    private boolean isOwnProfile, isFollow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,8 +175,11 @@ public class ProfileActivity extends AppCompatActivity implements ReportReasonSh
         followLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                setFollow(profileUserId);
-//                setUnFollow(profileUserId);
+                if (isFollow) {
+                    setUnFollow(profileUserId);
+                } else {
+                    setFollow(profileUserId);
+                }
             }
         });
 
@@ -212,11 +215,12 @@ public class ProfileActivity extends AppCompatActivity implements ReportReasonSh
             isOwnProfile = false;
             ivChangeProfileImage.setVisibility(View.INVISIBLE);
             ivChangeCoverImage.setVisibility(View.INVISIBLE);
-            followLayout.setVisibility(View.INVISIBLE);
+            followLayout.setVisibility(View.VISIBLE);
         }
     }
 
     private void getData() {
+        isFriendStatus();
         Call<UserAllInfo> call = profileService.getUserInfo(deviceId, userId, token, userId, profileUserName, true);
         getUserInfo(call);
     }
@@ -491,6 +495,34 @@ public class ProfileActivity extends AppCompatActivity implements ReportReasonSh
         });
     }
 
+    private void isFriendStatus() {
+        Call<String> call = profileService.isFriendStatus(deviceId, userId, token, userId, profileUserName);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                String jsonResponse = response.body();
+                try {
+                    JSONObject obj = new JSONObject(jsonResponse);
+                    boolean follow = obj.getBoolean("follow");
+                    if (follow) {
+                        isFollow = true;
+                        tvFollow.setText(getString(R.string.following));
+                    } else {
+                        isFollow = false;
+                        tvFollow.setText(getString(R.string.follow));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+
+            }
+        });
+    }
+
     private void getUserInfo(Call<UserAllInfo> call) {
         call.enqueue(new Callback<UserAllInfo>() {
             @Override
@@ -508,6 +540,7 @@ public class ProfileActivity extends AppCompatActivity implements ReportReasonSh
     }
 
     private void setFollow(String followUserId) {
+        progressDialog.setMessage(getString(R.string.updating));
         progressDialog.show();
         Call<String> call = profileService.setFollow(deviceId, token, userId, userId, followUserId);
         call.enqueue(new Callback<String>() {
@@ -518,7 +551,8 @@ public class ProfileActivity extends AppCompatActivity implements ReportReasonSh
                     JSONObject obj = new JSONObject(jsonResponse);
                     boolean status = obj.getBoolean("status");
                     if (status) {
-                        tvFollow.setText(getString(R.string.unfollow));
+                        isFollow = true;
+                        tvFollow.setText(getString(R.string.following));
                     } else {
                         Toast.makeText(getApplicationContext(), getString(R.string.something_went_wrong), Toast.LENGTH_LONG).show();
                     }
@@ -536,6 +570,7 @@ public class ProfileActivity extends AppCompatActivity implements ReportReasonSh
     }
 
     private void setUnFollow(String followUserId) {
+        progressDialog.setMessage(getString(R.string.updating));
         progressDialog.show();
         Call<String> call = profileService.setUnFollow(deviceId, token, userId, userId, followUserId);
         call.enqueue(new Callback<String>() {
@@ -546,6 +581,7 @@ public class ProfileActivity extends AppCompatActivity implements ReportReasonSh
                     JSONObject obj = new JSONObject(jsonResponse);
                     boolean status = obj.getBoolean("status");
                     if (status) {
+                        isFollow = false;
                         tvFollow.setText(getString(R.string.follow));
                     } else {
                         Toast.makeText(getApplicationContext(), getString(R.string.something_went_wrong), Toast.LENGTH_LONG).show();

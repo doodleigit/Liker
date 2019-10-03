@@ -75,7 +75,9 @@
                 android:paddingEnd="10dp"
                 android:inputType="textCapSentences|textMultiLine"
                 android:paddingBottom="5dp"
-                android:textSize="12sp" />
+                android:textSize="12sp" >
+                <requestFocus/>
+            </com.vanniktech.emoji.EmojiEditText>
 
 
             <ImageView

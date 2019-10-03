@@ -68,6 +68,25 @@ public class App extends Application {
     private static List<String> deleteMediaIds;
     private static boolean isPostShare;
     private static boolean checkEmail;
+    private static boolean rvCommentHeader;
+    private static boolean sharePostfooter;
+
+
+    public static boolean isSharePostfooter() {
+        return sharePostfooter;
+    }
+
+    public static void setSharePostfooter(boolean sharePostfooter) {
+        App.sharePostfooter = sharePostfooter;
+    }
+
+    public static boolean isRvCommentHeader() {
+        return rvCommentHeader;
+    }
+
+    public static void setRvCommentHeader(boolean rvCommentHeader) {
+        App.rvCommentHeader = rvCommentHeader;
+    }
 
     public static boolean isIsPostShare() {
         return isPostShare;

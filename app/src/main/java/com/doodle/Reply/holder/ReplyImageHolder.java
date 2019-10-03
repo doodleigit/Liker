@@ -89,7 +89,7 @@ public class ReplyImageHolder extends RecyclerView.ViewHolder {
     //Comment
     Comment_ commentItem;
 
-    private String commentPostId;
+
 
     private String commentText, commentUserName, commentUserImage, commentImage, commentTime;
     public EmojiTextView tvCommentMessage;
@@ -220,15 +220,15 @@ public class ReplyImageHolder extends RecyclerView.ViewHolder {
         this.position = position;
 
         //  userPostId = item.getPostId();
-        commentPostId = commentItem.getPostId();
 
-        commentText = commentItem.getCommentText();
-        commentUserName = commentItem.getUserFirstName() + " " + commentItem.getUserLastName();
-        commentUserImage = commentItem.getUserPhoto();
-        commentImage = commentItem.getCommentImage();
-        commentTime = commentItem.getDateTime();
-        goldStar = Integer.parseInt(commentItem.getUserGoldStars());
-        silverStar = parseInt(commentItem.getUserSliverStars());
+
+        commentText = replyItem.getCommentText();
+        commentUserName = replyItem.getFirstName() + " " + commentItem.getUserLastName();
+        commentUserImage = replyItem.getUserPhoto();
+        commentImage = replyItem.getCommentImage();
+        commentTime = replyItem.getDateTime();
+        goldStar = Integer.parseInt(replyItem.getUserGoldStars());
+        silverStar = parseInt(replyItem.getUserSliverStars());
 
 
         tvCommentUserName.setText(commentUserName);
@@ -273,11 +273,11 @@ public class ReplyImageHolder extends RecyclerView.ViewHolder {
         }
 
 
-        if (!isNullOrEmpty(commentItem.getReplyId())) {
-            commentLike = commentItem.getTotalReplyLike();
+        commentLike = replyItem.getTotalLike();
+      /*  if (!isNullOrEmpty(commentItem.getReplyId())) {
         } else {
             commentLike = commentItem.getTotalLike();
-        }
+        }*/
 
 
         if ("0".equalsIgnoreCase(commentLike)) {

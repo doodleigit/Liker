@@ -34,12 +34,10 @@ import android.text.SpannableString;
 import android.text.TextWatcher;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.StyleSpan;
-import android.text.style.UnderlineSpan;
 import android.transition.Fade;
 import android.transition.Transition;
 import android.transition.TransitionManager;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -56,8 +54,6 @@ import com.doodle.App;
 import com.doodle.Authentication.model.UserInfo;
 import com.doodle.Comment.adapter.CommentAdapter;
 import com.doodle.Comment.model.Comment;
-import com.doodle.Comment.model.CommentItem;
-import com.doodle.Comment.model.CommentTextIndex;
 import com.doodle.Comment.model.Comment_;
 import com.doodle.Comment.model.Reply;
 import com.doodle.Comment.holder.CommentImageHolder;
@@ -76,13 +72,13 @@ import com.doodle.Post.adapter.MentionUserAdapter;
 import com.doodle.Post.model.MentionUser;
 import com.doodle.Post.model.PostImage;
 import com.doodle.Post.service.PostService;
-import com.doodle.Post.view.activity.PostNew;
 import com.doodle.R;
 import com.doodle.Reply.adapter.ReplyAdapter;
 import com.doodle.Reply.holder.ReplyImageHolder;
 import com.doodle.Reply.holder.ReplyLinkScriptHolder;
 import com.doodle.Reply.holder.ReplyTextHolder;
 import com.doodle.Reply.holder.ReplyYoutubeHolder;
+import com.doodle.Tool.AppConstants;
 import com.doodle.Tool.NetworkHelper;
 import com.doodle.Tool.PageTransformer;
 import com.doodle.Tool.PrefManager;
@@ -117,6 +113,7 @@ import retrofit2.Response;
 import static android.widget.Toast.LENGTH_SHORT;
 import static android.widget.Toast.makeText;
 import static com.doodle.Comment.holder.CommentTextHolder.COMMENT_ITEM_KEY;
+import static com.doodle.Comment.holder.CommentTextHolder.COMMENT_ITEM_POSITION_KEY;
 import static com.doodle.Comment.holder.CommentTextHolder.POST_ITEM_KEY;
 import static com.doodle.Comment.holder.CommentTextHolder.REPLY_KEY;
 import static com.doodle.Post.view.activity.PostNew.isExternalStorageDocument;
@@ -124,7 +121,6 @@ import static com.doodle.Tool.MediaUtil.getDataColumn;
 import static com.doodle.Tool.MediaUtil.isDownloadsDocument;
 import static com.doodle.Tool.MediaUtil.isGooglePhotosUri;
 import static com.doodle.Tool.MediaUtil.isMediaDocument;
-import static com.doodle.Tool.Tools.containsIllegalCharacters;
 import static com.doodle.Tool.Tools.getMD5EncryptedString;
 import static com.doodle.Tool.Tools.isNullOrEmpty;
 import static java.lang.Integer.parseInt;
@@ -253,6 +249,9 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
     private String commentUserImage, commentTime;
     private TextView tvLikes, tvStarts;
     private View mView;
+    private int commentItemPosition;
+    private int totalReply;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -320,6 +319,7 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
         commentItem = getIntent().getExtras().getParcelable(COMMENT_ITEM_KEY);
         postItem = getIntent().getExtras().getParcelable(POST_ITEM_KEY);
         replyItems = getIntent().getExtras().getParcelableArrayList(REPLY_KEY);
+        commentItemPosition = getIntent().getExtras().getInt(COMMENT_ITEM_POSITION_KEY);
 
 
         if (commentItem == null) {
@@ -336,7 +336,7 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
        // tvLikes.setText(commentItem.getTotalLike());
         postId = postItem.getSharedPostId();
         commentId = commentItem.getId();
-
+        totalReply=Integer.parseInt(commentItem.getTotalReply());
         List<Comment_> commentList = new ArrayList<>();
         commentList.add(commentItem);
 
@@ -346,6 +346,7 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
         //  Picasso.with(App.getInstance()).load(imageUrl).into(target);
         adapter = new ReplyAdapter(this, replyItems, postItem, this, this, this, this);
         adapterHeader = new CommentAdapter(this, commentList, postItem, this, this, this, this);
+        App.setRvCommentHeader(true);
         rvCommentHeader.setAdapter(adapterHeader);
         recyclerView.setAdapter(adapter);
 
@@ -789,6 +790,15 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+
+        App.setRvCommentHeader(false);
+        Intent returnIntent = new Intent();
+        commentItem.setTotalReply(String.valueOf(totalReply));
+        returnIntent.putExtra("comment_item", (Parcelable) commentItem);
+        returnIntent.putExtra("comment_position", commentItemPosition);
+        returnIntent.setAction(AppConstants.REPLY_CHANGE_BROADCAST);
+        sendBroadcast(returnIntent);
+        finish();
 
     }
 
@@ -1235,6 +1245,7 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
 //                                replyItems.add(insertIndex, reply);
 //                                adapter.notifyItemInserted(insertIndex);
 
+                            totalReply++;
 
                             adapter.refreshData(reply);
                             progressDialog.dismiss();
@@ -1435,7 +1446,7 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
                             boolean status = object.getBoolean("status");
 
                             if (status) {
-
+                                totalReply--;
                                 //    int removeIndex = 2;
                                 replyItems.remove(position);
                                 adapter.notifyItemRemoved(position);

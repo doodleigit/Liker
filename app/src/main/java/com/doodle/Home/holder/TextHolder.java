@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -30,6 +31,7 @@ import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -42,6 +44,7 @@ import com.bumptech.glide.Glide;
 import com.doodle.App;
 import com.doodle.Comment.model.CommentItem;
 import com.doodle.Comment.model.Comment_;
+import com.doodle.Comment.model.MentionItem;
 import com.doodle.Comment.model.Reason;
 import com.doodle.Comment.model.ReportReason;
 import com.doodle.Comment.service.CommentService;
@@ -195,9 +198,12 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
     private LinearLayout containerHeaderShare;
     private CircleImageView imageSharePostUser;
-    private ImageView imageSharePermission, imageSharePostPermission;
+    private ImageView imageSharePostPermission;
     private TextView tvSharePostUserName, tvSharePostTime, tvShareHeaderInfo, tvSharePostContent;
-
+    private ViewGroup tvLikeShare;
+    private List<MentionItem> mentionNameList;
+    private ClickableSpan clickableSpan;
+  private TextView tvShared,tvPostShareUserName;
 
     public interface PostItemListener {
         void deletePost(PostItem postItem, int position);
@@ -221,11 +227,15 @@ public class TextHolder extends RecyclerView.ViewHolder {
         imagePostShare = (ImageView) itemView.findViewById(R.id.imagePostShare);
         imagePermission = (ImageView) itemView.findViewById(R.id.imagePermission);
         imagePostPermission = itemView.findViewById(R.id.imagePostPermission);
+        tvLikeShare = itemView.findViewById(R.id.tvLikeShare);
 
 
         mentions = new ArrayList<>();
         mList = new ArrayList<>();
+        mentionNameList=new ArrayList<>();
         tvPostUserName = (TextView) itemView.findViewById(R.id.tvPostUserName);
+        tvShared = (TextView) itemView.findViewById(R.id.tvShared);
+        tvPostShareUserName = (TextView) itemView.findViewById(R.id.tvPostShareUserName);
         imagePostUser = (CircleImageView) itemView.findViewById(R.id.imagePostUser);
         tvHeaderInfo = (TextView) itemView.findViewById(R.id.tvHeaderInfo);
         tvImgShareCount = (TextView) itemView.findViewById(R.id.tvImgShareCount);
@@ -288,7 +298,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
         tvSharePostUserName = itemView.findViewById(R.id.tvSharePostUserName);
         tvSharePostTime = itemView.findViewById(R.id.tvSharePostTime);
         tvShareHeaderInfo = itemView.findViewById(R.id.tvShareHeaderInfo);
-        imageSharePermission = itemView.findViewById(R.id.imageSharePermission);
+
         imageSharePostPermission = itemView.findViewById(R.id.imageSharePostPermission);
         tvSharePostContent = itemView.findViewById(R.id.tvSharePostContent);
 
@@ -336,11 +346,20 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
         isShared = item.getIsShared();
 
+        if(App.isSharePostfooter()){
+            tvLikeShare.setVisibility(View.GONE);
+            imagePermission.setVisibility(View.GONE);
+        }else {
+            tvLikeShare.setVisibility(View.VISIBLE);
+            imagePermission.setVisibility(View.VISIBLE);
+        }
         if ("1".equalsIgnoreCase(isShared)) {
             containerHeaderShare.setVisibility(View.VISIBLE);
-            imagePermission.setVisibility(View.GONE);
+         //   imagePermission.setVisibility(View.GONE);
+
 
             SharedProfile itemSharedProfile = item.getSharedProfile();
+
             sharedFirstName = itemSharedProfile.getUserFirstName();
             sharedLastName = itemSharedProfile.getUserLastName();
             sharedFullName = sharedFirstName + " " + sharedLastName;
@@ -349,9 +368,11 @@ public class TextHolder extends RecyclerView.ViewHolder {
             sharedTotalStar = Integer.parseInt(itemSharedProfile.getUserGoldStars()) + Integer.parseInt(itemSharedProfile.getUserSilverStars());
             sharedPostPermission = itemSharedProfile.getPermission();
             sharedUserProfileLike = itemSharedProfile.getUserProfileLikes();
+
             sharedPostText = item.getSharedPostText();
             sharedCategoryName = item.getCatName();
             SpannableStringBuilder builder = getSpannableStringShareHeader(sharedUserProfileLike, "", sharedTotalStar, sharedCategoryName);
+//            SpannableStringBuilder builder = getSpannableStringBuilder(mContext, item.getCatId(), sharedUserProfileLike, followers, sharedTotalStar, sharedCategoryName);
             long myMillis = Long.parseLong(sharedDateTime) * 1000;
             String postDate = Operation.getFormattedDateFromTimestamp(myMillis);
             //    tvSharePostTime.setText(chatDateCompare(mContext,myMillis));
@@ -374,13 +395,21 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
         } else {
             containerHeaderShare.setVisibility(View.GONE);
-            imagePermission.setVisibility(View.VISIBLE);
+
+            if(App.isSharePostfooter()){
+                imagePermission.setVisibility(View.GONE);
+            }else {
+                imagePermission.setVisibility(View.VISIBLE);
+            }
+
         }
 
 
         imgLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+             //  final MediaPlayer mp = MediaPlayer.create(this, R.raw);
 
                 if (userIds.equalsIgnoreCase(item.getPostUserid())) {
                     Tools.toast(mContext, "On Liker, you can't like your own posts. That would be cheating ", R.drawable.ic_insert_emoticon_black_24dp);
@@ -427,6 +456,10 @@ public class TextHolder extends RecyclerView.ViewHolder {
             String postType = temp.getType();
             if (postType.equalsIgnoreCase("mention")) {
                 String mentionUserName = extractMentionUser(temp.getText());
+                String userName=temp.getUserName();
+                String userId=temp.getUserId();
+                mentionNameList.add(new MentionItem(mentionUserName,userName,userId));
+
                 nameBuilder.append(mentionUserName);
                 nameBuilder.append(" ");
             }
@@ -472,12 +505,26 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
                 for (int k = 0; k < mList.size(); k++) {
                     int val = full_text.indexOf(mList.get(k));
-                    ClickableSpan clickableSpan = new ClickableSpan() {
-                        @Override
-                        public void onClick(View view) {
-                            Toast.makeText(App.getAppContext(), "\"You click the text.\"", Toast.LENGTH_SHORT).show();
+                    String name=mList.get(k);
+                    for (MentionItem temp:mentionNameList) {
+
+                        if(temp.getMentionFullName().contains(name)){
+                            clickableSpan = new ClickableSpan() {
+                                @Override
+                                public void onClick(View view) {
+
+                                    mContext.startActivity(new Intent(mContext, ProfileActivity.class).putExtra("user_id", temp.getMentionUserId()).putExtra("user_name", temp.getMentionUserName()));
+                                }
+
+                                @Override
+                                public void updateDrawState(TextPaint ds) {
+
+                                    ds.setColor(ds.linkColor);    // you can use custom color
+                                    ds.setUnderlineText(false);    // this remove the underline
+                                }
+                            };
                         }
-                    };
+                    }
                     if (val >= 0) {
                         str.setSpan(clickableSpan, val, val + mList.get(k).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     }
@@ -509,18 +556,26 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
                 for (int k = 0; k < mList.size(); k++) {
                     int val = full_text.indexOf(mList.get(k));
-                    ClickableSpan clickableSpan = new ClickableSpan() {
-                        @Override
-                        public void onClick(View view) {
-                            Toast.makeText(App.getAppContext(), "\"You click the text.\"", Toast.LENGTH_SHORT).show();
-                        }
+                    String name=mList.get(k);
+                    for (MentionItem temp:mentionNameList) {
 
-                        @Override
-                        public void updateDrawState(TextPaint ds) {
-                            ds.setColor(ds.linkColor);    // you can use custom color
-                            ds.setUnderlineText(false);    // this remove the underline
+                        if(temp.getMentionFullName().contains(name)){
+                            clickableSpan = new ClickableSpan() {
+                                @Override
+                                public void onClick(View view) {
+
+                                    mContext.startActivity(new Intent(mContext, ProfileActivity.class).putExtra("user_id", temp.getMentionUserId()).putExtra("user_name", temp.getMentionUserName()));
+                                }
+
+                                @Override
+                                public void updateDrawState(TextPaint ds) {
+
+                                    ds.setColor(ds.linkColor);    // you can use custom color
+                                    ds.setUnderlineText(false);    // this remove the underline
+                                }
+                            };
                         }
-                    };
+                    }
                     if (val >= 0) {
                         str.setSpan(clickableSpan, val, val + mList.get(k).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 //                        str.setSpan(new MyClickableSpan("mystring"), val, val + mList.get(k).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -685,7 +740,15 @@ public class TextHolder extends RecyclerView.ViewHolder {
         SpannableStringBuilder builder = getSpannableStringBuilder(mContext, item.getCatId(), likes, followers, totalStars, categoryName);
 
 
-        tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
+        if("1".equalsIgnoreCase(isShared)){
+            tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
+            tvShared.setVisibility(View.VISIBLE);
+            tvPostShareUserName.setText(String.format("%s  %s %s", sharedFullName,"'s"," post"));
+        }else {
+            tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
+        }
+      //  tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
+
         long myMillis = Long.parseLong(item.getDateTime()) * 1000;
         String postDate = Operation.getFormattedDateFromTimestamp(myMillis);
 
@@ -771,6 +834,13 @@ public class TextHolder extends RecyclerView.ViewHolder {
                 mContext.startActivity(new Intent(mContext, ProfileActivity.class).putExtra("user_id", item.getPostUserid()).putExtra("user_name", item.getPostUsername()));
             }
         });
+        tvPostShareUserName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mContext.startActivity(new Intent(mContext, ProfileActivity.class).putExtra("user_id", item.getPostUserid()).putExtra("user_name", item.getPostUsername()));
+            }
+        });
+
 
         imagePostUser.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -831,7 +901,8 @@ public class TextHolder extends RecyclerView.ViewHolder {
                         if (id == R.id.shareAsPost) {
 
                             String postId = postItem.getSharedPostId();
-                            Call<PostShareItem> call = webService.getPostDetails(deviceId, profileId, token, userIds, postId);
+                            //Call<PostShareItem> call = webService.getPostDetails(deviceId, profileId, token, userIds, postId);
+                            Call<PostItem> call = webService.getPostDetail(deviceId, profileId, token, userIds, postId);
                             sendShareItemRequest(call);
                         }
 
@@ -975,7 +1046,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
 //                            App.setItem(item);
 //                            activity = (AppCompatActivity) v.getContext();
-//                            if (NetworkHelper.hasNetworkAccess(mContext)) {
+//                            if (networkOk) {
 //                                Call<ReportReason> call = commentService.getReportReason(deviceId, profileId, token, item.getPostUserid(), "2", userIds);
 //                                sendReportReason(call);
 //                            } else {
@@ -985,7 +1056,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
                         if (id == R.id.publics) {
 
                             activity = (AppCompatActivity) v.getContext();
-                            if (NetworkHelper.hasNetworkAccess(mContext)) {0
+                            if (networkOk) {0
                                 Call<String> call = webService.postPermission(deviceId, profileId, token, "0", item.getPostId());
                                 sendPostPermissionRequest(call);
                             } else {
@@ -996,7 +1067,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
                         }
                         if (id == R.id.friends) {
                             activity = (AppCompatActivity) v.getContext();
-                            if (NetworkHelper.hasNetworkAccess(mContext)) {
+                            if (networkOk) {
                                 Call<String> call = webService.postPermission(deviceId, profileId, token, "2", item.getPostId());
                                 sendPostPermissionRequest(call);
                             } else {
@@ -1005,7 +1076,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
                         }
                         if (id == R.id.onlyMe) {
                             activity = (AppCompatActivity) v.getContext();
-                            if (NetworkHelper.hasNetworkAccess(mContext)) {
+                            if (networkOk) {
                                 Call<String> call = webService.postPermission(deviceId, profileId, token, "1", item.getPostId());
                                 sendPostPermissionRequest(call);
                             } else {
@@ -1061,174 +1132,6 @@ public class TextHolder extends RecyclerView.ViewHolder {
                         return true;
                     }
                 });*/
-
-            }
-        });
-        imageSharePermission.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("RestrictedApi")
-            @Override
-            public void onClick(View v) {
-
-
-                String postUserId = item.getPostUserid();
-                boolean isNotificationOff = item.isIsNotificationOff();
-
-                popupMenu = new PopupMenu(mContext, v);
-                popupMenu.getMenuInflater().inflate(R.menu.post_permission_menu, popupMenu.getMenu());
-
-
-                if (userIds.equalsIgnoreCase(postUserId)) {
-                    popupMenu.getMenu().findItem(R.id.blockedUser).setVisible(false);
-                    popupMenu.getMenu().findItem(R.id.reportedPost).setVisible(false);
-                    popupMenu.getMenu().findItem(R.id.publics).setVisible(true);
-                    popupMenu.getMenu().findItem(R.id.friends).setVisible(true);
-                    popupMenu.getMenu().findItem(R.id.onlyMe).setVisible(true);
-                    popupMenu.getMenu().findItem(R.id.edit).setVisible(true);
-                    popupMenu.getMenu().findItem(R.id.delete).setVisible(true);
-                    //  popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(false);
-
-                } else {
-                    popupMenu.getMenu().findItem(R.id.blockedUser).setVisible(true);
-                    popupMenu.getMenu().findItem(R.id.reportedPost).setVisible(true);
-                    popupMenu.getMenu().findItem(R.id.publics).setVisible(false);
-                    popupMenu.getMenu().findItem(R.id.friends).setVisible(false);
-                    popupMenu.getMenu().findItem(R.id.onlyMe).setVisible(false);
-                    popupMenu.getMenu().findItem(R.id.edit).setVisible(false);
-                    popupMenu.getMenu().findItem(R.id.delete).setVisible(false);
-                    // popupMenu.getMenu().findItem(R.id.turnOffNotification).setVisible(false);
-
-
-                }
-
-
-                if (App.isNotificationStatus()) {
-
-                    if (notificationOff) {
-                        popupMenu.getMenu().add(1, R.id.turnOffNotification, 1, "Turn on notifications").setIcon(R.drawable.ic_notifications_black_24dp);
-                    } else {
-                        popupMenu.getMenu().add(1, R.id.turnOffNotification, 1, "Turn off notifications").setIcon(R.drawable.ic_notifications_off_black_24dp);
-
-                    }
-
-
-                } else {
-                    if (isNotificationOff) {
-                        popupMenu.getMenu().add(1, R.id.turnOffNotification, 1, "Turn on notifications").setIcon(R.drawable.ic_notifications_black_24dp);
-
-                    } else {
-                        popupMenu.getMenu().add(1, R.id.turnOffNotification, 1, "Turn off notifications").setIcon(R.drawable.ic_notifications_off_black_24dp);
-
-                    }
-                }
-
-
-                MenuPopupHelper menuHelper = new MenuPopupHelper(mContext, (MenuBuilder) popupMenu.getMenu(), v);
-                menuHelper.setForceShowIcon(true);
-                menuHelper.show();
-
-                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem menuItem) {
-                        int id = menuItem.getItemId();
-                        postPermissions = menuItem.getTitle().toString();
-                        if (id == R.id.blockedUser) {
-                            if (!((Activity) mContext).isFinishing()) {
-                                App.setItem(item);
-                                showBlockUser(v);
-                            } else {
-                                dismissDialog();
-                            }
-                        }
-
-                        if (id == R.id.reportedPost) {
-                            App.setItem(item);
-                            activity = (AppCompatActivity) v.getContext();
-                            if (NetworkHelper.hasNetworkAccess(mContext)) {
-                                Call<ReportReason> call = commentService.getReportReason(deviceId, profileId, token, item.getPostUserid(), "2", userIds);
-                                sendReportReason(call);
-                            } else {
-                                Tools.showNetworkDialog(activity.getSupportFragmentManager());
-                            }
-                        }
-                        if (id == R.id.publics) {
-
-                            activity = (AppCompatActivity) v.getContext();
-                            if (NetworkHelper.hasNetworkAccess(mContext)) {
-                                Call<String> call = webService.postPermission(deviceId, profileId, token, "0", item.getPostId());
-                                sendPostPermissionRequest(call);
-                            } else {
-                                Tools.showNetworkDialog(activity.getSupportFragmentManager());
-                            }
-
-
-                        }
-                        if (id == R.id.friends) {
-                            activity = (AppCompatActivity) v.getContext();
-                            if (NetworkHelper.hasNetworkAccess(mContext)) {
-                                Call<String> call = webService.postPermission(deviceId, profileId, token, "2", item.getPostId());
-                                sendPostPermissionRequest(call);
-                            } else {
-                                Tools.showNetworkDialog(activity.getSupportFragmentManager());
-                            }
-                        }
-                        if (id == R.id.onlyMe) {
-                            activity = (AppCompatActivity) v.getContext();
-                            if (NetworkHelper.hasNetworkAccess(mContext)) {
-                                Call<String> call = webService.postPermission(deviceId, profileId, token, "1", item.getPostId());
-                                sendPostPermissionRequest(call);
-                            } else {
-                                Tools.showNetworkDialog(activity.getSupportFragmentManager());
-                            }
-
-                        }
-
-                        if (id == R.id.edit) {
-                            Intent intent = new Intent(mContext, EditPost.class);
-                            App.setPosition(position);
-                            intent.putExtra(ITEM_KEY, (Parcelable) item);
-                            intent.putExtra("position", position);
-                            mContext.startActivity(intent);
-                            ((Activity) mContext).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
-                        }
-                        if (id == R.id.delete) {
-                            if (!((Activity) mContext).isFinishing()) {
-                                App.setItem(item);
-                                App.setPosition(position);
-                                postTextListener.deletePost(item, position);
-                            } else {
-                                dismissDialog();
-                            }
-                        }
-                        if (id == R.id.turnOffNotification) {
-
-                            activity = (AppCompatActivity) v.getContext();
-
-                            switch (postPermissions) {
-                                case "Turn off notifications":
-                                    notificationOff = true;
-                                    if (NetworkHelper.hasNetworkAccess(mContext)) {
-                                        Call<String> call = webService.postNotificationTurnOff(deviceId, profileId, token, userIds, item.getPostId());
-                                        sendNotificationRequest(call);
-                                    } else {
-                                        Tools.showNetworkDialog(activity.getSupportFragmentManager());
-                                    }
-                                    break;
-                                case "Turn on notifications":
-                                    notificationOff = false;
-                                    if (NetworkHelper.hasNetworkAccess(mContext)) {
-                                        Call<String> call = webService.postNotificationTurnOn(deviceId, profileId, token, userIds, item.getPostId());
-                                        sendNotificationRequest(call);
-                                    } else {
-                                        Tools.showNetworkDialog(activity.getSupportFragmentManager());
-                                    }
-                                    break;
-
-                            }
-
-                        }
-                        return true;
-                    }
-                });
 
             }
         });
@@ -1522,29 +1425,29 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
     }
 
-    private void sendShareItemRequest(Call<PostShareItem> call) {
+    private void sendShareItemRequest(Call<PostItem> call) {
 
 
-        call.enqueue(new Callback<PostShareItem>() {
+        call.enqueue(new Callback<PostItem>() {
 
             @Override
-            public void onResponse(Call<PostShareItem> call, Response<PostShareItem> response) {
+            public void onResponse(Call<PostItem> call, Response<PostItem> response) {
 
-                PostShareItem postShareItem = response.body();
-                Log.d("Data", postShareItem.toString());
-                if (postShareItem != null) {
+                PostItem postItem = response.body();
+                Log.d("Data", postItem.toString());
+                if (postItem != null) {
                     //   adapter = new PostAdapter(getActivity(), postItemList);
                     //  Toast.makeText(mContext, "item selected " + item.getItemName(), Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(mContext, PostShare.class);
                     //intent.putExtra(ITEM_ID_KEY,item.getItemId());
-                    intent.putExtra(ITEM_KEY, (Parcelable) postShareItem);
+                    intent.putExtra(ITEM_KEY, (Parcelable) postItem);
                     mContext.startActivity(intent);
                 }
 
             }
 
             @Override
-            public void onFailure(Call<PostShareItem> call, Throwable t) {
+            public void onFailure(Call<PostItem> call, Throwable t) {
                 Log.d("MESSAGE: ", t.getMessage());
 
             }
