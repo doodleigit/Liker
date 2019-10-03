@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -131,13 +132,15 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
 
     private String commentLike;
     private int commentLikeNumeric;
-
+    private MediaPlayer player;
 
     public CommentImageHolder(View itemView, Context context, final CommentListener listener) {
         super(itemView);
 
         mContext = context;
         this.listener = listener;
+
+        player = MediaPlayer.create(mContext, R.raw.post_like);
         manager = new PrefManager(App.getAppContext());
         deviceId = manager.getDeviceId();
         profileId = manager.getProfileId();
@@ -846,7 +849,7 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
                             if (isContain(object, "status")) {
                                 String status = object.getString("status");
                                 if ("true".equalsIgnoreCase(status)) {
-
+                                    player.start();
                                     Call<String> mCall = webService.sendBrowserNotification(
                                             deviceId,//"8b64708fa409da20341b1a555d1ddee526444",
                                             profileId,//"26444",

@@ -1338,9 +1338,9 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                                 } else {
 
                                 }*/
-                                    startActivity(new Intent(PostNew.this, Home.class));
+//                                    startActivity(new Intent(PostNew.this, Home.class));
                                     finish();
-
+                                    sendBroadcast((new Intent()).setAction(AppConstants.NEW_POST_ADD_BROADCAST));
                                 }
 
                             }
@@ -1646,9 +1646,9 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                         try {
                             JSONObject object = new JSONObject(response.body());
 
-                            startActivity(new Intent(PostNew.this, Home.class));
+//                            startActivity(new Intent(PostNew.this, Home.class));
                             finish();
-
+                            sendBroadcast((new Intent()).setAction(AppConstants.NEW_POST_ADD_BROADCAST));
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -2690,9 +2690,11 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                                     Call<String> mediaCall = videoServices.uploadVideo(deviceId, profileId, token, fileToUpload, postId, true);
                                     sendVideoRequest(mediaCall);
                                 } else {
-                                    Intent intent = new Intent(PostNew.this, Home.class);
-                                    intent.putExtra("STATUS", status);
-                                    startActivity(intent);
+//                                    Intent intent = new Intent(PostNew.this, Home.class);
+//                                    intent.putExtra("STATUS", status);
+//                                    startActivity(intent);
+                                    finish();
+                                    sendBroadcast((new Intent()).setAction(AppConstants.NEW_POST_ADD_BROADCAST));
                                     String message = "You are now a contributor to the Hobby & Leisure - Airplanes category and your post has been added to your profile.";
                                   //  Tools.showCustomToast(PostNew.this, mView, message, Gravity.CENTER);
                                 }

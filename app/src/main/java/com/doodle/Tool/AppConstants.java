@@ -138,6 +138,7 @@ public class AppConstants {
     public static final String RECONNECT_SOCKET_BROADCAST = "reconnect_socket_broadcast";
     public static final String CATEGORY_CHANGE_BROADCAST = "category_change_broadcast";
     public static final String PROFILE_PAGE_PAGINATION_BROADCAST = "profile_page_pagination_broadcast";
+    public static final String NEW_POST_ADD_BROADCAST = "new_post_add_broadcast";
     public static final String POST_CHANGE_BROADCAST = "post_change_broadcast";
     public static final String POST_FILTER_CAT_BROADCAST = "post_filter_cat_broadcast";
     public static final String PERMISSION_CHANGE_BROADCAST = "permission_change_broadcast";

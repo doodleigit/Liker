@@ -35,37 +35,36 @@
                     android:layout_marginTop="12dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginBottom="12dp"
-                    android:layout_toStartOf="@+id/add_photo"
                     android:layout_toEndOf="@+id/image"
                     android:background="@drawable/rectangle_corner_round_eight"
                     android:gravity="start|center"
                     android:paddingStart="20dp"
                     android:paddingEnd="20dp"
-                    android:text="What's on your mind?"
+                    android:text="@string/speak_your_mind"
                     android:textSize="14sp" />
 
-                <LinearLayout
-                    android:id="@+id/add_photo"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerInParent="true"
-                    android:layout_marginEnd="10dp"
-                    android:orientation="vertical">
+<!--                <LinearLayout-->
+<!--                    android:id="@+id/add_photo"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_alignParentEnd="true"-->
+<!--                    android:layout_centerInParent="true"-->
+<!--                    android:layout_marginEnd="10dp"-->
+<!--                    android:orientation="vertical">-->
 
-                    <ImageView
-                        android:layout_width="35dp"
-                        android:layout_height="30dp"
-                        android:src="@drawable/photo" />
+<!--                    <ImageView-->
+<!--                        android:layout_width="35dp"-->
+<!--                        android:layout_height="30dp"-->
+<!--                        android:src="@drawable/photo" />-->
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Photo"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
+<!--                    <TextView-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="Photo"-->
+<!--                        android:textSize="12sp"-->
+<!--                        android:textStyle="bold" />-->
 
-                </LinearLayout>
+<!--                </LinearLayout>-->
 
             </RelativeLayout>
 

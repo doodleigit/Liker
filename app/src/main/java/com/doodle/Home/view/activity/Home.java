@@ -99,6 +99,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import cn.jzvd.JZVideoPlayer;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -161,6 +162,7 @@ public class Home extends AppCompatActivity implements
     private boolean networkOk, isCatSelectFromPost;
     private String profileId;
     private String blockUserId;
+    boolean active;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -220,6 +222,10 @@ public class Home extends AppCompatActivity implements
         IntentFilter catFilter = new IntentFilter();
         catFilter.addAction(AppConstants.POST_FILTER_CAT_BROADCAST);
         registerReceiver(filterBroadcast, catFilter);
+
+        IntentFilter newPostFilter = new IntentFilter();
+        newPostFilter.addAction(AppConstants.NEW_POST_ADD_BROADCAST);
+        registerReceiver(newPostBroadcastReceiver, newPostFilter);
 
         findViewById(R.id.tvSearchInput).setOnClickListener(this);
         drawer = findViewById(R.id.drawer_layout);
@@ -894,6 +900,7 @@ public class Home extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+        active = false;
         if (App.isIsBockComment()) {
             App.setIsBockComment(false);
             startActivity(getIntent());
@@ -1186,6 +1193,7 @@ public class Home extends AppCompatActivity implements
                 startActivity(new Intent(this, LikerSearch.class));
                 break;
             case R.id.imageNewPost:
+                active = true;
                 startActivity(new Intent(this, PostNew.class));
 
 // imageNewPost.setCircleBackgroundColor(getResources().getColor(R.color.colorWhite));
@@ -1246,7 +1254,7 @@ public class Home extends AppCompatActivity implements
     protected void onPause() {
         super.onPause();
         JZVideoPlayer.releaseAllVideos();
-
+//        unregisterReceiver(newPostBroadcastReceiver);
     }
 
     @Override
@@ -1254,6 +1262,7 @@ public class Home extends AppCompatActivity implements
         super.onDestroy();
         unregisterReceiver(broadcastReceiver);
         unregisterReceiver(filterBroadcast);
+        unregisterReceiver(newPostBroadcastReceiver);
         Tools.dismissDialog();
     }
 
@@ -1743,4 +1752,15 @@ public class Home extends AppCompatActivity implements
     public void postPermissionEnable(int image, String reasonId) {
         Toast.makeText(this, "post permission enable..", Toast.LENGTH_SHORT).show();
     }
+
+    BroadcastReceiver newPostBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (active) {
+                startActivity(new Intent(getApplicationContext(), Home.class));
+                finish();
+            }
+        }
+    };
+
 }
