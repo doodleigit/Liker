@@ -8,7 +8,9 @@ public class PostImage implements Parcelable {
     public String imagePath;
     public String imageId;
     public String mdFive;
+    public boolean isDuplicate;
     MultipleMediaFile multipleMediaFile;
+
 
 
     public PostImage() {
@@ -23,10 +25,11 @@ public class PostImage implements Parcelable {
         this.imagePath = imagePath;
     }
 
-    public PostImage(String imagePath, String imageId,String mdFive) {
+    public PostImage(String imagePath, String imageId,String mdFive,boolean isDuplicate ) {
         this.imagePath = imagePath;
         this.imageId = imageId;
         this.mdFive = mdFive;
+        this.isDuplicate = isDuplicate;
     }
 
     public String getImageId() {
@@ -42,6 +45,14 @@ public class PostImage implements Parcelable {
         imagePath = in.readString();
         imageId = in.readString();
         mdFive = in.readString();
+    }
+
+    public boolean isDuplicate() {
+        return isDuplicate;
+    }
+
+    public void setDuplicate(boolean duplicate) {
+        isDuplicate = duplicate;
     }
 
     public MultipleMediaFile getMultipleMediaFile() {

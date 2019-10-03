@@ -7,14 +7,17 @@ public class PostVideo implements Parcelable {
     public String videoPath;
     public String videoId;
     public String mdFive;
+    public boolean isDuplicate;
     public MultipleMediaFile multipleMediaFile;
 
 
 
-    public PostVideo(String videoPath, String videoId) {
+    public PostVideo(String videoPath, String videoId,boolean isDuplicate) {
         this.videoPath = videoPath;
         this.videoId = videoId;
+        this.isDuplicate=isDuplicate;
     }
+
 
     public String getVideoId() {
         return videoId;
@@ -34,6 +37,13 @@ public class PostVideo implements Parcelable {
 
     }
 
+    public boolean isDuplicate() {
+        return isDuplicate;
+    }
+
+    public void setDuplicate(boolean duplicate) {
+        isDuplicate = duplicate;
+    }
 
     public static final Creator<PostVideo> CREATOR = new Creator<PostVideo>() {
         @Override

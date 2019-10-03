@@ -75,11 +75,11 @@ public class MediaAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
 
         if (viewHolder instanceof ImageViewHolder) {
-            ((ImageViewHolder) viewHolder).populate(postImages.get(position), position);
+            ((ImageViewHolder) viewHolder).populate(context,postImages.get(position), position);
         }
 
         if (viewHolder instanceof VideoViewHolder) {
-            ((VideoViewHolder) viewHolder).populate(postVideos.get(position - postImages.size()), position);
+            ((VideoViewHolder) viewHolder).populate(context,postVideos.get(position - postImages.size()), position);
             // if not first item check if item above has the same header
         }
     }

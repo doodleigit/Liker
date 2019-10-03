@@ -114,6 +114,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -288,12 +289,14 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
    public MediaAdapter mediaAdapter;
     List<String> deleteMediaFiles;
     private FloatingActionButton postButton;
+    private Context mContext;
+    Set<String> mediaList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.edit_post);
-
+        mContext=this;
         editPostItem = new PostItem();
         editPostItem = getIntent().getExtras().getParcelable(TextHolder.ITEM_KEY);
         position = getIntent().getIntExtra("position", -1);
@@ -315,7 +318,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage(getString(R.string.checking));
         deleteMediaFiles=new ArrayList<>();
-
+        mediaList = new HashSet<>();
         mediaRecyclerView = findViewById(R.id.rvPostMedia);
         mimRecyclerView = (RecyclerView) findViewById(R.id.rvMim);
         recyclerViewSearchMention = (RecyclerView) findViewById(R.id.rvSearchMention);
@@ -343,7 +346,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
         contentPostView = findViewById(R.id.contentPostView);
         messageContainer = findViewById(R.id.messageContainer);
         messageContainer.setOnClickListener(this);
-        mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos, imageListener, videoListen);
+        mediaAdapter = new MediaAdapter(mContext, postImages, postVideos, imageListener, videoListen);
         imageListener=new ImageViewHolder.ImageListener() {
             @Override
             public void deleteImage(PostImage postImage, int position) {
@@ -900,10 +903,10 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                 if (!isNullOrEmpty(postType)) {
                     if ("1".equalsIgnoreCase(postType)) {
                         imageString = temp.getImageName();
-                        postImages.add(new PostImage(imageString, temp.getId()));
+                        postImages.add(new PostImage(imageString, temp.getId(),"",false));
                     } else if ("2".equalsIgnoreCase(postType)) {
                         videoString = temp.getVideoName();
-                        postVideos.add(new PostVideo(videoString, temp.getId()));
+                        postVideos.add(new PostVideo(videoString, temp.getId(),false));
                     }
                 }
 
@@ -911,7 +914,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 
             rvMediaShow = true;
             mediaRecyclerViewToggle();
-            MediaAdapter mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos,imageListener,videoListen);
+            MediaAdapter mediaAdapter = new MediaAdapter(mContext, postImages, postVideos,imageListener,videoListen);
             mediaRecyclerView.setAdapter(mediaAdapter);
 
         }
@@ -1805,14 +1808,14 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                 RequestBody requestFile = RequestBody.create(MediaType.parse("image"), file);
                 MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("picture", file.getName(), requestFile);
                 Call<String> mediaCall = webService.addPhoto(deviceId, profileId, token, fileToUpload);
-                addPhotoRequest(mediaCall);
+                addPhotoRequest(mediaCall,fileEncoded);
 
                 progressDialog.show();
-                postImages.add(new PostImage("file://" + imagePath,fileEncoded));
+                postImages.add(new PostImage("file://" + imagePath,fileEncoded,"",false));
                 if (postImages.size() > 0)
                     rvMediaShow = true;
                 mediaRecyclerViewToggle();
-                MediaAdapter mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos,imageListener,videoListen);
+                MediaAdapter mediaAdapter = new MediaAdapter(mContext, postImages, postVideos,imageListener,videoListen);
                 mediaRecyclerView.setAdapter(mediaAdapter);
                 progressDialog.dismiss();
 
@@ -1837,7 +1840,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 
     }
 
-    private void addPhotoRequest(Call<String> call) {
+    private void addPhotoRequest(Call<String> call,String fileEncoded) {
 
 
         call.enqueue(new Callback<String>() {
@@ -1933,7 +1936,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                                 if (postImages.size() > 0)
                                     rvMediaShow = true;
                                 mediaRecyclerViewToggle();
-                                MediaAdapter mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos,imageListener,videoListen);
+                                MediaAdapter mediaAdapter = new MediaAdapter(mContext, postImages, postVideos,imageListener,videoListen);
                                 mediaRecyclerView.setAdapter(mediaAdapter);
                                 progressView.setVisibility(View.GONE);
                                 progressView.stopAnimation();
@@ -2023,6 +2026,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 
         ClipData clipData = data.getClipData();
         if (clipData != null) {
+            ArrayList<String> tempMedia = new ArrayList<>();
             for (int i = 0; i < clipData.getItemCount(); i++) {
                 ClipData.Item videoItem = clipData.getItemAt(i);
                 Uri videoURI = videoItem.getUri();
@@ -2035,8 +2039,32 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                 Log.d("Extension: ", videoExtension);
                 String strMD5 = getMD5EncryptedString(videoPath);
                 fileEncoded = strMD5;
-                Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "2", strMD5);
-                sendIsDuplicateVideoRequest(call);
+
+                if (videoList.size() == 0) {
+                    Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "2", strMD5);
+                    sendIsDuplicateVideoRequest(call, videoPath, fileEncoded, filePath);
+                    tempMedia.add(videoPath);
+                } else {
+                    boolean hasAlready = false;
+                    for (String temp : videoList) {
+                        if (temp.equalsIgnoreCase(videoPath)) {
+                            hasAlready = true;
+
+                            //    Tools.toast(PostNew.this, "You have already add this!", R.drawable.ic_info_outline_blue_24dp);
+                            break;
+                        }
+                    }
+                    if (!hasAlready) {
+                        Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "2", strMD5);
+                        sendIsDuplicateVideoRequest(call, videoPath, fileEncoded, filePath);
+                        tempMedia.add(videoPath);
+
+                    }
+                }
+
+
+//                Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "2", strMD5);
+//                sendIsDuplicateVideoRequest(call);
 
                 //   result.add(new PostVideo(videoPath));
 
@@ -2045,8 +2073,9 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                 RequestBody requestFile = RequestBody.create(MediaType.parse("video/*"), file);
                 fileToUpload = MultipartBody.Part.createFormData("video", file.getName(), requestFile);
 //                Call<String> mediaCall = videoServices.uploadVideo(deviceId, profileId, token, fileToUpload, true);
-//                sendImageRequest(mediaCall);
+//                addPhotoRequest(mediaCall);
             }
+            videoList.addAll(tempMedia);
         } else {
             Uri videoURI = data.getData();
             videoFilePath = getPath(this, videoURI);
@@ -2059,8 +2088,23 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 
             String strMD5 = getMD5EncryptedString(videoPath);
             fileEncoded = strMD5;
-            Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "2", strMD5);
-            sendIsDuplicateVideoRequest(call);
+
+            if (videoList.size() == 0) {
+                Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "2", strMD5);
+                sendIsDuplicateVideoRequest(call, videoPath, fileEncoded, videoFilePath);
+                videoList.add(videoPath);
+            } else {
+                for (String temp : videoList) {
+                    if (temp.equalsIgnoreCase(videoPath)) {
+
+                        //  Tools.toast(PostNew.this, "You have already add this!", R.drawable.ic_info_outline_blue_24dp);
+                    } else {
+
+                        Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "2", strMD5);
+                        sendIsDuplicateVideoRequest(call, videoPath, fileEncoded, videoFilePath);
+                    }
+                }
+            }
 
 
             File file = new File(videoFilePath);
@@ -2073,7 +2117,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
         return result;
     }
 
-    private void sendIsDuplicateVideoRequest(Call<String> call) {
+    private void sendIsDuplicateVideoRequest(Call<String> call, String videoPath, String fileEncoded, String filePath) {
 
         call.enqueue(new Callback<String>() {
 
@@ -2089,12 +2133,35 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                             JSONObject object = new JSONObject(response.body());
                             boolean status = object.getBoolean("status");
                             if (status) {
-                                String message = "You have already posted it .";
-                                Tools.showCustomToast(EditPost.this, mView, message, Gravity.CENTER);
+
+                                // String message = "You have already posted it .";
+                                //Tools.showCustomToast(PostNew.this, mView, message, Gravity.CENTER);
+
+
+
+
+                                progressDialog.show();
+                                progressDialog.dismiss();
+
+                                // String videoPath = "file://" + filePath;
+                                PostVideo postVideo = new PostVideo();
+                                postVideo.setVideoPath(videoPath);
+                                postVideo.setMdFive(fileEncoded);
+                                postVideo.setDuplicate(true);
+                                postVideos.add(postVideo);
+                                if (postVideos.size() > 0)
+                                    rvMediaShow = true;
+                                mediaRecyclerViewToggle();
+                                mediaAdapter = new MediaAdapter(mContext, postImages, postVideos, imageListener, videoListen);
+                                mediaRecyclerView.setAdapter(mediaAdapter);
+
+
+
+
                             } else {
 
-                                if (!isNullOrEmpty(videoFilePath)) {
-                                    File file = new File(videoFilePath);
+                                if (!isNullOrEmpty(filePath)) {
+                                    File file = new File(filePath);
                                     //Parsing any Media type file
                                     RequestBody requestFile = RequestBody.create(MediaType.parse("video/*"), file);
                                     MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("video", file.getName(), requestFile);
@@ -2103,23 +2170,24 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 
                                     progressDialog.show();
 
-                                    String videoPath = "file://" + videoFilePath;
-                                    PostVideo postVideo=new PostVideo();
+                                    // String videoPath = "file://" + filePath;
+                                    PostVideo postVideo = new PostVideo();
                                     postVideo.setVideoPath(videoPath);
                                     postVideo.setMdFive(fileEncoded);
+                                    postVideo.setDuplicate(false);
                                     postVideos.add(postVideo);
                                     if (postVideos.size() > 0)
                                         rvMediaShow = true;
                                     mediaRecyclerViewToggle();
-                                    MediaAdapter mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos,imageListener,videoListen);
+                                    mediaAdapter = new MediaAdapter(mContext, postImages, postVideos, imageListener, videoListen);
                                     mediaRecyclerView.setAdapter(mediaAdapter);
 
 
                                 }
 
 
-                              //  String message = "Add gallery successfully!";
-                             //   Tools.showCustomToast(EditPost.this, mView, message, Gravity.CENTER);
+                                //     String message = "Add gallery successfully!";
+                                //     Tools.showCustomToast(PostNew.this, mView, message, Gravity.CENTER);
 
                             }
 
@@ -2195,35 +2263,78 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 
         ClipData clipData = data.getClipData();
         if (clipData != null) {
+            ArrayList<String> tempMedia = new ArrayList<>();
             for (int i = 0; i < clipData.getItemCount(); i++) {
                 ClipData.Item videoItem = clipData.getItemAt(i);
                 Uri videoURI = videoItem.getUri();
                 imageFilePath = getPath(this, videoURI);
+                //   String multiImagePath=getPath(this, videoURI);
                 String imagePath = "file://" + imageFilePath;
                 //     String strBase64 = getBase64(imagePath);
                 String strMD5 = getMD5EncryptedString(imagePath);
                 fileEncoded = strMD5;
-                Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "1", strMD5);
-                sendIsDuplicateImageRequest(call);
+
+                if (mediaList.size() == 0) {
+
+
+                    Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "1", strMD5);
+                    sendIsDuplicateImageRequest(call, imagePath, fileEncoded, imageFilePath);
+                    tempMedia.add(imagePath);
+
+                } else {
+                    boolean hasAlready = false;
+                    for (String temp : mediaList) {
+                        if (temp.equalsIgnoreCase(imagePath)) {
+                            hasAlready = true;
+
+                            //  Tools.toast(PostNew.this, "You have already add this!", R.drawable.ic_info_outline_blue_24dp);
+                            break;
+                        }
+                    }
+                    if (!hasAlready) {
+                        Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "1", strMD5);
+                        sendIsDuplicateImageRequest(call, imagePath, fileEncoded, imageFilePath);
+                        tempMedia.add(imagePath);
+
+                    }
+                }
+
 
             }
+            mediaList.addAll(tempMedia);
         } else {
+
+
             Uri videoURI = data.getData();
             imageFilePath = getPath(this, videoURI);
             String imagePath = "file://" + imageFilePath;
             String strMD5 = getMD5EncryptedString(imagePath);
             fileEncoded = strMD5;
             //   String strBase64 = getBase64(imageFilePath);
-            Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "1", strMD5);
-            sendIsDuplicateImageRequest(call);
 
+            if (mediaList.size() == 0) {
+                Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "1", strMD5);
+                sendIsDuplicateImageRequest(call, imagePath, fileEncoded, imageFilePath);
+                mediaList.add(imagePath);
+            } else {
+                for (String temp : mediaList) {
+                    if (temp.equalsIgnoreCase(imagePath)) {
+
+                        // Tools.toast(PostNew.this, "You have already add this!", R.drawable.ic_info_outline_blue_24dp);
+                    } else {
+
+                        Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "1", strMD5);
+                        sendIsDuplicateImageRequest(call, imagePath, fileEncoded, imageFilePath);
+                    }
+                }
+            }
 
         }
 
         return result;
     }
 
-    private void sendIsDuplicateImageRequest(Call<String> call) {
+    private void sendIsDuplicateImageRequest(Call<String> call, String imagePath, String fileEncoded, String imageFilePath) {
         call.enqueue(new Callback<String>() {
 
 
@@ -2238,24 +2349,37 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                             JSONObject object = new JSONObject(response.body());
                             boolean status = object.getBoolean("status");
                             if (status) {
-                                String message = "You have already posted it .";
-                                Tools.showCustomToast(EditPost.this, mView, message, Gravity.CENTER);
+                               // String message = "You have already posted it .";
+                                //Tools.showCustomToast(EditPost.this, mView, message, Gravity.CENTER);
+                                postImages.add(new PostImage(imagePath, "", fileEncoded, true));
+                                rvMediaShow = true;
+                                mediaRecyclerViewToggle();
+                                mediaAdapter = new MediaAdapter(mContext, postImages, postVideos, imageListener, videoListen);
+                                mediaRecyclerView.setAdapter(mediaAdapter);
+                                progressView.setVisibility(View.GONE);
+                                progressView.stopAnimation();
+
                             } else {
                                 if (!isNullOrEmpty(imageFilePath)) {
+
+
                                     File file = new File(imageFilePath);
                                     //Parsing any Media type file
                                     RequestBody requestFile = RequestBody.create(MediaType.parse("image"), file);
                                     MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("picture", file.getName(), requestFile);
                                     Call<String> mediaCall = webService.addPhoto(deviceId, profileId, token, fileToUpload);
-                                    addPhotoRequest(mediaCall);
+                                    addPhotoRequest(mediaCall, fileEncoded);
 
                                     progressDialog.show();
-                                    String imagePath = "file://" + imageFilePath;
-                                    postImages.add(new PostImage(imagePath,fileEncoded));
+                                    progressDialog.setCancelable(false);
+
+                                    postImages.add(new PostImage(imagePath, "", fileEncoded, false));
+
                                     if (postImages.size() > 0)
+
                                         rvMediaShow = true;
                                     mediaRecyclerViewToggle();
-                                    MediaAdapter mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos,imageListener,videoListen);
+                                    mediaAdapter = new MediaAdapter(mContext, postImages, postVideos, imageListener, videoListen);
                                     mediaRecyclerView.setAdapter(mediaAdapter);
                                     progressView.setVisibility(View.GONE);
                                     progressView.stopAnimation();
@@ -2361,7 +2485,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                                     if (postVideos.size() > 0)
                                         rvMediaShow = true;
                                     mediaRecyclerViewToggle();
-                                    MediaAdapter mediaAdapter = new MediaAdapter(getApplicationContext(), postImages, postVideos,imageListener,videoListen);
+                                    MediaAdapter mediaAdapter = new MediaAdapter(mContext, postImages, postVideos,imageListener,videoListen);
                                     mediaRecyclerView.setAdapter(mediaAdapter);
 
                                 }

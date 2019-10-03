@@ -114,6 +114,7 @@
                         android:tint="@color/colorPrimary" />
                 </LinearLayout>
 
+
                 <RelativeLayout
                     android:id="@+id/contentEveryPost"
                     android:layout_width="match_parent"
@@ -136,7 +137,6 @@
                             android:isScrollContainer="true"
                             android:hint="Speak your mind..."
                             android:imeOptions="actionSend"
-
                             android:inputType="textCapSentences|textMultiLine" >
                             <requestFocus />
                         </com.vanniktech.emoji.EmojiEditText>
