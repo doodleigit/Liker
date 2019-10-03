@@ -6,6 +6,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -171,9 +172,11 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
     private LinearLayout containerHeaderShare;
     private CircleImageView imageSharePostUser;
     private ImageView imageSharePostPermission;
-    private TextView tvSharePostUserName, tvSharePostTime,tvShareHeaderInfo,tvSharePostContent;
-   private ViewGroup tvLikeShare;
-    private TextView tvShared,tvPostShareUserName;
+    private TextView tvSharePostUserName, tvSharePostTime, tvShareHeaderInfo, tvSharePostContent;
+    private ViewGroup tvLikeShare;
+    private TextView tvShared, tvPostShareUserName;
+    private MediaPlayer player;
+
     public interface PostItemListener {
         void deletePost(PostItem postItem, int position);
     }
@@ -182,6 +185,8 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
         super(itemView);
         mContext = context;
         this.listener = listener;
+
+        player = MediaPlayer.create(mContext, R.raw.post_like);
         callbackManager = CallbackManager.Factory.create();
         shareDialog = new ShareDialog((Activity) context);
         manager = new PrefManager(App.getAppContext());
@@ -250,7 +255,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
         networkOk = NetworkHelper.hasNetworkAccess(mContext);
         mProgressBar = (ProgressBar) itemView.findViewById(R.id.ProgressBar);
         imagePostComment = (ImageView) itemView.findViewById(R.id.imagePostComment);
-        commentContainer =  itemView.findViewById(R.id.commentContainer);
+        commentContainer = itemView.findViewById(R.id.commentContainer);
 
         //SHARE_POST_HEADER
         containerHeaderShare = itemView.findViewById(R.id.containerHeaderShare);
@@ -266,6 +271,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
     }
 
     int position;
+
     public void setItem(PostItem item, int position) {
         this.item = item;
         this.position = position;
@@ -288,10 +294,10 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
 
         isShared = item.getIsShared();
 
-        if(App.isSharePostfooter()){
+        if (App.isSharePostfooter()) {
             tvLikeShare.setVisibility(View.GONE);
             imagePermission.setVisibility(View.GONE);
-        }else {
+        } else {
             tvLikeShare.setVisibility(View.VISIBLE);
             imagePermission.setVisibility(View.VISIBLE);
         }
@@ -310,8 +316,8 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
             sharedTotalStar = Integer.parseInt(itemSharedProfile.getUserGoldStars()) + Integer.parseInt(itemSharedProfile.getUserSilverStars());
             sharedPostPermission = itemSharedProfile.getPermission();
             sharedUserProfileLike = itemSharedProfile.getUserProfileLikes();
-            sharedPostText=item.getSharedPostText();
-            sharedCategoryName=item.getCatName();
+            sharedPostText = item.getSharedPostText();
+            sharedCategoryName = item.getCatName();
             SpannableStringBuilder builder = getSpannableStringShareHeader(sharedUserProfileLike, "", sharedTotalStar, sharedCategoryName);
             long myMillis = Long.parseLong(sharedDateTime) * 1000;
             String postDate = Operation.getFormattedDateFromTimestamp(myMillis);
@@ -335,13 +341,12 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
 
         } else {
             containerHeaderShare.setVisibility(View.GONE);
-            if(App.isSharePostfooter()){
+            if (App.isSharePostfooter()) {
                 imagePermission.setVisibility(View.GONE);
-            }else {
+            } else {
                 imagePermission.setVisibility(View.VISIBLE);
             }
         }
-
 
 
         tvCommentLike.setOnClickListener(new View.OnClickListener() {
@@ -528,15 +533,15 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
 //
 
         SpannableStringBuilder builder = getSpannableStringBuilder(mContext, item.getCatId(), likes, followers, totalStars, categoryName);
-        if("1".equalsIgnoreCase(isShared)){
+        if ("1".equalsIgnoreCase(isShared)) {
             tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
             tvShared.setVisibility(View.VISIBLE);
-            tvPostShareUserName.setText(String.format("%s  %s %s", sharedFullName,"'s"," post"));
-        }else {
+            tvPostShareUserName.setText(String.format("%s  %s %s", sharedFullName, "'s", " post"));
+        } else {
             tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
         }
 
-      //  tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
+        //  tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
         long myMillis = Long.parseLong(item.getDateTime()) * 1000;
         String postDate = Operation.getFormattedDateFromTimestamp(myMillis);
         tvPostTime.setText(postDate);
@@ -544,8 +549,8 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
         tvHeaderInfo.setMovementMethod(LinkMovementMethod.getInstance());
 
         PostFooter postFooter = item.getPostFooter();
-         postLike = postFooter.getPostTotalLike();
-         postTotalShare = postFooter.getPostTotalShare();
+        postLike = postFooter.getPostTotalLike();
+        postTotalShare = postFooter.getPostTotalShare();
         tvImgShareCount.setText(String.valueOf(postTotalShare));
         if ("0".equalsIgnoreCase(postLike)) {
             tvPostLikeCount.setVisibility(View.GONE);
@@ -703,11 +708,10 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
 
                 if (App.isIsPostShare()) {
                     postTotalShare++;
-                    popup.getMenu().add(1, R.id.shareAsPost, 1, "Share as a Post (" + postTotalShare+")").setIcon(R.drawable.like_done);
+                    popup.getMenu().add(1, R.id.shareAsPost, 1, "Share as a Post (" + postTotalShare + ")").setIcon(R.drawable.like_done);
                 } else {
-                    popup.getMenu().add(1, R.id.shareAsPost, 1, "Share as a Post ("+postTotalShare+")").setIcon(R.drawable.like_normal);
+                    popup.getMenu().add(1, R.id.shareAsPost, 1, "Share as a Post (" + postTotalShare + ")").setIcon(R.drawable.like_normal);
                 }
-
 
 
 //                popup.show();
@@ -722,7 +726,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
 
                         if (id == R.id.shareAsPost) {
                             String postId = item.getSharedPostId();
-                         //   Call<PostShareItem> call = webService.getPostDetails(deviceId, profileId, token, userIds, postId);
+                            //   Call<PostShareItem> call = webService.getPostDetails(deviceId, profileId, token, userIds, postId);
                             Call<PostItem> call = webService.getPostDetail(deviceId, profileId, token, userIds, postId);
                             sendShareItemRequest(call);
 
@@ -787,7 +791,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
             public void onClick(View v) {
 
                 activity = (AppCompatActivity) v.getContext();
-                PostPermissionSheet reportReasonSheet = PostPermissionSheet.newInstance(item,position);
+                PostPermissionSheet reportReasonSheet = PostPermissionSheet.newInstance(item, position);
                 reportReasonSheet.show(activity.getSupportFragmentManager(), "ReportReasonSheet");
 
         /*        boolean isNotificationOff = item.isIsNotificationOff();
@@ -978,7 +982,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
 
                                 postLikeNumeric = Integer.parseInt(postLike);
                                 postLikeNumeric = postLikeNumeric <= 0 ? 0 : --postLikeNumeric;
-                                postLike=String.valueOf(postLikeNumeric);
+                                postLike = String.valueOf(postLikeNumeric);
                                 item.getPostFooter().setPostTotalLike(postLike);
                                 item.getPostFooter().setLikeUserStatus(false);
 
@@ -1024,6 +1028,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
                             JSONObject object = new JSONObject(response.body());
                             String status = object.getString("status");
                             if ("true".equalsIgnoreCase(status)) {
+                                player.start();
                                 Call<String> mCall = webService.sendBrowserNotification(
                                         deviceId,//"8b64708fa409da20341b1a555d1ddee526444",
                                         profileId,//"26444",
@@ -1037,7 +1042,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
 
                                 postLikeNumeric = Integer.parseInt(postLike);
                                 postLikeNumeric++;
-                                postLike=String.valueOf(postLikeNumeric);
+                                postLike = String.valueOf(postLikeNumeric);
                                 item.getPostFooter().setPostTotalLike(postLike);
                                 item.getPostFooter().setLikeUserStatus(true);
 

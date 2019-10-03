@@ -203,7 +203,8 @@ public class TextHolder extends RecyclerView.ViewHolder {
     private ViewGroup tvLikeShare;
     private List<MentionItem> mentionNameList;
     private ClickableSpan clickableSpan;
-  private TextView tvShared,tvPostShareUserName;
+    private TextView tvShared, tvPostShareUserName;
+    private MediaPlayer player;
 
     public interface PostItemListener {
         void deletePost(PostItem postItem, int position);
@@ -216,6 +217,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
         this.postTextListener = postTextListener;
         this.isPopup = isPopup;
 
+        player = MediaPlayer.create(mContext, R.raw.post_like);
         callbackManager = CallbackManager.Factory.create();
         shareDialog = new ShareDialog((Activity) context);
         manager = new PrefManager(App.getAppContext());
@@ -232,7 +234,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
         mentions = new ArrayList<>();
         mList = new ArrayList<>();
-        mentionNameList=new ArrayList<>();
+        mentionNameList = new ArrayList<>();
         tvPostUserName = (TextView) itemView.findViewById(R.id.tvPostUserName);
         tvShared = (TextView) itemView.findViewById(R.id.tvShared);
         tvPostShareUserName = (TextView) itemView.findViewById(R.id.tvPostShareUserName);
@@ -346,16 +348,16 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
         isShared = item.getIsShared();
 
-        if(App.isSharePostfooter()){
+        if (App.isSharePostfooter()) {
             tvLikeShare.setVisibility(View.GONE);
             imagePermission.setVisibility(View.GONE);
-        }else {
+        } else {
             tvLikeShare.setVisibility(View.VISIBLE);
             imagePermission.setVisibility(View.VISIBLE);
         }
         if ("1".equalsIgnoreCase(isShared)) {
             containerHeaderShare.setVisibility(View.VISIBLE);
-         //   imagePermission.setVisibility(View.GONE);
+            //   imagePermission.setVisibility(View.GONE);
 
 
             SharedProfile itemSharedProfile = item.getSharedProfile();
@@ -396,9 +398,9 @@ public class TextHolder extends RecyclerView.ViewHolder {
         } else {
             containerHeaderShare.setVisibility(View.GONE);
 
-            if(App.isSharePostfooter()){
+            if (App.isSharePostfooter()) {
                 imagePermission.setVisibility(View.GONE);
-            }else {
+            } else {
                 imagePermission.setVisibility(View.VISIBLE);
             }
 
@@ -409,7 +411,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
             @Override
             public void onClick(View v) {
 
-             //  final MediaPlayer mp = MediaPlayer.create(this, R.raw);
+                //  final MediaPlayer mp = MediaPlayer.create(this, R.raw);
 
                 if (userIds.equalsIgnoreCase(item.getPostUserid())) {
                     Tools.toast(mContext, "On Liker, you can't like your own posts. That would be cheating ", R.drawable.ic_insert_emoticon_black_24dp);
@@ -456,9 +458,9 @@ public class TextHolder extends RecyclerView.ViewHolder {
             String postType = temp.getType();
             if (postType.equalsIgnoreCase("mention")) {
                 String mentionUserName = extractMentionUser(temp.getText());
-                String userName=temp.getUserName();
-                String userId=temp.getUserId();
-                mentionNameList.add(new MentionItem(mentionUserName,userName,userId));
+                String userName = temp.getUserName();
+                String userId = temp.getUserId();
+                mentionNameList.add(new MentionItem(mentionUserName, userName, userId));
 
                 nameBuilder.append(mentionUserName);
                 nameBuilder.append(" ");
@@ -505,10 +507,10 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
                 for (int k = 0; k < mList.size(); k++) {
                     int val = full_text.indexOf(mList.get(k));
-                    String name=mList.get(k);
-                    for (MentionItem temp:mentionNameList) {
+                    String name = mList.get(k);
+                    for (MentionItem temp : mentionNameList) {
 
-                        if(temp.getMentionFullName().contains(name)){
+                        if (temp.getMentionFullName().contains(name)) {
                             clickableSpan = new ClickableSpan() {
                                 @Override
                                 public void onClick(View view) {
@@ -556,10 +558,10 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
                 for (int k = 0; k < mList.size(); k++) {
                     int val = full_text.indexOf(mList.get(k));
-                    String name=mList.get(k);
-                    for (MentionItem temp:mentionNameList) {
+                    String name = mList.get(k);
+                    for (MentionItem temp : mentionNameList) {
 
-                        if(temp.getMentionFullName().contains(name)){
+                        if (temp.getMentionFullName().contains(name)) {
                             clickableSpan = new ClickableSpan() {
                                 @Override
                                 public void onClick(View view) {
@@ -740,14 +742,14 @@ public class TextHolder extends RecyclerView.ViewHolder {
         SpannableStringBuilder builder = getSpannableStringBuilder(mContext, item.getCatId(), likes, followers, totalStars, categoryName);
 
 
-        if("1".equalsIgnoreCase(isShared)){
+        if ("1".equalsIgnoreCase(isShared)) {
             tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
             tvShared.setVisibility(View.VISIBLE);
-            tvPostShareUserName.setText(String.format("%s  %s %s", sharedFullName,"'s"," post"));
-        }else {
+            tvPostShareUserName.setText(String.format("%s  %s %s", sharedFullName, "'s", " post"));
+        } else {
             tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
         }
-      //  tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
+        //  tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
 
         long myMillis = Long.parseLong(item.getDateTime()) * 1000;
         String postDate = Operation.getFormattedDateFromTimestamp(myMillis);
@@ -1198,6 +1200,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
                             JSONObject object = new JSONObject(response.body());
                             String status = object.getString("status");
                             if ("true".equalsIgnoreCase(status)) {
+                                player.start();
                                 Call<String> mCall = webService.sendBrowserNotification(
                                         deviceId,//"8b64708fa409da20341b1a555d1ddee526444",
                                         profileId,//"26444",
@@ -1405,7 +1408,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
                     Intent intent = new Intent(mContext, CommentPost.class);
                     intent.putExtra(COMMENT_KEY, (Parcelable) commentItem);
                     intent.putExtra(ITEM_KEY, (Parcelable) postItem);
-                    intent.putExtra(POST_ITEM_POSITION,position);
+                    intent.putExtra(POST_ITEM_POSITION, position);
                     //intent.putExtra(COMMENT_CHILD_KEY, (Parcelable) comment_Item);
                     //  intent.putExtra(REASON_KEY, (Parcelable) reportReason);
                     mContext.startActivity(intent);

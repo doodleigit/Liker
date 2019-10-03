@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -181,6 +182,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
     private ImageView imageSharePostPermission;
     private TextView tvSharePostUserName, tvSharePostTime,tvShareHeaderInfo,tvSharePostContent;
     private TextView tvShared,tvPostShareUserName;
+    private MediaPlayer player;
 
     public interface PostItemListener {
         void deletePost(PostItem postItem, int position);
@@ -191,13 +193,13 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
     private int postLikeNumeric;
     ViewGroup tvLikeShare;
 
-
-
     public TextMimHolder(View itemView, Context context, PostItemListener mimListener, boolean isPopup) {
         super(itemView);
         mContext = context;
         this.listener = mimListener;
         this.isPopup = isPopup;
+
+        player = MediaPlayer.create(mContext, R.raw.post_like);
         callbackManager = CallbackManager.Factory.create();
         shareDialog = new ShareDialog((Activity) context);
         manager = new PrefManager(App.getAppContext());
@@ -1062,6 +1064,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                             JSONObject object = new JSONObject(response.body());
                             String status = object.getString("status");
                             if ("true".equalsIgnoreCase(status)) {
+                                player.start();
                                 Call<String> mCall = webService.sendBrowserNotification(
                                         deviceId,//"8b64708fa409da20341b1a555d1ddee526444",
                                         profileId,//"26444",

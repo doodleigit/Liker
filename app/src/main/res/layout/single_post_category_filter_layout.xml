@@ -57,8 +57,7 @@
             android:focusable="true"
             android:hint="@string/search_category_"
             android:padding="10dp"
-            android:textSize="14sp"
-            android:visibility="gone"/>
+            android:textSize="14sp" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recyclerView"

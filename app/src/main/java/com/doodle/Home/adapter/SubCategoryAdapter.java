@@ -23,13 +23,14 @@ import java.util.ArrayList;
 public class SubCategoryAdapter extends RecyclerView.Adapter<SubCategoryAdapter.ViewHolder> {
 
     private Context context;
-    private ArrayList<PostFilterSubCategory> arrayList;
+    private ArrayList<PostFilterSubCategory> arrayList, mainArrayList;
     private FilterClickListener filterClickListener;
     private int type;
 
-    public SubCategoryAdapter(Context context, ArrayList<PostFilterSubCategory> arrayList, FilterClickListener filterClickListener, int type) {
+    public SubCategoryAdapter(Context context, ArrayList<PostFilterSubCategory> arrayList, ArrayList<PostFilterSubCategory> mainArrayList, FilterClickListener filterClickListener, int type) {
         this.context = context;
         this.arrayList = arrayList;
+        this.mainArrayList = mainArrayList;
         this.filterClickListener = filterClickListener;
         this.type = type;
     }
@@ -123,6 +124,12 @@ public class SubCategoryAdapter extends RecyclerView.Adapter<SubCategoryAdapter.
             arrayList.get(i).setSelectedAll(false);
             for (int j = 0; j < arrayList.get(i).getPostFilterItems().size(); j++) {
                 arrayList.get(i).getPostFilterItems().get(j).setSelected(false);
+            }
+        }
+        for (int i = 0; i < mainArrayList.size(); i++) {
+            mainArrayList.get(i).setSelectedAll(false);
+            for (int j = 0; j < mainArrayList.get(i).getPostFilterItems().size(); j++) {
+                mainArrayList.get(i).getPostFilterItems().get(j).setSelected(false);
             }
         }
     }

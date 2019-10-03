@@ -234,7 +234,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
     private List<String> uploadImageName = new ArrayList<>();
     private int contentType;
     private String categoryId = "", subCategoryId = "";
-    private String contentTitle;
+    private String contentTitle = "";
     private String contentLinkUrl;
     private String contentHost;
     private String contentLinkTitle;
@@ -1126,13 +1126,14 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
             case R.id.tvSubmitPost:
 
                 checkContentType();
-                if (categoryId.isEmpty() && subCategoryId.isEmpty()) {
+                if (contentTitle.isEmpty()) {
+                    Tools.showCustomToast(PostNew.this, mView, "Please add a post description", Gravity.TOP);
+                } else if (categoryId.isEmpty() && subCategoryId.isEmpty()) {
                     Tools.showCustomToast(PostNew.this, mView, "Please select your post’s audience.", Gravity.TOP);
                 } else if (!isAddContentTitle) {
                     Tools.showCustomToast(PostNew.this, mView, "Cat’s got your tongue? Please write at least 8 characters in your post description.", Gravity.TOP);
                 } else if (contentTitle.length() < 8) {
                     Tools.showCustomToast(PostNew.this, mView, "Cat’s got your tongue? Please write at least 8 characters in your post description.", Gravity.TOP);
-
                 } else {
                     createNewPost();
                 }

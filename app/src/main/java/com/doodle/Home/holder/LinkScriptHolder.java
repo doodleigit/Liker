@@ -6,6 +6,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -173,6 +174,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
     private ImageView imageSharePostPermission;
     private TextView tvSharePostUserName, tvSharePostTime,tvShareHeaderInfo,tvSharePostContent;
     private TextView tvShared,tvPostShareUserName;
+    private MediaPlayer player;
 
     ViewGroup tvLikeShare;
 
@@ -187,6 +189,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
         mContext = context;
         this.listener = listener;
 
+        player = MediaPlayer.create(mContext, R.raw.post_like);
         callbackManager = CallbackManager.Factory.create();
         shareDialog = new ShareDialog((Activity) context);
         manager = new PrefManager(App.getAppContext());
@@ -1037,6 +1040,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
                             JSONObject object = new JSONObject(response.body());
                             String status = object.getString("status");
                             if ("true".equalsIgnoreCase(status)) {
+                                player.start();
                                 Call<String> mCall = webService.sendBrowserNotification(
                                         deviceId,//"8b64708fa409da20341b1a555d1ddee526444",
                                         profileId,//"26444",

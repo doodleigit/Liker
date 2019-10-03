@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -141,6 +142,7 @@ public class MultipleMediaPopUpFragment extends Fragment {
     //Delete post
     public ImageHolder.PostItemListener listener;
     private String blockUserId;
+    private MediaPlayer player;
 
     @Nullable
     @Override
@@ -154,6 +156,7 @@ public class MultipleMediaPopUpFragment extends Fragment {
     }
 
     private void initialComponent() {
+        player = MediaPlayer.create(getActivity(), R.raw.post_like);
         item = getArguments().getParcelable(ITEM_KEY);
         hasFooter = getArguments().getBoolean("has_footer");
         isCommentAction = getArguments().getBoolean("is_comment_action");
@@ -953,6 +956,7 @@ public class MultipleMediaPopUpFragment extends Fragment {
                             JSONObject object = new JSONObject(response.body());
                             String status = object.getString("status");
                             if ("true".equalsIgnoreCase(status)) {
+                                player.start();
                                 Call<String> mCall = webService.sendBrowserNotification(
                                         deviceId,//"8b64708fa409da20341b1a555d1ddee526444",
                                         profileId,//"26444",

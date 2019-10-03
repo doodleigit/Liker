@@ -1319,13 +1319,15 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
             case R.id.tvSubmitPost:
 
                 checkContentType();
-                if (categoryId.isEmpty() && subCategoryId.isEmpty()) {
+                if (contentTitle.isEmpty()) {
+                    Tools.showCustomToast(EditPost.this, mView, "Please add a post description", Gravity.TOP);
+                } else if (categoryId.isEmpty() && subCategoryId.isEmpty()) {
                     Tools.showCustomToast(EditPost.this, mView, "Please select your post’s audience.", Gravity.TOP);
                 } else if (!isAddContentTitle) {
-                    Tools.showCustomToast(EditPost.this, mView, "you must add the post description!", Gravity.TOP);
+                    Tools.showCustomToast(EditPost.this, mView, "You must add the post description!", Gravity.TOP);
+                } else if (contentTitle.length() < 8) {
+                    Tools.showCustomToast(EditPost.this, mView, "Cat’s got your tongue? Please write at least 8 characters in your post description.", Gravity.TOP);
                 } else {
-
-
                     //  friendSet.add(id);
                     String separator = ", ";
 
@@ -1343,8 +1345,6 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 
                         deleteMediaIds = sb.substring(separator.length()).replaceAll("\\s+", "");
                     }
-
-
                     createNewPost();
                 }
 

@@ -24,6 +24,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -32,6 +34,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -605,8 +608,12 @@ public class Home extends AppCompatActivity implements
         Dialog dialog = new Dialog(this, R.style.Theme_Dialog);
         dialog.setContentView(R.layout.single_post_category_filter_layout);
 
+        ArrayList<PostFilterSubCategory> filterSubCategories = new ArrayList<>();
+
         Toolbar toolbar = dialog.findViewById(R.id.toolbar);
+        EditText etSearchCategory;
         RecyclerView recyclerView;
+        etSearchCategory = dialog.findViewById(R.id.search_category);
         recyclerView = dialog.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -634,8 +641,55 @@ public class Home extends AppCompatActivity implements
             }
         };
 
-        SubCategoryAdapter subCategoryAdapter = new SubCategoryAdapter(this, subCategories, filterClickListener, 0);
+        filterSubCategories.addAll(subCategories);
+
+        SubCategoryAdapter subCategoryAdapter = new SubCategoryAdapter(this, filterSubCategories, subCategories, filterClickListener, 0);
         recyclerView.setAdapter(subCategoryAdapter);
+
+        etSearchCategory.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String key = etSearchCategory.getText().toString();
+                filterSubCategories.clear();
+                if (key.isEmpty()) {
+                    filterSubCategories.addAll(subCategories);
+                } else {
+                    for (PostFilterSubCategory category : subCategories) {
+                        ArrayList<PostFilterItem> arrayList = new ArrayList<>();
+                        PostFilterSubCategory postFilterSubCategory = new PostFilterSubCategory();
+                        for (PostFilterItem postFilterItem : category.getPostFilterItems()) {
+                            if (postFilterItem.getItemName().toLowerCase().contains(key.toLowerCase())) {
+                                arrayList.add(postFilterItem);
+                            }
+                        }
+                        postFilterSubCategory.setCatId(category.getCatId());
+                        postFilterSubCategory.setSubCatId(category.getSubCatId());
+                        postFilterSubCategory.setSubCatName(category.getSubCatName());
+                        postFilterSubCategory.setSelectedAll(category.isSelectedAll());
+                        postFilterSubCategory.setPostFilterItems(arrayList);
+
+                        if (postFilterSubCategory.getSubCatName().toLowerCase().contains(key.toLowerCase())) {
+                            filterSubCategories.add(postFilterSubCategory);
+                        } else {
+                            if (arrayList.size() != 0) {
+                                filterSubCategories.add(postFilterSubCategory);
+                            }
+                        }
+                    }
+                }
+                subCategoryAdapter.notifyDataSetChanged();
+            }
+        });
 
         toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -651,13 +705,16 @@ public class Home extends AppCompatActivity implements
         Dialog dialog = new Dialog(this, R.style.Theme_Dialog);
         dialog.setContentView(R.layout.multiple_post_category_filter_layout);
 
+        ArrayList<PostFilterSubCategory> filterSubCategories = new ArrayList<>();
         SubCategoryAdapter subCategoryAdapter;
 
         Toolbar toolbar = dialog.findViewById(R.id.toolbar);
+        EditText etSearchCategory;
         FloatingActionButton done, clear;
         RecyclerView recyclerView;
         done = dialog.findViewById(R.id.done);
         clear = dialog.findViewById(R.id.clear);
+        etSearchCategory = dialog.findViewById(R.id.search_category);
         recyclerView = dialog.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -701,12 +758,63 @@ public class Home extends AppCompatActivity implements
 
 
         if (categoryPosition == 3) {
-            subCategoryAdapter = new SubCategoryAdapter(this, exceptMultipleSubCategories, filterClickListener, 1);
+            filterSubCategories.addAll(exceptMultipleSubCategories);
+            subCategoryAdapter = new SubCategoryAdapter(this, filterSubCategories, new ArrayList<>(), filterClickListener, 1);
             recyclerView.setAdapter(subCategoryAdapter);
         } else {
-            subCategoryAdapter = new SubCategoryAdapter(this, multipleSubCategories, filterClickListener, 1);
+            filterSubCategories.addAll(multipleSubCategories);
+            subCategoryAdapter = new SubCategoryAdapter(this, filterSubCategories, new ArrayList<>(), filterClickListener, 1);
             recyclerView.setAdapter(subCategoryAdapter);
         }
+
+        etSearchCategory.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String key = etSearchCategory.getText().toString();
+                filterSubCategories.clear();
+                if (key.isEmpty()) {
+                    if (categoryPosition == 3) {
+                        filterSubCategories.addAll(exceptMultipleSubCategories);
+                    } else {
+                        filterSubCategories.addAll(multipleSubCategories);
+                    }
+                } else {
+                    for (PostFilterSubCategory category : (categoryPosition == 3 ?  exceptMultipleSubCategories : multipleSubCategories)) {
+                        ArrayList<PostFilterItem> arrayList = new ArrayList<>();
+                        PostFilterSubCategory postFilterSubCategory = new PostFilterSubCategory();
+                        for (PostFilterItem postFilterItem : category.getPostFilterItems()) {
+                            if (postFilterItem.getItemName().toLowerCase().contains(key.toLowerCase())) {
+                                arrayList.add(postFilterItem);
+                            }
+                        }
+                        postFilterSubCategory.setCatId(category.getCatId());
+                        postFilterSubCategory.setSubCatId(category.getSubCatId());
+                        postFilterSubCategory.setSubCatName(category.getSubCatName());
+                        postFilterSubCategory.setSelectedAll(category.isSelectedAll());
+                        postFilterSubCategory.setPostFilterItems(arrayList);
+
+                        if (postFilterSubCategory.getSubCatName().toLowerCase().contains(key.toLowerCase())) {
+                            filterSubCategories.add(postFilterSubCategory);
+                        } else {
+                            if (arrayList.size() != 0) {
+                                filterSubCategories.add(postFilterSubCategory);
+                            }
+                        }
+                    }
+                }
+                subCategoryAdapter.notifyDataSetChanged();
+            }
+        });
 
         toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
