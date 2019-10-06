@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -23,6 +25,7 @@ import com.doodle.Tool.Tools;
 import com.doodle.Tool.fragment.Network;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -77,6 +80,7 @@ public class PostCategory extends AppCompatActivity {
             }
         });
         childSubcatgList = new HashMap<Category, List<Subcatg>>();
+        mCategoryList = new ArrayList<>();
 
         et_search = (EditText) findViewById(R.id.et_search);
         progressView = (CircularProgressView) findViewById(R.id.progress_view);
@@ -87,7 +91,7 @@ public class PostCategory extends AppCompatActivity {
         token = manager.getToken();
         activity = PostCategory.this;
 
-        if (networkOk) {
+        if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
             progressView.setVisibility(View.VISIBLE);
             progressView.startAnimation();
             Call<CategoryItem> call = webService.getCategories(deviceId, profileId, token);
@@ -99,6 +103,54 @@ public class PostCategory extends AppCompatActivity {
 
         }
 
+        et_search.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                String key = et_search.getText().toString();
+                mCategoryList.clear();
+                if (key.isEmpty()) {
+                    mCategoryList.addAll(categoryItem.getCategories());
+                } else {
+                    for (Category category : categoryItem.getCategories()) {
+                        ArrayList<Subcatg> arrayList = new ArrayList<>();
+                        Category postFilterSubCategory = new Category();
+                        for (Subcatg subcatg : category.getSubcatg()) {
+                            if (subcatg.getSubCategoryName().toLowerCase().contains(key.toLowerCase())) {
+                                arrayList.add(subcatg);
+                            }
+                        }
+                        postFilterSubCategory.setCategoryId(category.getCategoryId());
+                        postFilterSubCategory.setCategoryName(category.getCategoryName());
+                        postFilterSubCategory.setSubcatg(arrayList);
+
+                        if (postFilterSubCategory.getCategoryName().toLowerCase().contains(key.toLowerCase())) {
+                            mCategoryList.add(postFilterSubCategory);
+                        } else {
+                            if (arrayList.size() != 0) {
+                                mCategoryList.add(postFilterSubCategory);
+                            }
+                        }
+                    }
+                }
+                for (Category temp : mCategoryList) {
+                    subcatgList = temp.getSubcatg();
+                    childSubcatgList.put(temp, subcatgList);
+
+                }
+                adapter = new CategoryListAdapter(PostCategory.this, mCategoryList, childSubcatgList);
+                expandableListView.setAdapter(adapter);
+            }
+        });
 
         setListener();
 
@@ -113,7 +165,9 @@ public class PostCategory extends AppCompatActivity {
 
 
                 categoryItem = response.body();
-                mCategoryList = categoryItem.getCategories();
+                if (categoryItem != null) {
+                    mCategoryList.addAll(categoryItem.getCategories());
+                }
                 for (Category temp : mCategoryList
                 ) {
                     subcatgList = temp.getSubcatg();
@@ -153,7 +207,7 @@ public class PostCategory extends AppCompatActivity {
             @Override
             public boolean onGroupClick(ExpandableListView parent, View v,
                                         int groupPosition, long id) {
-               // Toast.makeText(activity, "Group Clicked " + mCategoryList.get(groupPosition).getCategoryName(), Toast.LENGTH_SHORT).show();
+                // Toast.makeText(activity, "Group Clicked " + mCategoryList.get(groupPosition).getCategoryName(), Toast.LENGTH_SHORT).show();
 
                 // only one group is populate using this
                 if (expandableListView.isGroupExpanded(groupPosition)) {
@@ -175,7 +229,7 @@ public class PostCategory extends AppCompatActivity {
 
             @Override
             public void onGroupExpand(int groupPosition) {
-               // Toast.makeText(activity, mCategoryList.get(groupPosition).getCategoryName() + " Expanded", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(activity, mCategoryList.get(groupPosition).getCategoryName() + " Expanded", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -200,7 +254,7 @@ public class PostCategory extends AppCompatActivity {
 
 //                String postAudience = childSubcatgList.get(mCategoryList.get(groupPosition)).get(childPosition).getSubCategoryName();
 //                Toast.makeText(activity, mCategoryList.get(groupPosition).getCategoryName() + " : " + postAudience, Toast.LENGTH_SHORT).show();
-                App.setmCategory( mCategoryList.get(groupPosition));
+                App.setmCategory(mCategoryList.get(groupPosition));
                 App.setmSubcatg(childSubcatgList.get(mCategoryList.get(groupPosition)).get(childPosition));
 //                Bundle bundle = new Bundle();
 //                bundle.putParcelable("Category", mCategoryList.get(groupPosition));
@@ -211,7 +265,7 @@ public class PostCategory extends AppCompatActivity {
 //                startActivity(intent);
                 onBackPressed();
 
-              //  overridePendingTransition(R.anim.nothing, R.anim.bottom_down);
+                //  overridePendingTransition(R.anim.nothing, R.anim.bottom_down);
                 return false;
             }
         });

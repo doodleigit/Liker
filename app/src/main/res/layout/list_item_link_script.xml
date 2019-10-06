@@ -78,7 +78,7 @@
             <!--android:layout_height="wrap_content"-->
             <!--android:layout_gravity="right"-->
             <!--android:layout_weight="1"-->
-            <!--android:drawableRight="@drawable/ic_close_black_24dp"-->
+            <!--android:drawableRight="@drawable/ic_close_white_24dp"-->
             <!--android:gravity="right" />-->
         </LinearLayout>
 

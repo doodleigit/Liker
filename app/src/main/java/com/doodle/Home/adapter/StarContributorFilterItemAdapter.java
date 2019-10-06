@@ -58,6 +58,14 @@ public class StarContributorFilterItemAdapter extends RecyclerView.Adapter<StarC
                 starContributorCategoryListener.onCategoryClick(arrayList.get(position).getItemId(), arrayList.get(position).getItemName());
             }
         });
+
+        viewHolder.mainLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                starContributorCategoryListener.onCategoryClick(arrayList.get(position).getItemId(), arrayList.get(position).getItemName());
+            }
+        });
+
     }
 
     @Override

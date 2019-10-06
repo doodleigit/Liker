@@ -20,8 +20,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <include layout="@layout/list_item_post_header"/>
             <include layout="@layout/list_item_post_header_share"/>
+            <include layout="@layout/list_item_post_header"/>
 
 
         </LinearLayout>
@@ -64,6 +64,7 @@
                 android:id="@+id/tvPostEmojiContent"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:background="@null"
                 android:textColor="@color/colorPostText"
                 android:layout_margin="@dimen/_5sdp"

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.format.DateFormat;
+import android.text.util.Linkify;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -69,6 +70,7 @@ public class MessagingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             LeftChatViewHolder viewHolder = (LeftChatViewHolder) holder;
 
             viewHolder.tvMessage.setText(message);
+            Linkify.addLinks(viewHolder.tvMessage, Linkify.ALL);
             viewHolder.tvMessageTime.setText(Tools.chatDateCompare(context, Long.valueOf(messageTime)));
 
             Glide.with(App.getAppContext())
@@ -89,6 +91,7 @@ public class MessagingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             RightChatViewHolder viewHolder = (RightChatViewHolder) holder;
 
             viewHolder.tvMessage.setText(message);
+            Linkify.addLinks(viewHolder.tvMessage, Linkify.ALL);
             viewHolder.tvMessageTime.setText(Tools.chatDateCompare(context, Long.valueOf(messageTime)));
 
             Glide.with(App.getAppContext())

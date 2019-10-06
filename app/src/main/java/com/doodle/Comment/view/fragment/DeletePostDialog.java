@@ -32,7 +32,8 @@ public class DeletePostDialog extends DialogFragment {
         //TODO: Set builder properties
         PostItem item = new PostItem();
         item = App.getItem();
-        message = "Are you sure you want to delete this post? You will permanently lose this post.";
+       // message = "Are you sure you want to delete this post? You will permanently lose this post.";
+        message = "Are you sure that you want to delete this post? ";
 
         builder.setMessage(message);
         // builder.setMessage("Do you like sugar snap peas");

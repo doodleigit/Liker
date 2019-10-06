@@ -1,6 +1,7 @@
 package com.doodle.Setting.view;
 
 import android.app.ProgressDialog;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -23,6 +24,7 @@ import com.doodle.Setting.model.AddedCategory;
 import com.doodle.Setting.model.Category;
 import com.doodle.Setting.model.Contribution;
 import com.doodle.Setting.model.ContributionItem;
+import com.doodle.Setting.model.Info;
 import com.doodle.Setting.model.SubCategory;
 import com.doodle.Setting.service.ContributionAddListener;
 import com.doodle.Setting.service.SettingService;
@@ -147,19 +149,20 @@ public class ContributorSettingFragment extends Fragment {
                 } else {
                     for (Category category : allCategories) {
                         ArrayList<SubCategory> arrayList = new ArrayList<>();
+                        Category cat = new Category();
                         for (SubCategory subCategory : category.getSubCategories()) {
                             if (subCategory.getName().toLowerCase().contains(key.toLowerCase())) {
                                 arrayList.add(subCategory);
                             }
                         }
-                        category.getSubCategories().clear();
-                        category.getSubCategories().addAll(arrayList);
+                        cat.setInfo(category.getInfo());
+                        cat.setSubCategories(arrayList);
 
-                        if (category.getInfo().getName().toLowerCase().equals(key.toLowerCase())) {
-                            categories.add(category);
+                        if (cat.getInfo().getName().toLowerCase().contains(key.toLowerCase())) {
+                            categories.add(cat);
                         } else {
                             if (arrayList.size() != 0) {
-                                categories.add(category);
+                                categories.add(cat);
                             }
                         }
                     }
@@ -187,37 +190,23 @@ public class ContributorSettingFragment extends Fragment {
                     } else {
                         for (Category category : allCategories) {
                             ArrayList<SubCategory> arrayList = new ArrayList<>();
+                            Category cat = new Category();
                             for (SubCategory subCategory : category.getSubCategories()) {
-                                if (subCategory.getName().contains(key)) {
+                                if (subCategory.getName().toLowerCase().contains(key.toLowerCase())) {
                                     arrayList.add(subCategory);
                                 }
                             }
-                            category.getSubCategories().clear();
-                            category.getSubCategories().addAll(arrayList);
+                            cat.setInfo(category.getInfo());
+                            cat.setSubCategories(arrayList);
 
-                            if (category.getInfo().getName().equals(key)) {
-                                categories.add(category);
+                            if (cat.getInfo().getName().toLowerCase().contains(key.toLowerCase())) {
+                                categories.add(cat);
                             } else {
                                 if (arrayList.size() != 0) {
-                                    categories.add(category);
+                                    categories.add(cat);
                                 }
                             }
                         }
-
-
-//                        for (Category category : allCategories) {
-//                            if (category.getInfo().getName().contains(key)) {
-//                                ArrayList<SubCategory> arrayList = new ArrayList<>();
-//                                for (SubCategory subCategory : category.getSubCategories()) {
-//                                    if (subCategory.getName().contains(key)) {
-//                                        arrayList.add(subCategory);
-//                                    }
-//                                }
-//                                category.getSubCategories().clear();
-//                                category.getSubCategories().addAll(arrayList);
-//                                categories.add(category);
-//                            }
-//                        }
                     }
                     contributorCategoryAdapter.notifyDataSetChanged();
                 }
@@ -274,5 +263,19 @@ public class ContributorSettingFragment extends Fragment {
             }
         });
     }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // Checks whether a hardware keyboard is available
+        if (newConfig.hardKeyboardHidden == Configuration.HARDKEYBOARDHIDDEN_NO) {
+
+        } else if (newConfig.hardKeyboardHidden == Configuration.HARDKEYBOARDHIDDEN_YES) {
+            categories.clear();
+            contributorCategoryAdapter.notifyDataSetChanged();
+        }
+    }
+
+
 
 }

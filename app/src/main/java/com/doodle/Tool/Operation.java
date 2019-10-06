@@ -236,13 +236,19 @@ public class Operation {
 
         Date systemDate = Calendar.getInstance().getTime();
         systemDate.setTime(timestampInMilliSeconds);
+        Calendar cal = Calendar.getInstance();
+        cal.setTimeInMillis(timestampInMilliSeconds);
+        int postYear = cal.get(Calendar.YEAR);
+        int thisYear = Calendar.getInstance().get(Calendar.YEAR);
         //String formattedDate=new SimpleDateFormat("MMM d, yyyy").format(date);
-        String formattedDate = new SimpleDateFormat("d MMM, yyyy HH:mm aa").format(timestampInMilliSeconds);
-        return formattedDate;
-
+        if (postYear == thisYear) {
+            String formattedDate = new SimpleDateFormat("d MMM HH:mm aa").format(timestampInMilliSeconds);
+            return formattedDate;
+        } else {
+            String formattedDate = new SimpleDateFormat("d MMM, yyyy HH:mm aa").format(timestampInMilliSeconds);
+            return formattedDate;
+        }
     }
-
-
 
 //
 //    public static String getTime(long mili){

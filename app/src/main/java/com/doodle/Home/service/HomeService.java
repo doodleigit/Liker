@@ -2,7 +2,9 @@ package com.doodle.Home.service;
 
 import com.doodle.Comment.model.CommentItem;
 import com.doodle.Home.model.LikeUsers;
+import com.doodle.Home.model.PostFilters;
 import com.doodle.Home.model.PostItem;
+import com.doodle.Home.model.SinglePostFilters;
 import com.doodle.Home.model.StarContributor;
 import com.doodle.Home.model.postshare.PostShareItem;
 import com.doodle.Tool.AppConstants;
@@ -140,6 +142,36 @@ public interface HomeService {
             @Field("user_id") String id
     );
 
+
+    @POST(AppConstants.GET_POST_FILTERS)
+    @FormUrlEncoded
+    Call<PostFilters> sendPostFilters(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("user_id") String id,
+            @Field("filter") String filter
+    );
+
+    @POST(AppConstants.GET_SINGLE_POST_FILTERS)
+    @FormUrlEncoded
+    Call<SinglePostFilters> sendSinglePostFilters(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("user_id") String id
+    );
+
+    @POST(AppConstants.ADDED_FILTER)
+    @FormUrlEncoded
+    Call<String > addedFilter(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("user_id") String id,
+            @Field("cat_id") String catId,
+            @Field("filter") String filter
+    );
 
     @POST(AppConstants.GET_USER_RANKINGS)
     @FormUrlEncoded

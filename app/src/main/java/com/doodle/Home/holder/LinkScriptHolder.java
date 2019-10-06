@@ -6,6 +6,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -109,7 +110,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
     public TextView tvPostLinkTitle, tvPostLinkDescription, tvPostLinkHost;
 
 
-    public ImageView imagePostShare, imagePermission;
+    public ImageView imagePostShare,imagePostShareSetting, imagePermission;
     private PopupMenu popup, popupMenu;
     public HomeService webService;
     public PrefManager manager;
@@ -173,6 +174,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
     private ImageView imageSharePostPermission;
     private TextView tvSharePostUserName, tvSharePostTime,tvShareHeaderInfo,tvSharePostContent;
     private TextView tvShared,tvPostShareUserName;
+    private MediaPlayer player;
 
     ViewGroup tvLikeShare;
 
@@ -187,6 +189,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
         mContext = context;
         this.listener = listener;
 
+        player = MediaPlayer.create(mContext, R.raw.post_like);
         callbackManager = CallbackManager.Factory.create();
         shareDialog = new ShareDialog((Activity) context);
         manager = new PrefManager(App.getAppContext());
@@ -196,6 +199,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
         userIds = manager.getProfileId();
         webService = HomeService.mRetrofit.create(HomeService.class);
         imagePostShare = (ImageView) itemView.findViewById(R.id.imagePostShare);
+        imagePostShareSetting = (ImageView) itemView.findViewById(R.id.imagePostShareSetting);
         imagePermission = (ImageView) itemView.findViewById(R.id.imagePermission);
 
 
@@ -310,7 +314,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
         if ("1".equalsIgnoreCase(isShared)) {
             containerHeaderShare.setVisibility(View.VISIBLE);
 
-
+            imagePermission.setVisibility(View.GONE);
             SharedProfile itemSharedProfile = item.getSharedProfile();
             sharedFirstName = itemSharedProfile.getUserFirstName();
             sharedLastName = itemSharedProfile.getUserLastName();
@@ -344,6 +348,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
             }
 
         } else {
+            imagePermission.setVisibility(View.VISIBLE);
             containerHeaderShare.setVisibility(View.GONE);
             if(App.isSharePostfooter()){
                 imagePermission.setVisibility(View.GONE);
@@ -790,6 +795,17 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
 
             }
         });
+        imagePostShareSetting.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("RestrictedApi")
+            @Override
+            public void onClick(View v) {
+
+                activity = (AppCompatActivity) v.getContext();
+                PostPermissionSheet reportReasonSheet = PostPermissionSheet.newInstance(item, position);
+                reportReasonSheet.show(activity.getSupportFragmentManager(), "ReportReasonSheet");
+
+            }
+        });
         imagePermission.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("RestrictedApi")
             @Override
@@ -960,7 +976,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
                 //  mContext.startActivity(new Intent(mContext, CommentPost.class));
 //                FullBottomSheetDialogFragment postPermissions = new FullBottomSheetDialogFragment();
 //                postPermissions.show(activity.getSupportFragmentManager(), "PostPermission");
-                if (networkOk) {
+                if (NetworkHelper.hasNetworkAccess(mContext)) {
 
                     Call<CommentItem> call = commentService.getAllPostComments(deviceId, profileId, token, "false", limit, offset, "DESC", item.getPostId(), userIds);
                     sendAllCommentItemRequest(call);
@@ -1037,6 +1053,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
                             JSONObject object = new JSONObject(response.body());
                             String status = object.getString("status");
                             if ("true".equalsIgnoreCase(status)) {
+                                player.start();
                                 Call<String> mCall = webService.sendBrowserNotification(
                                         deviceId,//"8b64708fa409da20341b1a555d1ddee526444",
                                         profileId,//"26444",

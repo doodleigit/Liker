@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
 import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.MenuBuilder;
@@ -116,6 +117,7 @@ public class ReplyLinkScriptHolder extends RecyclerView.ViewHolder {
 
     private String commentLike;
     private int commentLikeNumeric;
+    private MediaPlayer player;
 
     //EDIT COMMENT
     ReplyListener listener;
@@ -135,6 +137,8 @@ public class ReplyLinkScriptHolder extends RecyclerView.ViewHolder {
 
         mContext = context;
         this.listener = listener;
+
+        player = MediaPlayer.create(mContext, R.raw.post_like);
         manager = new PrefManager(App.getAppContext());
         deviceId = manager.getDeviceId();
         profileId = manager.getProfileId();
@@ -265,7 +269,11 @@ public class ReplyLinkScriptHolder extends RecyclerView.ViewHolder {
             tvCountCommentLike.setText(content);
         }
 
-
+        if (replyItem.isIsLikeReplied()) {
+            imgCommentLike.setImageResource(R.drawable.like_done);
+        } else {
+            imgCommentLike.setImageResource(R.drawable.like_normal);
+        }
 
         imgCommentLike.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -278,7 +286,7 @@ public class ReplyLinkScriptHolder extends RecyclerView.ViewHolder {
                     } else{
                         if (replyItem.isIsLikeReplied()) {
 
-                            if (networkOk) {
+                            if (NetworkHelper.hasNetworkAccess(mContext)) {
                                 Call<String> call = commentService.unLikeCommentReply(deviceId, profileId, token, replyItem.getCommentId(), replyItem.getId(), postItem.getPostId(), profileId);
                                 sendUnLikeCommentReplyRequest(call);
                             } else {
@@ -287,7 +295,7 @@ public class ReplyLinkScriptHolder extends RecyclerView.ViewHolder {
                             }
 
                         } else {
-                            if (networkOk) {
+                            if (NetworkHelper.hasNetworkAccess(mContext)) {
                                 Call<String> call = commentService.likeCommentReply(deviceId, profileId, token, replyItem.getCommentId(), replyItem.getId(), postItem.getPostId(), profileId);
                                 sendLikeCommentReplyRequest(call);
                             } else {
@@ -499,7 +507,7 @@ public class ReplyLinkScriptHolder extends RecyclerView.ViewHolder {
                             App.setReplyItem(replyItem);
                             App.setItem(postItem);
                             activity = (AppCompatActivity) v.getContext();
-                            if (networkOk) {
+                            if (NetworkHelper.hasNetworkAccess(mContext)) {
                                 Call<ReportReason> call = commentService.getReportReason(deviceId, profileId, token, replyItem.getUserId(), "2", userIds);
                                 sendReportReason(call);
                             } else {
@@ -545,7 +553,7 @@ public class ReplyLinkScriptHolder extends RecyclerView.ViewHolder {
 
                 String commentReply = commentItem.getTotalReply();
                 if (Integer.parseInt(commentReply) > 0) {
-                    if (networkOk) {
+                    if (NetworkHelper.hasNetworkAccess(mContext)) {
 
                         Call<List<Reply>> call = commentService.getPostCommentReplyList(deviceId, profileId, token, commentItem.getId(), "false", limit, offset, commentItem.getPostId(), userIds);
                         sendAllCommentReplyListRequest(call);
@@ -612,7 +620,7 @@ public class ReplyLinkScriptHolder extends RecyclerView.ViewHolder {
                             if (isContain(object, "status")) {
                                 String status = object.getString("status");
                                 if ("true".equalsIgnoreCase(status)) {
-
+                                    player.start();
                                     Call<String> mCall = webService.sendBrowserNotification(
                                             deviceId,//"8b64708fa409da20341b1a555d1ddee526444",
                                             profileId,//"26444",
@@ -635,6 +643,7 @@ public class ReplyLinkScriptHolder extends RecyclerView.ViewHolder {
                                     tvCountCommentLike.setVisibility(View.VISIBLE);
                                     tvCountCommentLike.setText(content);
 
+                                    imgCommentLike.setImageResource(R.drawable.like_done);
                                 }
                             }
 
@@ -691,6 +700,8 @@ public class ReplyLinkScriptHolder extends RecyclerView.ViewHolder {
                                         tvCountCommentLike.setVisibility(View.VISIBLE);
                                         tvCountCommentLike.setText(content);
                                     }
+
+                                    imgCommentLike.setImageResource(R.drawable.like_normal);
                                 }
 
 

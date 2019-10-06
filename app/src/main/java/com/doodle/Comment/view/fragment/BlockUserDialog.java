@@ -40,10 +40,10 @@ public class BlockUserDialog extends DialogFragment  {
         comment = App.getCommentItem();
         if (!isEmpty(item)) {
             blockUserName = item.getUserFirstName() + " " + item.getUserLastName();
-            message = "Are you sure that you want to " + blockUserName;
+            message = "Are you sure that you want to block " + blockUserName+"?";
         } else if (!isEmpty(comment)) {
             blockUserName = comment.getUserFirstName() + " " + comment.getUserLastName();
-            message = "Are you sure that you want to " + blockUserName;
+            message = "Are you sure that you want to block " + blockUserName+"?";
         }
 
 

@@ -43,7 +43,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_margin="@dimen/_15sdp"
-        android:src="@drawable/ic_close_black_24dp" />
+        android:src="@drawable/ic_close_white_24dp" />
 
     <LinearLayout
 
@@ -67,9 +67,12 @@
 
         <EditText
             android:id="@+id/etReportPerson"
+            android:gravity="start"
             android:layout_width="match_parent"
             android:layout_height="@dimen/_100sdp"
-            android:background="@drawable/drawable_comment"/>
+            android:background="@drawable/drawable_comment">
+            <requestFocus/>
+        </EditText>
 
     </LinearLayout>
     <Button

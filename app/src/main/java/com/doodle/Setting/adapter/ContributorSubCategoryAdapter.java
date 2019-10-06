@@ -85,6 +85,27 @@ public class ContributorSubCategoryAdapter extends RecyclerView.Adapter<Contribu
                 }
             }
         });
+
+        viewHolder.mainLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (arrayList.get(i).getIsSelected()) {
+                    String catId, subCatId, name, actionType;
+                    catId = arrayList.get(i).getId();
+                    subCatId = "0";
+                    name = arrayList.get(i).getName();
+                    actionType = "remove";
+                    sendContributorAddRequest(catId, subCatId, name, actionType, false, i);
+                } else {
+                    String catId, subCatId, name, actionType;
+                    catId = arrayList.get(i).getId();
+                    subCatId = "0";
+                    name = arrayList.get(i).getName();
+                    actionType = "add";
+                    sendContributorAddRequest(catId, subCatId, name, actionType, true, i);
+                }
+            }
+        });
     }
 
     @Override

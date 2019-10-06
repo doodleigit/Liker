@@ -234,7 +234,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
     private List<String> uploadImageName = new ArrayList<>();
     private int contentType;
     private String categoryId = "", subCategoryId = "";
-    private String contentTitle;
+    private String contentTitle = "";
     private String contentLinkUrl;
     private String contentHost;
     private String contentLinkTitle;
@@ -412,7 +412,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                     editPostMessage.setTextAppearance(this, android.R.style.TextAppearance_Medium);
                     editPostMessage.setTextColor(Color.parseColor("#000000"));
                     ViewGroup.LayoutParams params = messageContainer.getLayoutParams();
-                    params.height = 300;
+                    params.height = (int) getResources().getDimension(R.dimen._220sdp);
                     messageContainer.setLayoutParams(params);
                 } else {
                     int mColor = Color.parseColor(mimColor);
@@ -421,7 +421,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                         editPostMessage.setTextColor(Color.parseColor("#000000"));
                     }
                     ViewGroup.LayoutParams params = messageContainer.getLayoutParams();
-                    params.height = 350;
+                    params.height = (int) getResources().getDimension(R.dimen._200sdp);
                     messageContainer.setLayoutParams(params);
                     messageContainer.setGravity(Gravity.CENTER);
                     editPostMessage.setGravity(Gravity.CENTER);
@@ -721,7 +721,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
     }
 
     private void mentionUsers() {
-        if (networkOk) {
+        if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
             progressView.setVisibility(View.VISIBLE);
             progressView.startAnimation();
 
@@ -1130,13 +1130,14 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
             case R.id.tvSubmitPost:
 
                 checkContentType();
-                if (categoryId.isEmpty() && subCategoryId.isEmpty()) {
+                if (contentTitle.isEmpty()) {
+                    Tools.showCustomToast(PostNew.this, mView, "Please add a post description", Gravity.TOP);
+                } else if (categoryId.isEmpty() && subCategoryId.isEmpty()) {
                     Tools.showCustomToast(PostNew.this, mView, "Please select your post’s audience.", Gravity.TOP);
                 } else if (!isAddContentTitle) {
                     Tools.showCustomToast(PostNew.this, mView, "Cat’s got your tongue? Please write at least 8 characters in your post description.", Gravity.TOP);
                 } else if (contentTitle.length() < 8) {
                     Tools.showCustomToast(PostNew.this, mView, "Cat’s got your tongue? Please write at least 8 characters in your post description.", Gravity.TOP);
-
                 } else {
                     createNewPost();
                 }
@@ -1186,7 +1187,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
     }
 
     private void createNewPost() {
-        if (networkOk) {
+        if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
             progressView.setVisibility(View.VISIBLE);
             progressView.startAnimation();
             Call<String> call = webService.postAdded(
@@ -1336,9 +1337,9 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                                 } else {
 
                                 }*/
-                                    startActivity(new Intent(PostNew.this, Home.class));
+//                                    startActivity(new Intent(PostNew.this, Home.class));
                                     finish();
-
+                                    sendBroadcast((new Intent()).setAction(AppConstants.NEW_POST_ADD_BROADCAST));
                                 }
 
                             }
@@ -1644,9 +1645,9 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                         try {
                             JSONObject object = new JSONObject(response.body());
 
-                            startActivity(new Intent(PostNew.this, Home.class));
+//                            startActivity(new Intent(PostNew.this, Home.class));
                             finish();
-
+                            sendBroadcast((new Intent()).setAction(AppConstants.NEW_POST_ADD_BROADCAST));
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -2703,7 +2704,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
     @Override
     public void onPositiveResult(DialogFragment dlg) {
         //addedPostContributor
-        if (networkOk) {
+        if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
             progressView.setVisibility(View.VISIBLE);
             progressView.startAnimation();
             Call<String> call = webService.addedPostContributor(deviceId, profileId, token, categoryId, subCategoryId, 5, userIds);
@@ -2736,9 +2737,11 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                                     Call<String> mediaCall = videoServices.uploadVideo(deviceId, profileId, token, fileToUpload, postId, true);
                                     sendVideoRequest(mediaCall);
                                 } else {
-                                    Intent intent = new Intent(PostNew.this, Home.class);
-                                    intent.putExtra("STATUS", status);
-                                    startActivity(intent);
+//                                    Intent intent = new Intent(PostNew.this, Home.class);
+//                                    intent.putExtra("STATUS", status);
+//                                    startActivity(intent);
+                                    finish();
+                                    sendBroadcast((new Intent()).setAction(AppConstants.NEW_POST_ADD_BROADCAST));
                                     String message = "You are now a contributor to the Hobby & Leisure - Airplanes category and your post has been added to your profile.";
                                     //  Tools.showCustomToast(PostNew.this, mView, message, Gravity.CENTER);
                                 }
@@ -2768,7 +2771,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
     @Override
     public void onNegativeResult(DialogFragment dlg) {
 
-        if (networkOk) {
+        if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
             progressView.setVisibility(View.VISIBLE);
             progressView.startAnimation();
             Call<String> call = webService.addedPostContributor(deviceId, profileId, token, categoryId, subCategoryId, 6, userIds);

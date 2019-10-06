@@ -115,39 +115,39 @@ public class DataFetchingService extends Service {
             @Override
             public void call(Object... args) {
                 sendBroadcast((new Intent().putExtra("type", "0")).setAction(AppConstants.NEW_NOTIFICATION_BROADCAST));
-                try {
-                    JSONObject object = new JSONObject(args[0].toString());
-                    NotificationItem notificationItem = new NotificationItem();
-                    Data data = new Data();
-
-                    notificationItem.setText(object.getString("text"));
-                    notificationItem.setData(data);
-                    JSONObject jsonObject = object.getJSONObject("data");
-                    notificationItem.getData().setId(jsonObject.getString("id"));
-                    notificationItem.getData().setUserId(jsonObject.getString("user_id"));
-                    notificationItem.getData().setFromUserId(jsonObject.getString("from_user_id"));
-                    notificationItem.getData().setNotifType(jsonObject.getString("notif_type"));
-                    notificationItem.getData().setTypeId(jsonObject.getString("type_id"));
-                    notificationItem.getData().setTimeSent(jsonObject.getString("time_sent"));
-                    notificationItem.getData().setHasSeen(jsonObject.getString("has_seen"));
-                    notificationItem.getData().setHasSeenDetails(jsonObject.getString("has_seen_details"));
-                    notificationItem.getData().setCategoryId(jsonObject.getString("category_id"));
-                    notificationItem.getData().setSubCatgId(jsonObject.getString("sub_catg_id"));
-                    notificationItem.getData().setUsername(jsonObject.getString("username"));
-                    notificationItem.getData().setFirstName(jsonObject.getString("first_name"));
-                    notificationItem.getData().setLastName(jsonObject.getString("last_name"));
-                    notificationItem.getData().setPhoto(jsonObject.getString("photo"));
-                    notificationItem.getData().setGoldStars(jsonObject.getString("gold_stars"));
-                    notificationItem.getData().setSliverStars(jsonObject.getString("sliver_stars"));
-                    notificationItem.getData().setCategoryName(jsonObject.getString("category_name"));
-                    notificationItem.getData().setBadgeInfo(new BadgeInfo());
-                    notificationItem.getData().setIsFollowed(jsonObject.getBoolean("is_followed"));
-                    notificationItem.getData().setPostUserUsername(jsonObject.getString("post_user_username"));
-
-                    sendPushNotification(DataFetchingService.this, notificationItem);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+//                try {
+//                    JSONObject object = new JSONObject(args[0].toString());
+//                    NotificationItem notificationItem = new NotificationItem();
+//                    Data data = new Data();
+//
+//                    notificationItem.setText(object.getString("text"));
+//                    notificationItem.setData(data);
+//                    JSONObject jsonObject = object.getJSONObject("data");
+//                    notificationItem.getData().setId(jsonObject.getString("id"));
+//                    notificationItem.getData().setUserId(jsonObject.getString("user_id"));
+//                    notificationItem.getData().setFromUserId(jsonObject.getString("from_user_id"));
+//                    notificationItem.getData().setNotifType(jsonObject.getString("notif_type"));
+//                    notificationItem.getData().setTypeId(jsonObject.getString("type_id"));
+//                    notificationItem.getData().setTimeSent(jsonObject.getString("time_sent"));
+//                    notificationItem.getData().setHasSeen(jsonObject.getString("has_seen"));
+//                    notificationItem.getData().setHasSeenDetails(jsonObject.getString("has_seen_details"));
+//                    notificationItem.getData().setCategoryId(jsonObject.getString("category_id"));
+//                    notificationItem.getData().setSubCatgId(jsonObject.getString("sub_catg_id"));
+//                    notificationItem.getData().setUsername(jsonObject.getString("username"));
+//                    notificationItem.getData().setFirstName(jsonObject.getString("first_name"));
+//                    notificationItem.getData().setLastName(jsonObject.getString("last_name"));
+//                    notificationItem.getData().setPhoto(jsonObject.getString("photo"));
+//                    notificationItem.getData().setGoldStars(jsonObject.getString("gold_stars"));
+//                    notificationItem.getData().setSliverStars(jsonObject.getString("sliver_stars"));
+//                    notificationItem.getData().setCategoryName(jsonObject.getString("category_name"));
+//                    notificationItem.getData().setBadgeInfo(new BadgeInfo());
+//                    notificationItem.getData().setIsFollowed(jsonObject.getBoolean("is_followed"));
+//                    notificationItem.getData().setPostUserUsername(jsonObject.getString("post_user_username"));
+//
+//                    sendPushNotification(DataFetchingService.this, notificationItem);
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
             }
         });
     }

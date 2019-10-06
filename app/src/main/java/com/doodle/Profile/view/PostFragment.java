@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +19,8 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.doodle.App;
 import com.doodle.Comment.model.CommentItem;
 import com.doodle.Home.adapter.PostAdapter;
 import com.doodle.Home.model.PostItem;
@@ -28,6 +31,7 @@ import com.doodle.Home.holder.TextHolder;
 import com.doodle.Home.holder.TextMimHolder;
 import com.doodle.Home.holder.VideoHolder;
 import com.doodle.Home.service.VideoPlayerRecyclerView;
+import com.doodle.Post.view.activity.PostNew;
 import com.doodle.Profile.service.ProfileService;
 import com.doodle.R;
 import com.doodle.Tool.AppConstants;
@@ -42,6 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -49,10 +54,9 @@ import retrofit2.Response;
 public class PostFragment extends Fragment {
     View v;
     public List<PostItem> postItemList;
-    //  private List<Comment> comments = new ArrayList<Comment>();
     private ProfileService profileService;
     private PrefManager manager;
-    private String deviceId, profileUserName, token, userId;
+    private String deviceId, profileUserName, token, userId, userImage;
     private int cat_id, filter;
     private boolean isPublic;
     private boolean networkOk;
@@ -62,14 +66,14 @@ public class PostFragment extends Fragment {
     private PostAdapter adapter;
     private VideoPlayerRecyclerView recyclerView;
     private LinearLayoutManager layoutManager;
-    private int totalItems;
-    private int scrollOutItems;
-    private int currentItems;
     private boolean isScrolling;
-    int limit = 5;
+    int limit = 15;
     int offset = 0;
     private String catIds = "";
+
+    private CardView addPostLayout;
     private TextView tvAlert;
+    private CircleImageView ivImage;
 
     //Delete post item
     public static TextHolder.PostItemListener mCallback;
@@ -95,6 +99,10 @@ public class PostFragment extends Fragment {
         filter.addAction(AppConstants.PROFILE_PAGE_PAGINATION_BROADCAST);
         Objects.requireNonNull(getActivity()).registerReceiver(broadcastReceiver, filter);
 
+        IntentFilter newPostFilter = new IntentFilter();
+        newPostFilter.addAction(AppConstants.NEW_POST_ADD_BROADCAST);
+        Objects.requireNonNull(getActivity()).registerReceiver(newPostBroadcastReceiver, newPostFilter);
+
         IntentFilter postFooterIntentFilter = new IntentFilter();
         postFooterIntentFilter.addAction(AppConstants.POST_CHANGE_BROADCAST);
         Objects.requireNonNull(getActivity()).registerReceiver(postChangeBroadcast, postFooterIntentFilter);
@@ -108,6 +116,7 @@ public class PostFragment extends Fragment {
         profileUserName = getArguments().getString("user_name");
         token = manager.getToken();
         userId = manager.getProfileId();
+        userImage = manager.getProfileImage();
         profileService = ProfileService.mRetrofit.create(ProfileService.class);
         networkOk = NetworkHelper.hasNetworkAccess(getActivity());
         postItemList = new ArrayList<>();
@@ -124,7 +133,9 @@ public class PostFragment extends Fragment {
         progressDialog.setMessage(getString(R.string.loading));
         progressDialog.show();
 
+        addPostLayout = root.findViewById(R.id.add_post_layout);
         tvAlert = root.findViewById(R.id.alert);
+        ivImage = root.findViewById(R.id.image);
         layoutManager = new LinearLayoutManager(getContext());
         progressView = root.findViewById(R.id.progress_view);
         recyclerView = root.findViewById(R.id.recyclerView);
@@ -186,11 +197,28 @@ public class PostFragment extends Fragment {
             }
         };
 
+        //App.setSharePostfooter(true);
         adapter = new PostAdapter(getActivity(), postItemList, mCallback, mimListener, videoListener, youtubeListener, linkListener, imageListener, true);
         recyclerView.setMediaObjects(postItemList);
         recyclerView.setActivityContext(getActivity());
         recyclerView.setAdapter(adapter);
+
+        Glide.with(App.getAppContext())
+                .load(userImage)
+                .placeholder(R.drawable.profile)
+                .error(R.drawable.profile)
+                .centerCrop()
+                .dontAnimate()
+                .into(ivImage);
+
         getData();
+
+        addPostLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getContext(), PostNew.class));
+            }
+        });
 
         return root;
     }
@@ -203,7 +231,7 @@ public class PostFragment extends Fragment {
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
 
-                        if (networkOk) {
+                        if (NetworkHelper.hasNetworkAccess(getContext())) {
                             Call<String> call = profileService.postDelete(deviceId, userId, token, userId, deletePostItem.getPostId());
                             sendDeletePostRequest(call);
                         } else {
@@ -257,7 +285,8 @@ public class PostFragment extends Fragment {
     }
 
     private void getData() {
-        if (networkOk) {
+        if (NetworkHelper.hasNetworkAccess(getContext())) {
+            offset = 0;
             progressView.setVisibility(View.VISIBLE);
             Call<List<PostItem>> call = profileService.feed(deviceId, userId, token, userId, limit, offset, catIds, profileUserName, false);
             sendPostItemRequest(call);
@@ -270,7 +299,7 @@ public class PostFragment extends Fragment {
     private void PerformPagination() {
         isScrolling = false;
         progressView.setVisibility(View.VISIBLE);
-        if (networkOk) {
+        if (NetworkHelper.hasNetworkAccess(getContext())) {
             Call<List<PostItem>> call = profileService.feed(deviceId, userId, token, userId, limit, offset, catIds, profileUserName, false);
             PostItemPagingRequest(call);
 
@@ -313,7 +342,7 @@ public class PostFragment extends Fragment {
                     Log.d("friends", totalPostIDs);
 //                    Call<CommentItem> mCall = webService.getPostComments(deviceId, profileId, token, "false", limit, offset, "DESC", totalPostIDs, userIds);
 //                    sendCommentItemPagingRequest(mCall);
-                    offset += 5;
+                    offset += 15;
                     onPostResponsePagination();
                 } else {
                     onPostResponsePagination();
@@ -438,6 +467,13 @@ public class PostFragment extends Fragment {
         }*/
     }
 
+    BroadcastReceiver newPostBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            getData();
+        }
+    };
+
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -511,6 +547,7 @@ public class PostFragment extends Fragment {
         super.onDestroy();
         recyclerView.releasePlayer();
         Objects.requireNonNull(getActivity()).unregisterReceiver(broadcastReceiver);
+        Objects.requireNonNull(getActivity()).unregisterReceiver(newPostBroadcastReceiver);
         Objects.requireNonNull(getActivity()).unregisterReceiver(postChangeBroadcast);
         Objects.requireNonNull(getActivity()).unregisterReceiver(permissionBroadcast);
     }

@@ -121,6 +121,16 @@ public class CategoryListAdapter extends BaseExpandableListAdapter {
                 ((PostCategory) mContext).onBackPressed();
             }
         });
+
+        convertView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                App.setmCategory(listGroup.get(groupPosition));
+                App.setmSubcatg(listChild.get(listGroup.get(groupPosition)).get(childPosition));
+                ((PostCategory) mContext).onBackPressed();
+            }
+        });
+
         return convertView;
     }
 

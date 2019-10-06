@@ -11,12 +11,12 @@
     <RelativeLayout
         android:id="@+id/contentPostView"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/_50sdp"
+        android:layout_height="@dimen/_55sdp"
         android:background="#E7E8E9">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="@dimen/_35sdp"
+            android:layout_height="@dimen/_40sdp"
             android:background="@color/colorPrimary" />
 
 
@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
             android:padding="@dimen/_10sdp"
-            android:src="@drawable/ic_close_black_24dp"
+            android:src="@drawable/ic_close_white_24dp"
             android:tint="@android:color/white" />
 
         <TextView
@@ -36,6 +36,7 @@
             android:layout_alignParentRight="true"
             android:padding="@dimen/_10sdp"
             android:text="Post"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             android:textColor="@android:color/white" />
 
         <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"

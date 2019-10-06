@@ -400,7 +400,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                     editPostMessage.setTextAppearance(this, android.R.style.TextAppearance_Medium);
                     editPostMessage.setTextColor(Color.parseColor("#000000"));
                     ViewGroup.LayoutParams params = messageContainer.getLayoutParams();
-                    params.height = 300;
+                    params.height = (int) getResources().getDimension(R.dimen._220sdp);
                     messageContainer.setLayoutParams(params);
                 } else {
                     int mColor = Color.parseColor(mimColor);
@@ -409,7 +409,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                         editPostMessage.setTextColor(Color.parseColor("#000000"));
                     }
                     ViewGroup.LayoutParams params = messageContainer.getLayoutParams();
-                    params.height = 350;
+                    params.height = (int) getResources().getDimension(R.dimen._200sdp);
                     messageContainer.setLayoutParams(params);
                     messageContainer.setGravity(Gravity.CENTER);
                     editPostMessage.setGravity(Gravity.CENTER);
@@ -923,7 +923,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
     }
 
     private void mentionUsers() {
-        if (networkOk) {
+        if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
             progressView.setVisibility(View.VISIBLE);
             progressView.startAnimation();
 
@@ -1322,13 +1322,15 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
             case R.id.tvSubmitPost:
 
                 checkContentType();
-                if (categoryId.isEmpty() && subCategoryId.isEmpty()) {
+                if (contentTitle.isEmpty()) {
+                    Tools.showCustomToast(EditPost.this, mView, "Please add a post description", Gravity.TOP);
+                } else if (categoryId.isEmpty() && subCategoryId.isEmpty()) {
                     Tools.showCustomToast(EditPost.this, mView, "Please select your post’s audience.", Gravity.TOP);
                 } else if (!isAddContentTitle) {
-                    Tools.showCustomToast(EditPost.this, mView, "you must add the post description!", Gravity.TOP);
+                    Tools.showCustomToast(EditPost.this, mView, "You must add the post description!", Gravity.TOP);
+                } else if (contentTitle.length() < 8) {
+                    Tools.showCustomToast(EditPost.this, mView, "Cat’s got your tongue? Please write at least 8 characters in your post description.", Gravity.TOP);
                 } else {
-
-
                     //  friendSet.add(id);
                     String separator = ", ";
 
@@ -1346,8 +1348,6 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 
                         deleteMediaIds = sb.substring(separator.length()).replaceAll("\\s+", "");
                     }
-
-
                     createNewPost();
                 }
 
@@ -1397,7 +1397,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
     }
 
     private void createNewPost() {
-        if (networkOk) {
+        if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
             progressView.setVisibility(View.VISIBLE);
             progressView.startAnimation();
             Call<String> call = webService.postEdited(
@@ -3000,7 +3000,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
     public void onPositiveResult(DialogFragment dlg) {
         makeText(EditPost.this, "positive button", LENGTH_SHORT).show();
         //addedPostContributor
-        if (networkOk) {
+        if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
             progressView.setVisibility(View.VISIBLE);
             progressView.startAnimation();
             Call<String> call = webService.addedPostContributor(deviceId, profileId, token, categoryId, subCategoryId, 5, userIds);
@@ -3090,7 +3090,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
     public void onNegativeResult(DialogFragment dlg) {
         makeText(EditPost.this, "Negative Button", LENGTH_SHORT).show();
 
-        if (networkOk) {
+        if (NetworkHelper.hasNetworkAccess(getApplicationContext())) {
             progressView.setVisibility(View.VISIBLE);
             progressView.startAnimation();
             Call<String> call = webService.addedPostContributor(deviceId, profileId, token, categoryId, subCategoryId, 6, userIds);

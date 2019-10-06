@@ -7,8 +7,13 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
+import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.view.menu.MenuPopupHelper;
@@ -35,6 +40,7 @@ import com.doodle.Comment.model.Reason;
 import com.doodle.Comment.model.Reply;
 import com.doodle.Comment.model.ReportReason;
 import com.doodle.Comment.service.CommentService;
+import com.doodle.Post.view.fragment.MediaFullViewFragment;
 import com.doodle.Reply.view.ReplyPost;
 import com.doodle.Comment.view.fragment.ReportReasonSheet;
 import com.doodle.Home.model.PostItem;
@@ -95,7 +101,7 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
     public EmojiTextView tvCommentMessage;
     public ImageView imagePostCommenting, imageCommentSettings, imgCommentLike;
 
-    public TextView tvCommentUserName, tvCommentTime, tvCommentReply,tvSeeReply, tvCountCommentLike;
+    public TextView tvCommentUserName, tvCommentTime, tvCommentReply, tvSeeReply, tvCountCommentLike;
     private String userPostId;
     private PopupMenu popupCommentMenu;
 
@@ -131,13 +137,15 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
 
     private String commentLike;
     private int commentLikeNumeric;
-
+    private MediaPlayer player;
 
     public CommentImageHolder(View itemView, Context context, final CommentListener listener) {
         super(itemView);
 
         mContext = context;
         this.listener = listener;
+
+        player = MediaPlayer.create(mContext, R.raw.post_like);
         manager = new PrefManager(App.getAppContext());
         deviceId = manager.getDeviceId();
         profileId = manager.getProfileId();
@@ -185,6 +193,7 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
 
         //All comment post
         commentService = CommentService.mRetrofit.create(CommentService.class);
+        webService = HomeService.mRetrofit.create(HomeService.class);
         networkOk = NetworkHelper.hasNetworkAccess(mContext);
 
         mProgressBar = (ProgressBar) itemView.findViewById(R.id.ProgressBar);
@@ -273,6 +282,15 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
         }
 
 
+        imagePostCommenting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String commentImageUrl = PROFILE_IMAGE + commentImage;
+                fullMediaView("1", commentImageUrl);
+            }
+        });
+
+
         if (!isNullOrEmpty(commentItem.getReplyId())) {
             commentLike = commentItem.getTotalReplyLike();
         } else {
@@ -280,7 +298,7 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
         }
 
 
-        if(App.isRvCommentHeader()){
+        if (App.isRvCommentHeader()) {
             tvSeeReply.setVisibility(View.GONE);
             tvCommentReply.setVisibility(View.GONE);
         }
@@ -298,6 +316,11 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
             tvCountCommentLike.setText(content);
         }
 
+        if (commentItem.isLikeUserStatus()) {
+            imgCommentLike.setImageResource(R.drawable.like_done);
+        } else {
+            imgCommentLike.setImageResource(R.drawable.like_normal);
+        }
 
         imgCommentLike.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -307,7 +330,7 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
 
                     if (commentItem.isLikeUserStatus()) {
 
-                        if (networkOk) {
+                        if (NetworkHelper.hasNetworkAccess(mContext)) {
                             Call<String> call = commentService.unLikeCommentReply(deviceId, profileId, token, commentItem.getCommentId(), commentItem.getReplyId(), commentItem.getPostId(), profileId);
                             sendUnLikeCommentReplyRequest(call);
                         } else {
@@ -315,7 +338,7 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
                         }
 
                     } else {
-                        if (networkOk) {
+                        if (NetworkHelper.hasNetworkAccess(mContext)) {
                             Call<String> call = commentService.likeCommentReply(deviceId, profileId, token, commentItem.getCommentId(), commentItem.getReplyId(), commentItem.getPostId(), profileId);
                             sendLikeCommentReplyRequest(call);
                         } else {
@@ -329,7 +352,7 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
 
                     if (commentItem.isLikeUserStatus()) {
 
-                        if (networkOk) {
+                        if (NetworkHelper.hasNetworkAccess(mContext)) {
 
                             Call<String> call = commentService.commentUnLike(deviceId, profileId, token, commentItem.getId(), profileId);
                             sendCommentUnLikeRequest(call);
@@ -339,7 +362,8 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
                         }
 
                     } else {
-                        if (networkOk) {
+
+                        if (NetworkHelper.hasNetworkAccess(mContext)) {
 
                             Call<String> call = commentService.commentLike(deviceId, profileId, token, commentItem.getId(), userIds);
                             sendCommentLikeRequest(call);
@@ -537,7 +561,7 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
 
                             App.setCommentItem(commentItem);
                             activity = (AppCompatActivity) v.getContext();
-                            if (networkOk) {
+                            if (NetworkHelper.hasNetworkAccess(mContext)) {
                                 Call<ReportReason> call = commentService.getReportReason(deviceId, profileId, token, commentItem.getUserId(), "2", userIds);
                                 sendReportReason(call);
                             } else {
@@ -594,10 +618,10 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
             }
         });
         if (!isNullOrEmpty(commentItem.getTotalReply()) && Integer.parseInt(commentItem.getTotalReply()) > 0) {
-            if( Integer.parseInt(commentItem.getTotalReply())==1){
+            if (Integer.parseInt(commentItem.getTotalReply()) == 1) {
                 tvSeeReply.setText(String.format("View %s reply", commentItem.getTotalReply()));
                 // tvCommentReply.setText(String.format("%s Reply", commentItem.getTotalReply()));
-            }else {
+            } else {
                 // tvCommentReply.setText(String.format("%s Replies", commentItem.getTotalReply()));
                 tvSeeReply.setText(String.format("View %s replies", commentItem.getTotalReply()));
             }
@@ -609,7 +633,7 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
 
                 String commentReply = commentItem.getTotalReply();
                 if (Integer.parseInt(commentReply) > 0) {
-                    if (networkOk) {
+                    if (NetworkHelper.hasNetworkAccess(mContext)) {
 
                         Call<List<Reply>> call = commentService.getPostCommentReplyList(deviceId, profileId, token, commentItem.getId(), "false", limit, offset, commentItem.getPostId(), userIds);
                         sendAllCommentReplyListRequest(call);
@@ -807,7 +831,7 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
                                     }
                                 }
 
-
+                                imgCommentLike.setImageResource(R.drawable.like_normal);
                             }
 
                             if (isContain(object, "error")) {
@@ -845,7 +869,7 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
                             if (isContain(object, "status")) {
                                 String status = object.getString("status");
                                 if ("true".equalsIgnoreCase(status)) {
-
+                                    player.start();
                                     Call<String> mCall = webService.sendBrowserNotification(
                                             deviceId,//"8b64708fa409da20341b1a555d1ddee526444",
                                             profileId,//"26444",
@@ -867,7 +891,7 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
 
                                     tvCountCommentLike.setVisibility(View.VISIBLE);
                                     tvCountCommentLike.setText(content);
-
+                                    imgCommentLike.setImageResource(R.drawable.like_done);
                                 }
                             }
 
@@ -994,4 +1018,20 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
     }
 
 
+    private void fullMediaView(String postType, String url) {
+        FragmentTransaction ft = ((AppCompatActivity) mContext).getSupportFragmentManager().beginTransaction();
+        Fragment prev = ((AppCompatActivity) mContext).getSupportFragmentManager().findFragmentByTag("dialog");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        DialogFragment dialogFragment = new MediaFullViewFragment();
+
+        Bundle bundle = new Bundle();
+        bundle.putString("post_type", postType);
+        bundle.putString("url", url);
+        dialogFragment.setArguments(bundle);
+
+        dialogFragment.show(ft, "dialog");
+    }
 }

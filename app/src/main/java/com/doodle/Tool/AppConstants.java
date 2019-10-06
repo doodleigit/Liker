@@ -28,12 +28,16 @@ public class AppConstants {
     public static final String BASE_URL_LOCATION = "https://www.stg.liker.com/";
 
     //=======================LIVE SERVER=============================
-    //    public static final String BASE_URL = "https://www.liker.com/";
-    //    public static final String BASE_URL_MEDIA = "https://www.cdn-liker.com/";
+//        public static final String BASE_URL = "https://www.api.liker.com/";
+//        public static final String BASE_URL_MEDIA = "https://www.cdn-liker.com/";
+//    public static final String BASE_URL_IMAGES = "https://www.cdn-liker.com/";
 //    public static final String SOCKET_WEB = "https://node.liker.com:7800";
 //    public static final String SOCKET_MESSAGE = "https://node.liker.com:7801";
 //    public static final String SOCKET_VIDEO = "https://node.liker.com:7806";
-   // public static final String BASE_URL_LOCATION = "https://www.api.liker.com/";
+//    public static final String FACEBOOK_SHARE = "https://www.api.liker.com/public/posts/";
+//    public static final String LINK_IMAGES = "https://www.cdn-liker.com/uploads/link_images/";
+//    public static final String FACEBOOK_INVITATION = "https://www.liker.com/settings/fbinvite/";
+//    public static final String BASE_URL_LOCATION = "https://www.api.liker.com/";
 
     public static final String API_KEY = "cd662c2e9b2e49fc9d4d763089597ea8";
     public static final String NEWS_FEED = "top-headlines?country=us&apiKey=" + API_KEY;
@@ -113,6 +117,9 @@ public class AppConstants {
     public static final String ADD_SHARED_POST = "addSharedpost";
     public static final String SEND_BROWSER_NOTIFICATION = "send_browser_notification";
     public static final String GET_FILTER_CATEGORIES = "get_categories";
+    public static final String GET_POST_FILTERS = "get_postfilters";
+    public static final String GET_SINGLE_POST_FILTERS = "get_single_post_filter";
+    public static final String ADDED_FILTER = "added_filter";
     public static final String GET_USER_RANKINGS = "getUserRankings";
     public static final String POST_PERMISSION = "post_permission";
     public static final String POST_NOTIFICATION_TURN_OFF = "post_notification_turn_off";
@@ -131,6 +138,7 @@ public class AppConstants {
     public static final String RECONNECT_SOCKET_BROADCAST = "reconnect_socket_broadcast";
     public static final String CATEGORY_CHANGE_BROADCAST = "category_change_broadcast";
     public static final String PROFILE_PAGE_PAGINATION_BROADCAST = "profile_page_pagination_broadcast";
+    public static final String NEW_POST_ADD_BROADCAST = "new_post_add_broadcast";
     public static final String POST_CHANGE_BROADCAST = "post_change_broadcast";
     public static final String POST_FILTER_CAT_BROADCAST = "post_filter_cat_broadcast";
     public static final String PERMISSION_CHANGE_BROADCAST = "permission_change_broadcast";
@@ -180,6 +188,7 @@ public class AppConstants {
     public static final String PHONE_REMOVE = "phone_remove";
     public static final String ITEM_KEY = "item_key";
     public static final String COMMENT_KEY = "comment_item_key";
+    public static final String IS_FRIEND_STATUS = "isFriendStatus";
 
     public static final String PRIVACY_VIEW = "privacy_view";
     public static final String PRIVACY_UPDATE_PERMISSION = "privacy_update_permission";

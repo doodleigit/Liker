@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -120,7 +121,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
 
     PostItem item;
     private PopupMenu popup, popupMenu;
-    private ImageView imagePostShare, imagePermission;
+    private ImageView imagePostShare,imagePostShareSetting, imagePermission;
     public HomeService webService;
     public PrefManager manager;
     private String deviceId, profileId, token, userIds;
@@ -181,6 +182,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
     private ImageView imageSharePostPermission;
     private TextView tvSharePostUserName, tvSharePostTime,tvShareHeaderInfo,tvSharePostContent;
     private TextView tvShared,tvPostShareUserName;
+    private MediaPlayer player;
 
     public interface PostItemListener {
         void deletePost(PostItem postItem, int position);
@@ -191,13 +193,13 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
     private int postLikeNumeric;
     ViewGroup tvLikeShare;
 
-
-
     public TextMimHolder(View itemView, Context context, PostItemListener mimListener, boolean isPopup) {
         super(itemView);
         mContext = context;
         this.listener = mimListener;
         this.isPopup = isPopup;
+
+        player = MediaPlayer.create(mContext, R.raw.post_like);
         callbackManager = CallbackManager.Factory.create();
         shareDialog = new ShareDialog((Activity) context);
         manager = new PrefManager(App.getAppContext());
@@ -239,6 +241,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
         star15 = itemView.findViewById(R.id.star15);
         star16 = itemView.findViewById(R.id.star16);
         imagePostShare = itemView.findViewById(R.id.imagePostShare);
+        imagePostShareSetting = itemView.findViewById(R.id.imagePostShareSetting);
         imagePermission = itemView.findViewById(R.id.imagePermission);
         imagePostPermission = itemView.findViewById(R.id.imagePostPermission);
 
@@ -315,7 +318,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
 
         if ("1".equalsIgnoreCase(isShared)) {
             containerHeaderShare.setVisibility(View.VISIBLE);
-
+            imagePermission.setVisibility(View.GONE);
 
             SharedProfile itemSharedProfile = item.getSharedProfile();
             sharedFirstName = itemSharedProfile.getUserFirstName();
@@ -351,6 +354,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
 
         } else {
             containerHeaderShare.setVisibility(View.GONE);
+            imagePermission.setVisibility(View.VISIBLE);
             if(App.isSharePostfooter()){
                 imagePermission.setVisibility(View.GONE);
             }else {
@@ -361,14 +365,12 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 Intent intent = new Intent(mContext, PostPopup.class);
                 intent.putExtra(ITEM_KEY, (Parcelable) item);
                 intent.putExtra("has_footer", true);
                 intent.putExtra("position", position);
                 mContext.startActivity(intent);
                 ((Activity) mContext).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
-
             }
         });
 
@@ -410,20 +412,8 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                 if (mimColor.startsWith("#")) {
                     postBodyLayer.setBackgroundColor(Color.parseColor(mimColor));
                     ViewGroup.LayoutParams params = postBodyLayer.getLayoutParams();
-                    if (App.isIsMimPopup()) {
 
-
-                        DisplayMetrics displayMetrics = mContext.getResources().getDisplayMetrics();
-                        float dpHeight = displayMetrics.heightPixels / displayMetrics.density;
-                        int myMimHeight = (displayMetrics.heightPixels) * 75 / 100;
-                        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-
-                        // params.height= (int) dpHeight;
-                        params.height = myMimHeight;
-                    } else {
-                        params.height = 350;
-                    }
-
+                    params.height = (int) mContext.getResources().getDimension(R.dimen._220sdp);
                     postBodyLayer.setLayoutParams(params);
                     postBodyLayer.setGravity(Gravity.CENTER);
                     tvPostContent.setGravity(Gravity.CENTER);
@@ -440,8 +430,8 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                     tvPostContent.setGravity(Gravity.CENTER);
                     tvPostEmojiContent.setGravity(Gravity.CENTER);
                     postBodyLayer.setBackground(mDrawable);
-                    tvPostContent.setHeight(150);
-                    tvPostEmojiContent.setHeight(150);
+                    tvPostContent.setHeight((int) mContext.getResources().getDimension(R.dimen._200sdp));
+                    tvPostEmojiContent.setHeight((int) mContext.getResources().getDimension(R.dimen._200sdp));
                     switch (mimColor) {
                         case "img_bg_birthday.png":
                             tvPostContent.setTextColor(Color.parseColor("#000000"));
@@ -712,6 +702,18 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
             }
         });
 
+        postBodyLayer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(mContext, PostPopup.class);
+                intent.putExtra(ITEM_KEY, (Parcelable) item);
+                intent.putExtra("has_footer", true);
+                intent.putExtra("position", position);
+                mContext.startActivity(intent);
+                ((Activity) mContext).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
+            }
+        });
+
         tvPostUserName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -813,6 +815,17 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                         return true;
                     }
                 });
+
+            }
+        });
+        imagePostShareSetting.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("RestrictedApi")
+            @Override
+            public void onClick(View v) {
+
+                activity = (AppCompatActivity) v.getContext();
+                PostPermissionSheet reportReasonSheet = PostPermissionSheet.newInstance(item, position);
+                reportReasonSheet.show(activity.getSupportFragmentManager(), "ReportReasonSheet");
 
             }
         });
@@ -986,7 +999,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                 //  mContext.startActivity(new Intent(mContext, CommentPost.class));
 //                FullBottomSheetDialogFragment postPermissions = new FullBottomSheetDialogFragment();
 //                postPermissions.show(activity.getSupportFragmentManager(), "PostPermission");
-                if (networkOk) {
+                if (NetworkHelper.hasNetworkAccess(mContext)) {
 
                     Call<CommentItem> call = commentService.getAllPostComments(deviceId, profileId, token, "false", limit, offset, "DESC", item.getPostId(), userIds);
                     sendAllCommentItemRequest(call);
@@ -1064,6 +1077,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                             JSONObject object = new JSONObject(response.body());
                             String status = object.getString("status");
                             if ("true".equalsIgnoreCase(status)) {
+                                player.start();
                                 Call<String> mCall = webService.sendBrowserNotification(
                                         deviceId,//"8b64708fa409da20341b1a555d1ddee526444",
                                         profileId,//"26444",

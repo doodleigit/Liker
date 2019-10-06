@@ -79,7 +79,7 @@ public class TrendingPost extends Fragment   {
     private int scrollOutItems;
     private int currentItems;
     private boolean isScrolling, isPaginationDone = true;
-    int limit = 5;
+    int limit = 15;
     int offset = 0;
     private String catIds = "";
     private ShimmerFrameLayout shimmerFrameLayout;
@@ -244,12 +244,12 @@ public class TrendingPost extends Fragment   {
     private void deletePost(PostItem deletePostItem, int deletePosition) {
         new AlertDialog.Builder(getActivity())
                 //  .setTitle("Delete entry")
-                .setMessage("Are you sure you want to delete this post? You will permanently lose this post !")
-
+//                .setMessage("Are you sure you want to delete this post? You will permanently lose this post !")
+                .setMessage("Are you sure that you want to delete this post?")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
 
-                        if (networkOk) {
+                        if (NetworkHelper.hasNetworkAccess(getContext())) {
                             Call<String> call = webService.postDelete(deviceId, profileId, token, userIds, deletePostItem.getPostId());
                             sendDeletePostRequest(call);
                         } else {
@@ -307,7 +307,7 @@ public class TrendingPost extends Fragment   {
 
     private void getData() {
         offset = 0;
-        if (networkOk) {
+        if (NetworkHelper.hasNetworkAccess(getContext())) {
             progressView.setVisibility(View.VISIBLE);
             progressView.startAnimation();
             Call<List<PostItem>> call = webService.feed(deviceId, profileId, token, userIds, limit, offset, "trending", catIds, filter, false);
@@ -316,7 +316,7 @@ public class TrendingPost extends Fragment   {
             Tools.showNetworkDialog(getActivity().getSupportFragmentManager());
             progressView.setVisibility(View.GONE);
             progressView.stopAnimation();
-
+            refreshLayout.setRefreshing(false);
         }
     }
 
@@ -359,7 +359,7 @@ public class TrendingPost extends Fragment   {
                     Log.d("friends", totalPostIDs);
 //                    Call<CommentItem> mCall = webService.getPostComments(deviceId, profileId, token, "false", 1, 0, "DESC", totalPostIDs, userIds);
 //                    sendCommentItemPagingRequest(mCall);
-                    offset += 5;
+                    offset += 15;
                     onPostResponsePagination();
                 } else {
                     onPostResponsePagination();
@@ -522,6 +522,7 @@ public class TrendingPost extends Fragment   {
         public void onReceive(Context context, Intent intent) {
             catIds = intent.getStringExtra("category_ids");
             filter = intent.getIntExtra("filter", 1);
+            recyclerView.scrollToPosition(0);
             ((Home) Objects.requireNonNull(getActivity())).loadCompleteListener.onLoadInitial();
             getData();
         }

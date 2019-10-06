@@ -23,13 +23,14 @@ import java.util.ArrayList;
 public class SubCategoryAdapter extends RecyclerView.Adapter<SubCategoryAdapter.ViewHolder> {
 
     private Context context;
-    private ArrayList<PostFilterSubCategory> arrayList;
+    private ArrayList<PostFilterSubCategory> arrayList, mainArrayList;
     private FilterClickListener filterClickListener;
     private int type;
 
-    public SubCategoryAdapter(Context context, ArrayList<PostFilterSubCategory> arrayList, FilterClickListener filterClickListener, int type) {
+    public SubCategoryAdapter(Context context, ArrayList<PostFilterSubCategory> arrayList, ArrayList<PostFilterSubCategory> mainArrayList, FilterClickListener filterClickListener, int type) {
         this.context = context;
         this.arrayList = arrayList;
+        this.mainArrayList = mainArrayList;
         this.filterClickListener = filterClickListener;
         this.type = type;
     }
@@ -79,18 +80,7 @@ public class SubCategoryAdapter extends RecyclerView.Adapter<SubCategoryAdapter.
                             arrayList.get(position).getPostFilterItems().get(i).setSelected(true);
                         }
                         arrayList.get(position).setSelectedAll(true);
-                        String catId, subCatId, subCatName;
-                        boolean isSelectedAll;
-                        catId = arrayList.get(position).getCatId();
-                        subCatId = arrayList.get(position).getSubCatId();
-                        subCatName= arrayList.get(position).getSubCatName();
-                        isSelectedAll = arrayList.get(position).isSelectedAll();
-                        ArrayList<PostFilterItem> postFilterItems = new ArrayList<>();
-                        for (PostFilterItem postFilterItem : arrayList.get(position).getPostFilterItems()) {
-                            postFilterItems.add(postFilterItem);
-                        }
-                        PostFilterSubCategory postFilterSubCategory = new PostFilterSubCategory(catId, subCatId, subCatName, isSelectedAll, postFilterItems);
-                        filterClickListener.onSingleSubCategorySelect(postFilterSubCategory);
+                        filterClickListener.onSingleSubCategorySelect(null);
                         filterItemAdapter.notifyDataSetChanged();
                     }
                 } else {
@@ -100,18 +90,7 @@ public class SubCategoryAdapter extends RecyclerView.Adapter<SubCategoryAdapter.
                             arrayList.get(position).getPostFilterItems().get(i).setSelected(false);
                         }
                         arrayList.get(position).setSelectedAll(false);
-                        String catId, subCatId, subCatName;
-                        boolean isSelectedAll;
-                        catId = arrayList.get(position).getCatId();
-                        subCatId = arrayList.get(position).getSubCatId();
-                        subCatName= arrayList.get(position).getSubCatName();
-                        isSelectedAll = arrayList.get(position).isSelectedAll();
-                        ArrayList<PostFilterItem> postFilterItems = new ArrayList<>();
-                        for (PostFilterItem postFilterItem : arrayList.get(position).getPostFilterItems()) {
-                            postFilterItems.add(postFilterItem);
-                        }
-                        PostFilterSubCategory postFilterSubCategory = new PostFilterSubCategory(catId, subCatId, subCatName, isSelectedAll, postFilterItems);
-                        filterClickListener.onSingleSubCategoryDeselect(postFilterSubCategory);
+                        filterClickListener.onSingleSubCategoryDeselect(null);
                         filterItemAdapter.notifyDataSetChanged();
                     } else {
                         viewHolder.ivAdd.setImageResource(R.drawable.ok);
@@ -119,18 +98,7 @@ public class SubCategoryAdapter extends RecyclerView.Adapter<SubCategoryAdapter.
                             arrayList.get(position).getPostFilterItems().get(i).setSelected(true);
                         }
                         arrayList.get(position).setSelectedAll(true);
-                        String catId, subCatId, subCatName;
-                        boolean isSelectedAll;
-                        catId = arrayList.get(position).getCatId();
-                        subCatId = arrayList.get(position).getSubCatId();
-                        subCatName= arrayList.get(position).getSubCatName();
-                        isSelectedAll = arrayList.get(position).isSelectedAll();
-                        ArrayList<PostFilterItem> postFilterItems = new ArrayList<>();
-                        for (PostFilterItem postFilterItem : arrayList.get(position).getPostFilterItems()) {
-                            postFilterItems.add(postFilterItem);
-                        }
-                        PostFilterSubCategory postFilterSubCategory = new PostFilterSubCategory(catId, subCatId, subCatName, isSelectedAll, postFilterItems);
-                        filterClickListener.onSingleSubCategorySelect(postFilterSubCategory);
+                        filterClickListener.onSingleSubCategorySelect(null);
                         filterItemAdapter.notifyDataSetChanged();
                     }
                 }
@@ -156,6 +124,12 @@ public class SubCategoryAdapter extends RecyclerView.Adapter<SubCategoryAdapter.
             arrayList.get(i).setSelectedAll(false);
             for (int j = 0; j < arrayList.get(i).getPostFilterItems().size(); j++) {
                 arrayList.get(i).getPostFilterItems().get(j).setSelected(false);
+            }
+        }
+        for (int i = 0; i < mainArrayList.size(); i++) {
+            mainArrayList.get(i).setSelectedAll(false);
+            for (int j = 0; j < mainArrayList.get(i).getPostFilterItems().size(); j++) {
+                mainArrayList.get(i).getPostFilterItems().get(j).setSelected(false);
             }
         }
     }

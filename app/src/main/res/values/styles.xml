@@ -9,6 +9,7 @@
         <item name="android:windowAnimationStyle">@style/CustomActivityAnimation</item>
         <!-- Customize your theme here. -->
         <item name="android:dropDownListViewStyle">@style/SpinnerStyle</item>
+
         <item name="popupMenuStyle">@style/popupMenuStyle</item>
     </style>
 

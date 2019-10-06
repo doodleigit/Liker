@@ -58,6 +58,16 @@ public interface ProfileService {
             @Field("get_followers") boolean getFollowers
     );
 
+    @POST(AppConstants.IS_FRIEND_STATUS)
+    @FormUrlEncoded
+    Call<String> isFriendStatus(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("user_id") String userIds,
+            @Field("profile_username") String userName
+    );
+
     @Multipart
     @POST(AppConstants.UPLOAD_PROFILE_IMAGE)
     Call<String> uploadProfileImage(
