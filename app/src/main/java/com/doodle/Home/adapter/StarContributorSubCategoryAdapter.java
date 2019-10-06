@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.doodle.Home.model.PostFilterSubCategory;
+import com.doodle.Home.service.CategoryExpandListener;
 import com.doodle.Home.service.StarContributorCategoryListener;
 import com.doodle.R;
 
@@ -22,12 +23,15 @@ public class StarContributorSubCategoryAdapter extends RecyclerView.Adapter<Star
     private Context context;
     private ArrayList<PostFilterSubCategory> arrayList;
     private StarContributorCategoryListener starContributorCategoryListener;
+    private CategoryExpandListener categoryExpandListener;
     private String catId;
 
-    public StarContributorSubCategoryAdapter(Context context, ArrayList<PostFilterSubCategory> arrayList, StarContributorCategoryListener starContributorCategoryListener, String catId) {
+    public StarContributorSubCategoryAdapter(Context context, ArrayList<PostFilterSubCategory> arrayList, StarContributorCategoryListener starContributorCategoryListener,
+                                             CategoryExpandListener categoryExpandListener, String catId) {
         this.context = context;
         this.arrayList = arrayList;
         this.starContributorCategoryListener = starContributorCategoryListener;
+        this.categoryExpandListener = categoryExpandListener;
         this.catId = catId;
     }
 
@@ -68,6 +72,7 @@ public class StarContributorSubCategoryAdapter extends RecyclerView.Adapter<Star
                 } else {
                     viewHolder.recyclerView.setVisibility(View.VISIBLE);
                     viewHolder.ivArrow.setImageResource(R.drawable.arrow_down);
+                    categoryExpandListener.onExpand(view);
                 }
             }
         });

@@ -13,9 +13,11 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -58,6 +60,7 @@ import com.doodle.Home.model.PostFooter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.postshare.PostShareItem;
 import com.doodle.Home.service.HomeService;
+import com.doodle.Home.service.SingleVideoPlayerRecyclerView;
 import com.doodle.Home.view.activity.EditPost;
 import com.doodle.Home.view.activity.PostShare;
 import com.doodle.Home.view.fragment.LikerUserListFragment;
@@ -108,6 +111,7 @@ import static java.lang.Integer.parseInt;
 public class MultipleMediaPopUpFragment extends Fragment {
 
     View view;
+    private AppBarLayout appBarLayout;
     private RelativeLayout commentHold;
     private LinearLayout linkScriptContainer, postBodyLayer;
     private EmojiTextView tvCommentMessage;
@@ -118,7 +122,8 @@ public class MultipleMediaPopUpFragment extends Fragment {
     private ImageView imgLinkScript, imagePostPermission, imagePostShare, imagePermission, imgLike, imageCommentLikeThumb, imagePostComment, star1, star2, star3, star4, star5, star6, star7, star8,
             star9, star10, star11, star12, star13, star14, star15, star16;
     private ProgressBar mProgressBar;
-    private RecyclerView singleImgRecyclerView;
+    private SingleVideoPlayerRecyclerView singleImgRecyclerView;
+    private LinearLayoutManager linearLayoutManager;
 
     private Drawable mDrawable;
 
@@ -133,7 +138,7 @@ public class MultipleMediaPopUpFragment extends Fragment {
     private PrefManager manager;
 
     private String deviceId, profileId, token, userIds;
-    private int limit = 10, position = -1;
+    private int limit = 10, position = -1, mediaPosition = -1;
     private int offset = 0;
     private boolean networkOk, hasFooter, isCommentAction;
     private String postPermissions;
@@ -161,6 +166,7 @@ public class MultipleMediaPopUpFragment extends Fragment {
         hasFooter = getArguments().getBoolean("has_footer");
         isCommentAction = getArguments().getBoolean("is_comment_action");
         position = getArguments().getInt("position");
+        mediaPosition = getArguments().getInt("media_position");
 
         callbackManager = CallbackManager.Factory.create();
         shareDialog = new ShareDialog(getActivity());
@@ -171,6 +177,7 @@ public class MultipleMediaPopUpFragment extends Fragment {
         userIds = manager.getProfileId();
         webService = HomeService.mRetrofit.create(HomeService.class);
 
+        appBarLayout = view.findViewById(R.id.app_bar_layout);
         linkScriptContainer = view.findViewById(R.id.linkScriptContainer);
         postBodyLayer = view.findViewById(R.id.postBodyLayer);
         tvPostLinkTitle = view.findViewById(R.id.tvPostLinkTitle);
@@ -230,7 +237,8 @@ public class MultipleMediaPopUpFragment extends Fragment {
         mProgressBar = view.findViewById(R.id.ProgressBar);
         imagePostComment = view.findViewById(R.id.imagePostComment);
         singleImgRecyclerView = view.findViewById(R.id.recyclerView);
-        singleImgRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        linearLayoutManager = new LinearLayoutManager(getContext());
+        singleImgRecyclerView.setLayoutManager(linearLayoutManager);
 
         GalleryAdapter.RecyclerViewClickListener listener = new GalleryAdapter.RecyclerViewClickListener() {
             @Override
@@ -242,6 +250,20 @@ public class MultipleMediaPopUpFragment extends Fragment {
         galleryAdapter = new GalleryAdapter(getActivity(), item.getPostFiles(), listener);
 //        singleImgRecyclerView.setMediaObjects(item.getPostFiles());
         singleImgRecyclerView.setAdapter(galleryAdapter);
+        singleImgRecyclerView.setMediaObjects(item.getPostFiles());
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (mediaPosition > 0) {
+                    appBarLayout.setExpanded(false);
+                    singleImgRecyclerView.smoothScrollToPosition(mediaPosition);
+//                    int totalVisibleItems = linearLayoutManager.findLastVisibleItemPosition() - linearLayoutManager.findFirstVisibleItemPosition();
+//                    int centeredItemPosition = totalVisibleItems / 2;
+//                    singleImgRecyclerView.setScrollY(centeredItemPosition );
+                }
+            }
+        }, 1000);
+
     }
 
     private void setData() {
@@ -1126,5 +1148,15 @@ public class MultipleMediaPopUpFragment extends Fragment {
         }
     };
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        singleImgRecyclerView.pausePlayer();
+    }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        singleImgRecyclerView.releasePlayer();
+    }
 }

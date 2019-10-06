@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.doodle.Home.model.PostFilterItem;
 import com.doodle.Home.model.PostFilterSubCategory;
+import com.doodle.Home.service.CategoryExpandListener;
 import com.doodle.Home.service.FilterClickListener;
 import com.doodle.Home.service.SelectChangeListener;
 import com.doodle.R;
@@ -25,13 +26,16 @@ public class SubCategoryAdapter extends RecyclerView.Adapter<SubCategoryAdapter.
     private Context context;
     private ArrayList<PostFilterSubCategory> arrayList, mainArrayList;
     private FilterClickListener filterClickListener;
+    private CategoryExpandListener categoryExpandListener;
     private int type;
 
-    public SubCategoryAdapter(Context context, ArrayList<PostFilterSubCategory> arrayList, ArrayList<PostFilterSubCategory> mainArrayList, FilterClickListener filterClickListener, int type) {
+    public SubCategoryAdapter(Context context, ArrayList<PostFilterSubCategory> arrayList, ArrayList<PostFilterSubCategory> mainArrayList, FilterClickListener filterClickListener,
+                              CategoryExpandListener categoryExpandListener, int type) {
         this.context = context;
         this.arrayList = arrayList;
         this.mainArrayList = mainArrayList;
         this.filterClickListener = filterClickListener;
+        this.categoryExpandListener = categoryExpandListener;
         this.type = type;
     }
 
@@ -112,6 +116,7 @@ public class SubCategoryAdapter extends RecyclerView.Adapter<SubCategoryAdapter.
                     viewHolder.recyclerView.setVisibility(View.GONE);
                     viewHolder.ivArrow.setImageResource(R.drawable.arrow_right);
                 } else {
+                    categoryExpandListener.onExpand(view);
                     viewHolder.recyclerView.setVisibility(View.VISIBLE);
                     viewHolder.ivArrow.setImageResource(R.drawable.arrow_down);
                 }

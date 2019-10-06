@@ -425,21 +425,18 @@ public class ImageHolder extends RecyclerView.ViewHolder {
             }
         }
 
-
-
-
-        dynamicMediaFrame.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(mContext, PostPopup.class);
-                intent.putExtra(ITEM_KEY, (Parcelable) item);
-                intent.putExtra("has_footer", true);
-                intent.putExtra("position", position);
-                App.setIsImagePopup(true);
-                mContext.startActivity(intent);
-//                ((Activity) mContext).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
-            }
-        });
+//        dynamicMediaFrame.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent intent = new Intent(mContext, PostPopup.class);
+//                intent.putExtra(ITEM_KEY, (Parcelable) item);
+//                intent.putExtra("has_footer", true);
+//                intent.putExtra("position", position);
+//                App.setIsImagePopup(true);
+//                mContext.startActivity(intent);
+////                ((Activity) mContext).overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
+//            }
+//        });
 
         imgLike.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -645,11 +642,11 @@ public class ImageHolder extends RecyclerView.ViewHolder {
 
         SpannableStringBuilder builder = getSpannableStringBuilder(mContext, item.getCatId(), likes, followers, totalStars, categoryName);
         if("1".equalsIgnoreCase(isShared)){
-            tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
+            tvPostUserName.setText(String.format("%s %s", item.getUserFirstName().trim(), item.getUserLastName().trim()));
             tvShared.setVisibility(View.VISIBLE);
-            tvPostShareUserName.setText(String.format("%s  %s %s", sharedFullName,"'s"," post"));
-        }else {
-            tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
+            tvPostShareUserName.setText(String.format("%s %s %s", sharedFullName,"'s"," post"));
+        } else {
+            tvPostUserName.setText(String.format("%s %s", item.getUserFirstName().trim(), item.getUserLastName().trim()));
         }
     //    tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
         long myMillis = Long.parseLong(item.getDateTime()) * 1000;
@@ -702,36 +699,53 @@ public class ImageHolder extends RecyclerView.ViewHolder {
         }
 
         for (int i = 0; i < mediaFrames.get(item.getFrameNumber()).getItemCount(); i++) {
+            final int mediaPosition = i;
             if (item.getPostFiles().get(i).getPostType().equals("2")) {
                 String imageUrl = AppConstants.POST_VIDEOS_THUMBNAIL + item.getPostFiles().get(i).getImageName();
                 mediaViewHolders.get(i).getMediaVideoLayout().setVisibility(View.VISIBLE);
                 mediaViewHolders.get(i).getMediaImage().setVisibility(View.GONE);
                 Glide.with(App.getAppContext())
                         .load(imageUrl)
+                        .centerInside()
                         .error(R.drawable.post_image_background)
                         .dontAnimate()
                         .into(mediaViewHolders.get(i).getMediaThumbnail());
                 Glide.with(App.getAppContext())
                         .load(imageUrl)
+                        .centerInside()
                         .error(R.drawable.post_image_background)
-                        .centerCrop()
                         .dontAnimate()
                         .into(mediaViewHolders.get(i).getMediaImage());
+
+                mediaViewHolders.get(i).getMediaVideoLayout().setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        popUpPost(mediaPosition);
+                    }
+                });
             } else {
                 String imageUrl = AppConstants.POST_IMAGES + item.getPostFiles().get(i).getImageName();
                 mediaViewHolders.get(i).getMediaVideoLayout().setVisibility(View.GONE);
                 mediaViewHolders.get(i).getMediaImage().setVisibility(View.VISIBLE);
                 Glide.with(App.getAppContext())
                         .load(imageUrl)
+                        .centerInside()
                         .error(R.drawable.post_image_background)
-                        .centerCrop()
                         .dontAnimate()
                         .into(mediaViewHolders.get(i).getMediaImage());
                 Glide.with(App.getAppContext())
                         .load(imageUrl)
+                        .centerInside()
                         .error(R.drawable.post_image_background)
                         .dontAnimate()
                         .into(mediaViewHolders.get(i).getMediaThumbnail());
+
+                mediaViewHolders.get(i).getMediaImage().setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        popUpPost(mediaPosition);
+                    }
+                });
             }
         }
 
@@ -1043,6 +1057,16 @@ public class ImageHolder extends RecyclerView.ViewHolder {
 
             }
         });
+    }
+
+    private void popUpPost(int mediaPosition) {
+        Intent intent = new Intent(mContext, PostPopup.class);
+        intent.putExtra(ITEM_KEY, (Parcelable) item);
+        intent.putExtra("has_footer", true);
+        intent.putExtra("position", position);
+        intent.putExtra("media_position", mediaPosition);
+        App.setIsImagePopup(true);
+        mContext.startActivity(intent);
     }
 
     private void sendPostUnLikeRequest(Call<String> call) {

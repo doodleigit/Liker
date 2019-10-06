@@ -25,6 +25,7 @@ import com.doodle.Home.adapter.StarContributorsAdapter;
 import com.doodle.Home.model.PostFilterItem;
 import com.doodle.Home.model.PostFilterSubCategory;
 import com.doodle.Home.model.StarContributor;
+import com.doodle.Home.service.CategoryExpandListener;
 import com.doodle.Home.service.HomeService;
 import com.doodle.Home.service.StarContributorCategoryListener;
 import com.doodle.R;
@@ -202,9 +203,11 @@ public class StarContributorActivity extends AppCompatActivity {
         Toolbar toolbar = dialog.findViewById(R.id.toolbar);
         EditText etSearchCategory;
         RecyclerView recyclerView;
+        LinearLayoutManager linearLayoutManager;
         etSearchCategory = dialog.findViewById(R.id.search_category);
         recyclerView = dialog.findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        linearLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(linearLayoutManager);
         etSearchCategory.setVisibility(View.VISIBLE);
 
         StarContributorCategoryListener starContributorCategoryListener = new StarContributorCategoryListener() {
@@ -221,7 +224,16 @@ public class StarContributorActivity extends AppCompatActivity {
 
         subCategories.addAll(allCategories);
 
-        StarContributorSubCategoryAdapter subCategoryAdapter = new StarContributorSubCategoryAdapter(this, subCategories, starContributorCategoryListener, selectedCategory);
+        CategoryExpandListener categoryExpandListener = new CategoryExpandListener() {
+            @Override
+            public void onExpand(View view) {
+                int itemToScroll = recyclerView.getChildLayoutPosition(view);
+                int centerOfScreen = recyclerView.getHeight() / 2 - view.getHeight() / 2;
+                linearLayoutManager.scrollToPositionWithOffset(itemToScroll, centerOfScreen);
+            }
+        };
+
+        StarContributorSubCategoryAdapter subCategoryAdapter = new StarContributorSubCategoryAdapter(this, subCategories, starContributorCategoryListener, categoryExpandListener, selectedCategory);
         recyclerView.setAdapter(subCategoryAdapter);
 
         etSearchCategory.addTextChangedListener(new TextWatcher() {
