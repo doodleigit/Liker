@@ -35,6 +35,7 @@ public class ContributorCategoryAdapter extends RecyclerView.Adapter<Contributor
     private String deviceId, token, userId;
     private ProgressDialog progressDialog;
     private ContributionAddListener contributionAddListener;
+    private boolean isSearch;
 
     public ContributorCategoryAdapter(Context context, ArrayList<Category> arrayList, ContributionAddListener contributionAddListener, ProgressDialog progressDialog, SettingService settingService, String deviceId, String token, String userId) {
         this.context = context;
@@ -67,6 +68,14 @@ public class ContributorCategoryAdapter extends RecyclerView.Adapter<Contributor
 
         ContributorSubCategoryAdapter contributorSubCategoryAdapter = new ContributorSubCategoryAdapter(context, arrayList.get(i).getSubCategories(), contributionAddListener, progressDialog, settingService, arrayList.get(i).getInfo().getId(), deviceId, token, userId);
         viewHolder.recyclerView.setAdapter(contributorSubCategoryAdapter);
+
+        if (isSearch) {
+            viewHolder.recyclerView.setVisibility(View.VISIBLE);
+            viewHolder.ivArrow.setImageResource(R.drawable.arrow_down);
+        } else {
+            viewHolder.recyclerView.setVisibility(View.GONE);
+            viewHolder.ivArrow.setImageResource(R.drawable.arrow_right);
+        }
 
         viewHolder.ivAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -161,6 +170,10 @@ public class ContributorCategoryAdapter extends RecyclerView.Adapter<Contributor
                 Toast.makeText(context, context.getString(R.string.something_went_wrong), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public void setSearchParam(boolean isSearch) {
+        this.isSearch = isSearch;
     }
 
 }

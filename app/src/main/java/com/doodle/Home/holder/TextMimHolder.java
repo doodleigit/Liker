@@ -121,7 +121,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
 
     PostItem item;
     private PopupMenu popup, popupMenu;
-    private ImageView imagePostShare, imagePermission;
+    private ImageView imagePostShare,imagePostShareSetting, imagePermission;
     public HomeService webService;
     public PrefManager manager;
     private String deviceId, profileId, token, userIds;
@@ -241,6 +241,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
         star15 = itemView.findViewById(R.id.star15);
         star16 = itemView.findViewById(R.id.star16);
         imagePostShare = itemView.findViewById(R.id.imagePostShare);
+        imagePostShareSetting = itemView.findViewById(R.id.imagePostShareSetting);
         imagePermission = itemView.findViewById(R.id.imagePermission);
         imagePostPermission = itemView.findViewById(R.id.imagePostPermission);
 
@@ -317,7 +318,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
 
         if ("1".equalsIgnoreCase(isShared)) {
             containerHeaderShare.setVisibility(View.VISIBLE);
-
+            imagePermission.setVisibility(View.GONE);
 
             SharedProfile itemSharedProfile = item.getSharedProfile();
             sharedFirstName = itemSharedProfile.getUserFirstName();
@@ -353,6 +354,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
 
         } else {
             containerHeaderShare.setVisibility(View.GONE);
+            imagePermission.setVisibility(View.VISIBLE);
             if(App.isSharePostfooter()){
                 imagePermission.setVisibility(View.GONE);
             }else {
@@ -692,8 +694,9 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                 DialogFragment dialogFragment = new LikerUserListFragment();
 
                 Bundle bundle = new Bundle();
-                bundle.putString("post_id", item.getPostId());
+                bundle.putString("type_id", item.getPostId());
                 bundle.putString("total_likes", item.getPostFooter().getPostTotalLike());
+                bundle.putString("liker_type", "post");
                 dialogFragment.setArguments(bundle);
 
                 dialogFragment.show(ft, "dialog");
@@ -813,6 +816,17 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                         return true;
                     }
                 });
+
+            }
+        });
+        imagePostShareSetting.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("RestrictedApi")
+            @Override
+            public void onClick(View v) {
+
+                activity = (AppCompatActivity) v.getContext();
+                PostPermissionSheet reportReasonSheet = PostPermissionSheet.newInstance(item, position);
+                reportReasonSheet.show(activity.getSupportFragmentManager(), "ReportReasonSheet");
 
             }
         });

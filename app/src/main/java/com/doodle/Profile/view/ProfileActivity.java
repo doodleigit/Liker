@@ -226,11 +226,10 @@ public class ProfileActivity extends AppCompatActivity implements ReportReasonSh
     }
 
     private void setData() {
-        int stars = Integer.parseInt(userAllInfo.getGoldStars()) + Integer.parseInt(userAllInfo.getSliverStars());
         fullName = userAllInfo.getFirstName() + " " + userAllInfo.getLastName();
         userImage = AppConstants.USER_UPLOADED_IMAGES + userAllInfo.getPhoto();
         coverImage = AppConstants.USER_UPLOADED_IMAGES + userAllInfo.getCoverImage();
-        allCountInfo = userAllInfo.getTotalLikes() + " Likes " + userAllInfo.getTotalFollowers() + " Followers " + stars + " Stars";
+        allCountInfo = userAllInfo.getTotalLikes() + " Likes " + userAllInfo.getTotalFollowers() + " Followers " + userAllInfo.getTotalFollowings() + " Following";
         tvUserName.setText(fullName);
         tvTotalInfoCount.setText(allCountInfo);
         loadProfileImage();

@@ -49,7 +49,7 @@ public class LikerUserListFragment extends DialogFragment {
     private PrefManager manager;
     private LikeUserAdapter likeUserAdapter;
     private List<LikeUser> likeUsers;
-    private String deviceId, postId, token, userId, totalLikes;
+    private String deviceId, typeId, replyId, token, userId, totalLikes, likerType;
     int limit = 10;
     int offset = 0, current = 0;
     private boolean isScrolling;
@@ -69,7 +69,7 @@ public class LikerUserListFragment extends DialogFragment {
         view = inflater.inflate(R.layout.like_user_list_fragment_layout, container, false);
 
         initialComponent();
-        sendFriendListRequest();
+        sendLikerListRequest();
 
         return view;
     }
@@ -92,8 +92,10 @@ public class LikerUserListFragment extends DialogFragment {
         deviceId = manager.getDeviceId();
         token = manager.getToken();
         userId = manager.getProfileId();
-        postId = getArguments().getString("post_id");
+        typeId = getArguments().getString("type_id");
         totalLikes = getArguments().getString("total_likes");
+        likerType = getArguments().getString("liker_type");
+        replyId = getArguments().getString("reply_id") != null ? getArguments().getString("reply_id")  : "";
 
         progressBar = view.findViewById(R.id.progress_bar);
         progressBarLoading = view.findViewById(R.id.progress_bar_loading);
@@ -145,7 +147,7 @@ public class LikerUserListFragment extends DialogFragment {
 
                 if (isScrolling && (currentItems + scrollOutItems == totalItems)) {
                     isScrolling = false;
-                    sendFriendListPaginationRequest();
+                    sendLikerListPaginationRequest();
                 }
             }
         });
@@ -159,8 +161,15 @@ public class LikerUserListFragment extends DialogFragment {
 
     }
 
-    private void sendFriendListRequest() {
-        Call<LikeUsers> call = homeService.postLiker(deviceId, userId, token, userId, postId, offset, limit, current);
+    private void sendLikerListRequest() {
+        Call<LikeUsers> call = null;
+        if (likerType.equals("post")) {
+            call = homeService.postLiker(deviceId, userId, token, userId, typeId, offset, limit, current);
+        } else if (likerType.equals("comment")){
+            call = homeService.commentLiker(deviceId, userId, token, userId, typeId, offset, limit, current);
+        } else if (likerType.equals("reply")) {
+            call = homeService.commentReplyLiker(deviceId, userId, token, userId, typeId, replyId, offset, limit, current);
+        }
         call.enqueue(new Callback<LikeUsers>() {
             @Override
             public void onResponse(Call<LikeUsers> call, Response<LikeUsers> response) {
@@ -192,9 +201,9 @@ public class LikerUserListFragment extends DialogFragment {
 
     }
 
-    private void sendFriendListPaginationRequest() {
+    private void sendLikerListPaginationRequest() {
         progressBar.setVisibility(View.VISIBLE);
-        Call<LikeUsers> call = homeService.postLiker(deviceId, userId, token, userId, postId, limit, offset, current);
+        Call<LikeUsers> call = homeService.postLiker(deviceId, userId, token, userId, typeId, limit, offset, current);
         call.enqueue(new Callback<LikeUsers>() {
             @Override
             public void onResponse(Call<LikeUsers> call, Response<LikeUsers> response) {

@@ -16,8 +16,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <include layout="@layout/list_item_post_header"/>
             <include layout="@layout/list_item_post_header_share"/>
+            <include layout="@layout/list_item_post_header"/>
 
 
         </LinearLayout>
@@ -66,11 +66,11 @@
                 android:layout_height="220dp"
                 android:visibility="gone" />
 
+
             <cn.jzvd.JZVideoPlayerStandard
                 android:id="@+id/videoplayer"
                 android:layout_width="match_parent"
                 android:layout_height="200dp" />
-
 
 
         </LinearLayout>

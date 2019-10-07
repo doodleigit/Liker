@@ -681,6 +681,7 @@ public class Home extends AppCompatActivity implements
                 filterSubCategories.clear();
                 if (key.isEmpty()) {
                     filterSubCategories.addAll(subCategories);
+                    subCategoryAdapter.setSearchParam(false);
                 } else {
                     for (PostFilterSubCategory category : subCategories) {
                         ArrayList<PostFilterItem> arrayList = new ArrayList<>();
@@ -704,6 +705,7 @@ public class Home extends AppCompatActivity implements
                             }
                         }
                     }
+                    subCategoryAdapter.setSearchParam(true);
                 }
                 subCategoryAdapter.notifyDataSetChanged();
             }
@@ -816,6 +818,7 @@ public class Home extends AppCompatActivity implements
                     } else {
                         filterSubCategories.addAll(multipleSubCategories);
                     }
+                    subCategoryAdapter.setSearchParam(false);
                 } else {
                     for (PostFilterSubCategory category : (categoryPosition == 3 ? exceptMultipleSubCategories : multipleSubCategories)) {
                         ArrayList<PostFilterItem> arrayList = new ArrayList<>();
@@ -839,6 +842,7 @@ public class Home extends AppCompatActivity implements
                             }
                         }
                     }
+                    subCategoryAdapter.setSearchParam(true);
                 }
                 subCategoryAdapter.notifyDataSetChanged();
             }

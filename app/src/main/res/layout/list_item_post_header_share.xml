@@ -6,19 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
-    <com.borjabravo.readmoretextview.ReadMoreTextView
-        android:id="@+id/tvSharePostContent"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/_5sdp"
-        android:textColor="#333"
-        android:textSize="14sp"
-        app:colorClickableText="@android:color/holo_blue_light"
-        app:trimCollapsedText="Show less"
-        app:trimExpandedText="Show more"
-        app:trimLength="200"
-        app:trimMode="trimModeLength"
-        tools:text="Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.vHere is my first post.Here is my first post.Here is my first post. " />
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -89,9 +77,31 @@
 
         </LinearLayout>
 
-
+        <ImageView
+            android:id="@+id/imagePostShareSetting"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            android:padding="5dp"
+            android:src="@drawable/ic_more_vert_black_24dp"
+            android:tint="#8596A3" />
 
     </RelativeLayout>
+
+    <com.borjabravo.readmoretextview.ReadMoreTextView
+        android:id="@+id/tvSharePostContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_5sdp"
+        android:textColor="#333"
+        android:textSize="14sp"
+        app:colorClickableText="@android:color/holo_blue_light"
+        app:trimCollapsedText="Show less"
+        app:trimExpandedText="Show more"
+        app:trimLength="200"
+        app:trimMode="trimModeLength"
+        tools:text="Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.vHere is my first post.Here is my first post.Here is my first post. " />
 
     <View
         android:layout_width="match_parent"

@@ -243,7 +243,8 @@ public class MultipleMediaPopUpFragment extends Fragment {
         GalleryAdapter.RecyclerViewClickListener listener = new GalleryAdapter.RecyclerViewClickListener() {
             @Override
             public void onClick(View view, int position) {
-
+                singleImgRecyclerView.pausePlayer();
+                singleImgRecyclerView.releasePlayer();
             }
         };
 
@@ -518,8 +519,9 @@ public class MultipleMediaPopUpFragment extends Fragment {
                 DialogFragment dialogFragment = new LikerUserListFragment();
 
                 Bundle bundle = new Bundle();
-                bundle.putString("post_id", item.getPostId());
+                bundle.putString("type_id", item.getPostId());
                 bundle.putString("total_likes", item.getPostFooter().getPostTotalLike());
+                bundle.putString("liker_type", "post");
                 dialogFragment.setArguments(bundle);
 
                 dialogFragment.show(ft, "dialog");

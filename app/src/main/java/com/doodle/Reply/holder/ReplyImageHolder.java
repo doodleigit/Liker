@@ -8,8 +8,12 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
+import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.view.menu.MenuPopupHelper;
@@ -39,6 +43,9 @@ import com.doodle.Comment.service.CommentService;
 import com.doodle.Comment.view.fragment.ReportReasonSheet;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.service.HomeService;
+import com.doodle.Home.view.fragment.LikerUserListFragment;
+import com.doodle.Post.view.fragment.MediaFullViewFragment;
+import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.R;
 import com.doodle.Reply.view.ReplyPost;
 import com.doodle.Tool.AppConstants;
@@ -276,6 +283,13 @@ public class ReplyImageHolder extends RecyclerView.ViewHolder {
                     .into(imagePostCommenting);
         }
 
+        imagePostCommenting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String commentImageUrl = PROFILE_IMAGE + commentImage;
+                fullMediaView("1", commentImageUrl);
+            }
+        });
 
         commentLike = replyItem.getTotalLike();
       /*  if (!isNullOrEmpty(commentItem.getReplyId())) {
@@ -301,6 +315,48 @@ public class ReplyImageHolder extends RecyclerView.ViewHolder {
             public void onClick(View v) {
                 App.setReplyItem(replyItem);
                 listener.replyToReply(position, replyItem);
+            }
+        });
+
+        if (replyItem.isIsLikeReplied()) {
+            imgCommentLike.setImageResource(R.drawable.like_done);
+        } else {
+            imgCommentLike.setImageResource(R.drawable.like_normal);
+        }
+
+        imagePostUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mContext.startActivity(new Intent(mContext, ProfileActivity.class).putExtra("user_id", replyItem.getUserId()).putExtra("user_name", replyItem.getUserName()));
+            }
+        });
+
+        tvCommentUserName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mContext.startActivity(new Intent(mContext, ProfileActivity.class).putExtra("user_id", replyItem.getUserId()).putExtra("user_name", replyItem.getUserName()));
+            }
+        });
+
+        tvCountCommentLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentTransaction ft = ((ReplyPost) mContext).getSupportFragmentManager().beginTransaction();
+                Fragment prev = ((ReplyPost) mContext).getSupportFragmentManager().findFragmentByTag("dialog");
+                if (prev != null) {
+                    ft.remove(prev);
+                }
+                ft.addToBackStack(null);
+                DialogFragment dialogFragment = new LikerUserListFragment();
+
+                Bundle bundle = new Bundle();
+                bundle.putString("type_id", replyItem.getCommentId());
+                bundle.putString("reply_id", replyItem.getId());
+                bundle.putString("total_likes", replyItem.getTotalLike());
+                bundle.putString("liker_type", "reply");
+                dialogFragment.setArguments(bundle);
+
+                dialogFragment.show(ft, "dialog");
             }
         });
 
@@ -635,6 +691,7 @@ public class ReplyImageHolder extends RecyclerView.ViewHolder {
                                     tvCountCommentLike.setVisibility(View.VISIBLE);
                                     tvCountCommentLike.setText(content);
 
+                                    imgCommentLike.setImageResource(R.drawable.like_done);
                                 }
                             }
 
@@ -691,6 +748,7 @@ public class ReplyImageHolder extends RecyclerView.ViewHolder {
                                         tvCountCommentLike.setVisibility(View.VISIBLE);
                                         tvCountCommentLike.setText(content);
                                     }
+                                    imgCommentLike.setImageResource(R.drawable.like_normal);
                                 }
 
 
@@ -934,5 +992,21 @@ public class ReplyImageHolder extends RecyclerView.ViewHolder {
         });
     }*/
 
+    private void fullMediaView(String postType, String url) {
+        FragmentTransaction ft = ((AppCompatActivity) mContext).getSupportFragmentManager().beginTransaction();
+        Fragment prev = ((AppCompatActivity) mContext).getSupportFragmentManager().findFragmentByTag("dialog");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        DialogFragment dialogFragment = new MediaFullViewFragment();
+
+        Bundle bundle = new Bundle();
+        bundle.putString("post_type", postType);
+        bundle.putString("url", url);
+        dialogFragment.setArguments(bundle);
+
+        dialogFragment.show(ft, "dialog");
+    }
 
 }

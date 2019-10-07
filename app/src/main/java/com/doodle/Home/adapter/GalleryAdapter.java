@@ -23,23 +23,13 @@ import com.bumptech.glide.Glide;
 import com.doodle.App;
 import com.doodle.Home.model.PostFile;
 import com.doodle.Post.view.fragment.MediaFullViewFragment;
+import com.doodle.Post.view.fragment.NewMediaFullViewFragment;
 import com.doodle.R;
 import com.doodle.Tool.AppConstants;
-import com.github.chrisbanes.photoview.PhotoView;
-import com.google.android.exoplayer2.ExoPlayer;
-import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
-import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.ui.PlayerView;
-import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
-import com.google.android.exoplayer2.upstream.DataSource;
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
-import com.google.android.exoplayer2.upstream.RawResourceDataSource;
-import com.google.android.exoplayer2.util.Util;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
@@ -102,14 +92,16 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         holder.imageMedia.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                fullMediaView(item.getPostType(), postImages);
+                mListener.onClick(view, position);
+                fullMediaView((ArrayList<PostFile>) postFiles, position);
             }
         });
 
         holder.mediaVideoLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                fullMediaView(item.getPostType(), item.getVideoName());
+                mListener.onClick(view, position);
+                fullMediaView((ArrayList<PostFile>) postFiles, position);
             }
         });
 
@@ -166,18 +158,18 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
         }
     };
 
-    private void fullMediaView(String postType, String url) {
+    private void fullMediaView(ArrayList<PostFile> postFiles, int position) {
         FragmentTransaction ft = ((AppCompatActivity) mContext).getSupportFragmentManager().beginTransaction();
         Fragment prev = ((AppCompatActivity) mContext).getSupportFragmentManager().findFragmentByTag("dialog");
         if (prev != null) {
             ft.remove(prev);
         }
         ft.addToBackStack(null);
-        DialogFragment dialogFragment = new MediaFullViewFragment();
+        DialogFragment dialogFragment = new NewMediaFullViewFragment();
 
         Bundle bundle = new Bundle();
-        bundle.putString("post_type", postType);
-        bundle.putString("url",url);
+        bundle.putParcelableArrayList("media_files", postFiles);
+        bundle.putInt("position", position);
         dialogFragment.setArguments(bundle);
 
         dialogFragment.show(ft, "dialog");

@@ -71,6 +71,9 @@ public class UserAllInfo implements Serializable, Parcelable
     @SerializedName("total_followers")
     @Expose
     private String totalFollowers;
+    @SerializedName("total_followings")
+    @Expose
+    private String totalFollowings;
     public final static Creator<UserAllInfo> CREATOR = new Creator<UserAllInfo>() {
 
 
@@ -110,6 +113,7 @@ public class UserAllInfo implements Serializable, Parcelable
         this.privacy = ((Privacy) in.readValue((Privacy.class.getClassLoader())));
         this.isBlocked = ((Boolean) in.readValue((Boolean.class.getClassLoader())));
         this.totalFollowers = ((String) in.readValue((String.class.getClassLoader())));
+        this.totalFollowings = ((String) in.readValue((String.class.getClassLoader())));
     }
 
     public UserAllInfo() {
@@ -275,6 +279,14 @@ public class UserAllInfo implements Serializable, Parcelable
         this.totalFollowers = totalFollowers;
     }
 
+    public String getTotalFollowings() {
+        return totalFollowings;
+    }
+
+    public void setTotalFollowings(String totalFollowings) {
+        this.totalFollowings = totalFollowings;
+    }
+
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeValue(id);
         dest.writeValue(userId);
@@ -296,6 +308,7 @@ public class UserAllInfo implements Serializable, Parcelable
         dest.writeValue(privacy);
         dest.writeValue(isBlocked);
         dest.writeValue(totalFollowers);
+        dest.writeValue(totalFollowings);
     }
 
     public int describeContents() {

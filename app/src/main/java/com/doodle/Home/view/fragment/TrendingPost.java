@@ -244,8 +244,8 @@ public class TrendingPost extends Fragment   {
     private void deletePost(PostItem deletePostItem, int deletePosition) {
         new AlertDialog.Builder(getActivity())
                 //  .setTitle("Delete entry")
-                .setMessage("Are you sure you want to delete this post? You will permanently lose this post !")
-
+//                .setMessage("Are you sure you want to delete this post? You will permanently lose this post !")
+                .setMessage("Are you sure that you want to delete this post?")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
 

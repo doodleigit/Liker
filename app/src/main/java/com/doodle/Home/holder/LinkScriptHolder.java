@@ -110,7 +110,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
     public TextView tvPostLinkTitle, tvPostLinkDescription, tvPostLinkHost;
 
 
-    public ImageView imagePostShare, imagePermission;
+    public ImageView imagePostShare,imagePostShareSetting, imagePermission;
     private PopupMenu popup, popupMenu;
     public HomeService webService;
     public PrefManager manager;
@@ -199,6 +199,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
         userIds = manager.getProfileId();
         webService = HomeService.mRetrofit.create(HomeService.class);
         imagePostShare = (ImageView) itemView.findViewById(R.id.imagePostShare);
+        imagePostShareSetting = (ImageView) itemView.findViewById(R.id.imagePostShareSetting);
         imagePermission = (ImageView) itemView.findViewById(R.id.imagePermission);
 
 
@@ -313,7 +314,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
         if ("1".equalsIgnoreCase(isShared)) {
             containerHeaderShare.setVisibility(View.VISIBLE);
 
-
+            imagePermission.setVisibility(View.GONE);
             SharedProfile itemSharedProfile = item.getSharedProfile();
             sharedFirstName = itemSharedProfile.getUserFirstName();
             sharedLastName = itemSharedProfile.getUserLastName();
@@ -347,6 +348,7 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
             }
 
         } else {
+            imagePermission.setVisibility(View.VISIBLE);
             containerHeaderShare.setVisibility(View.GONE);
             if(App.isSharePostfooter()){
                 imagePermission.setVisibility(View.GONE);
@@ -664,8 +666,9 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
                 DialogFragment dialogFragment = new LikerUserListFragment();
 
                 Bundle bundle = new Bundle();
-                bundle.putString("post_id", item.getPostId());
+                bundle.putString("type_id", item.getPostId());
                 bundle.putString("total_likes", item.getPostFooter().getPostTotalLike());
+                bundle.putString("liker_type", "post");
                 dialogFragment.setArguments(bundle);
 
                 dialogFragment.show(ft, "dialog");
@@ -790,6 +793,17 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
                         return true;
                     }
                 });
+
+            }
+        });
+        imagePostShareSetting.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("RestrictedApi")
+            @Override
+            public void onClick(View v) {
+
+                activity = (AppCompatActivity) v.getContext();
+                PostPermissionSheet reportReasonSheet = PostPermissionSheet.newInstance(item, position);
+                reportReasonSheet.show(activity.getSupportFragmentManager(), "ReportReasonSheet");
 
             }
         });

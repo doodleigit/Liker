@@ -128,6 +128,8 @@ public class AppConstants {
     public static final String POST_LIKE = "post_like";
     public static final String POST_UNLIKE = "post_unlike";
     public static final String POST_LIKERS = "post-likers";
+    public static final String COMMENT_LIKERS = "comment-likers";
+    public static final String COMMENT_REPLY_LIKERS = "comment-reply-likers";
     public static final String NOTIFICATION_SEEN = "notification_seen";
 
 

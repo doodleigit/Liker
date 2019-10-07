@@ -7,7 +7,11 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
+import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.view.menu.MenuPopupHelper;
@@ -30,6 +34,9 @@ import com.doodle.App;
 import com.doodle.Comment.model.Comment_;
 import com.doodle.Comment.model.Reply;
 import com.doodle.Comment.service.CommentService;
+import com.doodle.Comment.view.activity.CommentPost;
+import com.doodle.Home.view.fragment.LikerUserListFragment;
+import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.Reply.view.ReplyPost;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.service.HomeService;
@@ -87,7 +94,7 @@ public class CommentLinkScriptHolder extends RecyclerView.ViewHolder {
     public EmojiTextView tvCommentMessage;
     public ImageView imagePostCommenting, imageCommentSettings,imgCommentLike;
 
-    public TextView tvCommentUserName, tvCommentTime,  tvCommentReply, tvCountCommentLike;
+    public TextView tvCommentUserName, tvCommentTime, tvSeeReply,  tvCommentReply, tvCountCommentLike;
     private String userPostId;
     private PopupMenu popupCommentMenu;
 
@@ -170,6 +177,7 @@ public class CommentLinkScriptHolder extends RecyclerView.ViewHolder {
         imgCommentLike = itemView.findViewById(R.id.imgCommentLike);
         tvCommentReply = itemView.findViewById(R.id.tvCommentReply);
         tvCountCommentLike = itemView.findViewById(R.id.tvCountCommentLike);
+        tvSeeReply = itemView.findViewById(R.id.tvSeeReply);
 
         tvCountCommentLike.setVisibility(View.GONE);
 
@@ -249,8 +257,6 @@ public class CommentLinkScriptHolder extends RecyclerView.ViewHolder {
             commentLike = commentItem.getTotalLike();
         }
 
-
-
         if ("0".equalsIgnoreCase(commentLike)) {
             tvCountCommentLike.setText("");
             tvCountCommentLike.setVisibility(View.GONE);
@@ -263,7 +269,58 @@ public class CommentLinkScriptHolder extends RecyclerView.ViewHolder {
             tvCountCommentLike.setText(content);
         }
 
+        if (commentItem.isLikeUserStatus()) {
+            imgCommentLike.setImageResource(R.drawable.like_done);
+        } else {
+            imgCommentLike.setImageResource(R.drawable.like_normal);
+        }
 
+        if (App.isRvCommentHeader()) {
+            tvSeeReply.setVisibility(View.GONE);
+            tvCommentReply.setVisibility(View.GONE);
+        } else {
+            if (commentItem.getTotalReply().equals("0")) {
+                tvSeeReply.setVisibility(View.GONE);
+            } else {
+                tvSeeReply.setVisibility(View.VISIBLE);
+            }
+            tvCommentReply.setVisibility(View.VISIBLE);
+        }
+
+        imagePostUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mContext.startActivity(new Intent(mContext, ProfileActivity.class).putExtra("user_id", commentItem.getUserId()).putExtra("user_name", commentItem.getUserName()));
+            }
+        });
+
+        tvCommentUserName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mContext.startActivity(new Intent(mContext, ProfileActivity.class).putExtra("user_id", commentItem.getUserId()).putExtra("user_name", commentItem.getUserName()));
+            }
+        });
+
+        tvCountCommentLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentTransaction ft = ((CommentPost) mContext).getSupportFragmentManager().beginTransaction();
+                Fragment prev = ((CommentPost) mContext).getSupportFragmentManager().findFragmentByTag("dialog");
+                if (prev != null) {
+                    ft.remove(prev);
+                }
+                ft.addToBackStack(null);
+                DialogFragment dialogFragment = new LikerUserListFragment();
+
+                Bundle bundle = new Bundle();
+                bundle.putString("type_id", commentItem.getId());
+                bundle.putString("total_likes", commentItem.getTotalLike());
+                bundle.putString("liker_type", "comment");
+                dialogFragment.setArguments(bundle);
+
+                dialogFragment.show(ft, "dialog");
+            }
+        });
 
         imgCommentLike.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -306,6 +363,7 @@ public class CommentLinkScriptHolder extends RecyclerView.ViewHolder {
                         }
 
                     } else {
+
                         if (NetworkHelper.hasNetworkAccess(mContext)) {
 
                             Call<String> call = commentService.commentLike(deviceId, profileId, token, commentItem.getId(), userIds);
@@ -540,6 +598,16 @@ public class CommentLinkScriptHolder extends RecyclerView.ViewHolder {
             }
         });
 
+        if (!isNullOrEmpty(commentItem.getTotalReply()) && Integer.parseInt(commentItem.getTotalReply()) > 0) {
+            if( Integer.parseInt(commentItem.getTotalReply())==1){
+                tvSeeReply.setText(String.format("View %s reply", commentItem.getTotalReply()));
+                // tvCommentReply.setText(String.format("%s Reply", commentItem.getTotalReply()));
+            }else {
+                // tvCommentReply.setText(String.format("%s Replies", commentItem.getTotalReply()));
+                tvSeeReply.setText(String.format("View %s replies", commentItem.getTotalReply()));
+            }
+        }
+
         tvCommentReply.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -566,6 +634,34 @@ public class CommentLinkScriptHolder extends RecyclerView.ViewHolder {
                     mContext.startActivity(intent);
                 }
 
+            }
+        });
+
+        tvSeeReply.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AppCompatActivity activity = (AppCompatActivity) v.getContext();
+
+                String commentReply = commentItem.getTotalReply();
+                if (Integer.parseInt(commentReply) > 0) {
+                    if (networkOk) {
+
+                        Call<List<Reply>> call = commentService.getPostCommentReplyList(deviceId, profileId, token, commentItem.getId(), "false", limit, offset, commentItem.getPostId(), userIds);
+                        sendAllCommentReplyListRequest(call);
+                        delayLoadComment(mProgressBar);
+                    } else {
+                        Tools.showNetworkDialog(activity.getSupportFragmentManager());
+
+                    }
+                } else {
+                    Intent intent = new Intent(mContext, ReplyPost.class);
+                    intent.putExtra(COMMENT_ITEM_KEY, (Parcelable) commentItem);
+                    intent.putExtra(POST_ITEM_KEY, (Parcelable) postItem);
+
+                    intent.putParcelableArrayListExtra(REPLY_KEY, (ArrayList<? extends Parcelable>) replyItem);
+
+                    mContext.startActivity(intent);
+                }
             }
         });
 
@@ -716,6 +812,8 @@ public class CommentLinkScriptHolder extends RecyclerView.ViewHolder {
                                         tvCountCommentLike.setVisibility(View.VISIBLE);
                                         tvCountCommentLike.setText(content);
                                     }
+
+                                    imgCommentLike.setImageResource(R.drawable.like_normal);
                                 }
 
 
@@ -777,7 +875,7 @@ public class CommentLinkScriptHolder extends RecyclerView.ViewHolder {
                                     content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
                                     tvCountCommentLike.setVisibility(View.VISIBLE);
                                     tvCountCommentLike.setText(content);
-
+                                    imgCommentLike.setImageResource(R.drawable.like_done);
                                 }
                             }
 

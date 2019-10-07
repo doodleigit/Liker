@@ -35,7 +35,7 @@ public class ReplyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private Context mContext;
     PostItem postItem;
     Comment_ comment_;
-    private int size = 0;
+//    private int size = 0;
 
 
     private ReplyLinkScriptHolder.ReplyListener replyLinkListener;
@@ -58,7 +58,7 @@ public class ReplyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         this.replyLinkListener = replyLinkListener;
         this.replyYoutubeListener = replyYoutubeListener;
         this.replyImageListener = replyImageListener;
-            size = replyList.size();
+//            size = replyList.size();
     }
 
     @Override
@@ -171,26 +171,26 @@ public class ReplyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     public void refreshData(Reply reply) {
 
-        if (replyList.size() > 0) {
-            replyList.add(0, reply);
-            size = replyList.size();
-            notifyDataSetChanged();
-        } else {
+//        if (replyList.size() > 0) {
+//            replyList.add(0, reply);
+//            size = replyList.size();
+//            notifyDataSetChanged();
+//        } else {
             replyList.add(reply);
-            size = replyList.size();
+//            size = replyList.size();
             notifyDataSetChanged();
-        }
+//        }
     }
 
     public void updateData(Reply reply, int position) {
 
         if (replyList.size() > 0) {
             replyList.set(position, reply);
-            size = replyList.size();
+//            size = replyList.size();
             notifyItemChanged(position);
         } else {
             replyList.set(position, reply);
-            size = replyList.size();
+//            size = replyList.size();
             notifyItemChanged(position);
         }
     }
@@ -206,7 +206,7 @@ public class ReplyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         // comment_list.remove(position);
 
         //   comment_list.remove(position);
-        size = replyList.size();
+//        size = replyList.size();
         //   notifyItemRemoved(position);
         notifyDataSetChanged();
 

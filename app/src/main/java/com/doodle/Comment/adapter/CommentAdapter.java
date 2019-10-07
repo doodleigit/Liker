@@ -29,7 +29,7 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private List<Comment_> comment_list;
     private Context mContext;
     PostItem postItem;
-    private int size = 0;
+//    private int size = 0;
 
 
     private CommentLinkScriptHolder.CommentListener commentLinkListener;
@@ -51,9 +51,9 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         this.commentLinkListener = commentLinkListener;
         this.commentYoutubeListener = commentYoutubeListener;
         this.commentImageListener = commentImageListener;
-        if (comment_list != null && !comment_list.isEmpty()) {
-            size = comment_list.size();
-        }
+//        if (comment_list != null && !comment_list.isEmpty()) {
+//            size = comment_list.size();
+//        }
     }
 
     @Override
@@ -114,7 +114,7 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     @Override
     public int getItemCount() {
         // return comment_list.size();
-        return size;
+        return comment_list.size();
     }
 
 
@@ -169,11 +169,11 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         if (comment_list.size() > 0) {
             comment_list.add(0, commentItem);
-            size = comment_list.size();
+//            size = comment_list.size();
             notifyDataSetChanged();
         } else {
             comment_list.add(commentItem);
-            size = comment_list.size();
+//            size = comment_list.size();
             notifyDataSetChanged();
         }
     }
@@ -182,11 +182,11 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
         if (comment_list.size() > 0) {
             comment_list.set(position, commentItem);
-            size = comment_list.size();
+//            size = comment_list.size();
             notifyItemChanged(position);
         } else {
             comment_list.set(position, commentItem);
-            size = comment_list.size();
+//            size = comment_list.size();
             notifyItemChanged(position);
         }
     }
@@ -204,7 +204,7 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
        // comment_list.remove(position);
      //   notifyItemRemoved(position);
-        size = comment_list.size();
+//        size = comment_list.size();
         notifyItemRemoved(position);
 
     }

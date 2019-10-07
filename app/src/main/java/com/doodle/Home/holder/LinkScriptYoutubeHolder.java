@@ -110,7 +110,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
     public TextView tvPostLinkTitle, tvPostLinkDescription, tvPostLinkHost;
 
 
-    public ImageView imagePostShare, imagePermission;
+    public ImageView imagePostShare,imagePostShareSetting, imagePermission;
     private PopupMenu popup, popupMenu;
     public HomeService webService;
     public PrefManager manager;
@@ -196,6 +196,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
         userIds = manager.getProfileId();
         webService = HomeService.mRetrofit.create(HomeService.class);
         imagePostShare = (ImageView) itemView.findViewById(R.id.imagePostShare);
+        imagePostShareSetting = (ImageView) itemView.findViewById(R.id.imagePostShareSetting);
         imagePermission = (ImageView) itemView.findViewById(R.id.imagePermission);
         imagePostPermission = (ImageView) itemView.findViewById(R.id.imagePostPermission);
         imgLike = (ImageView) itemView.findViewById(R.id.imgLike);
@@ -305,7 +306,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
 
         if ("1".equalsIgnoreCase(isShared)) {
             containerHeaderShare.setVisibility(View.VISIBLE);
-
+            imagePermission.setVisibility(View.GONE);
 
             SharedProfile itemSharedProfile = item.getSharedProfile();
             sharedFirstName = itemSharedProfile.getUserFirstName();
@@ -341,6 +342,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
 
         } else {
             containerHeaderShare.setVisibility(View.GONE);
+            imagePermission.setVisibility(View.VISIBLE);
             if (App.isSharePostfooter()) {
                 imagePermission.setVisibility(View.GONE);
             } else {
@@ -656,8 +658,9 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
                 DialogFragment dialogFragment = new LikerUserListFragment();
 
                 Bundle bundle = new Bundle();
-                bundle.putString("post_id", item.getPostId());
+                bundle.putString("type_id", item.getPostId());
                 bundle.putString("total_likes", item.getPostFooter().getPostTotalLike());
+                bundle.putString("liker_type", "post");
                 dialogFragment.setArguments(bundle);
 
                 dialogFragment.show(ft, "dialog");
@@ -782,6 +785,17 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
                         return true;
                     }
                 });
+
+            }
+        });
+        imagePostShareSetting.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("RestrictedApi")
+            @Override
+            public void onClick(View v) {
+
+                activity = (AppCompatActivity) v.getContext();
+                PostPermissionSheet reportReasonSheet = PostPermissionSheet.newInstance(item, position);
+                reportReasonSheet.show(activity.getSupportFragmentManager(), "ReportReasonSheet");
 
             }
         });

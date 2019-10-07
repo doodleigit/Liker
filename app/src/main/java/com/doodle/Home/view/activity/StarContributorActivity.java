@@ -253,6 +253,7 @@ public class StarContributorActivity extends AppCompatActivity {
                 subCategories.clear();
                 if (key.isEmpty()) {
                     subCategories.addAll(allCategories);
+                    subCategoryAdapter.setSearchParam(false);
                 } else {
                     for (PostFilterSubCategory category : allCategories) {
                         ArrayList<PostFilterItem> arrayList = new ArrayList<>();
@@ -276,6 +277,7 @@ public class StarContributorActivity extends AppCompatActivity {
                             }
                         }
                     }
+                    subCategoryAdapter.setSearchParam(true);
                 }
                 subCategoryAdapter.notifyDataSetChanged();
             }

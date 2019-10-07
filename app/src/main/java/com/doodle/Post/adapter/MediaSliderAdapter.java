@@ -7,13 +7,14 @@ import android.support.v4.view.PagerAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.VideoView;
 
 import com.bumptech.glide.Glide;
 import com.doodle.App;
 import com.doodle.Home.model.PostFile;
 import com.doodle.R;
 import com.doodle.Tool.AppConstants;
+import com.github.chrisbanes.photoview.PhotoView;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.ExtractorMediaSource;
@@ -23,16 +24,22 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MediaSliderAdapter extends PagerAdapter {
     private Context context;
     private LayoutInflater inflater;
     private List<PostFile> arrayList;
+    private ArrayList<PlayerView> videoViews;
 
     public MediaSliderAdapter(Context context, List<PostFile> arrayList) {
         this.context = context;
         this.arrayList = arrayList;
+        videoViews = new ArrayList<>();
+        for (int i = 0; i < arrayList.size(); i++) {
+            videoViews.add(null);
+        }
         inflater = LayoutInflater.from(context);
     }
 
@@ -51,8 +58,9 @@ public class MediaSliderAdapter extends PagerAdapter {
         View imageLayout = inflater.inflate(R.layout.media_slider_item, view, false);
 
         assert imageLayout != null;
-        final ImageView imageView = imageLayout.findViewById(R.id.media_image);
+        final PhotoView imageView = imageLayout.findViewById(R.id.media_image);
         final PlayerView videoView = imageLayout.findViewById(R.id.video_view);
+        videoViews.set(position, videoView);
 
         if (arrayList.get(position).getPostType().equals("2")) {
             imageView.setVisibility(View.GONE);
@@ -60,7 +68,7 @@ public class MediaSliderAdapter extends PagerAdapter {
             // Setup Exoplayer instance
             SimpleExoPlayer exoPlayerInstance = ExoPlayerFactory.newSimpleInstance(context);
 // Produces DataSource instances through which media data is loaded.
-            DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context, Util.getUserAgent(context, "simpleExoPlayer"));
+            DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context, Util.getUserAgent(context, "Liker"));
             //Getting media from raw resource
             MediaSource videoSource = new ExtractorMediaSource.Factory(dataSourceFactory)
                     .createMediaSource(Uri.parse(AppConstants.POST_VIDEOS + arrayList.get(position).getVideoName()));
@@ -83,6 +91,8 @@ public class MediaSliderAdapter extends PagerAdapter {
         return imageLayout;
     }
 
+
+
     @Override
     public boolean isViewFromObject(View view, Object object) {
         return view.equals(object);
@@ -96,4 +106,15 @@ public class MediaSliderAdapter extends PagerAdapter {
     public Parcelable saveState() {
         return null;
     }
+
+    public void pauseVideo(int position) {
+        for (int i = 0; i < videoViews.size(); i++) {
+            if (videoViews.get(i) != null) {
+                if (position != i) {
+                    videoViews.get(i).getPlayer().setPlayWhenReady(false);
+                }
+            }
+        }
+    }
+
 }

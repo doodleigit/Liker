@@ -198,7 +198,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
     private LinearLayout containerHeaderShare;
     private CircleImageView imageSharePostUser;
-    private ImageView imageSharePostPermission;
+    private ImageView imageSharePostPermission,imagePostShareSetting;
     private TextView tvSharePostUserName, tvSharePostTime, tvShareHeaderInfo, tvSharePostContent;
     private ViewGroup tvLikeShare;
     private List<MentionItem> mentionNameList;
@@ -302,6 +302,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
         tvShareHeaderInfo = itemView.findViewById(R.id.tvShareHeaderInfo);
 
         imageSharePostPermission = itemView.findViewById(R.id.imageSharePostPermission);
+        imagePostShareSetting = itemView.findViewById(R.id.imagePostShareSetting);
         tvSharePostContent = itemView.findViewById(R.id.tvSharePostContent);
 
     }
@@ -351,13 +352,15 @@ public class TextHolder extends RecyclerView.ViewHolder {
         if (App.isSharePostfooter()) {
             tvLikeShare.setVisibility(View.GONE);
             imagePermission.setVisibility(View.GONE);
+            //imagePostShareSetting.setVisibility(View.GONE);
         } else {
             tvLikeShare.setVisibility(View.VISIBLE);
             imagePermission.setVisibility(View.VISIBLE);
+            //imagePostShareSetting.setVisibility(View.GONE);
         }
         if ("1".equalsIgnoreCase(isShared)) {
             containerHeaderShare.setVisibility(View.VISIBLE);
-            //   imagePermission.setVisibility(View.GONE);
+               imagePermission.setVisibility(View.GONE);
 
 
             SharedProfile itemSharedProfile = item.getSharedProfile();
@@ -397,7 +400,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
         } else {
             containerHeaderShare.setVisibility(View.GONE);
-
+            imagePermission.setVisibility(View.VISIBLE);
             if (App.isSharePostfooter()) {
                 imagePermission.setVisibility(View.GONE);
             } else {
@@ -822,8 +825,9 @@ public class TextHolder extends RecyclerView.ViewHolder {
                 DialogFragment dialogFragment = new LikerUserListFragment();
 
                 Bundle bundle = new Bundle();
-                bundle.putString("post_id", item.getPostId());
+                bundle.putString("type_id", item.getPostId());
                 bundle.putString("total_likes", item.getPostFooter().getPostTotalLike());
+                bundle.putString("liker_type", "post");
                 dialogFragment.setArguments(bundle);
 
                 dialogFragment.show(ft, "dialog");
@@ -1134,6 +1138,20 @@ public class TextHolder extends RecyclerView.ViewHolder {
                         return true;
                     }
                 });*/
+
+            }
+        });
+
+        imagePostShareSetting.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("RestrictedApi")
+            @Override
+            public void onClick(View v) {
+
+
+                activity = (AppCompatActivity) v.getContext();
+                PostPermissionSheet reportReasonSheet = PostPermissionSheet.newInstance(postItem, position);
+                reportReasonSheet.show(activity.getSupportFragmentManager(), "ReportReasonSheet");
+
 
             }
         });

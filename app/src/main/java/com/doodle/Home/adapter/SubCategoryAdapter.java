@@ -28,6 +28,7 @@ public class SubCategoryAdapter extends RecyclerView.Adapter<SubCategoryAdapter.
     private FilterClickListener filterClickListener;
     private CategoryExpandListener categoryExpandListener;
     private int type;
+    private boolean isSearch;
 
     public SubCategoryAdapter(Context context, ArrayList<PostFilterSubCategory> arrayList, ArrayList<PostFilterSubCategory> mainArrayList, FilterClickListener filterClickListener,
                               CategoryExpandListener categoryExpandListener, int type) {
@@ -72,6 +73,14 @@ public class SubCategoryAdapter extends RecyclerView.Adapter<SubCategoryAdapter.
 
         FilterItemAdapter filterItemAdapter = new FilterItemAdapter(context, arrayList.get(position), filterClickListener, selectChangeListener, type);
         viewHolder.recyclerView.setAdapter(filterItemAdapter);
+
+        if (isSearch) {
+            viewHolder.recyclerView.setVisibility(View.VISIBLE);
+            viewHolder.ivArrow.setImageResource(R.drawable.arrow_down);
+        } else {
+            viewHolder.recyclerView.setVisibility(View.GONE);
+            viewHolder.ivArrow.setImageResource(R.drawable.arrow_right);
+        }
 
         viewHolder.ivAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -162,6 +171,10 @@ public class SubCategoryAdapter extends RecyclerView.Adapter<SubCategoryAdapter.
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
             recyclerView.setNestedScrollingEnabled(false);
         }
+    }
+
+    public void setSearchParam(boolean isSearch) {
+        this.isSearch = isSearch;
     }
 
 }

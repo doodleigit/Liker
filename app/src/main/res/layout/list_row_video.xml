@@ -38,6 +38,25 @@
                     android:layout_marginRight="@dimen/_15sdp"
                     android:src="@drawable/ic_cancel_black_24dp" />
 
+            <ImageView
+                android:visibility="gone"
+                android:id="@+id/imageDuplicate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:tint="@android:color/holo_red_light"
+                android:src="@drawable/ic_warning_black_24dp"
+                />
+
+            <ImageView
+                android:visibility="gone"
+                android:id="@+id/imageUnique"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:src="@drawable/ic_check_circle_black_24dp"
+                android:tint="#1483C9"
+                />
 
 
             <RelativeLayout
@@ -57,5 +76,18 @@
 
 
         </RelativeLayout>
+
     </android.support.v7.widget.CardView>
+    <TextView
+        android:visibility="visible"
+        android:id="@+id/tvInfoGallery"
+        android:text="why?"
+        android:textColor="@android:color/black"
+   android:layout_gravity="center"
+        android:textAlignment="center"
+        android:padding="@dimen/_5sdp"
+        android:drawableRight="@drawable/ic_info_outline_black_24dp"
+        android:drawableTint="#1483C9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
 </LinearLayout>

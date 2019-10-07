@@ -146,6 +146,7 @@ public class ContributorSettingFragment extends Fragment {
                 categories.clear();
                 if (key.isEmpty()) {
                     categories.addAll(allCategories);
+                    contributorCategoryAdapter.setSearchParam(false);
                 } else {
                     for (Category category : allCategories) {
                         ArrayList<SubCategory> arrayList = new ArrayList<>();
@@ -166,6 +167,7 @@ public class ContributorSettingFragment extends Fragment {
                             }
                         }
                     }
+                    contributorCategoryAdapter.setSearchParam(true);
                 }
                 contributorCategoryAdapter.notifyDataSetChanged();
             }
@@ -182,6 +184,7 @@ public class ContributorSettingFragment extends Fragment {
                 if (!b) {
                     categories.clear();
                     contributorCategoryAdapter.notifyDataSetChanged();
+                    contributorCategoryAdapter.setSearchParam(false);
                 } else {
                     String key = etAddCategory.getText().toString();
                     categories.clear();
@@ -207,6 +210,7 @@ public class ContributorSettingFragment extends Fragment {
                                 }
                             }
                         }
+                        contributorCategoryAdapter.setSearchParam(true);
                     }
                     contributorCategoryAdapter.notifyDataSetChanged();
                 }
