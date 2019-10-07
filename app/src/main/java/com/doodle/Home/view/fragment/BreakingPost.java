@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.TextView;
 
+import com.doodle.App;
 import com.doodle.Home.adapter.PostAdapter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.service.HomeService;
@@ -233,6 +234,7 @@ public class BreakingPost extends Fragment {
             }
         };
 
+        App.setSharePostfooter(false);
         adapter = new PostAdapter(getActivity(), postItemList, mCallback, mimListener, videoListener, youtubeListener, linkListener, imageListener, true);
         recyclerView.setMediaObjects(postItemList);
         recyclerView.setActivityContext(getActivity());

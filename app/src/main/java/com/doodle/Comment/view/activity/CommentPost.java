@@ -1140,8 +1140,9 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
                     adapter.refreshData(commentItems);
                     progressDialog.dismiss();
                     etComment.setText("");
-                    offset++;
+                 //   offset++;
                     recyclerView.smoothScrollToPosition(0);
+                   // recyclerView.smoothScrollToPosition(0);
                     // App.setCommentCount(1);
                 }
 
@@ -1379,9 +1380,9 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
             if (position != -1) {
              //   Log.d("Cbndklfj ",commentItem.toString());
 
-                comment_list.remove(position);
-                comment_list.add(position, commentItem);
-                adapter.notifyItemChanged(position);
+               // comment_list.remove(position);
+                comment_list.set(position, commentItem);
+                adapter.notifyDataSetChanged();
 
               /*  if (postItemList.size() >= position + 1) {
                     if (postItemList.get(position).getPostId().equals(postItem.getPostId())) {

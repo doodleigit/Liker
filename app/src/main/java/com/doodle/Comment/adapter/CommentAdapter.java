@@ -168,7 +168,7 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public void refreshData(Comment_ commentItem) {
 
         if (comment_list.size() > 0) {
-            comment_list.add(0, commentItem);
+            comment_list.add(0,commentItem);
             size = comment_list.size();
             notifyDataSetChanged();
         } else {

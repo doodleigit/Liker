@@ -7,6 +7,7 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
@@ -105,6 +106,7 @@ import static com.doodle.Tool.Tools.getSpannableStringBuilder;
 import static com.doodle.Tool.Tools.getSpannableStringShareHeader;
 import static com.doodle.Tool.Tools.isNullOrEmpty;
 import static com.doodle.Tool.Tools.sendNotificationRequest;
+import static com.doodle.Tool.Tools.setMargins;
 import static com.doodle.Tool.Tools.showBlockUser;
 import static java.lang.Integer.parseInt;
 
@@ -118,7 +120,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
     public EmojiTextView tvPostEmojiContent;
     public ImageView star1, star2, star3, star4, star5, star6, star7, star8,
             star9, star10, star11, star12, star13, star14, star15, star16;
-    public LinearLayout postBodyLayer;
+    public LinearLayout postBodyLayer, sharePostBody;
     private Drawable mDrawable;
     List<Mim> viewColors = DataProvider.mimList;
 
@@ -198,13 +200,17 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
     private LinearLayout containerHeaderShare;
     private CircleImageView imageSharePostUser;
-    private ImageView imageSharePostPermission,imagePostShareSetting;
+    private ImageView imageSharePostPermission, imagePostShareSetting;
     private TextView tvSharePostUserName, tvSharePostTime, tvShareHeaderInfo, tvSharePostContent;
     private ViewGroup tvLikeShare;
     private List<MentionItem> mentionNameList;
     private ClickableSpan clickableSpan;
     private TextView tvShared, tvPostShareUserName;
     private MediaPlayer player;
+    private String postWalFullName;
+    private TextView tvWallPost, tvUserName, tvWallUserName;
+    private LinearLayout wallFeedContainer;
+
 
     public interface PostItemListener {
         void deletePost(PostItem postItem, int position);
@@ -248,6 +254,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
         tvLinkScriptText = (ReadMoreTextView) itemView.findViewById(R.id.tvLinkScriptText);
         tvPostEmojiContent = (EmojiTextView) itemView.findViewById(R.id.tvPostEmojiContent);
         postBodyLayer = (LinearLayout) itemView.findViewById(R.id.postBodyLayer);
+        sharePostBody = (LinearLayout) itemView.findViewById(R.id.sharePostBody);
         tvCommentCount = (TextView) itemView.findViewById(R.id.tvCommentCount);
 
 
@@ -267,6 +274,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
         star14 = itemView.findViewById(R.id.star14);
         star15 = itemView.findViewById(R.id.star15);
         star16 = itemView.findViewById(R.id.star16);
+
 
         //Comment
         tvCommentMessage = itemView.findViewById(R.id.tvCommentMessage);
@@ -304,6 +312,10 @@ public class TextHolder extends RecyclerView.ViewHolder {
         imageSharePostPermission = itemView.findViewById(R.id.imageSharePostPermission);
         imagePostShareSetting = itemView.findViewById(R.id.imagePostShareSetting);
         tvSharePostContent = itemView.findViewById(R.id.tvSharePostContent);
+        tvWallPost = itemView.findViewById(R.id.tvWallPost);
+        tvWallUserName = itemView.findViewById(R.id.tvWallUserName);
+        tvUserName = itemView.findViewById(R.id.tvUserName);
+        wallFeedContainer = itemView.findViewById(R.id.wallFeedContainer);
 
     }
 
@@ -359,9 +371,14 @@ public class TextHolder extends RecyclerView.ViewHolder {
             //imagePostShareSetting.setVisibility(View.GONE);
         }
         if ("1".equalsIgnoreCase(isShared)) {
-            containerHeaderShare.setVisibility(View.VISIBLE);
-               imagePermission.setVisibility(View.GONE);
 
+
+            setMargins(postBodyLayer, 10, 10, 10, 10);
+            postBodyLayer.setBackgroundResource(R.drawable.drawable_comment);
+            sharePostBody.setBackgroundColor(Color.parseColor("#cfcfcf"));
+
+            containerHeaderShare.setVisibility(View.VISIBLE);
+            // imagePermission.setVisibility(View.GONE);
 
             SharedProfile itemSharedProfile = item.getSharedProfile();
 
@@ -455,7 +472,6 @@ public class TextHolder extends RecyclerView.ViewHolder {
         String contentUrl = FACEBOOK_SHARE + item.getSharedPostId();
         StringBuilder nameBuilder = new StringBuilder();
         List<String> mentionUrl = extractUrls(item.getPostText());
-
 
         for (PostTextIndex temp : item.getPostTextIndex()) {
             String postType = temp.getType();
@@ -744,6 +760,18 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
         SpannableStringBuilder builder = getSpannableStringBuilder(mContext, item.getCatId(), likes, followers, totalStars, categoryName);
 
+
+        if (!isNullOrEmpty(item.getPostWallFirstName())) {
+            postWalFullName = item.getPostWallFirstName() + " " + item.getPostWallLastName();
+            wallFeedContainer.setVisibility(View.VISIBLE);
+            tvUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
+            tvWallUserName.setText(postWalFullName);
+            setMargins(wallFeedContainer, 5, 5, 5, 5);
+            wallFeedContainer.setBackgroundResource(R.drawable.drawable_comment);
+
+        } else {
+            wallFeedContainer.setVisibility(View.GONE);
+        }
 
         if ("1".equalsIgnoreCase(isShared)) {
             tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));

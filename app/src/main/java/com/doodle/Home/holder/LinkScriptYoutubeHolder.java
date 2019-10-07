@@ -6,6 +6,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -92,6 +93,7 @@ import static com.doodle.Tool.Tools.getSpannableStringBuilder;
 import static com.doodle.Tool.Tools.getSpannableStringShareHeader;
 import static com.doodle.Tool.Tools.isNullOrEmpty;
 import static com.doodle.Tool.Tools.sendNotificationRequest;
+import static com.doodle.Tool.Tools.setMargins;
 import static com.doodle.Tool.Tools.showBlockUser;
 import static java.lang.Integer.parseInt;
 
@@ -105,7 +107,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
             star9, star10, star11, star12, star13, star14, star15, star16;
     public ImageView imgLinkScript;
     public ImageView imagePostPermission;
-    public LinearLayout postBodyLayer;
+    public LinearLayout postBodyLayer,sharePostBody;
     PostItem item;
     public TextView tvPostLinkTitle, tvPostLinkDescription, tvPostLinkHost;
 
@@ -212,6 +214,7 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
         tvLinkScriptText = (ReadMoreTextView) itemView.findViewById(R.id.tvLinkScriptText);
         tvPostEmojiContent = (EmojiTextView) itemView.findViewById(R.id.tvPostEmojiContent);
         postBodyLayer = (LinearLayout) itemView.findViewById(R.id.postBodyLayer);
+        sharePostBody = (LinearLayout) itemView.findViewById(R.id.sharePostBody);
         tvCommentCount = itemView.findViewById(R.id.tvCommentCount);
         tvLikeShare = itemView.findViewById(R.id.tvLikeShare);
 
@@ -306,7 +309,10 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
 
         if ("1".equalsIgnoreCase(isShared)) {
             containerHeaderShare.setVisibility(View.VISIBLE);
-            imagePermission.setVisibility(View.GONE);
+           // imagePermission.setVisibility(View.GONE);
+            setMargins(postBodyLayer,10,10,10,10);
+            postBodyLayer.setBackgroundResource(R.drawable.drawable_comment);
+            sharePostBody.setBackgroundColor(Color.parseColor("#cfcfcf"));
 
             SharedProfile itemSharedProfile = item.getSharedProfile();
             sharedFirstName = itemSharedProfile.getUserFirstName();

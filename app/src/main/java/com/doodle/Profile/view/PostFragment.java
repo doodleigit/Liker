@@ -32,6 +32,7 @@ import com.doodle.Home.holder.TextMimHolder;
 import com.doodle.Home.holder.VideoHolder;
 import com.doodle.Home.service.VideoPlayerRecyclerView;
 import com.doodle.Post.view.activity.PostNew;
+import com.doodle.Post.view.activity.WallPost;
 import com.doodle.Profile.service.ProfileService;
 import com.doodle.R;
 import com.doodle.Tool.AppConstants;
@@ -198,6 +199,7 @@ public class PostFragment extends Fragment {
         };
 
         //App.setSharePostfooter(true);
+        App.setSharePostfooter(false);
         adapter = new PostAdapter(getActivity(), postItemList, mCallback, mimListener, videoListener, youtubeListener, linkListener, imageListener, true);
         recyclerView.setMediaObjects(postItemList);
         recyclerView.setActivityContext(getActivity());
@@ -216,7 +218,7 @@ public class PostFragment extends Fragment {
         addPostLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getContext(), PostNew.class));
+                startActivity(new Intent(getContext(), WallPost.class));
             }
         });
 

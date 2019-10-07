@@ -10,66 +10,70 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
+
+<LinearLayout
+    android:id="@+id/layoutHeader"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <include layout="@layout/list_item_post_header"/>
+
+
+        </LinearLayout>
+
+
+<LinearLayout
+    android:id="@+id/sharePostBody"
+    android:layout_below="@id/layoutHeader"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <LinearLayout
+        android:id="@+id/postBodyLayer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
         <LinearLayout
-            android:id="@+id/layoutHeader"
-            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-
-
             <include layout="@layout/list_item_post_header_share"/>
-            <include layout="@layout/list_item_post_header"/>
-
         </LinearLayout>
 
-   <!--     <include
-            android:id="@+id/containerHeader"
-            layout="@layout/list_item_post_header"
+        <com.borjabravo.readmoretextview.ReadMoreTextView
+            android:id="@+id/tvPostContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-        </include>-->
+            android:layout_margin="@dimen/_5sdp"
+            android:textColor="@color/colorPostText"
+            android:textSize="14sp"
+            app:colorClickableText="@android:color/holo_blue_light"
+            app:trimCollapsedText="Show less"
+            app:trimExpandedText="Show more"
+            app:trimLength="200"
+            app:trimMode="trimModeLength"
+            tools:text="Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.vHere is my first post.Here is my first post.Here is my first post. " />
 
-        <LinearLayout
-            android:id="@+id/postBodyLayer"
+        <com.vanniktech.emoji.EmojiTextView
+
+            android:id="@+id/tvPostEmojiContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/layoutHeader"
-            android:orientation="vertical">
-
-            <com.borjabravo.readmoretextview.ReadMoreTextView
-                android:id="@+id/tvPostContent"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/_5sdp"
-                android:textColor="@color/colorPostText"
-                android:textSize="14sp"
-                app:colorClickableText="@android:color/holo_blue_light"
-                app:trimCollapsedText="Show less"
-                app:trimExpandedText="Show more"
-                app:trimLength="200"
-                app:trimMode="trimModeLength"
-                tools:text="Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.Here is my first post.vHere is my first post.Here is my first post.Here is my first post. " />
-
-            <com.vanniktech.emoji.EmojiTextView
-
-                android:id="@+id/tvPostEmojiContent"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/_5sdp"
-                android:textColor="@color/colorPostText"
-                android:background="@null"
-                android:imeOptions="actionSend"
-                android:inputType="textCapSentences|textMultiLine" />
+            android:layout_margin="@dimen/_5sdp"
+            android:textColor="@color/colorPostText"
+            android:background="@null"
+            android:imeOptions="actionSend"
+            android:inputType="textCapSentences|textMultiLine" />
 
 
-        </LinearLayout>
+    </LinearLayout>
 
-        <include
-            layout="@layout/list_item_post_footer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/postBodyLayer" />
+    <include
+        layout="@layout/list_item_post_footer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/postBodyLayer" />
+</LinearLayout>
+
 
 
     </RelativeLayout>
