@@ -66,6 +66,7 @@ import com.doodle.Home.model.PostFilters;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.SinglePostFilters;
 import com.doodle.Home.model.TopContributorStatus;
+import com.doodle.Home.service.CategoryExpandListener;
 import com.doodle.Home.service.CategoryRemoveListener;
 import com.doodle.Home.service.FilterClickListener;
 import com.doodle.Home.service.HomeService;
@@ -619,9 +620,11 @@ public class Home extends AppCompatActivity implements
         Toolbar toolbar = dialog.findViewById(R.id.toolbar);
         EditText etSearchCategory;
         RecyclerView recyclerView;
+        LinearLayoutManager linearLayoutManager;
         etSearchCategory = dialog.findViewById(R.id.search_category);
         recyclerView = dialog.findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        linearLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(linearLayoutManager);
 
         FilterClickListener filterClickListener = new FilterClickListener() {
             @Override
@@ -649,7 +652,16 @@ public class Home extends AppCompatActivity implements
 
         filterSubCategories.addAll(subCategories);
 
-        SubCategoryAdapter subCategoryAdapter = new SubCategoryAdapter(this, filterSubCategories, subCategories, filterClickListener, 0);
+        CategoryExpandListener categoryExpandListener = new CategoryExpandListener() {
+            @Override
+            public void onExpand(View view) {
+                int itemToScroll = recyclerView.getChildLayoutPosition(view);
+                int centerOfScreen = recyclerView.getHeight() / 2 - view.getHeight() / 2;
+                linearLayoutManager.scrollToPositionWithOffset(itemToScroll, centerOfScreen);
+            }
+        };
+
+        SubCategoryAdapter subCategoryAdapter = new SubCategoryAdapter(this, filterSubCategories, subCategories, filterClickListener, categoryExpandListener, 0);
         recyclerView.setAdapter(subCategoryAdapter);
 
         etSearchCategory.addTextChangedListener(new TextWatcher() {
@@ -669,6 +681,7 @@ public class Home extends AppCompatActivity implements
                 filterSubCategories.clear();
                 if (key.isEmpty()) {
                     filterSubCategories.addAll(subCategories);
+                    subCategoryAdapter.setSearchParam(false);
                 } else {
                     for (PostFilterSubCategory category : subCategories) {
                         ArrayList<PostFilterItem> arrayList = new ArrayList<>();
@@ -692,6 +705,7 @@ public class Home extends AppCompatActivity implements
                             }
                         }
                     }
+                    subCategoryAdapter.setSearchParam(true);
                 }
                 subCategoryAdapter.notifyDataSetChanged();
             }
@@ -718,11 +732,13 @@ public class Home extends AppCompatActivity implements
         EditText etSearchCategory;
         FloatingActionButton done, clear;
         RecyclerView recyclerView;
+        LinearLayoutManager linearLayoutManager;
         done = dialog.findViewById(R.id.done);
         clear = dialog.findViewById(R.id.clear);
         etSearchCategory = dialog.findViewById(R.id.search_category);
         recyclerView = dialog.findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        linearLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(linearLayoutManager);
 
         FilterClickListener filterClickListener = new FilterClickListener() {
             @Override
@@ -762,14 +778,22 @@ public class Home extends AppCompatActivity implements
             }
         };
 
+        CategoryExpandListener categoryExpandListener = new CategoryExpandListener() {
+            @Override
+            public void onExpand(View view) {
+                int itemToScroll = recyclerView.getChildLayoutPosition(view);
+                int centerOfScreen = recyclerView.getHeight() / 2 - view.getHeight() / 2;
+                linearLayoutManager.scrollToPositionWithOffset(itemToScroll, centerOfScreen);
+            }
+        };
 
         if (categoryPosition == 3) {
             filterSubCategories.addAll(exceptMultipleSubCategories);
-            subCategoryAdapter = new SubCategoryAdapter(this, filterSubCategories, new ArrayList<>(), filterClickListener, 1);
+            subCategoryAdapter = new SubCategoryAdapter(this, filterSubCategories, new ArrayList<>(), filterClickListener, categoryExpandListener, 1);
             recyclerView.setAdapter(subCategoryAdapter);
         } else {
             filterSubCategories.addAll(multipleSubCategories);
-            subCategoryAdapter = new SubCategoryAdapter(this, filterSubCategories, new ArrayList<>(), filterClickListener, 1);
+            subCategoryAdapter = new SubCategoryAdapter(this, filterSubCategories, new ArrayList<>(), filterClickListener, categoryExpandListener, 1);
             recyclerView.setAdapter(subCategoryAdapter);
         }
 
@@ -794,8 +818,9 @@ public class Home extends AppCompatActivity implements
                     } else {
                         filterSubCategories.addAll(multipleSubCategories);
                     }
+                    subCategoryAdapter.setSearchParam(false);
                 } else {
-                    for (PostFilterSubCategory category : (categoryPosition == 3 ?  exceptMultipleSubCategories : multipleSubCategories)) {
+                    for (PostFilterSubCategory category : (categoryPosition == 3 ? exceptMultipleSubCategories : multipleSubCategories)) {
                         ArrayList<PostFilterItem> arrayList = new ArrayList<>();
                         PostFilterSubCategory postFilterSubCategory = new PostFilterSubCategory();
                         for (PostFilterItem postFilterItem : category.getPostFilterItems()) {
@@ -817,6 +842,7 @@ public class Home extends AppCompatActivity implements
                             }
                         }
                     }
+                    subCategoryAdapter.setSearchParam(true);
                 }
                 subCategoryAdapter.notifyDataSetChanged();
             }

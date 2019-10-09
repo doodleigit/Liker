@@ -17,7 +17,6 @@ import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.os.Handler;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Spannable;
@@ -53,6 +52,7 @@ import com.doodle.Comment.view.fragment.DeletePostDialog;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.PostTextIndex;
 import com.doodle.Home.model.postshare.PostShareItem;
+import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.R;
 import com.doodle.Tool.fragment.Network;
 import com.marcoscg.materialtoast.MaterialToast;
@@ -430,6 +430,70 @@ public class Tools {
         return builder;
 
     }
+
+    public static SpannableStringBuilder getWallSpannableStringBuilder(Context context, String postUserFullName, String postUserId,String postUserName, String postWalFullName, String postWallUserId,String postWallUserName) {
+
+
+      //  String headerInfo = String.format("%s Likes | %d Stars | %s Followers | %s", likes, totalStars, followers,"");
+     //   String userName= String.format("Azharul Islam ");
+
+        String wallInfo=" "+" posted on ";
+
+        SpannableStringBuilder builder = new SpannableStringBuilder();
+        SpannableString spannableUser=new SpannableString(postUserFullName);
+
+                ClickableSpan clickableSpanUser = new ClickableSpan() {
+            @Override
+            public void onClick(View textView) {
+
+                context.startActivity(new Intent(context, ProfileActivity.class).putExtra("user_id", postUserId).putExtra("user_name", postUserName));
+            }
+            @Override
+            public void updateDrawState(TextPaint ds) {
+                super.updateDrawState(ds);
+                ds.setUnderlineText(false);
+            }
+        };
+
+        spannableUser.setSpan(clickableSpanUser, 0, postUserFullName.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ForegroundColorSpan foregroundColorSpan1 = new ForegroundColorSpan(Color.parseColor("#60b2fc"));
+        spannableUser.setSpan(foregroundColorSpan1, 0, postUserFullName.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+        builder.append(spannableUser);
+
+        SpannableString spannableWallInfo = new SpannableString(wallInfo);
+        builder.append(spannableWallInfo);
+
+        //String wallUser= String.format("Azharul Islam");
+        SpannableString spannableWallUser = new SpannableString(postWalFullName);
+
+        ClickableSpan clickableSpanWallUser = new ClickableSpan() {
+            @Override
+            public void onClick(View textView) {
+
+                context.startActivity(new Intent(context, ProfileActivity.class).putExtra("user_id", postWallUserId).putExtra("user_name", postWallUserName));
+            }
+            @Override
+            public void updateDrawState(TextPaint ds) {
+                super.updateDrawState(ds);
+                ds.setUnderlineText(false);
+            }
+        };
+
+        spannableWallUser.setSpan(clickableSpanWallUser, 0, postWalFullName.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        ForegroundColorSpan foregroundColorSpan2 = new ForegroundColorSpan(Color.parseColor("#60b2fc"));
+        spannableWallUser.setSpan(foregroundColorSpan2, 0, postWalFullName.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
+        builder.append(spannableWallUser);
+
+        String wallSuffix= String.format("'s wall");
+        SpannableString spannableWallSuffix=new SpannableString(wallSuffix);
+        builder.append(spannableWallSuffix);
+
+
+        return builder;
+
+    }
+
+
 
 
     public static SpannableStringBuilder getSpannableStringShareHeader(String likes, String followers, int totalStars, String categoryName) {

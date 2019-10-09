@@ -32,6 +32,8 @@ public class PostFile implements Serializable, Parcelable
     @SerializedName("duration")
     @Expose
     private String duration;
+
+    private int playTime = 0;
     public final static Parcelable.Creator<PostFile> CREATOR = new Creator<PostFile>() {
 
 
@@ -119,7 +121,13 @@ public class PostFile implements Serializable, Parcelable
         this.duration = duration;
     }
 
+    public int getPlayTime() {
+        return playTime;
+    }
 
+    public void setPlayTime(int playTime) {
+        this.playTime = playTime;
+    }
 
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeValue(id);

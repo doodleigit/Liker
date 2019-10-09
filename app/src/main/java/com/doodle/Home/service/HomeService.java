@@ -262,6 +262,33 @@ public interface HomeService {
             @Field("current") int current
     );
 
+    @POST(AppConstants.COMMENT_LIKERS)
+    @FormUrlEncoded
+    Call<LikeUsers> commentLiker(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("user_id") String userIds,
+            @Field("commentid") String commentId,
+            @Field("offset") int offset,
+            @Field("limit") int limit,
+            @Field("current") int current
+    );
+
+    @POST(AppConstants.COMMENT_REPLY_LIKERS)
+    @FormUrlEncoded
+    Call<LikeUsers> commentReplyLiker(
+            @Header("Device-Id") String deviceId,
+            @Header("User-Id") String userId,
+            @Header("Security-Token") String token,
+            @Field("user_id") String userIds,
+            @Field("commentid") String commentId,
+            @Field("reply_id") String replyId,
+            @Field("offset") int offset,
+            @Field("limit") int limit,
+            @Field("current") int current
+    );
+
     @POST(AppConstants.FOLLOW)
     @FormUrlEncoded
     Call<String> setFollow(

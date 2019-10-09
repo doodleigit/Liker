@@ -25,9 +25,6 @@ public class LikeUsers implements Serializable, Parcelable
     @SerializedName("offset")
     @Expose
     private Integer offset;
-    @SerializedName("post_id")
-    @Expose
-    private String postId;
     @SerializedName("refload")
     @Expose
     private Boolean refload;
@@ -60,7 +57,6 @@ public class LikeUsers implements Serializable, Parcelable
         this.reloadUser = ((String) in.readValue((String.class.getClassLoader())));
         this.cpage = ((Integer) in.readValue((Integer.class.getClassLoader())));
         this.offset = ((Integer) in.readValue((Integer.class.getClassLoader())));
-        this.postId = ((String) in.readValue((String.class.getClassLoader())));
         this.refload = ((Boolean) in.readValue((Boolean.class.getClassLoader())));
         this.totalLike = ((String) in.readValue((String.class.getClassLoader())));
         this.currentUser = ((String) in.readValue((String.class.getClassLoader())));
@@ -101,14 +97,6 @@ public class LikeUsers implements Serializable, Parcelable
         this.offset = offset;
     }
 
-    public String getPostId() {
-        return postId;
-    }
-
-    public void setPostId(String postId) {
-        this.postId = postId;
-    }
-
     public Boolean getRefload() {
         return refload;
     }
@@ -138,7 +126,6 @@ public class LikeUsers implements Serializable, Parcelable
         dest.writeValue(reloadUser);
         dest.writeValue(cpage);
         dest.writeValue(offset);
-        dest.writeValue(postId);
         dest.writeValue(refload);
         dest.writeValue(totalLike);
         dest.writeValue(currentUser);

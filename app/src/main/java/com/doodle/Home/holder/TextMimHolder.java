@@ -100,6 +100,7 @@ import static com.doodle.Tool.Tools.delayLoadComment;
 import static com.doodle.Tool.Tools.dismissDialog;
 import static com.doodle.Tool.Tools.getSpannableStringBuilder;
 import static com.doodle.Tool.Tools.getSpannableStringShareHeader;
+import static com.doodle.Tool.Tools.getWallSpannableStringBuilder;
 import static com.doodle.Tool.Tools.isNullOrEmpty;
 import static com.doodle.Tool.Tools.sendNotificationRequest;
 import static com.doodle.Tool.Tools.setMargins;
@@ -110,7 +111,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
 
     public static final String ITEM_KEY = "item_key";
     public static final String POST_ITEM_POSITION = "post_item_position";
-    public TextView tvHeaderInfo, tvPostTime, tvPostUserName, tvImgShareCount, tvPostLikeCount, tvLinkScriptText, tvCommentCount;
+    public TextView tvHeaderInfo, tvPostTime, tvPostUserName, tvImgShareCount, tvPostLikeCount, tvLinkScriptText, tvCommentCount,tvWallPostInfo;
     public CircleImageView imagePostUser;
     public ReadMoreTextView tvPostContent;
     public EmojiTextView tvPostEmojiContent;
@@ -224,6 +225,7 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
         tvCommentCount = itemView.findViewById(R.id.tvCommentCount);
         imgLike = itemView.findViewById(R.id.imgLike);
         tvLikeShare = itemView.findViewById(R.id.tvLikeShare);
+        tvWallPostInfo = itemView.findViewById(R.id.tvWallPostInfo);
 
 
         star1 = itemView.findViewById(R.id.star1);
@@ -612,6 +614,27 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
 
         SpannableStringBuilder builder = getSpannableStringBuilder(mContext, item.getCatId(), likes, followers, totalStars, categoryName);
 
+
+        if (!isNullOrEmpty(item.getPostWallFirstName())) {
+
+            tvWallPostInfo.setVisibility(View.VISIBLE);
+            String postWallUserId=item.getPostWallUserid();
+            String postWallUserName=item.getPostWallUsername();
+            String postUserId=item.getPostUserid();
+            String postUserName=item.getPostUsername();
+            String postWalFullName = item.getPostWallFirstName() + " " + item.getPostWallLastName();
+            String postUserFullName=String.format("%s %s", item.getUserFirstName(), item.getUserLastName());
+
+            setMargins(tvWallPostInfo, 5, 5, 5, 5);
+           // tvWallPostInfo.setBackgroundResource(R.drawable.drawable_comment);
+            tvWallPostInfo.setBackgroundColor(Color.parseColor("#80E9ECF5"));
+            tvWallPostInfo.setText(getWallSpannableStringBuilder(mContext,postUserFullName,postUserId,postUserName,postWalFullName,postWallUserId,postWallUserName));
+            tvWallPostInfo.setMovementMethod(LinkMovementMethod.getInstance());
+
+        } else {
+            tvWallPostInfo.setVisibility(View.GONE);
+        }
+
         if("1".equalsIgnoreCase(isShared)){
             tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
             tvShared.setVisibility(View.VISIBLE);
@@ -700,8 +723,9 @@ public class TextMimHolder extends RecyclerView.ViewHolder {
                 DialogFragment dialogFragment = new LikerUserListFragment();
 
                 Bundle bundle = new Bundle();
-                bundle.putString("post_id", item.getPostId());
+                bundle.putString("type_id", item.getPostId());
                 bundle.putString("total_likes", item.getPostFooter().getPostTotalLike());
+                bundle.putString("liker_type", "post");
                 dialogFragment.setArguments(bundle);
 
                 dialogFragment.show(ft, "dialog");

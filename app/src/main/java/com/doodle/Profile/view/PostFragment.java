@@ -33,6 +33,7 @@ import com.doodle.Home.holder.VideoHolder;
 import com.doodle.Home.service.VideoPlayerRecyclerView;
 import com.doodle.Post.view.activity.PostNew;
 import com.doodle.Post.view.activity.WallPost;
+import com.doodle.Profile.service.ProfileDataFetchCompleteListener;
 import com.doodle.Profile.service.ProfileService;
 import com.doodle.R;
 import com.doodle.Tool.AppConstants;
@@ -143,6 +144,21 @@ public class PostFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setNestedScrollingEnabled(false);
         v = root;
+
+        ((ProfileActivity) Objects.requireNonNull(getActivity())).profileDataFetchCompleteListener = new ProfileDataFetchCompleteListener() {
+            @Override
+            public void onComplete(String wallPermission, boolean isFollow) {
+                if (wallPermission.equals("0")) {
+                    addPostLayout.setVisibility(View.VISIBLE);
+                } else if (wallPermission.equals("1")) {
+                    addPostLayout.setVisibility(View.GONE);
+                } else {
+                    if (isFollow)
+                        addPostLayout.setVisibility(View.VISIBLE);
+                }
+
+            }
+        };
 
         mCallback = new TextHolder.PostItemListener() {
             @Override
@@ -520,18 +536,18 @@ public class PostFragment extends Fragment {
         public void onReceive(Context context, Intent intent) {
             PostItem postItem = (PostItem) intent.getSerializableExtra("post_item");
             int position = intent.getIntExtra("position", -1);
-            String type=intent.getStringExtra("type");
+            String type = intent.getStringExtra("type");
 
             if (position != -1) {
                 if (postItemList.size() >= position + 1) {
                     if (postItemList.get(position).getPostId().equals(postItem.getPostId())) {
 
 
-                        if("permission".equalsIgnoreCase(type)){
+                        if ("permission".equalsIgnoreCase(type)) {
                             postItemList.remove(position);
                             postItemList.add(position, postItem);
                             adapter.notifyItemChanged(position);
-                        }else {
+                        } else {
                             postItemList.remove(position);
                             // adapter.notifyItemChanged(position);
                             adapter.notifyDataSetChanged();

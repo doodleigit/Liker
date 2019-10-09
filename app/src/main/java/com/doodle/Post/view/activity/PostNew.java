@@ -30,6 +30,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextWatcher;
@@ -82,6 +83,8 @@ import com.doodle.Post.view.fragment.ContributorStatus;
 import com.doodle.Post.view.fragment.PostPermission;
 import com.doodle.R;
 import com.doodle.Tool.AppConstants;
+import com.doodle.Tool.EditTextLinesLimiter;
+import com.doodle.Tool.MaxLinesInputFilter;
 import com.doodle.Tool.NetworkHelper;
 import com.doodle.Tool.PageTransformer;
 import com.doodle.Tool.PrefManager;
@@ -405,6 +408,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
             hasMim = viewColors.get(position).getId();
             if (mimColor.startsWith("#")) {
                 if (mimColor.contentEquals("#FFFFFF")) {
+                    editPostMessage.addTextChangedListener(new EditTextLinesLimiter(editPostMessage, 100));
                     int mColor = Color.parseColor(mimColor);
                     messageContainer.setBackgroundColor(mColor);
                     messageContainer.setGravity(Gravity.START);
@@ -415,6 +419,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                     params.height = (int) getResources().getDimension(R.dimen._220sdp);
                     messageContainer.setLayoutParams(params);
                 } else {
+                    editPostMessage.addTextChangedListener(new EditTextLinesLimiter(editPostMessage, 4));
                     int mColor = Color.parseColor(mimColor);
                     messageContainer.setBackgroundColor(mColor);
                     if (mimColor.contentEquals("#C6FFD4")) {
@@ -425,12 +430,15 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                     messageContainer.setLayoutParams(params);
                     messageContainer.setGravity(Gravity.CENTER);
                     editPostMessage.setGravity(Gravity.CENTER);
+                 //   editPostMessage.setFilters(new InputFilter[]{new MaxLinesInputFilter(2)});
                     editPostMessage.setTextAppearance(this, android.R.style.TextAppearance_Large);
                     editPostMessage.setTextColor(Color.parseColor("#FFFFFF"));
+
                 }
 
 
             } else {
+                editPostMessage.addTextChangedListener(new EditTextLinesLimiter(editPostMessage, 4));
                 String imageUrl = AppConstants.MIM_IMAGE + mimColor;
                 Picasso.with(this).load(imageUrl).into(target);
                 messageContainer.setBackground(mDrawable);
@@ -452,6 +460,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                         editPostMessage.setTextColor(Color.parseColor("#FFFFFF"));
                         break;
                 }
+
             }
 
 
@@ -687,7 +696,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
         });
 
-        progressDialog.setCancelable(false);
+     //   progressDialog.setCancelable(false);
 
 
     }
@@ -2121,7 +2130,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                                     addPhotoRequest(mediaCall, fileEncoded);
 
                                     progressDialog.show();
-                                    progressDialog.setCancelable(false);
+                                  //  progressDialog.setCancelable(false);
 
                                     postImages.add(new PostImage(imagePath, "", fileEncoded, false));
 

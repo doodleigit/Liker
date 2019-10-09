@@ -465,6 +465,12 @@ public class SingleVideoPlayerRecyclerView extends RecyclerView {
         }
     }
 
+    public void pausePlayer() {
+        if (videoPlayer != null) {
+            videoPlayer.setPlayWhenReady(false);
+        }
+    }
+
     public void setMediaObjects(List<PostFile> mediaObjects) {
         this.mediaObjects = mediaObjects;
     }

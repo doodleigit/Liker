@@ -140,7 +140,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
         BlockUserDialog.BlockListener {
 
     private static final String TAG = "CommentPost";
-    private List<Comment> commentList;
+    //    private List<Comment> commentList;
     private List<Comment_> comment_list;
     private RecyclerView recyclerView;
     private TextView userName;
@@ -178,7 +178,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
     private String mention;
 
     int limit = 10;
-    int offset = 0;
+    int offset = 10;
     private LinearLayoutManager layoutManager;
     private int totalItems;
     private int scrollOutItems;
@@ -259,7 +259,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
         imageEmoji.setOnClickListener(this);
         userName = findViewById(R.id.user_name);
         etComment = findViewById(R.id.etComment);
-        commentList = new ArrayList<Comment>();
+//        commentList = new ArrayList<Comment>();
         comment_list = new ArrayList<Comment_>();
         comment_Item = new Comment_();
         commentChild = new Comment_();
@@ -285,24 +285,10 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
 //        if (commentChild == null) {
 //            throw new AssertionError("Null data item received!");
 //        }
-        commentList = commentItem.getComments();
-        for (Comment temp : commentList) {
+//        commentList = commentItem.getComments();
+        for (Comment temp : commentItem.getComments()) {
             comment_list = temp.getComments();
         }
-
-//        reportReason=getIntent().getExtras().getParcelable(REASON_KEY);
-//        reasonList=reportReason.getReason();
-//        isFriend=reportReason.isIsFriends();
-//        if (reportReason == null) {
-//            throw new AssertionError("Null data item received!");
-//        }
-//
-//
-//        if (reasonList.size()>0){
-//
-//            ReportReasonSheet reportReasonSheet = ReportReasonSheet.newInstance(reasonList);
-//            reportReasonSheet.show(getSupportFragmentManager(), "ReportReasonSheet");
-//        }
 
         IntentFilter replyBroadcastIntent = new IntentFilter();
         replyBroadcastIntent.addAction(AppConstants.REPLY_CHANGE_BROADCAST);
@@ -350,10 +336,11 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
                 commentText = s.toString().trim();
 
 
-                if(commentText.length()>0){
+                if (commentText.length() > 0) {
                     imageSendComment.setVisibility(View.VISIBLE);
-                }else {
+                } else {
                     imageSendComment.setVisibility(View.GONE);
+                    imageEditComment.setVisibility(View.GONE);
                 }
 
                 //  String s = "my very long string to test";
@@ -361,11 +348,10 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
                 for (String st : commentText.split(" ")) {
                     if (st.startsWith("@")) {
                         userQuery = st;
-                    }else {
+                    } else {
                         userQuery = "";
                     }
                 }
-
 
 
                 if (!isNullOrEmpty(userQuery) && userQuery.length() > 1) {
@@ -376,7 +362,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
                     rvMentionUserShow = true;
                     mentionUserToggle();
                     mentionUsers();
-                }else if(isFirstTimeShowMention && isNullOrEmpty(userQuery)){
+                } else if (isFirstTimeShowMention && isNullOrEmpty(userQuery)) {
                     rvMentionUserShow = false;
                     mentionUserToggle();
                 }
@@ -428,21 +414,6 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
 
                 }
 
-//                Reply reply = App.getReplyItem();
-//                if (!isNullOrEmpty(reply.getCommentText())) {
-//                    if (commentText.equalsIgnoreCase(reply.getCommentText())) {
-//                        imageEditComment.setVisibility(View.GONE);
-//                        imageSendComment.setVisibility(View.VISIBLE);
-//                    } else {
-//                        imageEditComment.setVisibility(View.VISIBLE);
-//                        imageSendComment.setVisibility(View.GONE);
-//                    }
-//                } else {
-//                    imageEditComment.setVisibility(View.GONE);
-//                    imageSendComment.setVisibility(View.VISIBLE);
-//                }
-//                imageEditComment.setVisibility(View.GONE);
-//                imageSendComment.setVisibility(View.VISIBLE);
             }
 
             @Override
@@ -471,7 +442,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
 
                 if (isScrolling && (currentItems + scrollOutItems == totalItems)) {
                     isScrolling = false;
-                   // PerformPagination();
+                    PerformPagination();
                 }
 
 
@@ -677,7 +648,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
                     progressView.setVisibility(View.GONE);
                 }
             }
-        }, 2000);
+        }, 200);
 
     }
 
@@ -688,18 +659,21 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
             public void onResponse(Call<CommentItem> mCall, Response<CommentItem> response) {
 
                 CommentItem commentItem = response.body();
-                commentList = commentItem.getComments();
-                for (Comment temp : commentList) {
-                    Collections.reverse(temp.getComments());
-                    comment_list = temp.getComments();
-                }
-                Log.d("commentItem", commentItem.toString());
-                if (commentList != null) {
-                    adapter.addPagingData(comment_list);
+                if (commentItem != null && commentItem.getComments() != null) {
+                    List<Comment> comment = commentItem.getComments();
+//                commentList = commentItem.getComments();
+                    for (Comment temp : comment) {
+//                    Collections.reverse(temp.getComments());
+                        comment_list.addAll(temp.getComments());
+                    }
                     offset += 10;
-                    progressView.setVisibility(View.GONE);
+//                    Log.d("commentItem", commentItem.toString());
+//                    if (commentList != null) {
+//                        adapter.addPagingData(comment_list);
+//                    }
+                    adapter.notifyDataSetChanged();
                 }
-
+                progressView.setVisibility(View.GONE);
             }
 
             @Override
@@ -805,12 +779,14 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
 
                 if (!isNullOrEmpty(comment_Item.getCommentText())) {
                     if (commentText.equalsIgnoreCase(comment_Item.getCommentText())) {
-                        etComment.getText().clear();
+                        etComment.getText().clear(); //edit comment send button
                     } else {
                         Call<Comment_> mCall = commentService.editPostComment(deviceId, profileId, token, "1", "0", String.valueOf(comment_Item.getId()), fileToUpload, commentText, commentType, hasMention, true, linkUrl, mention, postId, userIds);
                         sendCommentEditItemRequest(mCall);
-                        etComment.getText().clear();
+                        etComment.getText().clear(); //edit comment send button
                     }
+                    imageEditComment.setVisibility(View.GONE);
+                    imageSendComment.setVisibility(View.VISIBLE);
                 }
 
                 break;
@@ -840,30 +816,11 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
                 Comment_ commentItems = response.body();
                 int editCommentId = Integer.parseInt(commentItems.getId());
                 if (editCommentId > 0) {
-
-//                    Comment_ commentItem = new Comment_();
-//                    commentItem.setCommentImage(commentItems.getCommentImage());
-//                    commentItem.setUserPhoto(userInfo.getPhoto());
-//                    commentItem.setCommentType(String.valueOf(commentType));
-//                    commentItem.setCommentText(commentItems.getCommentText());
-//                    commentItem.setHasMention(String.valueOf(hasMention));
-//                    commentItem.setCommentTextIndex(commentItems.getCommentTextIndex());
-//                    commentItem.setLinkData(commentItems.getLinkData());
-//                    commentItem.setTotalLike("0");
-//                    commentItem.setUserId(profileId);
-//                    commentItem.setUserFirstName(userInfo.getFirstName());
-//                    commentItem.setUserLastName(userInfo.getLastName());
-//                    commentItem.setUserGoldStars(userInfo.getGoldStars());
-//                    commentItem.setUserSliverStars(userInfo.getSliverStars());
-//                    long seconds = System.currentTimeMillis() / 1000;
-//                    commentItem.setDateTime(String.valueOf(seconds));
-//                    Log.d("comment: ", commentItem.toString());
                     adapter.updateData(commentItems, position);
                     progressDialog.dismiss();
                     etComment.setText("");
-                    offset++;
-                    recyclerView.smoothScrollToPosition(0);
-                    // App.setCommentCount(1);
+//                    offset++;
+                    recyclerView.smoothScrollToPosition(position);
                 }
 
             }
@@ -891,10 +848,6 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
     }
 
     public void sendImageFromGallery() {
-//        Intent intent = new Intent();
-//        intent.setType("image/*");
-//        intent.setAction(Intent.ACTION_GET_CONTENT);
-//        startActivityForResult(Intent.createChooser(intent, "Select Picture"), REQUEST_TAKE_GALLERY_IMAGE);
 
         if (Build.VERSION.SDK_INT < 19) {
             Intent intent1 = new Intent();
@@ -1219,9 +1172,11 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
                                 postItem.setTotalComment(String.valueOf(totalComment));
                                 App.getAppContext().sendBroadcast((new Intent().putExtra("post_item", (Serializable) postItem).putExtra("position", position).putExtra("isFooterChange", true).setAction(AppConstants.POST_CHANGE_BROADCAST)));
 
-                                comment_list.remove(comment_Item);
-                                adapter.deleteItem(position);
-                                recyclerView.scrollToPosition(position);
+                                comment_list.remove(position);
+//                                adapter.deleteItem(position);
+                                adapter.notifyDataSetChanged();
+                                --offset;
+//                                recyclerView.scrollToPosition(position);
                                 // adapter.notifyDataSetChanged();
 
                             }
@@ -1370,6 +1325,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
         super.onPause();
 
     }
+
     BroadcastReceiver replyBroadcast = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -1378,7 +1334,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
             //  String type=intent.getStringExtra("type");
 
             if (position != -1) {
-             //   Log.d("Cbndklfj ",commentItem.toString());
+                //   Log.d("Cbndklfj ",commentItem.toString());
 
                // comment_list.remove(position);
                 comment_list.set(position, commentItem);
@@ -1404,6 +1360,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
             }
         }
     };
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -1411,9 +1368,5 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
         mHandler.removeCallbacksAndMessages(null);
         Objects.requireNonNull(this).unregisterReceiver(replyBroadcast);
     }
-
-
-
-
 
 }

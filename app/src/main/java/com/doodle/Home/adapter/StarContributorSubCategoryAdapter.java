@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.doodle.Home.model.PostFilterSubCategory;
+import com.doodle.Home.service.CategoryExpandListener;
 import com.doodle.Home.service.StarContributorCategoryListener;
 import com.doodle.R;
 
@@ -22,12 +23,16 @@ public class StarContributorSubCategoryAdapter extends RecyclerView.Adapter<Star
     private Context context;
     private ArrayList<PostFilterSubCategory> arrayList;
     private StarContributorCategoryListener starContributorCategoryListener;
+    private CategoryExpandListener categoryExpandListener;
     private String catId;
+    private boolean isSearch;
 
-    public StarContributorSubCategoryAdapter(Context context, ArrayList<PostFilterSubCategory> arrayList, StarContributorCategoryListener starContributorCategoryListener, String catId) {
+    public StarContributorSubCategoryAdapter(Context context, ArrayList<PostFilterSubCategory> arrayList, StarContributorCategoryListener starContributorCategoryListener,
+                                             CategoryExpandListener categoryExpandListener, String catId) {
         this.context = context;
         this.arrayList = arrayList;
         this.starContributorCategoryListener = starContributorCategoryListener;
+        this.categoryExpandListener = categoryExpandListener;
         this.catId = catId;
     }
 
@@ -52,6 +57,14 @@ public class StarContributorSubCategoryAdapter extends RecyclerView.Adapter<Star
         StarContributorFilterItemAdapter starContributorFilterItemAdapter = new StarContributorFilterItemAdapter(context, arrayList.get(position), starContributorCategoryListener, catId);
         viewHolder.recyclerView.setAdapter(starContributorFilterItemAdapter);
 
+        if (isSearch) {
+            viewHolder.recyclerView.setVisibility(View.VISIBLE);
+            viewHolder.ivArrow.setImageResource(R.drawable.arrow_down);
+        } else {
+            viewHolder.recyclerView.setVisibility(View.GONE);
+            viewHolder.ivArrow.setImageResource(R.drawable.arrow_right);
+        }
+
         viewHolder.ivAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -68,6 +81,7 @@ public class StarContributorSubCategoryAdapter extends RecyclerView.Adapter<Star
                 } else {
                     viewHolder.recyclerView.setVisibility(View.VISIBLE);
                     viewHolder.ivArrow.setImageResource(R.drawable.arrow_down);
+                    categoryExpandListener.onExpand(view);
                 }
             }
         });
@@ -96,6 +110,10 @@ public class StarContributorSubCategoryAdapter extends RecyclerView.Adapter<Star
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
             recyclerView.setNestedScrollingEnabled(false);
         }
+    }
+
+    public void setSearchParam(boolean isSearch) {
+        this.isSearch = isSearch;
     }
 
 }

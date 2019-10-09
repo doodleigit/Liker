@@ -47,7 +47,7 @@ public class PostPopup extends AppCompatActivity
     PostItem postItem;
     private String reportId;
     private boolean hasFooter, isCommentAction;
-    private int position;
+    private int position, mediaPosition;
     private boolean networkOk;
     private String profileId;
     private String blockUserId;
@@ -66,6 +66,7 @@ public class PostPopup extends AppCompatActivity
         hasFooter = getIntent().getBooleanExtra("has_footer", false);
         isCommentAction = getIntent().getBooleanExtra("is_comment_action", false);
         position = getIntent().getIntExtra("position", -1);
+        mediaPosition = getIntent().getIntExtra("media_position", -1);
 
         manager = new PrefManager(this);
         deviceId = manager.getDeviceId();
@@ -85,6 +86,7 @@ public class PostPopup extends AppCompatActivity
         bundle.putBoolean("has_footer", hasFooter);
         bundle.putBoolean("is_comment_action", isCommentAction);
         bundle.putInt("position", position);
+        bundle.putInt("media_position", mediaPosition);
         fragment.setArguments(bundle);
         android.support.v4.app.FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.container, fragment).commit();

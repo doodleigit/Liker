@@ -181,7 +181,7 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
     private String mention;
 
     int limit = 10;
-    int offset = 0;
+    int offset = 10;
     private LinearLayoutManager layoutManager;
     private int totalItems;
     private int scrollOutItems;
@@ -265,7 +265,7 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
                 onBackPressed();
             }
         });
-        mView=new View(this);
+        mView = new View(this);
 //        toolbar.setNavigationIcon(R.drawable.ic_people_black_24dp);
 //        toolbar.setNavigationIcon(mDrawable);
 //        getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -331,12 +331,12 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
         if (replyItems == null) {
             throw new AssertionError("Null data item received!");
         }
-        int totalStar=Integer.parseInt(commentItem.getUserGoldStars())+Integer.parseInt(commentItem.getUserSliverStars());
-      //  tvStarts.setText(String.valueOf(totalStar));
-       // tvLikes.setText(commentItem.getTotalLike());
+        int totalStar = Integer.parseInt(commentItem.getUserGoldStars()) + Integer.parseInt(commentItem.getUserSliverStars());
+        //  tvStarts.setText(String.valueOf(totalStar));
+        // tvLikes.setText(commentItem.getTotalLike());
         postId = postItem.getSharedPostId();
         commentId = commentItem.getId();
-        totalReply=Integer.parseInt(commentItem.getTotalReply());
+        totalReply = Integer.parseInt(commentItem.getTotalReply());
         List<Comment_> commentList = new ArrayList<>();
         commentList.add(commentItem);
 
@@ -351,9 +351,9 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
         recyclerView.setAdapter(adapter);
 
         userName.setText(String.format("%s %s", userInfo.getFirstName(), userInfo.getLastName()));
-        int totalStars=Integer.parseInt(userInfo.getGoldStars())+Integer.parseInt(userInfo.getSliverStars());
-        tvStarts.setText(String.valueOf(totalStars)+" Stars");
-        tvLikes.setText(userInfo.getTotalLikes()+" Likes");
+        int totalStars = Integer.parseInt(userInfo.getGoldStars()) + Integer.parseInt(userInfo.getSliverStars());
+        tvStarts.setText(String.valueOf(totalStars) + " Stars");
+        tvLikes.setText(userInfo.getTotalLikes() + " Likes");
         setUpEmojiPopup();
 
         etComment.addTextChangedListener(new TextWatcher() {
@@ -368,17 +368,18 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
                 extractedUrls = Tools.extractUrls(s.toString());
                 /// if(uploadImageName.)
                 commentText = s.toString().trim();
-                if (!isNullOrEmpty(commentText)){
+                if (!isNullOrEmpty(commentText)) {
                     imageSendComment.setVisibility(View.VISIBLE);
-                }else {
+                } else {
                     imageSendComment.setVisibility(View.GONE);
+                    imageEditComment.setVisibility(View.GONE);
                 }
 
                 for (String st : commentText.split(" ")) {
                     if (st.startsWith("@")) {
                         userQuery = st;
-                    }else {
-                        userQuery="";
+                    } else {
+                        userQuery = "";
                     }
                 }
 
@@ -472,7 +473,7 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
 
                 if (isScrolling && (currentItems + scrollOutItems == totalItems)) {
                     isScrolling = false;
-                    //   PerformPagination();
+                    PerformPagination();
                 }
 
 
@@ -736,7 +737,7 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
                     progressView.setVisibility(View.GONE);
                 }
             }
-        }, 2000);
+        }, 200);
 
     }
 
@@ -746,20 +747,15 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
 
             @Override
             public void onResponse(Call<List<Reply>> mCall, Response<List<Reply>> response) {
-
-
-                if (response.body() != null) {
-                    List<Reply> replyItem = response.body();
-                    Collections.reverse(replyItem);
-
-                    if (replyItem != null) {
-                        adapter.addPagingData(replyItem);
-                        offset += 10;
-                        progressView.setVisibility(View.GONE);
-                    }
+                List<Reply> replyItem = response.body();
+                if (replyItem != null) {
+//                    Collections.reverse(replyItem);
+//                    adapter.addPagingData(replyItem);
+                    replyItems.addAll(replyItem);
+                    offset += 10;
+                    adapter.notifyDataSetChanged();
                 }
-
-
+                progressView.setVisibility(View.GONE);
             }
 
             @Override
@@ -851,7 +847,8 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
                 Call<String> mCall = commentService.editCommentReply(deviceId, profileId, token, "1", "0", replyItem.getCommentId(), fileToUpload, replyItem.getId(), commentText, commentType, hasMention, true, linkUrl, mention, postId, userIds);
                 sendCommentEditItemRequest(mCall);
                 etComment.getText().clear();
-
+                imageSendComment.setVisibility(View.VISIBLE);
+                imageEditComment.setVisibility(View.GONE);
 
             /*    if (!isNullOrEmpty(comment_Item.getCommentText())) {
                     if (commentText.equalsIgnoreCase(comment_Item.getCommentText())) {
@@ -904,8 +901,8 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
                                 adapter.updateData(reply, position);
                                 progressDialog.dismiss();
                                 etComment.setText("");
-                                offset++;
-                                recyclerView.smoothScrollToPosition(0);
+//                                offset++;
+                                recyclerView.smoothScrollToPosition(position);
                                 // adapter.notifyDataSetChanged();
 
                             }
@@ -1211,8 +1208,8 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
                     if (response.body() != null) {
 
                         Reply reply = response.body();
-                     //   String insertId = reply.getId();
-                         int newReplyId=Integer.parseInt(reply.getId());
+                        //   String insertId = reply.getId();
+                        int newReplyId = Integer.parseInt(reply.getId());
                         if (newReplyId > 0) {
 
                          /*       Reply replyItem = new Reply();
@@ -1251,7 +1248,7 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
                             progressDialog.dismiss();
                             etComment.setText("");
                             offset++;
-                            recyclerView.smoothScrollToPosition(0);
+                            recyclerView.smoothScrollToPosition(replyItems.size() - 1);
 
                         }
 
@@ -1280,7 +1277,7 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
         this.reply = reply;
         imageEditComment.setVisibility(View.VISIBLE);
         imageSendComment.setVisibility(View.GONE);
-       // etComment.setText(reply.getCommentText());
+        // etComment.setText(reply.getCommentText());
         etComment.append(reply.getCommentText());
         etComment.requestFocus();
         etComment.postDelayed(new Runnable() {
@@ -1449,7 +1446,8 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
                                 totalReply--;
                                 //    int removeIndex = 2;
                                 replyItems.remove(position);
-                                adapter.notifyItemRemoved(position);
+                                adapter.notifyDataSetChanged();
+                                --offset;
 
 
                             }

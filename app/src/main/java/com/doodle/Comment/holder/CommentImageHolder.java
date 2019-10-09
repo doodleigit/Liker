@@ -41,6 +41,7 @@ import com.doodle.Comment.model.Reply;
 import com.doodle.Comment.model.ReportReason;
 import com.doodle.Comment.service.CommentService;
 import com.doodle.Post.view.fragment.MediaFullViewFragment;
+import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.Reply.view.ReplyPost;
 import com.doodle.Comment.view.fragment.ReportReasonSheet;
 import com.doodle.Home.model.PostItem;
@@ -281,7 +282,6 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
                     .into(imagePostCommenting);
         }
 
-
         imagePostCommenting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -297,12 +297,17 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
             commentLike = commentItem.getTotalLike();
         }
 
-
         if (App.isRvCommentHeader()) {
             tvSeeReply.setVisibility(View.GONE);
             tvCommentReply.setVisibility(View.GONE);
+        } else {
+            if (commentItem.getTotalReply().equals("0")) {
+                tvSeeReply.setVisibility(View.GONE);
+            } else {
+                tvSeeReply.setVisibility(View.VISIBLE);
+            }
+            tvCommentReply.setVisibility(View.VISIBLE);
         }
-
 
         if ("0".equalsIgnoreCase(commentLike)) {
             tvCountCommentLike.setText("");
@@ -321,6 +326,22 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
         } else {
             imgCommentLike.setImageResource(R.drawable.like_normal);
         }
+
+        imagePostUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mContext.startActivity(new Intent(mContext, ProfileActivity.class).putExtra("user_id", commentItem.getUserId()).putExtra("user_name", commentItem.getUserName()));
+            }
+        });
+
+        tvCommentUserName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mContext.startActivity(new Intent(mContext, ProfileActivity.class).putExtra("user_id", commentItem.getUserId()).putExtra("user_name", commentItem.getUserName()));
+            }
+        });
+
+
 
         imgCommentLike.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -617,6 +638,7 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
 
             }
         });
+
         if (!isNullOrEmpty(commentItem.getTotalReply()) && Integer.parseInt(commentItem.getTotalReply()) > 0) {
             if (Integer.parseInt(commentItem.getTotalReply()) == 1) {
                 tvSeeReply.setText(String.format("View %s reply", commentItem.getTotalReply()));
@@ -626,6 +648,7 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
                 tvSeeReply.setText(String.format("View %s replies", commentItem.getTotalReply()));
             }
         }
+
         tvSeeReply.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

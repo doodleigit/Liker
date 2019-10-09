@@ -30,16 +30,15 @@
             android:orientation="vertical">
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/tvPostUserName"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:layout_weight="1"
                     android:ellipsize="end"
                     android:maxLines="1"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small"
@@ -51,7 +50,8 @@
                     android:id="@+id/tvShared"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=" shared "
+                    android:text=" shared"
+                    android:layout_gravity="center"
                     android:textColor="@color/colorPrimaryText"
                     />
 
@@ -95,6 +95,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
+                    android:textSize="@dimen/_8sdp"
                     android:layout_marginLeft="@dimen/_5sdp"
                     android:text="7 minutes ago"
                     android:textColor="@color/colorPrimaryText"/>
@@ -113,31 +114,6 @@
                     android:textColor="@color/colorPrimaryText"/>
 
             </LinearLayout>
-            <LinearLayout
-                android:visibility="gone"
-                android:id="@+id/wallFeedContainer"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:id="@+id/tvUserName"
-                    tools:text="tvUserName"
-                    android:textColor="@color/colorPrimary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-                <TextView
-                    android:text=" posted on "
-                    android:textColor="@color/colorPrimaryText"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-                <TextView
-                    android:id="@+id/tvWallUserName"
-                    tools:text="tvWallUserName"
-                    android:textColor="@color/colorPrimary"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout>
-
-
 
         </LinearLayout>
 
@@ -146,10 +122,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:layout_centerInParent="true"
             android:padding="5dp"
             android:src="@drawable/ic_more_vert_black_24dp"
             android:tint="#8596A3" />
+
+
+            <TextView
+                android:visibility="gone"
+                android:padding="@dimen/_5sdp"
+                android:layout_below="@+id/content"
+                android:id="@+id/tvWallPostInfo"
+                tools:text="tvUserName"
+                android:textAlignment="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+
 
     </RelativeLayout>
 

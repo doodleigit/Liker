@@ -8,7 +8,11 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
+import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.MenuBuilder;
 import android.support.v7.view.menu.MenuPopupHelper;
@@ -39,6 +43,7 @@ import com.doodle.Comment.model.Reason;
 import com.doodle.Comment.model.Reply;
 import com.doodle.Comment.model.ReportReason;
 import com.doodle.Comment.service.CommentService;
+import com.doodle.Home.view.fragment.LikerUserListFragment;
 import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.Reply.view.ReplyPost;
 import com.doodle.Comment.view.fragment.ReportReasonSheet;
@@ -309,6 +314,42 @@ public class ReplyTextHolder extends RecyclerView.ViewHolder {
         } else {
             imgCommentLike.setImageResource(R.drawable.like_normal);
         }
+
+        imagePostUser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mContext.startActivity(new Intent(mContext, ProfileActivity.class).putExtra("user_id", replyItem.getUserId()).putExtra("user_name", replyItem.getUserName()));
+            }
+        });
+
+        tvCommentUserName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mContext.startActivity(new Intent(mContext, ProfileActivity.class).putExtra("user_id", replyItem.getUserId()).putExtra("user_name", replyItem.getUserName()));
+            }
+        });
+
+        tvCountCommentLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentTransaction ft = ((ReplyPost) mContext).getSupportFragmentManager().beginTransaction();
+                Fragment prev = ((ReplyPost) mContext).getSupportFragmentManager().findFragmentByTag("dialog");
+                if (prev != null) {
+                    ft.remove(prev);
+                }
+                ft.addToBackStack(null);
+                DialogFragment dialogFragment = new LikerUserListFragment();
+
+                Bundle bundle = new Bundle();
+                bundle.putString("type_id", replyItem.getCommentId());
+                bundle.putString("reply_id", replyItem.getId());
+                bundle.putString("total_likes", replyItem.getTotalLike());
+                bundle.putString("liker_type", "reply");
+                dialogFragment.setArguments(bundle);
+
+                dialogFragment.show(ft, "dialog");
+            }
+        });
 
         imgCommentLike.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -56,9 +56,7 @@ import com.doodle.Home.model.PostFooter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.model.PostTextIndex;
 import com.doodle.Home.model.SharedProfile;
-import com.doodle.Home.model.postshare.PostShareItem;
 import com.doodle.Home.service.HomeService;
-import com.doodle.Home.view.activity.EditPost;
 import com.doodle.Home.view.activity.Home;
 import com.doodle.Home.view.activity.PostShare;
 import com.doodle.Home.view.fragment.LikerUserListFragment;
@@ -99,15 +97,13 @@ import retrofit2.Response;
 import static com.doodle.Tool.AppConstants.FACEBOOK_SHARE;
 import static com.doodle.Tool.Tools.containsIllegalCharacters;
 import static com.doodle.Tool.Tools.delayLoadComment;
-import static com.doodle.Tool.Tools.dismissDialog;
 import static com.doodle.Tool.Tools.extractMentionText;
 import static com.doodle.Tool.Tools.extractUrls;
 import static com.doodle.Tool.Tools.getSpannableStringBuilder;
 import static com.doodle.Tool.Tools.getSpannableStringShareHeader;
+import static com.doodle.Tool.Tools.getWallSpannableStringBuilder;
 import static com.doodle.Tool.Tools.isNullOrEmpty;
-import static com.doodle.Tool.Tools.sendNotificationRequest;
 import static com.doodle.Tool.Tools.setMargins;
-import static com.doodle.Tool.Tools.showBlockUser;
 import static java.lang.Integer.parseInt;
 
 public class TextHolder extends RecyclerView.ViewHolder {
@@ -207,9 +203,10 @@ public class TextHolder extends RecyclerView.ViewHolder {
     private ClickableSpan clickableSpan;
     private TextView tvShared, tvPostShareUserName;
     private MediaPlayer player;
-    private String postWalFullName;
-    private TextView tvWallPost, tvUserName, tvWallUserName;
-    private LinearLayout wallFeedContainer;
+
+    private TextView tvWallPost, tvWallPostInfo;
+
+
 
 
     public interface PostItemListener {
@@ -313,9 +310,8 @@ public class TextHolder extends RecyclerView.ViewHolder {
         imagePostShareSetting = itemView.findViewById(R.id.imagePostShareSetting);
         tvSharePostContent = itemView.findViewById(R.id.tvSharePostContent);
         tvWallPost = itemView.findViewById(R.id.tvWallPost);
-        tvWallUserName = itemView.findViewById(R.id.tvWallUserName);
-        tvUserName = itemView.findViewById(R.id.tvUserName);
-        wallFeedContainer = itemView.findViewById(R.id.wallFeedContainer);
+        tvWallPostInfo = itemView.findViewById(R.id.tvWallPostInfo);
+
 
     }
 
@@ -425,6 +421,7 @@ public class TextHolder extends RecyclerView.ViewHolder {
             }
 
         }
+
 
 
         imgLike.setOnClickListener(new View.OnClickListener() {
@@ -762,15 +759,23 @@ public class TextHolder extends RecyclerView.ViewHolder {
 
 
         if (!isNullOrEmpty(item.getPostWallFirstName())) {
-            postWalFullName = item.getPostWallFirstName() + " " + item.getPostWallLastName();
-            wallFeedContainer.setVisibility(View.VISIBLE);
-            tvUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
-            tvWallUserName.setText(postWalFullName);
-            setMargins(wallFeedContainer, 5, 5, 5, 5);
-            wallFeedContainer.setBackgroundResource(R.drawable.drawable_comment);
+
+            tvWallPostInfo.setVisibility(View.VISIBLE);
+            String postWallUserId=item.getPostWallUserid();
+            String postWallUserName=item.getPostWallUsername();
+            String postUserId=item.getPostUserid();
+            String postUserName=item.getPostUsername();
+            String postWalFullName = item.getPostWallFirstName() + " " + item.getPostWallLastName();
+            String postUserFullName=String.format("%s %s", item.getUserFirstName(), item.getUserLastName());
+
+            setMargins(tvWallPostInfo, 5, 5, 5, 5);
+           // tvWallPostInfo.setBackgroundResource(R.drawable.drawable_comment);
+            tvWallPostInfo.setBackgroundColor(Color.parseColor("#80E9ECF5"));
+            tvWallPostInfo.setText(getWallSpannableStringBuilder(mContext,postUserFullName,postUserId,postUserName,postWalFullName,postWallUserId,postWallUserName));
+            tvWallPostInfo.setMovementMethod(LinkMovementMethod.getInstance());
 
         } else {
-            wallFeedContainer.setVisibility(View.GONE);
+            tvWallPostInfo.setVisibility(View.GONE);
         }
 
         if ("1".equalsIgnoreCase(isShared)) {
@@ -853,8 +858,9 @@ public class TextHolder extends RecyclerView.ViewHolder {
                 DialogFragment dialogFragment = new LikerUserListFragment();
 
                 Bundle bundle = new Bundle();
-                bundle.putString("post_id", item.getPostId());
+                bundle.putString("type_id", item.getPostId());
                 bundle.putString("total_likes", item.getPostFooter().getPostTotalLike());
+                bundle.putString("liker_type", "post");
                 dialogFragment.setArguments(bundle);
 
                 dialogFragment.show(ft, "dialog");

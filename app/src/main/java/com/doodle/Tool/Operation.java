@@ -242,10 +242,10 @@ public class Operation {
         int thisYear = Calendar.getInstance().get(Calendar.YEAR);
         //String formattedDate=new SimpleDateFormat("MMM d, yyyy").format(date);
         if (postYear == thisYear) {
-            String formattedDate = new SimpleDateFormat("d MMM HH:mm aa").format(timestampInMilliSeconds);
+            String formattedDate = new SimpleDateFormat("MMM d HH:mm aa").format(timestampInMilliSeconds);
             return formattedDate;
         } else {
-            String formattedDate = new SimpleDateFormat("d MMM, yyyy HH:mm aa").format(timestampInMilliSeconds);
+            String formattedDate = new SimpleDateFormat("MMM d, yyyy HH:mm aa").format(timestampInMilliSeconds);
             return formattedDate;
         }
     }
