@@ -22,6 +22,7 @@ import android.os.Environment;
 import android.os.PersistableBundle;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
@@ -33,6 +34,7 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.StyleSpan;
@@ -56,8 +58,10 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.doodle.App;
+import com.doodle.Comment.view.fragment.ReportReasonSheet;
 import com.doodle.Home.holder.mediaHolder.ImageViewHolder;
 import com.doodle.Home.holder.mediaHolder.VideoViewHolder;
 import com.doodle.Home.view.activity.Home;
@@ -78,6 +82,7 @@ import com.doodle.Post.model.PostVideo;
 import com.doodle.Post.model.Subcatg;
 import com.doodle.Post.service.DataProvider;
 import com.doodle.Post.service.PostService;
+import com.doodle.Post.view.fragment.AttachmentBottomSheet;
 import com.doodle.Post.view.fragment.Audience;
 import com.doodle.Post.view.fragment.ContributorStatus;
 import com.doodle.Post.view.fragment.PostPermission;
@@ -125,9 +130,12 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import pub.devrel.easypermissions.EasyPermissions;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
 import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 
@@ -137,10 +145,13 @@ import static com.doodle.Tool.Tools.getMD5EncryptedString;
 import static com.doodle.Tool.Tools.isContain;
 import static com.doodle.Tool.Tools.isNullOrEmpty;
 
-public class PostNew extends AppCompatActivity implements View.OnClickListener,
+public class PostNew extends AppCompatActivity implements
+        View.OnClickListener,
         PostPermission.BottomSheetListener,
         Audience.BottomSheetListener,
-        ContributorStatus.ContributorStatusListener {
+        ContributorStatus.ContributorStatusListener,
+        AttachmentBottomSheet.BottomSheetListener,
+        EasyPermissions.PermissionCallbacks {
 
     // data to populate the RecyclerView with
 
@@ -156,6 +167,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
     private CircularProgressView progressView;
     boolean isGrantGallery = false;
     boolean isGrantCamera = false;
+
 
     private String profileId;
     private String deviceId;
@@ -191,6 +203,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
     private static final int REQUEST_TAKE_CAMERA = 101;
     private static final int REQUEST_TAKE_GALLERY_IMAGE = 102;
     private static final int REQUEST_TAKE_GALLERY_VIDEO = 103;
+    private static final int REQUEST_VIDEO_CAPTURE = 104;//CAMERA_REQUEST_CODE_VEDIO
     private RecyclerView mediaRecyclerView;
     boolean rvMediaShow;
     private ProgressBar mediaProgress;
@@ -294,11 +307,18 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
     List<LinkScriptItem> scriptItemList;
     private Context mContext;
 
+
+    private static final int READ_REQUEST_CODE = 200;
+    private Uri uri;
+    private String pathToStoredVideo;
+    private VideoView displayRecordedVideo;
+    private static final String SERVER_PATH = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.new_post);
-       mContext=this;
+        mContext = this;
 
         manager = new PrefManager(this);
         webService = PostService.mRetrofit.create(PostService.class);
@@ -430,7 +450,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                     messageContainer.setLayoutParams(params);
                     messageContainer.setGravity(Gravity.CENTER);
                     editPostMessage.setGravity(Gravity.CENTER);
-                 //   editPostMessage.setFilters(new InputFilter[]{new MaxLinesInputFilter(2)});
+                    //   editPostMessage.setFilters(new InputFilter[]{new MaxLinesInputFilter(2)});
                     editPostMessage.setTextAppearance(this, android.R.style.TextAppearance_Large);
                     editPostMessage.setTextColor(Color.parseColor("#FFFFFF"));
 
@@ -696,7 +716,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
         });
 
-     //   progressDialog.setCancelable(false);
+        //   progressDialog.setCancelable(false);
 
 
     }
@@ -1165,13 +1185,17 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                 overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
                 break;
             case R.id.imageCamera:
-                rvMimShow = false;
-                rvMimToggle();
-                if (isGrantCamera) {
-                    sendImageFromCamera();
-                } else {
-                    checkCameraPermission();
-                }
+                List<String> reasonList = new ArrayList<>();
+                reasonList.add("azhar");
+                AttachmentBottomSheet attachmentBottomSheet = AttachmentBottomSheet.newInstance(reasonList);
+                attachmentBottomSheet.show(getSupportFragmentManager(), "AttachmentBottomSheet");
+//                rvMimShow = false;
+//                rvMimToggle();
+//                if (isGrantCamera) {
+//                    sendImageFromCamera();
+//                } else {
+//                    checkCameraPermission();
+//                }
 
                 break;
             case R.id.imageGallery:
@@ -1445,10 +1469,13 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
     public void sendImageFromCamera() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // Intent takePictureIntent = new Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA);
         imageUri = getImageUri();
         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(takePictureIntent, REQUEST_TAKE_CAMERA);
+            //  startActivityForResult(new Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA), REQUEST_TAKE_CAMERA);
+
         }
 
     }
@@ -1539,16 +1566,16 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
             isGrantCamera = false;
 
         } else {
-
             sendImageFromCamera();
-            //  makeText(this, R.string.grant, LENGTH_SHORT).show();
             isGrantCamera = true;
         }
     }
 
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions,
                                            int[] grantResults) {
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, PostNew.this);
         switch (requestCode) {
             case REQUEST_TAKE_GALLERY_IMAGE:
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -1583,15 +1610,12 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == REQUEST_TAKE_GALLERY_IMAGE) {
-
             if (resultCode == RESULT_OK) {
-
                 try {
                     getSelectedImagesPath(requestCode, data);
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
-
 
             } else {
                 Toast.makeText(this, "Cancel Gallery", Toast.LENGTH_SHORT).show();
@@ -1627,6 +1651,41 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                 Toast.makeText(this, "Cancel Camera Capture", Toast.LENGTH_SHORT).show();
             }
         }
+
+        if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_VIDEO_CAPTURE) {
+            uri = data.getData();
+            if (EasyPermissions.hasPermissions(PostNew.this, android.Manifest.permission.READ_EXTERNAL_STORAGE)) {
+               // imageUri = getVideoUri();
+                pathToStoredVideo = getRealPathFromURIPath(uri, PostNew.this);
+                //imageUri = getImageUri();
+
+                File file = new File(pathToStoredVideo);
+                //Parsing any Media type file
+                RequestBody requestFile = RequestBody.create(MediaType.parse("video/*"), file);
+                MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("video", file.getName(), requestFile);
+                Call<String> mediaCall = videoServices.uploadVideo(deviceId, profileId, token, fileToUpload, postId, true);
+                sendUploadVideoRequest(mediaCall);
+
+                progressDialog.show();
+
+                String videoPath = "file://" + pathToStoredVideo;
+                PostVideo postVideo = new PostVideo();
+                postVideo.setVideoPath(videoPath);
+                postVideo.setMdFive(fileEncoded);
+                postVideo.setDuplicate(false);
+                postVideos.add(postVideo);
+                if (postVideos.size() > 0)
+                    rvMediaShow = true;
+                mediaRecyclerViewToggle();
+                mediaAdapter = new MediaAdapter(mContext, postImages, postVideos, imageListener, videoListen);
+                mediaRecyclerView.setAdapter(mediaAdapter);
+
+
+            } else {
+                EasyPermissions.requestPermissions(PostNew.this, getString(R.string.read_file), READ_REQUEST_CODE, Manifest.permission.READ_EXTERNAL_STORAGE);
+            }
+        }
+
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_TAKE_GALLERY_VIDEO) {
 
@@ -1642,6 +1701,58 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
 
     }
+
+    private void uploadVideoToServer(String pathToVideoFile) {
+        File videoFile = new File(pathToVideoFile);
+        RequestBody videoBody = RequestBody.create(MediaType.parse("video/*"), videoFile);
+        MultipartBody.Part vFile = MultipartBody.Part.createFormData("video", videoFile.getName(), videoBody);
+
+        Log.d("videoPath: ", vFile + "");
+
+     /*     Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(SERVER_PATH)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+      VideoInterface vInterface = retrofit.create(VideoInterface.class);
+        Call<ResultObject>  serverCom = vInterface.uploadVideoToServer(vFile);
+        serverCom.enqueue(new Callback<ResultObject>() {
+            @Override
+            public void onResponse(Call<ResultObject> call, Response<ResultObject> response) {
+                ResultObject result = response.body();
+                if(!TextUtils.isEmpty(result.getSuccess())){
+                    Toast.makeText(PostNew.this, "Result " + result.getSuccess(), Toast.LENGTH_LONG).show();
+                    Log.d(TAG, "Result " + result.getSuccess());
+                }
+            }
+            @Override
+            public void onFailure(Call<ResultObject> call, Throwable t) {
+                Log.d(TAG, "Error message " + t.getMessage());
+            }
+        });*/
+    }
+
+    private String getRealPathFromURIPath(Uri contentURI, Activity activity) {
+        Cursor cursor = activity.getContentResolver().query(contentURI, null, null, null, null);
+        if (cursor == null) {
+            return contentURI.getPath();
+        } else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            return cursor.getString(idx);
+        }
+    }
+
+    private String getFileDestinationPath() {
+        String generatedFilename = String.valueOf(System.currentTimeMillis());
+        String filePathEnvironment = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
+        File directoryFolder = new File(filePathEnvironment + "/video/");
+        if (!directoryFolder.exists()) {
+            directoryFolder.mkdir();
+        }
+        Log.d(TAG, "Full path " + filePathEnvironment + "/video/" + generatedFilename + ".mp4");
+        return filePathEnvironment + "/video/" + generatedFilename + ".mp4";
+    }
+
 
     private void sendVideoRequest(Call<String> call) {
         call.enqueue(new Callback<String>() {
@@ -1746,6 +1857,19 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
         return m_imgUri;
     }
 
+    private Uri getVideoUri() {
+        Uri m_imgUri = null;
+        File m_file;
+        try {
+            SimpleDateFormat m_sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+            String m_curentDateandTime = m_sdf.format(new Date());
+            String m_imagePath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + m_curentDateandTime+".mp4" ;
+            m_file = new File(m_imagePath);
+            m_imgUri = Uri.fromFile(m_file);
+        } catch (Exception p_e) {
+        }
+        return m_imgUri;
+    }
     public String getPath(Uri uri) {
         int column_index;
         String imagePath;
@@ -1810,7 +1934,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                         if (temp.equalsIgnoreCase(videoPath)) {
                             hasAlready = true;
 
-                        //    Tools.toast(PostNew.this, "You have already add this!", R.drawable.ic_info_outline_blue_24dp);
+                            //    Tools.toast(PostNew.this, "You have already add this!", R.drawable.ic_info_outline_blue_24dp);
                             break;
                         }
                     }
@@ -1857,7 +1981,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                 for (String temp : videoList) {
                     if (temp.equalsIgnoreCase(videoPath)) {
 
-                      //  Tools.toast(PostNew.this, "You have already add this!", R.drawable.ic_info_outline_blue_24dp);
+                        //  Tools.toast(PostNew.this, "You have already add this!", R.drawable.ic_info_outline_blue_24dp);
                     } else {
 
                         Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "2", strMD5);
@@ -1894,28 +2018,23 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                             boolean status = object.getBoolean("status");
                             if (status) {
 
-                               // String message = "You have already posted it .";
+                                // String message = "You have already posted it .";
                                 //Tools.showCustomToast(PostNew.this, mView, message, Gravity.CENTER);
 
+                                progressDialog.show();
+                                progressDialog.dismiss();
 
-
-
-                                    progressDialog.show();
-                                    progressDialog.dismiss();
-
-                                    // String videoPath = "file://" + filePath;
-                                    PostVideo postVideo = new PostVideo();
-                                    postVideo.setVideoPath(videoPath);
-                                    postVideo.setMdFive(fileEncoded);
-                                    postVideo.setDuplicate(true);
-                                    postVideos.add(postVideo);
-                                    if (postVideos.size() > 0)
-                                        rvMediaShow = true;
-                                    mediaRecyclerViewToggle();
-                                    mediaAdapter = new MediaAdapter(mContext, postImages, postVideos, imageListener, videoListen);
-                                    mediaRecyclerView.setAdapter(mediaAdapter);
-
-
+                                // String videoPath = "file://" + filePath;
+                                PostVideo postVideo = new PostVideo();
+                                postVideo.setVideoPath(videoPath);
+                                postVideo.setMdFive(fileEncoded);
+                                postVideo.setDuplicate(true);
+                                postVideos.add(postVideo);
+                                if (postVideos.size() > 0)
+                                    rvMediaShow = true;
+                                mediaRecyclerViewToggle();
+                                mediaAdapter = new MediaAdapter(mContext, postImages, postVideos, imageListener, videoListen);
+                                mediaRecyclerView.setAdapter(mediaAdapter);
 
 
                             } else {
@@ -2011,7 +2130,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                         if (temp.equalsIgnoreCase(imagePath)) {
                             hasAlready = true;
 
-                          //  Tools.toast(PostNew.this, "You have already add this!", R.drawable.ic_info_outline_blue_24dp);
+                            //  Tools.toast(PostNew.this, "You have already add this!", R.drawable.ic_info_outline_blue_24dp);
                             break;
                         }
                     }
@@ -2044,7 +2163,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                 for (String temp : mediaList) {
                     if (temp.equalsIgnoreCase(imagePath)) {
 
-                       // Tools.toast(PostNew.this, "You have already add this!", R.drawable.ic_info_outline_blue_24dp);
+                        // Tools.toast(PostNew.this, "You have already add this!", R.drawable.ic_info_outline_blue_24dp);
                     } else {
 
                         Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "1", strMD5);
@@ -2106,17 +2225,16 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                             if (status) {
 
 
-
-                               // String message = "You have already posted it .";
+                                // String message = "You have already posted it .";
                                 //Tools.showCustomToast(PostNew.this, mView, message, Gravity.CENTER);
 
-                                    postImages.add(new PostImage(imagePath, "", fileEncoded, true));
-                                    rvMediaShow = true;
-                                    mediaRecyclerViewToggle();
-                                    mediaAdapter = new MediaAdapter(mContext, postImages, postVideos, imageListener, videoListen);
-                                    mediaRecyclerView.setAdapter(mediaAdapter);
-                                    progressView.setVisibility(View.GONE);
-                                    progressView.stopAnimation();
+                                postImages.add(new PostImage(imagePath, "", fileEncoded, true));
+                                rvMediaShow = true;
+                                mediaRecyclerViewToggle();
+                                mediaAdapter = new MediaAdapter(mContext, postImages, postVideos, imageListener, videoListen);
+                                mediaRecyclerView.setAdapter(mediaAdapter);
+                                progressView.setVisibility(View.GONE);
+                                progressView.stopAnimation();
 
 
                             } else {
@@ -2130,7 +2248,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                                     addPhotoRequest(mediaCall, fileEncoded);
 
                                     progressDialog.show();
-                                  //  progressDialog.setCancelable(false);
+                                    //  progressDialog.setCancelable(false);
 
                                     postImages.add(new PostImage(imagePath, "", fileEncoded, false));
 
@@ -2800,4 +2918,104 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
     }
 
 
+    @Override
+    public void onCameraClicked() {
+
+        rvMimShow = false;
+        rvMimToggle();
+        if (isGrantCamera) {
+            sendImageFromCamera();
+        } else {
+            checkCameraPermission();
+        }
+    }
+
+    @Override
+    public void onVideoLibraryClicked() {
+
+        rvMimShow = false;
+        rvMimToggle();
+        checkVideoPermission();
+    }
+
+    @Override
+    public void onVideoRecordClicked() {
+
+
+
+        Intent videoCaptureIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+      //  Uri videoUri=getVideoUri();
+       // videoCaptureIntent.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
+        if (videoCaptureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(videoCaptureIntent, REQUEST_VIDEO_CAPTURE);
+        }
+
+//        Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+//        if (takeVideoIntent.resolveActivity(getPackageManager()) != null) {
+//            startActivityForResult(takeVideoIntent,
+//                    REQUEST_VIDEO_CAPTURE);
+//        }
+
+    }
+
+    @Override
+    public void onPhotoClicked() {
+
+        rvMimShow = false;
+        rvMimToggle();
+        if (isGrantGallery) {
+
+            sendImageFromGallery();
+        } else {
+            checkGalleryPermission();
+        }
+
+    }
+
+    @Override
+    public void onEmojiClicked() {
+
+    }
+
+
+    @Override
+    public void onPermissionsGranted(int requestCode, List<String> perms) {
+        if (uri != null) {
+            if (EasyPermissions.hasPermissions(PostNew.this, android.Manifest.permission.READ_EXTERNAL_STORAGE)) {
+//                displayRecordedVideo.setVideoURI(uri);
+//                displayRecordedVideo.start();
+
+                pathToStoredVideo = getRealPathFromURIPath(uri, PostNew.this);
+                //    Log.d(TAG, "Recorded Video Path " + pathToStoredVideo);
+                //Store the video to your server
+                //  uploadVideoToServer(pathToStoredVideo);
+
+                File file = new File(pathToStoredVideo);
+                //Parsing any Media type file
+                RequestBody requestFile = RequestBody.create(MediaType.parse("video/*"), file);
+                MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("video", file.getName(), requestFile);
+                Call<String> mediaCall = videoServices.uploadVideo(deviceId, profileId, token, fileToUpload, postId, true);
+                sendUploadVideoRequest(mediaCall);
+
+                progressDialog.show();
+
+                String videoPath = "file://" + pathToStoredVideo;
+                PostVideo postVideo = new PostVideo();
+                postVideo.setVideoPath(videoPath);
+                postVideo.setMdFive(fileEncoded);
+                postVideo.setDuplicate(false);
+                postVideos.add(postVideo);
+                if (postVideos.size() > 0)
+                    rvMediaShow = true;
+                mediaRecyclerViewToggle();
+                mediaAdapter = new MediaAdapter(mContext, postImages, postVideos, imageListener, videoListen);
+                mediaRecyclerView.setAdapter(mediaAdapter);
+            }
+        }
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, List<String> perms) {
+        Log.d(TAG, "User has denied requested permission");
+    }
 }

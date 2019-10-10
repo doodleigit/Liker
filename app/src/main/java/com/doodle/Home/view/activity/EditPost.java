@@ -55,6 +55,7 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.doodle.App;
 import com.doodle.Home.holder.mediaHolder.ImageViewHolder;
@@ -80,6 +81,7 @@ import com.doodle.Post.model.Subcatg;
 import com.doodle.Post.service.DataProvider;
 import com.doodle.Post.service.PostService;
 import com.doodle.Post.view.activity.PostNew;
+import com.doodle.Post.view.fragment.AttachmentBottomSheet;
 import com.doodle.Post.view.fragment.Audience;
 import com.doodle.Post.view.fragment.ContributorStatus;
 import com.doodle.Post.view.fragment.PostPermission;
@@ -125,6 +127,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import pub.devrel.easypermissions.EasyPermissions;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -140,7 +143,9 @@ import static com.doodle.Tool.Tools.isNullOrEmpty;
 public class EditPost extends AppCompatActivity implements View.OnClickListener,
         PostPermission.BottomSheetListener,
         Audience.BottomSheetListener,
-        ContributorStatus.ContributorStatusListener {
+        ContributorStatus.ContributorStatusListener,
+        AttachmentBottomSheet.BottomSheetListener,
+        EasyPermissions.PermissionCallbacks{
 
     // data to populate the RecyclerView with
 
@@ -193,6 +198,8 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
     private static final int REQUEST_TAKE_CAMERA = 101;
     private static final int REQUEST_TAKE_GALLERY_IMAGE = 102;
     private static final int REQUEST_TAKE_GALLERY_VIDEO = 103;
+    private static final int REQUEST_VIDEO_CAPTURE = 104;//CAMERA_REQUEST_CODE_VEDIO
+
     private RecyclerView mediaRecyclerView;
     boolean rvMediaShow;
 
@@ -291,6 +298,13 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
     private FloatingActionButton postButton;
     private Context mContext;
     Set<String> mediaList;
+
+
+    private static final int READ_REQUEST_CODE = 200;
+    private Uri uri;
+    private String pathToStoredVideo;
+    private VideoView displayRecordedVideo;
+    private static final String SERVER_PATH = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -1366,14 +1380,20 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                 overridePendingTransition(R.anim.bottom_up, R.anim.nothing);*/
                 break;
             case R.id.imageCamera:
-                rvMimShow = false;
+
+                List<String> reasonList = new ArrayList<>();
+                reasonList.add("azhar");
+                AttachmentBottomSheet attachmentBottomSheet = AttachmentBottomSheet.newInstance(reasonList);
+                attachmentBottomSheet.show(getSupportFragmentManager(), "AttachmentBottomSheet");
+
+              /*  rvMimShow = false;
                 rvMimToggle();
                 if (isGrantCamera) {
                     sendImageFromCamera();
                 } else {
                     checkCameraPermission();
                 }
-
+*/
                 break;
             case R.id.imageGallery:
 
@@ -1824,6 +1844,41 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
                 Toast.makeText(this, "Cancel Camera Capture", Toast.LENGTH_SHORT).show();
             }
         }
+
+        if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_VIDEO_CAPTURE) {
+            uri = data.getData();
+            if (EasyPermissions.hasPermissions(EditPost.this, android.Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                // imageUri = getVideoUri();
+                pathToStoredVideo = getRealPathFromURIPath(uri, EditPost.this);
+                //imageUri = getImageUri();
+
+                File file = new File(pathToStoredVideo);
+                //Parsing any Media type file
+                RequestBody requestFile = RequestBody.create(MediaType.parse("video/*"), file);
+                MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("video", file.getName(), requestFile);
+                Call<String> mediaCall = videoServices.uploadVideo(deviceId, profileId, token, fileToUpload, postId, true);
+                sendUploadVideoRequest(mediaCall);
+
+                progressDialog.show();
+
+                String videoPath = "file://" + pathToStoredVideo;
+                PostVideo postVideo = new PostVideo();
+                postVideo.setVideoPath(videoPath);
+                postVideo.setMdFive(fileEncoded);
+                postVideo.setDuplicate(false);
+                postVideos.add(postVideo);
+                if (postVideos.size() > 0)
+                    rvMediaShow = true;
+                mediaRecyclerViewToggle();
+                mediaAdapter = new MediaAdapter(mContext, postImages, postVideos, imageListener, videoListen);
+                mediaRecyclerView.setAdapter(mediaAdapter);
+
+
+            } else {
+                EasyPermissions.requestPermissions(EditPost.this, getString(R.string.read_file), READ_REQUEST_CODE, Manifest.permission.READ_EXTERNAL_STORAGE);
+            }
+        }
+
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_TAKE_GALLERY_VIDEO) {
 
@@ -1838,6 +1893,17 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
         }
 
 
+    }
+
+    private String getRealPathFromURIPath(Uri contentURI, Activity activity) {
+        Cursor cursor = activity.getContentResolver().query(contentURI, null, null, null, null);
+        if (cursor == null) {
+            return contentURI.getPath();
+        } else {
+            cursor.moveToFirst();
+            int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+            return cursor.getString(idx);
+        }
     }
 
     private void addPhotoRequest(Call<String> call,String fileEncoded) {
@@ -3106,6 +3172,95 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
     //Your post has been successfully added to your profile. View Post
     @Override
     public void onNeutralResult(DialogFragment dlg) {
+
+    }
+
+    @Override
+    public void onCameraClicked() {
+
+             rvMimShow = false;
+                rvMimToggle();
+                if (isGrantCamera) {
+                    sendImageFromCamera();
+                } else {
+                    checkCameraPermission();
+                }
+    }
+
+    @Override
+    public void onVideoLibraryClicked() {
+        rvMimShow = false;
+        rvMimToggle();
+        checkVideoPermission();
+    }
+
+    @Override
+    public void onVideoRecordClicked() {
+        Intent videoCaptureIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+        //  Uri videoUri=getVideoUri();
+        // videoCaptureIntent.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
+        if (videoCaptureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(videoCaptureIntent, REQUEST_VIDEO_CAPTURE);
+        }
+    }
+
+    @Override
+    public void onPhotoClicked() {
+
+        rvMimShow = false;
+        rvMimToggle();
+        if (isGrantGallery) {
+
+            sendImageFromGallery();
+        } else {
+            checkGalleryPermission();
+        }
+
+    }
+
+    @Override
+    public void onEmojiClicked() {
+
+    }
+
+    @Override
+    public void onPermissionsGranted(int requestCode, List<String> perms) {
+        if (uri != null) {
+            if (EasyPermissions.hasPermissions(EditPost.this, android.Manifest.permission.READ_EXTERNAL_STORAGE)) {
+//                displayRecordedVideo.setVideoURI(uri);
+//                displayRecordedVideo.start();
+
+                pathToStoredVideo = getRealPathFromURIPath(uri, EditPost.this);
+                //    Log.d(TAG, "Recorded Video Path " + pathToStoredVideo);
+                //Store the video to your server
+                //  uploadVideoToServer(pathToStoredVideo);
+
+                File file = new File(pathToStoredVideo);
+                //Parsing any Media type file
+                RequestBody requestFile = RequestBody.create(MediaType.parse("video/*"), file);
+                MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("video", file.getName(), requestFile);
+                Call<String> mediaCall = videoServices.uploadVideo(deviceId, profileId, token, fileToUpload, postId, true);
+                sendUploadVideoRequest(mediaCall);
+
+                progressDialog.show();
+
+                String videoPath = "file://" + pathToStoredVideo;
+                PostVideo postVideo = new PostVideo();
+                postVideo.setVideoPath(videoPath);
+                postVideo.setMdFive(fileEncoded);
+                postVideo.setDuplicate(false);
+                postVideos.add(postVideo);
+                if (postVideos.size() > 0)
+                    rvMediaShow = true;
+                mediaRecyclerViewToggle();
+                mediaAdapter = new MediaAdapter(mContext, postImages, postVideos, imageListener, videoListen);
+                mediaRecyclerView.setAdapter(mediaAdapter);
+            }
+        }
+    }
+
+    @Override
+    public void onPermissionsDenied(int requestCode, List<String> perms) {
 
     }
 }
