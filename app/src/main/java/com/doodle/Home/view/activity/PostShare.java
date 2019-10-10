@@ -201,7 +201,7 @@ public class PostShare extends AppCompatActivity implements
                     .into(imgPostUser);
         }
 
-        //App.setSharePostfooter(true);
+        App.setSharePostfooter(true);
         postItemList.add(item);
         adapter = new PostAdapter(this, postItemList, this, this, this, this, this, this, true);
         sharedRecyclerview.setAdapter(adapter);
@@ -925,6 +925,7 @@ public class PostShare extends AppCompatActivity implements
                     friends
             );
             sendSharedPostRequest(call);
+            App.setIsPostShare(false);
         } else {
             Tools.showNetworkDialog(getSupportFragmentManager());
             progressView.setVisibility(View.GONE);
@@ -952,7 +953,7 @@ public class PostShare extends AppCompatActivity implements
                             if (status) {
                                 Toast.makeText(PostShare.this, "successfully shared!", Toast.LENGTH_SHORT).show();
 
-                                App.setIsPostShare(true);
+
 
                                 Call<String> mCall = webService.sendBrowserNotification(
                                         deviceId,//"8b64708fa409da20341b1a555d1ddee526444",

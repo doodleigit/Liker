@@ -1,5 +1,6 @@
 package com.doodle.Authentication.view.activity;
 
+import android.annotation.SuppressLint;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.ActivityNotFoundException;
 import android.content.BroadcastReceiver;
@@ -199,6 +200,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
     private RequestToken mRequestToken = null;
     View mView;
 
+    @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -219,6 +221,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
         manager = new PrefManager(this);
         mDeviceId = manager.getDeviceId();
         etFirstName = (ClearableEditText) findViewById(R.id.etFirstName);
+
         etFirstName.setOnClickListener(this);
         etFirstName.setOnEditorActionListener(editorListener);
         etLastName = (ClearableEditText) findViewById(R.id.etLastName);

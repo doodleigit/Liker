@@ -13,12 +13,11 @@
 
         <LinearLayout
             android:id="@+id/layoutHeader"
-            android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <include layout="@layout/list_item_post_header_share"/>
             <include layout="@layout/list_item_post_header"/>
+
 
 
         </LinearLayout>
@@ -35,11 +34,21 @@
         </include>-->
 
         <LinearLayout
+            android:id="@+id/sharePostBody"
+            android:layout_below="@id/layoutHeader"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        <LinearLayout
             android:id="@+id/postBodyLayer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_below="@id/layoutHeader">
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <include layout="@layout/list_item_post_header_share"/>
+            </LinearLayout>
 
             <com.borjabravo.readmoretextview.ReadMoreTextView
                 android:id="@+id/tvPostContent"
@@ -114,6 +123,6 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/postBodyLayer" />
 
-
+        </LinearLayout>
     </RelativeLayout>
 </android.support.v7.widget.CardView>

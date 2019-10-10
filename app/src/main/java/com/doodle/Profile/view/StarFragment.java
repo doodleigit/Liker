@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.doodle.App;
 import com.doodle.Comment.model.CommentItem;
 import com.doodle.Home.adapter.PostAdapter;
 import com.doodle.Home.model.PostItem;
@@ -197,7 +198,7 @@ public class StarFragment extends Fragment {
                 StarFragment.this.deletePost(deletePostItem, deletePosition);
             }
         };
-
+        App.setSharePostfooter(false);
         adapter = new PostAdapter(getActivity(), postItemList, mCallback, mimListener, videoListener, youtubeListener, linkListener, imageListener, true);
         feedRecyclerView.setMediaObjects(postItemList);
         feedRecyclerView.setActivityContext(getActivity());

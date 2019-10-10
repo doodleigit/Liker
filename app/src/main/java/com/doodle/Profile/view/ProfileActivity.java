@@ -44,7 +44,9 @@ import com.doodle.Comment.view.fragment.ReportSendCategorySheet;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.view.fragment.PostPermissionSheet;
 import com.doodle.Profile.adapter.ViewPagerAdapter;
+import com.doodle.Profile.model.Privacy;
 import com.doodle.Profile.model.UserAllInfo;
+import com.doodle.Profile.service.ProfileDataFetchCompleteListener;
 import com.doodle.Profile.service.ProfileService;
 import com.doodle.R;
 import com.doodle.Search.LikerSearch;
@@ -60,6 +62,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import okhttp3.MediaType;
@@ -93,6 +96,7 @@ public class ProfileActivity extends AppCompatActivity implements ReportReasonSh
     private ProfileService profileService;
     private CommentService commentService;
     private ProgressDialog progressDialog;
+    public ProfileDataFetchCompleteListener profileDataFetchCompleteListener;
 
     private PrefManager manager;
     private UserAllInfo userAllInfo;
@@ -220,7 +224,7 @@ public class ProfileActivity extends AppCompatActivity implements ReportReasonSh
     }
 
     private void getData() {
-        isFriendStatus();
+
         Call<UserAllInfo> call = profileService.getUserInfo(deviceId, userId, token, userId, profileUserName, true);
         getUserInfo(call);
     }
@@ -230,6 +234,7 @@ public class ProfileActivity extends AppCompatActivity implements ReportReasonSh
         userImage = AppConstants.USER_UPLOADED_IMAGES + userAllInfo.getPhoto();
         coverImage = AppConstants.USER_UPLOADED_IMAGES + userAllInfo.getCoverImage();
         allCountInfo = userAllInfo.getTotalLikes() + " Likes " + userAllInfo.getTotalFollowers() + " Followers " + userAllInfo.getTotalFollowings() + " Following";
+
         tvUserName.setText(fullName);
         tvTotalInfoCount.setText(allCountInfo);
         loadProfileImage();
@@ -511,6 +516,9 @@ public class ProfileActivity extends AppCompatActivity implements ReportReasonSh
                         isFollow = false;
                         tvFollow.setText(getString(R.string.follow));
                     }
+                    if (profileDataFetchCompleteListener != null) {
+                        profileDataFetchCompleteListener.onComplete(userAllInfo.getPrivacy().getWallPermission(), isFollow);
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -528,6 +536,7 @@ public class ProfileActivity extends AppCompatActivity implements ReportReasonSh
             @Override
             public void onResponse(Call<UserAllInfo> call, Response<UserAllInfo> response) {
                 userAllInfo = response.body();
+                isFriendStatus();
                 setData();
                 progressDialog.dismiss();
             }

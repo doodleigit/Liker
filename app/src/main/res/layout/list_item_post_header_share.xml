@@ -36,7 +36,7 @@
 
                 <com.doodle.Tool.SingleLineTextView
                     android:id="@+id/tvSharePostUserName"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small"
@@ -84,12 +84,13 @@
             android:layout_alignParentRight="true"
             android:layout_centerInParent="true"
             android:padding="5dp"
+            android:visibility="gone"
             android:src="@drawable/ic_more_vert_black_24dp"
             android:tint="#8596A3" />
 
     </RelativeLayout>
 
-    <com.borjabravo.readmoretextview.ReadMoreTextView
+<!--    <com.borjabravo.readmoretextview.ReadMoreTextView
         android:id="@+id/tvSharePostContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -106,6 +107,6 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#EDF0F1" />
+        android:background="#EDF0F1" />-->
 
 </LinearLayout>

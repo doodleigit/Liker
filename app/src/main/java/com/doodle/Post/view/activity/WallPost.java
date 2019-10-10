@@ -17,7 +17,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Environment;
 import android.os.PersistableBundle;
 import android.provider.DocumentsContract;
@@ -27,10 +26,10 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
-import android.text.InputFilter;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextWatcher;
@@ -60,7 +59,6 @@ import android.widget.Toast;
 import com.doodle.App;
 import com.doodle.Home.holder.mediaHolder.ImageViewHolder;
 import com.doodle.Home.holder.mediaHolder.VideoViewHolder;
-import com.doodle.Home.view.activity.Home;
 import com.doodle.Post.adapter.ChatAdapter;
 import com.doodle.Post.adapter.ImageAdapter;
 import com.doodle.Post.adapter.LinkScriptAdapter;
@@ -83,8 +81,6 @@ import com.doodle.Post.view.fragment.ContributorStatus;
 import com.doodle.Post.view.fragment.PostPermission;
 import com.doodle.R;
 import com.doodle.Tool.AppConstants;
-import com.doodle.Tool.EditTextLinesLimiter;
-import com.doodle.Tool.MaxLinesInputFilter;
 import com.doodle.Tool.NetworkHelper;
 import com.doodle.Tool.PageTransformer;
 import com.doodle.Tool.PrefManager;
@@ -134,10 +130,9 @@ import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 import static android.widget.Toast.LENGTH_SHORT;
 import static android.widget.Toast.makeText;
 import static com.doodle.Tool.Tools.getMD5EncryptedString;
-import static com.doodle.Tool.Tools.isContain;
 import static com.doodle.Tool.Tools.isNullOrEmpty;
 
-public class PostNew extends AppCompatActivity implements View.OnClickListener,
+public class WallPost extends AppCompatActivity implements View.OnClickListener,
         PostPermission.BottomSheetListener,
         Audience.BottomSheetListener,
         ContributorStatus.ContributorStatusListener {
@@ -151,7 +146,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
     private ImageView imgPermission;
     private PrefManager manager;
     private PostService webService, videoServices;
-    private final String TAG = "PostNew";
+    private final String TAG = "WallPost";
     private boolean networkOk;
     private CircularProgressView progressView;
     boolean isGrantGallery = false;
@@ -297,8 +292,8 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.new_post);
-       mContext=this;
+        setContentView(R.layout.activity_wall_post);
+        mContext=this;
 
         manager = new PrefManager(this);
         webService = PostService.mRetrofit.create(PostService.class);
@@ -408,7 +403,6 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
             hasMim = viewColors.get(position).getId();
             if (mimColor.startsWith("#")) {
                 if (mimColor.contentEquals("#FFFFFF")) {
-                    editPostMessage.addTextChangedListener(new EditTextLinesLimiter(editPostMessage, 100));
                     int mColor = Color.parseColor(mimColor);
                     messageContainer.setBackgroundColor(mColor);
                     messageContainer.setGravity(Gravity.START);
@@ -419,7 +413,6 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                     params.height = (int) getResources().getDimension(R.dimen._220sdp);
                     messageContainer.setLayoutParams(params);
                 } else {
-                    editPostMessage.addTextChangedListener(new EditTextLinesLimiter(editPostMessage, 4));
                     int mColor = Color.parseColor(mimColor);
                     messageContainer.setBackgroundColor(mColor);
                     if (mimColor.contentEquals("#C6FFD4")) {
@@ -430,15 +423,12 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                     messageContainer.setLayoutParams(params);
                     messageContainer.setGravity(Gravity.CENTER);
                     editPostMessage.setGravity(Gravity.CENTER);
-                 //   editPostMessage.setFilters(new InputFilter[]{new MaxLinesInputFilter(2)});
                     editPostMessage.setTextAppearance(this, android.R.style.TextAppearance_Large);
                     editPostMessage.setTextColor(Color.parseColor("#FFFFFF"));
-
                 }
 
 
             } else {
-                editPostMessage.addTextChangedListener(new EditTextLinesLimiter(editPostMessage, 4));
                 String imageUrl = AppConstants.MIM_IMAGE + mimColor;
                 Picasso.with(this).load(imageUrl).into(target);
                 messageContainer.setBackground(mDrawable);
@@ -460,7 +450,6 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                         editPostMessage.setTextColor(Color.parseColor("#FFFFFF"));
                         break;
                 }
-
             }
 
 
@@ -577,13 +566,13 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
         editPostMessage.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                //  makeText(PostNew.this, "beforeTextChanged " + s, LENGTH_SHORT).show();
+                //  makeText(WallPost.this, "beforeTextChanged " + s, LENGTH_SHORT).show();
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-                //   makeText(PostNew.this, "onTextChanged " + s, LENGTH_SHORT).show();
+                //   makeText(WallPost.this, "onTextChanged " + s, LENGTH_SHORT).show();
                 extractedUrls = Tools.extractUrls(s.toString());
                 /// if(uploadImageName.)
                 contentTitle = s.toString().trim();
@@ -624,7 +613,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                     linkScriptToggle();*/
 
                     if (!isNullOrEmpty(contentTitle)) {
-                        //  makeText(PostNew.this, "Button Enable-1!", LENGTH_SHORT).show();
+                        //  makeText(WallPost.this, "Button Enable-1!", LENGTH_SHORT).show();
                     }
                 }
                 if (extractedUrls.size() > 0) {
@@ -675,7 +664,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                 if (s.length() == 1) {
                     if (manager.getNewPostIntro().equals("0")) {
                         manager.setNewPostIntro("1");
-                        hideKeyboard(PostNew.this);
+                        hideKeyboard(WallPost.this);
                         showIntroTooltip();
                     }
                 }
@@ -686,7 +675,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
             public void afterTextChanged(Editable s) {
                 if (!isNullOrEmpty(mentionMessage)) {
                     //mentionMessage += s;
-//                    makeText(PostNew.this, "mention-data: " + mentionMessage, LENGTH_SHORT).show();
+//                    makeText(WallPost.this, "mention-data: " + mentionMessage, LENGTH_SHORT).show();
                 }
 
                 //  List<String> extractedUrls = extractUrls("ForgotPasswords to https://stackoverflow.com/ and here is another link http://www.google.com/ \n which is a great search engine");
@@ -696,7 +685,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
         });
 
-     //   progressDialog.setCancelable(false);
+        progressDialog.setCancelable(false);
 
 
     }
@@ -871,7 +860,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                     rvMimToggle();
 
                 };
-                MentionUserAdapter mentionUserAdapter = new MentionUserAdapter(PostNew.this, mentionUsers, listener);
+                MentionUserAdapter mentionUserAdapter = new MentionUserAdapter(WallPost.this, mentionUsers, listener);
                 recyclerViewSearchMention.setAdapter(mentionUserAdapter);
 
 
@@ -1140,13 +1129,13 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
                 checkContentType();
                 if (contentTitle.isEmpty()) {
-                    Tools.showCustomToast(PostNew.this, mView, "Please add a post description", Gravity.TOP);
-                } else if (categoryId.isEmpty() && subCategoryId.isEmpty()) {
-                    Tools.showCustomToast(PostNew.this, mView, "Please select your post’s audience.", Gravity.TOP);
-                } else if (!isAddContentTitle) {
-                    Tools.showCustomToast(PostNew.this, mView, "Cat’s got your tongue? Please write at least 8 characters in your post description.", Gravity.TOP);
+                    Tools.showCustomToast(WallPost.this, mView, "Please add a post description", Gravity.TOP);
+                } /*else if (categoryId.isEmpty() && subCategoryId.isEmpty()) {
+                    Tools.showCustomToast(WallPost.this, mView, "Please select your post’s audience.", Gravity.TOP);
+                }*/ else if (!isAddContentTitle) {
+                    Tools.showCustomToast(WallPost.this, mView, "Cat’s got your tongue? Please write at least 8 characters in your post description.", Gravity.TOP);
                 } else if (contentTitle.length() < 8) {
-                    Tools.showCustomToast(PostNew.this, mView, "Cat’s got your tongue? Please write at least 8 characters in your post description.", Gravity.TOP);
+                    Tools.showCustomToast(WallPost.this, mView, "Cat’s got your tongue? Please write at least 8 characters in your post description.", Gravity.TOP);
                 } else {
                     createNewPost();
                 }
@@ -1160,7 +1149,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                 break;
             case R.id.contentCategory:
 
-                Intent intent = new Intent(PostNew.this, PostCategory.class);
+                Intent intent = new Intent(WallPost.this, PostCategory.class);
                 startActivity(intent);
                 overridePendingTransition(R.anim.bottom_up, R.anim.nothing);
                 break;
@@ -1210,7 +1199,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                     imageFile,
                     fileEncoded,//"",
                     postPermission,//0,
-                    categoryId,//3,
+                    "26",//3,
                     subCategoryId,// 54,
                     contentType,//1,
                     contentTitle,//contentTitle,//"Here is studio.. ",
@@ -1346,9 +1335,9 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                                 } else {
 
                                 }*/
-//                                    startActivity(new Intent(PostNew.this, Home.class));
+//                                    startActivity(new Intent(WallPost.this, Home.class));
                                     finish();
-                                    sendBroadcast((new Intent()).setAction(AppConstants.NEW_POST_ADD_BROADCAST));
+                                  //  sendBroadcast((new Intent()).setAction(AppConstants.NEW_POST_ADD_BROADCAST));
                                 }
 
                             }
@@ -1356,7 +1345,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                             JSONObject errorObject = object.getJSONObject("errors");
                             if (errorObject.length() > 0) {
                                 String post_duplicate = errorObject.getString("post_duplicate");
-                                Tools.toast(PostNew.this, post_duplicate, R.drawable.ic_warning_black_24dp);
+                                Tools.toast(WallPost.this, post_duplicate, R.drawable.ic_warning_black_24dp);
                             }
 
 
@@ -1494,12 +1483,12 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
         if ((ContextCompat.checkSelfPermission(getApplicationContext(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) && (ContextCompat.checkSelfPermission(getApplicationContext(),
                 Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)) {
-            if ((ActivityCompat.shouldShowRequestPermissionRationale(PostNew.this,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) && (ActivityCompat.shouldShowRequestPermissionRationale(PostNew.this,
+            if ((ActivityCompat.shouldShowRequestPermissionRationale(WallPost.this,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE)) && (ActivityCompat.shouldShowRequestPermissionRationale(WallPost.this,
                     Manifest.permission.READ_EXTERNAL_STORAGE))) {
 
             } else {
-                ActivityCompat.requestPermissions(PostNew.this,
+                ActivityCompat.requestPermissions(WallPost.this,
                         new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE},
                         REQUEST_TAKE_GALLERY_VIDEO);
             }
@@ -1654,7 +1643,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                         try {
                             JSONObject object = new JSONObject(response.body());
 
-//                            startActivity(new Intent(PostNew.this, Home.class));
+//                            startActivity(new Intent(WallPost.this, Home.class));
                             finish();
                             sendBroadcast((new Intent()).setAction(AppConstants.NEW_POST_ADD_BROADCAST));
                         } catch (JSONException e) {
@@ -1810,7 +1799,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                         if (temp.equalsIgnoreCase(videoPath)) {
                             hasAlready = true;
 
-                        //    Tools.toast(PostNew.this, "You have already add this!", R.drawable.ic_info_outline_blue_24dp);
+                            //    Tools.toast(WallPost.this, "You have already add this!", R.drawable.ic_info_outline_blue_24dp);
                             break;
                         }
                     }
@@ -1857,7 +1846,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                 for (String temp : videoList) {
                     if (temp.equalsIgnoreCase(videoPath)) {
 
-                      //  Tools.toast(PostNew.this, "You have already add this!", R.drawable.ic_info_outline_blue_24dp);
+                        //  Tools.toast(WallPost.this, "You have already add this!", R.drawable.ic_info_outline_blue_24dp);
                     } else {
 
                         Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "2", strMD5);
@@ -1894,26 +1883,26 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                             boolean status = object.getBoolean("status");
                             if (status) {
 
-                               // String message = "You have already posted it .";
-                                //Tools.showCustomToast(PostNew.this, mView, message, Gravity.CENTER);
+                                // String message = "You have already posted it .";
+                                //Tools.showCustomToast(WallPost.this, mView, message, Gravity.CENTER);
 
 
 
 
-                                    progressDialog.show();
-                                    progressDialog.dismiss();
+                                progressDialog.show();
+                                progressDialog.dismiss();
 
-                                    // String videoPath = "file://" + filePath;
-                                    PostVideo postVideo = new PostVideo();
-                                    postVideo.setVideoPath(videoPath);
-                                    postVideo.setMdFive(fileEncoded);
-                                    postVideo.setDuplicate(true);
-                                    postVideos.add(postVideo);
-                                    if (postVideos.size() > 0)
-                                        rvMediaShow = true;
-                                    mediaRecyclerViewToggle();
-                                    mediaAdapter = new MediaAdapter(mContext, postImages, postVideos, imageListener, videoListen);
-                                    mediaRecyclerView.setAdapter(mediaAdapter);
+                                // String videoPath = "file://" + filePath;
+                                PostVideo postVideo = new PostVideo();
+                                postVideo.setVideoPath(videoPath);
+                                postVideo.setMdFive(fileEncoded);
+                                postVideo.setDuplicate(true);
+                                postVideos.add(postVideo);
+                                if (postVideos.size() > 0)
+                                    rvMediaShow = true;
+                                mediaRecyclerViewToggle();
+                                mediaAdapter = new MediaAdapter(mContext, postImages, postVideos, imageListener, videoListen);
+                                mediaRecyclerView.setAdapter(mediaAdapter);
 
 
 
@@ -1947,7 +1936,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
 
                                 //     String message = "Add gallery successfully!";
-                                //     Tools.showCustomToast(PostNew.this, mView, message, Gravity.CENTER);
+                                //     Tools.showCustomToast(WallPost.this, mView, message, Gravity.CENTER);
 
                             }
 
@@ -2011,7 +2000,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                         if (temp.equalsIgnoreCase(imagePath)) {
                             hasAlready = true;
 
-                          //  Tools.toast(PostNew.this, "You have already add this!", R.drawable.ic_info_outline_blue_24dp);
+                            //  Tools.toast(WallPost.this, "You have already add this!", R.drawable.ic_info_outline_blue_24dp);
                             break;
                         }
                     }
@@ -2044,7 +2033,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                 for (String temp : mediaList) {
                     if (temp.equalsIgnoreCase(imagePath)) {
 
-                       // Tools.toast(PostNew.this, "You have already add this!", R.drawable.ic_info_outline_blue_24dp);
+                        // Tools.toast(WallPost.this, "You have already add this!", R.drawable.ic_info_outline_blue_24dp);
                     } else {
 
                         Call<String> call = webService.isDuplicateFile(deviceId, profileId, token, userIds, "1", strMD5);
@@ -2107,16 +2096,16 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
 
 
-                               // String message = "You have already posted it .";
-                                //Tools.showCustomToast(PostNew.this, mView, message, Gravity.CENTER);
+                                // String message = "You have already posted it .";
+                                //Tools.showCustomToast(WallPost.this, mView, message, Gravity.CENTER);
 
-                                    postImages.add(new PostImage(imagePath, "", fileEncoded, true));
-                                    rvMediaShow = true;
-                                    mediaRecyclerViewToggle();
-                                    mediaAdapter = new MediaAdapter(mContext, postImages, postVideos, imageListener, videoListen);
-                                    mediaRecyclerView.setAdapter(mediaAdapter);
-                                    progressView.setVisibility(View.GONE);
-                                    progressView.stopAnimation();
+                                postImages.add(new PostImage(imagePath, "", fileEncoded, true));
+                                rvMediaShow = true;
+                                mediaRecyclerViewToggle();
+                                mediaAdapter = new MediaAdapter(mContext, postImages, postVideos, imageListener, videoListen);
+                                mediaRecyclerView.setAdapter(mediaAdapter);
+                                progressView.setVisibility(View.GONE);
+                                progressView.stopAnimation();
 
 
                             } else {
@@ -2130,7 +2119,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                                     addPhotoRequest(mediaCall, fileEncoded);
 
                                     progressDialog.show();
-                                  //  progressDialog.setCancelable(false);
+                                    progressDialog.setCancelable(false);
 
                                     postImages.add(new PostImage(imagePath, "", fileEncoded, false));
 
@@ -2147,7 +2136,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
 
 //                                String message = "Add gallery successfully!";
-//                                Tools.showCustomToast(PostNew.this, mView, message, Gravity.CENTER);
+//                                Tools.showCustomToast(WallPost.this, mView, message, Gravity.CENTER);
 
                             }
 
@@ -2628,7 +2617,7 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
 
             LinkScriptItem scriptItem = new LinkScriptItem(currentImage, currentTitle, currentDescription, currentUrl);
             scriptItemList.add(scriptItem);
-            LinkScriptAdapter linkScriptAdapter = new LinkScriptAdapter(PostNew.this, scriptItemList);
+            LinkScriptAdapter linkScriptAdapter = new LinkScriptAdapter(WallPost.this, scriptItemList);
             rvLinkScript.setAdapter(linkScriptAdapter);
         }
     };
@@ -2746,17 +2735,17 @@ public class PostNew extends AppCompatActivity implements View.OnClickListener,
                                     Call<String> mediaCall = videoServices.uploadVideo(deviceId, profileId, token, fileToUpload, postId, true);
                                     sendVideoRequest(mediaCall);
                                 } else {
-//                                    Intent intent = new Intent(PostNew.this, Home.class);
+//                                    Intent intent = new Intent(WallPost.this, Home.class);
 //                                    intent.putExtra("STATUS", status);
 //                                    startActivity(intent);
                                     finish();
                                     sendBroadcast((new Intent()).setAction(AppConstants.NEW_POST_ADD_BROADCAST));
                                     String message = "You are now a contributor to the Hobby & Leisure - Airplanes category and your post has been added to your profile.";
-                                    //  Tools.showCustomToast(PostNew.this, mView, message, Gravity.CENTER);
+                                    //  Tools.showCustomToast(WallPost.this, mView, message, Gravity.CENTER);
                                 }
 
                             } else {
-                                Tools.showCustomToast(PostNew.this, mView, status, Gravity.CENTER);
+                                Tools.showCustomToast(WallPost.this, mView, status, Gravity.CENTER);
                             }
 
 
