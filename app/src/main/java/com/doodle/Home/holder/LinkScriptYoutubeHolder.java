@@ -58,6 +58,7 @@ import com.doodle.Home.view.fragment.LikerUserListFragment;
 import com.doodle.Home.view.fragment.PostPermissionSheet;
 import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.R;
+import com.doodle.Setting.view.SettingActivity;
 import com.doodle.Tool.AppConstants;
 import com.doodle.Tool.NetworkHelper;
 import com.doodle.Tool.Operation;
@@ -687,14 +688,16 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
                 String pattern = "https?:\\/\\/(?:[0-9A-Z-]+\\.)?(?:youtu\\.be\\/|youtube\\.com\\S*[^\\w\\-\\s])([\\w\\-]{11})(?=[^\\w\\-]|$)(?![?=&+%\\w]*(?:['\"][^<>]*>|<\\/a>))[?=&+%\\w]*";
                 if (!item.getPostLinkUrl().isEmpty() && item.getPostLinkUrl().matches(pattern)) {
                     /// Valid youtube URL
-                    Intent browserIntents = new Intent(Intent.ACTION_VIEW, Uri.parse(item.getPostLinkUrl()));
-                    browserIntents.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    App.getAppContext().startActivity(browserIntents);
+//                    Intent browserIntents = new Intent(Intent.ACTION_VIEW, Uri.parse(item.getPostLinkUrl()));
+//                    browserIntents.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                    App.getAppContext().startActivity(browserIntents);
+                    webLink(item.getPostLinkTitle(), item.getPostLinkUrl());
                 } else {
                     // Not Valid youtube URL
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(item.getPostLinkUrl()));
-                    browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    App.getAppContext().startActivity(browserIntent);
+//                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(item.getPostLinkUrl()));
+//                    browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                    App.getAppContext().startActivity(browserIntent);
+                    webLink(item.getPostLinkTitle(), item.getPostLinkUrl());
                 }
 
             }
@@ -980,6 +983,13 @@ public class LinkScriptYoutubeHolder extends RecyclerView.ViewHolder {
 
             }
         });
+    }
+
+    private void webLink(String type, String link) {
+        Intent termsIntent = new Intent(mContext, SettingActivity.class);
+        termsIntent.putExtra("type", type);
+        termsIntent.putExtra("link", link);
+        mContext.startActivity(termsIntent);
     }
 
     private void sendPostUnLikeRequest(Call<String> call) {

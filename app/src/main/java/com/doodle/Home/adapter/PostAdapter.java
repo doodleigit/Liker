@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.doodle.Home.holder.HowLikerWorksHolder;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.holder.ImageHolder;
 import com.doodle.Home.holder.LinkScriptHolder;
@@ -21,6 +22,7 @@ import com.doodle.R;
 import java.util.List;
 
 public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    final int VIEW_TYPE_LIKER_USE = 0;
     final int VIEW_TYPE_TEXT = 1;
     final int VIEW_TYPE_TEXT_IMAGE = 2;
     final int VIEW_TYPE_TEXT_LINK_SCRIPT = 3;
@@ -65,11 +67,14 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view;
+        if (viewType == VIEW_TYPE_LIKER_USE) {
+            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.how_liker_works_layout, parent, false);
+            return new HowLikerWorksHolder(view, mContext);
+        }
         if (viewType == VIEW_TYPE_TEXT) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_post_text, parent, false);
             return new TextHolder(view, mContext, listener, isPopup);
         }
-
         if (viewType == VIEW_TYPE_TEX_MIM) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_post_text_mim, parent, false);
             return new TextMimHolder(view, mContext, mimListener, isPopup);
@@ -83,7 +88,6 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_post_link_script, parent, false);
             return new LinkScriptHolder(view, mContext, LinkListener);
         }
-
         if (viewType == VIEW_TYPE_TEXT_LINK_SCRIPT_YOUTUBE) {
 
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_post_link_script_youtube, parent, false);
@@ -99,6 +103,10 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
+        if (viewHolder instanceof HowLikerWorksHolder) {
+            HowLikerWorksHolder vh = (HowLikerWorksHolder) viewHolder;
+            vh.setItem(postItems.get(position), position);
+        }
         if (viewHolder instanceof TextHolder) {
             TextHolder vh = (TextHolder) viewHolder;
             vh.setItem(postItems.get(position), position);
@@ -139,6 +147,8 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         int mimId = Integer.parseInt(hasMim);
         int viewType = Integer.parseInt(postType);
         switch (viewType) {
+            case 0:
+                return VIEW_TYPE_LIKER_USE;
             case 1:
                 if (mimId > 0) {
 

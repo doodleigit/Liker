@@ -965,7 +965,7 @@ public class Tools {
         if (display) {
             view.setVisibility(View.VISIBLE);
         } else {
-            view.setVisibility(View.INVISIBLE);
+            view.setVisibility(View.GONE);
         }
     }
 
@@ -1012,5 +1012,11 @@ public class Tools {
         return jsonObject != null && jsonObject.has(key) && !jsonObject.isNull(key) ? true : false;
     }
 
+    public static int[] getImageDimension(int displayWidth, int imageWidth, int imageHeight) {
+        float ratio = imageHeight / imageWidth;
+        imageWidth = displayWidth;
+        imageHeight = (int) (displayWidth * ratio);
+        return new int[]{imageWidth, imageHeight};
+    }
 
 }

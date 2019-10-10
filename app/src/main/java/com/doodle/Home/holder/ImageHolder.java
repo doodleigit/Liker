@@ -6,10 +6,14 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -39,6 +43,9 @@ import android.widget.Toast;
 
 import com.borjabravo.readmoretextview.ReadMoreTextView;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.SizeReadyCallback;
+import com.bumptech.glide.request.transition.Transition;
 import com.doodle.App;
 import com.doodle.Comment.model.Reason;
 import com.doodle.Comment.model.ReportReason;
@@ -100,7 +107,7 @@ import static com.doodle.Tool.Tools.showBlockUser;
 import static java.lang.Integer.parseInt;
 
 public class ImageHolder extends RecyclerView.ViewHolder {
-    public static final String POST_ITEM_POSITION ="post_item_position" ;
+    public static final String POST_ITEM_POSITION = "post_item_position";
     public TextView tvHeaderInfo, tvPostTime, tvPostUserName, tvImgShareCount, tvPostLikeCount, tvLinkScriptText, tvCommentCount;
     public CircleImageView imagePostUser;
     public ReadMoreTextView tvPostContent;
@@ -112,7 +119,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
     public LinearLayout postBodyLayer;
     PostItem item;
 
-    public ImageView imagePostShare,imagePostShareSetting, imagePermission;
+    public ImageView imagePostShare, imagePostShareSetting, imagePermission;
     private PopupMenu popup, popupMenu;
     public HomeService webService;
     public PrefManager manager;
@@ -168,7 +175,6 @@ public class ImageHolder extends RecyclerView.ViewHolder {
     private int postTotalShare;
 
 
-
     //SHARE-POST-HEADER
     private String sharedFirstName;
     private String sharedLastName;
@@ -185,9 +191,9 @@ public class ImageHolder extends RecyclerView.ViewHolder {
     private LinearLayout containerHeaderShare;
     private CircleImageView imageSharePostUser;
     private ImageView imageSharePostPermission;
-    private TextView tvSharePostUserName, tvSharePostTime,tvShareHeaderInfo,tvSharePostContent;
+    private TextView tvSharePostUserName, tvSharePostTime, tvShareHeaderInfo, tvSharePostContent;
     ViewGroup tvLikeShare;
-    private TextView tvShared,tvPostShareUserName;
+    private TextView tvShared, tvPostShareUserName;
     private MediaPlayer player;
 
     public interface PostItemListener {
@@ -272,7 +278,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
         networkOk = NetworkHelper.hasNetworkAccess(mContext);
         mProgressBar = (ProgressBar) itemView.findViewById(R.id.ProgressBar);
         imagePostComment = (ImageView) itemView.findViewById(R.id.imagePostComment);
-        commentContainer =itemView.findViewById(R.id.commentContainer);
+        commentContainer = itemView.findViewById(R.id.commentContainer);
         singleImgRecyclerView = itemView.findViewById(R.id.singleImgRecyclerView);
         imgLike = itemView.findViewById(R.id.imgLike);
         tvLikeShare = itemView.findViewById(R.id.tvLikeShare);
@@ -371,13 +377,11 @@ public class ImageHolder extends RecyclerView.ViewHolder {
         }
 
 
-
-
         isShared = item.getIsShared();
-        if(App.isSharePostfooter()){
+        if (App.isSharePostfooter()) {
             tvLikeShare.setVisibility(View.GONE);
             imagePermission.setVisibility(View.GONE);
-        }else {
+        } else {
             tvLikeShare.setVisibility(View.VISIBLE);
             imagePermission.setVisibility(View.VISIBLE);
         }
@@ -395,8 +399,8 @@ public class ImageHolder extends RecyclerView.ViewHolder {
             sharedTotalStar = Integer.parseInt(itemSharedProfile.getUserGoldStars()) + Integer.parseInt(itemSharedProfile.getUserSilverStars());
             sharedPostPermission = itemSharedProfile.getPermission();
             sharedUserProfileLike = itemSharedProfile.getUserProfileLikes();
-            sharedPostText=item.getSharedPostText();
-            sharedCategoryName=item.getCatName();
+            sharedPostText = item.getSharedPostText();
+            sharedCategoryName = item.getCatName();
             SpannableStringBuilder builder = getSpannableStringShareHeader(sharedUserProfileLike, item.getCatId(), sharedTotalStar, sharedCategoryName);
             long myMillis = Long.parseLong(sharedDateTime) * 1000;
             String postDate = Operation.getFormattedDateFromTimestamp(myMillis);
@@ -421,9 +425,9 @@ public class ImageHolder extends RecyclerView.ViewHolder {
         } else {
             containerHeaderShare.setVisibility(View.GONE);
             imagePermission.setVisibility(View.VISIBLE);
-            if(App.isSharePostfooter()){
+            if (App.isSharePostfooter()) {
                 imagePermission.setVisibility(View.GONE);
-            }else {
+            } else {
                 imagePermission.setVisibility(View.VISIBLE);
             }
         }
@@ -644,14 +648,14 @@ public class ImageHolder extends RecyclerView.ViewHolder {
         String categoryName = item.getCatName();
 
         SpannableStringBuilder builder = getSpannableStringBuilder(mContext, item.getCatId(), likes, followers, totalStars, categoryName);
-        if("1".equalsIgnoreCase(isShared)){
+        if ("1".equalsIgnoreCase(isShared)) {
             tvPostUserName.setText(String.format("%s %s", item.getUserFirstName().trim(), item.getUserLastName().trim()));
             tvShared.setVisibility(View.VISIBLE);
-            tvPostShareUserName.setText(String.format("%s %s %s", sharedFullName,"'s"," post"));
+            tvPostShareUserName.setText(String.format("%s %s %s", sharedFullName, "'s", " post"));
         } else {
             tvPostUserName.setText(String.format("%s %s", item.getUserFirstName().trim(), item.getUserLastName().trim()));
         }
-    //    tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
+        //    tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
         long myMillis = Long.parseLong(item.getDateTime()) * 1000;
         String postDate = Operation.getFormattedDateFromTimestamp(myMillis);
         tvPostTime.setText(postDate);
@@ -707,15 +711,18 @@ public class ImageHolder extends RecyclerView.ViewHolder {
                 String imageUrl = AppConstants.POST_VIDEOS_THUMBNAIL + item.getPostFiles().get(i).getImageName();
                 mediaViewHolders.get(i).getMediaVideoLayout().setVisibility(View.VISIBLE);
                 mediaViewHolders.get(i).getMediaImage().setVisibility(View.GONE);
+                int layoutPos = i;
+
                 Glide.with(App.getAppContext())
                         .load(imageUrl)
-                        .centerInside()
+                        .centerCrop()
                         .error(R.drawable.post_image_background)
                         .dontAnimate()
                         .into(mediaViewHolders.get(i).getMediaThumbnail());
+
                 Glide.with(App.getAppContext())
                         .load(imageUrl)
-                        .centerInside()
+                        .centerCrop()
                         .error(R.drawable.post_image_background)
                         .dontAnimate()
                         .into(mediaViewHolders.get(i).getMediaImage());
@@ -730,18 +737,21 @@ public class ImageHolder extends RecyclerView.ViewHolder {
                 String imageUrl = AppConstants.POST_IMAGES + item.getPostFiles().get(i).getImageName();
                 mediaViewHolders.get(i).getMediaVideoLayout().setVisibility(View.GONE);
                 mediaViewHolders.get(i).getMediaImage().setVisibility(View.VISIBLE);
+                int layoutPos = i;
+
                 Glide.with(App.getAppContext())
                         .load(imageUrl)
-                        .centerInside()
-                        .error(R.drawable.post_image_background)
-                        .dontAnimate()
-                        .into(mediaViewHolders.get(i).getMediaImage());
-                Glide.with(App.getAppContext())
-                        .load(imageUrl)
-                        .centerInside()
+                        .centerCrop()
                         .error(R.drawable.post_image_background)
                         .dontAnimate()
                         .into(mediaViewHolders.get(i).getMediaThumbnail());
+
+                Glide.with(App.getAppContext())
+                        .load(imageUrl)
+                        .centerCrop()
+                        .error(R.drawable.post_image_background)
+                        .dontAnimate()
+                        .into(mediaViewHolders.get(i).getMediaImage());
 
                 mediaViewHolders.get(i).getMediaImage().setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -897,7 +907,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
             public void onClick(View v) {
 
                 activity = (AppCompatActivity) v.getContext();
-                PostPermissionSheet reportReasonSheet = PostPermissionSheet.newInstance(item,position);
+                PostPermissionSheet reportReasonSheet = PostPermissionSheet.newInstance(item, position);
                 reportReasonSheet.show(activity.getSupportFragmentManager(), "ReportReasonSheet");
 
 
@@ -1099,7 +1109,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
                                 postLikeNumeric = Integer.parseInt(postLike);
 
                                 postLikeNumeric = postLikeNumeric <= 0 ? 0 : --postLikeNumeric;
-                                postLike=String.valueOf(postLikeNumeric);
+                                postLike = String.valueOf(postLikeNumeric);
                                 item.getPostFooter().setPostTotalLike(postLike);
                                 item.getPostFooter().setLikeUserStatus(false);
 
@@ -1159,7 +1169,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
 
                                 postLikeNumeric = Integer.parseInt(postLike);
                                 postLikeNumeric++;
-                                postLike=String.valueOf(postLikeNumeric);
+                                postLike = String.valueOf(postLikeNumeric);
                                 item.getPostFooter().setPostTotalLike(postLike);
                                 item.getPostFooter().setLikeUserStatus(true);
 
