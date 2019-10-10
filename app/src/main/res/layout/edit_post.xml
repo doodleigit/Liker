@@ -209,6 +209,7 @@
                 android:tint="@color/colorThemeBlue" />
 
             <ImageView
+                android:visibility="gone"
                 android:id="@+id/imageVideo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -218,6 +219,7 @@
                 android:tint="@color/colorThemeBlue" />
 
             <ImageView
+                android:visibility="gone"
                 android:id="@+id/imageGallery"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

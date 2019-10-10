@@ -143,6 +143,7 @@
     <orderEntry type="library" name="Gradle: com.facebook.android:facebook-share:5.8.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.theartofdev.edmodo:android-image-cropper:2.7.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.github.florent37:viewtooltip:1.1.5@aar" level="project" />
+    <orderEntry type="library" name="Gradle: pub.devrel:easypermissions:0.2.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.facebook.android:facebook-common:5.8.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.vanniktech:emoji-twitter:0.6.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.vanniktech:emoji:0.6.0@aar" level="project" />

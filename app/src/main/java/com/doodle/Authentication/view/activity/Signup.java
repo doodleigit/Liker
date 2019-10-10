@@ -185,7 +185,6 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
                 countrySpinnerList.add(new CountrySpinner(id, name));
             }
 
-
             ArrayAdapter<CountrySpinner> countryAdapter = new ArrayAdapter<>(this, R.layout.spinner_item, countrySpinnerList);
             spinnerCountry.setAdapter(countryAdapter);
 
@@ -541,7 +540,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
             @Override
             public void afterTextChanged(Editable s) {
                 /// bitForMessageSave = 1;
-                viewModel.validatePasswordField(etPassword);
+             //   viewModel.validatePasswordField(etPassword);
 
             }
         });
@@ -570,7 +569,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
 
             @Override
             public void afterTextChanged(Editable s) {
-                viewModel.validateNameField(etFirstName);
+               // viewModel.validateNameField(etFirstName);
             }
         });
 
@@ -598,7 +597,7 @@ public class Signup extends AppCompatActivity implements View.OnClickListener, R
 
             @Override
             public void afterTextChanged(Editable s) {
-                viewModel.validateNameField(etLastName);
+              //  viewModel.validateNameField(etLastName);
             }
         });
 

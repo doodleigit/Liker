@@ -319,6 +319,12 @@
     <string name="alert">Alert</string>
     <string name="no_network">No Network</string>
     <string name="enable">Enable</string>
+    <string name="camera">Take a photo</string>
+    <string name="video">Browse video</string>
+    <string name="photo">Browse photo</string>
+    <string name="video_record">Take a video </string>
+    <string name="feeling_activity_sticker">Feeling/Activity/Sticker</string>
+    <string name="read_file">This app needs access to your file storage so that it can read video.</string>
 
     <string-array name="string_array_alcohol">
         <item>Vodka</item>

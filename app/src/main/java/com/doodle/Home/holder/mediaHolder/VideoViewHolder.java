@@ -99,11 +99,12 @@ public class VideoViewHolder extends RecyclerView.ViewHolder {
 
 
         if (postVideo.isDuplicate) {
-            imageUnique.setVisibility(View.VISIBLE);
-        } else {
+          //  imageUnique.setVisibility(View.VISIBLE);
             imageDuplicate.setVisibility(View.VISIBLE);
-            imagePlayVideo.setVisibility(View.GONE);
             tvInfoGallery.setVisibility(View.VISIBLE);
+        } else {
+            imageUnique.setVisibility(View.VISIBLE);
+          //  imagePlayVideo.setVisibility(View.GONE);
         }
         tvInfoGallery.setOnClickListener(new View.OnClickListener() {
             @Override
