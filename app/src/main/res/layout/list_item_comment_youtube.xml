@@ -6,152 +6,214 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <FrameLayout
-        android:id="@+id/layout"
-        android:layout_width="wrap_content"
+    <include
+        android:id="@+id/imageCommentUser"
+        layout="@layout/post_star_user_header_image"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="15dp"
+        android:layout_marginTop="5dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/imageCommentUser"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="5dp"
-        android:layout_marginEnd="5dp"
-        android:layout_marginBottom="5dp"
         android:layout_toStartOf="@+id/imageCommentSettings"
         android:layout_toEndOf="@+id/imageCommentUser"
-        android:minHeight="35dp">
+        android:orientation="vertical">
 
         <LinearLayout
-            android:id="@+id/commentBox"
+            android:id="@+id/messageContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_5sdp"
+            android:layout_marginBottom="@dimen/_5sdp"
             android:orientation="vertical">
 
             <LinearLayout
-                android:id="@+id/youtubeHold"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:baselineAligned="false"
-                android:orientation="horizontal"
-                android:weightSum="3">
-
-                <ImageView
-                    android:id="@+id/image_post"
-                    android:layout_width="0dip"
-                    android:layout_height="100dp"
-                    android:layout_weight="1"
-                    android:contentDescription="empty"
-                    android:scaleType="centerCrop" />
-
-                <LinearLayout
-                    android:id="@+id/info_wrap"
-                    android:layout_width="0dip"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:layout_weight="2"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:id="@+id/title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:maxLines="2"
-                        android:textColor="@color/aa"
-                        android:textSize="18sp" />
-
-                    <TextView
-                        android:id="@+id/tvLinkHost"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:singleLine="true"
-                        android:textColor="@color/soft_grey_split"
-                        android:textSize="14sp" />
-
-                    <TextView
-                        android:id="@+id/tvDescription"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:ellipsize="end"
-                        android:maxLines="5"
-                        android:textSize="16sp" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_5sdp"
-                android:orientation="vertical">
-
-                <ProgressBar
-                    android:id="@+id/ProgressBar"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/_2sdp"
-                    android:indeterminate="true"
-                    android:visibility="invisible" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="5dp"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/tvCommentTime"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        tools:text="2h" />
-
-                    <ImageView
-                        android:id="@+id/imgCommentLike"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="@dimen/_10sdp"
-                        android:src="@drawable/like_normal" />
-
-                    <ImageView
-                        android:id="@+id/imageCommentLikeThumb"
-                        android:layout_width="@dimen/_15sdp"
-                        android:layout_height="@dimen/_15sdp"
-                        android:layout_marginLeft="@dimen/_10sdp"
-                        android:background="@drawable/circle_like"
-                        android:padding="@dimen/_2sdp"
-                        android:src="@drawable/ic_thumb_up_black_24dp"
-                        android:visibility="gone" />
-
-                    <TextView
-                        android:id="@+id/tvCountCommentLike"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:paddingStart="10dp"
-                        android:paddingEnd="10dp"
-                        android:textAlignment="center"
-                        android:textColor="@color/colorPrimaryDark"
-                        tools:text="1" />
-
-                    <TextView
-                        android:id="@+id/tvCommentReply"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="@dimen/_5sdp"
-                        android:text="Reply" />
-
-                </LinearLayout>
-
-            </LinearLayout>
-            <TextView
-                android:id="@+id/tvSeeReply"
-                android:padding="@dimen/_5sdp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="@color/colorPostText"
-                android:textStyle="bold"
-                tools:text="See 3 more replies"/>
+                android:layout_marginBottom="@dimen/_2sdp"
+                android:background="@drawable/rectangle_corner_round_two"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvCommentUserName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="4dp"
+                    android:paddingStart="10dp"
+                    android:paddingTop="7dp"
+                    android:paddingEnd="10dp"
+                    android:textColor="@color/colorAccent"
+                    android:textStyle="bold"
+                    tools:text="User Comment full name" />
+
+                <com.vanniktech.emoji.EmojiTextView
+                    android:id="@+id/tvCommentMessage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|center"
+                    android:paddingStart="25dp"
+                    android:paddingTop="7dp"
+                    android:paddingEnd="10dp"
+                    android:paddingBottom="7dp"
+                    android:textColor="@color/colorBlack"
+                    android:textSize="14sp"
+                    tools:text="Hellodddd" />
+
+            </LinearLayout>
+
+
         </LinearLayout>
 
-    </FrameLayout>
+        <FrameLayout
+            android:id="@+id/layout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/imageCommentUser"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_toStartOf="@+id/imageCommentSettings"
+            android:layout_toEndOf="@+id/imageCommentUser"
+            android:minHeight="35dp">
 
+            <LinearLayout
+                android:id="@+id/commentBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/youtubeHold"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:baselineAligned="false"
+                    android:orientation="horizontal"
+                    android:weightSum="3">
+
+                    <ImageView
+                        android:id="@+id/image_post"
+                        android:layout_width="0dip"
+                        android:layout_height="100dp"
+                        android:layout_weight="1"
+                        android:contentDescription="empty"
+                        android:scaleType="centerCrop" />
+
+                    <LinearLayout
+                        android:id="@+id/info_wrap"
+                        android:layout_width="0dip"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:layout_weight="2"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:maxLines="2"
+                            android:textColor="@color/aa"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/tvLinkHost"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:singleLine="true"
+                            android:textColor="@color/soft_grey_split"
+                            android:textSize="14sp" />
+
+                        <TextView
+                            android:id="@+id/tvDescription"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:ellipsize="end"
+                            android:maxLines="5"
+                            android:textSize="16sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:orientation="vertical">
+
+                    <ProgressBar
+                        android:id="@+id/ProgressBar"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/_2sdp"
+                        android:indeterminate="true"
+                        android:visibility="invisible" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="5dp"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/tvCommentTime"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            tools:text="2h" />
+
+                        <ImageView
+                            android:id="@+id/imgCommentLike"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="@dimen/_10sdp"
+                            android:src="@drawable/like_normal" />
+
+                        <ImageView
+                            android:id="@+id/imageCommentLikeThumb"
+                            android:layout_width="@dimen/_15sdp"
+                            android:layout_height="@dimen/_15sdp"
+                            android:layout_marginLeft="@dimen/_10sdp"
+                            android:background="@drawable/circle_like"
+                            android:padding="@dimen/_2sdp"
+                            android:src="@drawable/ic_thumb_up_black_24dp"
+                            android:visibility="gone" />
+
+                        <TextView
+                            android:id="@+id/tvCountCommentLike"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="10dp"
+                            android:textAlignment="center"
+                            android:textColor="@color/colorPrimaryDark"
+                            tools:text="1" />
+
+                        <TextView
+                            android:id="@+id/tvCommentReply"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="@dimen/_5sdp"
+                            android:text="Reply" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+                <TextView
+                    android:id="@+id/tvSeeReply"
+                    android:padding="@dimen/_5sdp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/colorPostText"
+                    android:textStyle="bold"
+                    tools:text="See 3 more replies"/>
+            </LinearLayout>
+
+        </FrameLayout>
+
+    </LinearLayout>
 
     <ImageView
         android:id="@+id/imageCommentSettings"
@@ -166,63 +228,6 @@
         android:textColor="@color/soft_grey_choose"
         android:textSize="12sp"
         android:tint="@android:color/black" />
-
-    <LinearLayout
-        android:id="@+id/messageContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/_5sdp"
-        android:layout_marginBottom="@dimen/_5sdp"
-        android:layout_toLeftOf="@+id/imageCommentSettings"
-        android:layout_toRightOf="@+id/imageCommentUser"
-        android:orientation="vertical">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/_2sdp"
-            android:background="@drawable/rectangle_corner_round_two"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tvCommentUserName"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="4dp"
-                android:paddingStart="10dp"
-                android:paddingTop="7dp"
-                android:paddingEnd="10dp"
-                android:textColor="@color/colorAccent"
-                android:textStyle="bold"
-                tools:text="User Comment full name" />
-
-            <com.vanniktech.emoji.EmojiTextView
-                android:id="@+id/tvCommentMessage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="start|center"
-                android:paddingStart="25dp"
-                android:paddingTop="7dp"
-                android:paddingEnd="10dp"
-                android:paddingBottom="7dp"
-                android:textColor="@color/colorBlack"
-                android:textSize="14sp"
-                tools:text="Hellodddd" />
-
-        </LinearLayout>
-
-
-    </LinearLayout>
-
-
-    <include
-        android:id="@+id/imageCommentUser"
-        layout="@layout/post_star_user_header_image"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="5dp" />
 
 
 </RelativeLayout>

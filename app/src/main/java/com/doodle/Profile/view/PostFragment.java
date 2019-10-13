@@ -58,7 +58,7 @@ public class PostFragment extends Fragment {
     public List<PostItem> postItemList;
     private ProfileService profileService;
     private PrefManager manager;
-    private String deviceId, profileUserName, token, userId, userImage;
+    private String deviceId, profileuserId, profileUserName, token, userId, userImage;
     private int cat_id, filter;
     private boolean isPublic;
     private boolean networkOk;
@@ -116,6 +116,7 @@ public class PostFragment extends Fragment {
         manager = new PrefManager(getActivity());
         deviceId = manager.getDeviceId();
         profileUserName = getArguments().getString("user_name");
+        profileuserId = getArguments().getString("user_id");
         token = manager.getToken();
         userId = manager.getProfileId();
         userImage = manager.getProfileImage();
@@ -234,7 +235,7 @@ public class PostFragment extends Fragment {
         addPostLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getContext(), WallPost.class));
+                startActivity(new Intent(getContext(), WallPost.class).putExtra("wall_user_id", profileuserId));
             }
         });
 

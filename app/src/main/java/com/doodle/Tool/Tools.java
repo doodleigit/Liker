@@ -9,6 +9,7 @@ import android.content.pm.ResolveInfo;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.media.AudioManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -17,6 +18,7 @@ import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.os.Handler;
+import android.provider.Settings;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Spannable;
@@ -406,7 +408,7 @@ public class Tools {
     public static SpannableStringBuilder getSpannableStringBuilder(Context context, String catId, String likes, String followers, int totalStars, String categoryName) {
 
 
-        String headerInfo = String.format("%s Likes | %d Stars | %s Followers | %s", likes, totalStars, followers,"");
+        String headerInfo = String.format("%s Likes | %d Stars | %s Followers | %s", likes, totalStars, followers, "");
 
         SpannableStringBuilder builder = new SpannableStringBuilder();
         SpannableString spannableUserStr = new SpannableString(headerInfo);
@@ -417,6 +419,7 @@ public class Tools {
             public void onClick(View textView) {
                 context.sendBroadcast((new Intent().putExtra("category_id", catId)).setAction(AppConstants.POST_FILTER_CAT_BROADCAST));
             }
+
             @Override
             public void updateDrawState(TextPaint ds) {
                 super.updateDrawState(ds);
@@ -431,23 +434,24 @@ public class Tools {
 
     }
 
-    public static SpannableStringBuilder getWallSpannableStringBuilder(Context context, String postUserFullName, String postUserId,String postUserName, String postWalFullName, String postWallUserId,String postWallUserName) {
+    public static SpannableStringBuilder getWallSpannableStringBuilder(Context context, String postUserFullName, String postUserId, String postUserName, String postWalFullName, String postWallUserId, String postWallUserName) {
 
 
-      //  String headerInfo = String.format("%s Likes | %d Stars | %s Followers | %s", likes, totalStars, followers,"");
-     //   String userName= String.format("Azharul Islam ");
+        //  String headerInfo = String.format("%s Likes | %d Stars | %s Followers | %s", likes, totalStars, followers,"");
+        //   String userName= String.format("Azharul Islam ");
 
-        String wallInfo=" "+" posted on ";
+        String wallInfo = " " + " posted on ";
 
         SpannableStringBuilder builder = new SpannableStringBuilder();
-        SpannableString spannableUser=new SpannableString(postUserFullName);
+        SpannableString spannableUser = new SpannableString(postUserFullName);
 
-                ClickableSpan clickableSpanUser = new ClickableSpan() {
+        ClickableSpan clickableSpanUser = new ClickableSpan() {
             @Override
             public void onClick(View textView) {
 
                 context.startActivity(new Intent(context, ProfileActivity.class).putExtra("user_id", postUserId).putExtra("user_name", postUserName));
             }
+
             @Override
             public void updateDrawState(TextPaint ds) {
                 super.updateDrawState(ds);
@@ -472,6 +476,7 @@ public class Tools {
 
                 context.startActivity(new Intent(context, ProfileActivity.class).putExtra("user_id", postWallUserId).putExtra("user_name", postWallUserName));
             }
+
             @Override
             public void updateDrawState(TextPaint ds) {
                 super.updateDrawState(ds);
@@ -484,8 +489,8 @@ public class Tools {
         spannableWallUser.setSpan(foregroundColorSpan2, 0, postWalFullName.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
         builder.append(spannableWallUser);
 
-        String wallSuffix= String.format("'s wall");
-        SpannableString spannableWallSuffix=new SpannableString(wallSuffix);
+        String wallSuffix = String.format("'s wall");
+        SpannableString spannableWallSuffix = new SpannableString(wallSuffix);
         builder.append(spannableWallSuffix);
 
 
@@ -494,11 +499,9 @@ public class Tools {
     }
 
 
-
-
     public static SpannableStringBuilder getSpannableStringShareHeader(String likes, String followers, int totalStars, String categoryName) {
 
-        String headerInfo = String.format("%s Likes | %d Stars | %s", likes, totalStars,"");
+        String headerInfo = String.format("%s Likes | %d Stars | %s", likes, totalStars, "");
 
         SpannableStringBuilder builder = new SpannableStringBuilder();
         SpannableString spannableUserStr = new SpannableString(headerInfo);
@@ -1083,11 +1086,19 @@ public class Tools {
         return new int[]{imageWidth, imageHeight};
     }
 
-    public static void setMargins (View view, int left, int top, int right, int bottom) {
+    public static void setMargins(View view, int left, int top, int right, int bottom) {
         if (view.getLayoutParams() instanceof ViewGroup.MarginLayoutParams) {
             ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) view.getLayoutParams();
             p.setMargins(left, top, right, bottom);
             view.requestLayout();
         }
     }
+
+    public static boolean checkNormalModeIsOn(Context context) {
+        boolean status;
+        AudioManager am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+        status = am.getRingerMode() == AudioManager.RINGER_MODE_NORMAL;
+        return status;
+    }
+
 }

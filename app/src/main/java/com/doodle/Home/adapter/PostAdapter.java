@@ -27,7 +27,7 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     final int VIEW_TYPE_TEXT_IMAGE = 2;
     final int VIEW_TYPE_TEXT_LINK_SCRIPT = 3;
     final int VIEW_TYPE_TEXT_LINK_SCRIPT_YOUTUBE = 4;
-    final int VIEW_TYPE_VIDEO = 5;
+//    final int VIEW_TYPE_VIDEO = 5;
     final int VIEW_TYPE_TEX_MIM = 6;
 
     private List<PostItem> postItems;
@@ -93,10 +93,10 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_post_link_script_youtube, parent, false);
             return new LinkScriptYoutubeHolder(view, mContext, YoutubeListener);
         }
-        if (viewType == VIEW_TYPE_VIDEO) {
-            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_post_video, parent, false);
-            return new VideoHolder(view, mContext, videoListener);
-        }
+//        if (viewType == VIEW_TYPE_VIDEO) {
+//            view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_post_video, parent, false);
+//            return new VideoHolder(view, mContext, videoListener);
+//        }
 
         return null;
     }
@@ -127,10 +127,10 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             ImageHolder vh = (ImageHolder) viewHolder;
             vh.setItem(postItems.get(position), position, viewHolder);
         }
-        if (viewHolder instanceof VideoHolder) {
-            VideoHolder vh = (VideoHolder) viewHolder;
-            vh.setItem(postItems.get(position), position);
-        }
+//        if (viewHolder instanceof VideoHolder) {
+//            VideoHolder vh = (VideoHolder) viewHolder;
+//            vh.setItem(postItems.get(position), position);
+//        }
 
     }
 
@@ -162,8 +162,8 @@ public class PostAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 return VIEW_TYPE_TEXT_LINK_SCRIPT;
             case 4:
                 return VIEW_TYPE_TEXT_LINK_SCRIPT_YOUTUBE;
-            case 5:
-                return VIEW_TYPE_VIDEO;
+//            case 5:
+//                return VIEW_TYPE_VIDEO;
             default:
                 return -1;
         }

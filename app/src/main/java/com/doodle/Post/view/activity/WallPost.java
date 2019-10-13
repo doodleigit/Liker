@@ -457,9 +457,9 @@ public class WallPost extends AppCompatActivity implements View.OnClickListener,
         MimAdapter adapter = new MimAdapter(this, viewColors, listener);
         mimRecyclerView.setAdapter(adapter);
 
+        toUserId = getIntent().getStringExtra("wall_user_id");
         profileId = manager.getProfileId();
         userIds = manager.getProfileId();
-        toUserId = manager.getProfileId();
         deviceId = manager.getDeviceId();
         token = manager.getToken();
 
@@ -1337,7 +1337,7 @@ public class WallPost extends AppCompatActivity implements View.OnClickListener,
                                 }*/
 //                                    startActivity(new Intent(WallPost.this, Home.class));
                                     finish();
-                                  //  sendBroadcast((new Intent()).setAction(AppConstants.NEW_POST_ADD_BROADCAST));
+                                    sendBroadcast((new Intent()).setAction(AppConstants.NEW_POST_ADD_BROADCAST));
                                 }
 
                             }
@@ -2648,7 +2648,7 @@ public class WallPost extends AppCompatActivity implements View.OnClickListener,
     }
 
 
-    /**
+     /**
      * Change the current image in image set
      */
     private void changeImage(Button previousButton, Button forwardButton,
