@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.TextView;
 
+import com.doodle.Authentication.model.UserInfo;
 import com.doodle.App;
 import com.doodle.Home.adapter.PostAdapter;
 import com.doodle.Home.model.PostItem;
@@ -40,6 +41,7 @@ import com.doodle.Tool.PrefManager;
 import com.doodle.Tool.Tools;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
+import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -107,6 +109,10 @@ public class BreakingPost extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        IntentFilter commonIntentFilter = new IntentFilter();
+        commonIntentFilter.addAction(AppConstants.COMMON_CHANGE_BROADCAST);
+        Objects.requireNonNull(getActivity()).registerReceiver(commonReceiver, commonIntentFilter);
 
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(AppConstants.CATEGORY_CHANGE_BROADCAST);
@@ -234,7 +240,7 @@ public class BreakingPost extends Fragment {
             }
         };
 
-        App.setSharePostfooter(false);
+//        App.setSharePostfooter(false);
         adapter = new PostAdapter(getActivity(), postItemList, mCallback, mimListener, videoListener, youtubeListener, linkListener, imageListener, true);
         recyclerView.setMediaObjects(postItemList);
         recyclerView.setActivityContext(getActivity());
@@ -270,8 +276,6 @@ public class BreakingPost extends Fragment {
 
 
     public void sendDeletePostRequest(Call<String> call) {
-
-
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
@@ -306,8 +310,6 @@ public class BreakingPost extends Fragment {
             }
 
         });
-
-
     }
 
     private void getData() {
@@ -390,6 +392,7 @@ public class BreakingPost extends Fragment {
                 List<PostItem> itemList = response.body();
                 if (itemList != null) {
                     postItemList.clear();
+                    checkLearnAboutSiteStatus();
                     postItemList.addAll(itemList);
 
                     String totalPostIDs;
@@ -429,6 +432,19 @@ public class BreakingPost extends Fragment {
             }
         });
 
+    }
+
+    private void checkLearnAboutSiteStatus() {
+        Gson gson = new Gson();
+        String json = manager.getUserInfo();
+        UserInfo userInfo = gson.fromJson(json, UserInfo.class);
+        if (userInfo.getLearnAboutSite().equals("0")) {
+            PostItem postItem = new PostItem();
+            postItem.setPostId("");
+            postItem.setHasMeme("0");
+            postItem.setPostType("0");
+            postItemList.add(postItem);
+        }
     }
 
     private void onPostResponse() {
@@ -508,6 +524,21 @@ public class BreakingPost extends Fragment {
         }*/
     }
 
+    BroadcastReceiver commonReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String type = intent.getStringExtra("type");
+            if (type.equals("0")) {
+                if (postItemList.size() > 0) {
+                    if (postItemList.get(0).getPostType().equals("0")) {
+                        postItemList.remove(0);
+                        adapter.notifyDataSetChanged();
+                    }
+                }
+            }
+        }
+    };
+
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -583,6 +614,7 @@ public class BreakingPost extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         recyclerView.releasePlayer();
+        Objects.requireNonNull(getActivity()).unregisterReceiver(commonReceiver);
         Objects.requireNonNull(getActivity()).unregisterReceiver(broadcastReceiver);
         Objects.requireNonNull(getActivity()).unregisterReceiver(postChangeBroadcast);
         Objects.requireNonNull(getActivity()).unregisterReceiver(permissionBroadcast);

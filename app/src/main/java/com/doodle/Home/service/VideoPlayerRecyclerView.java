@@ -621,6 +621,7 @@ public class VideoPlayerRecyclerView extends RecyclerView {
     }
 
     private void showLikeTooltip(ImageView imageView) {
+        scrollToPosition(1);
         new MaterialShowcaseView.Builder(activityContext)
                 .setTarget(imageView)
                 .setDismissText(context.getString(R.string.ok_i_got_it))

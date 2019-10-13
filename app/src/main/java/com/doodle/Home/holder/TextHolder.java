@@ -397,6 +397,11 @@ public class TextHolder extends RecyclerView.ViewHolder {
             tvShareHeaderInfo.setText(builder);
             tvSharePostTime.setText(postDate);
             tvSharePostContent.setText(sharedPostText);
+            if (sharedPostText == null || sharedPostText.isEmpty()) {
+                tvSharePostContent.setVisibility(View.GONE);
+            } else {
+                tvSharePostContent.setVisibility(View.VISIBLE);
+            }
 
             switch (sharedPostPermission) {
                 case "0":
@@ -418,7 +423,11 @@ public class TextHolder extends RecyclerView.ViewHolder {
             } else {
                 imagePermission.setVisibility(View.VISIBLE);
             }
-
+            if (sharedPostText == null || sharedPostText.isEmpty()) {
+                tvSharePostContent.setVisibility(View.GONE);
+            } else {
+                tvSharePostContent.setVisibility(View.VISIBLE);
+            }
         }
 
 
@@ -1250,7 +1259,8 @@ public class TextHolder extends RecyclerView.ViewHolder {
                             JSONObject object = new JSONObject(response.body());
                             String status = object.getString("status");
                             if ("true".equalsIgnoreCase(status)) {
-                                player.start();
+                                if (Tools.checkNormalModeIsOn(mContext))
+                                    player.start();
                                 Call<String> mCall = webService.sendBrowserNotification(
                                         deviceId,//"8b64708fa409da20341b1a555d1ddee526444",
                                         profileId,//"26444",

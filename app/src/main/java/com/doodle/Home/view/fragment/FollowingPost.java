@@ -22,6 +22,7 @@ import android.widget.AbsListView;
 import android.widget.TextView;
 
 import com.doodle.App;
+import com.doodle.Authentication.model.UserInfo;
 import com.doodle.Home.adapter.PostAdapter;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Home.service.HomeService;
@@ -40,6 +41,7 @@ import com.doodle.Tool.PrefManager;
 import com.doodle.Tool.Tools;
 import com.facebook.shimmer.ShimmerFrameLayout;
 import com.github.rahatarmanahmed.cpv.CircularProgressView;
+import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -105,6 +107,10 @@ public class FollowingPost extends Fragment   {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        IntentFilter commonIntentFilter = new IntentFilter();
+        commonIntentFilter.addAction(AppConstants.COMMON_CHANGE_BROADCAST);
+        Objects.requireNonNull(getActivity()).registerReceiver(commonReceiver, commonIntentFilter);
+
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(AppConstants.CATEGORY_CHANGE_BROADCAST);
         Objects.requireNonNull(getActivity()).registerReceiver(broadcastReceiver, intentFilter);
@@ -113,12 +119,9 @@ public class FollowingPost extends Fragment   {
         postFooterIntentFilter.addAction(AppConstants.POST_CHANGE_BROADCAST);
         Objects.requireNonNull(getActivity()).registerReceiver(postFooterChangeBroadcast, postFooterIntentFilter);
 
-
-
         IntentFilter permissionIntent = new IntentFilter();
         permissionIntent.addAction(AppConstants.PERMISSION_CHANGE_BROADCAST);
         Objects.requireNonNull(getActivity()).registerReceiver(permissionBroadcast, permissionIntent);
-
 
         manager = new PrefManager(getActivity());
         deviceId = manager.getDeviceId();
@@ -388,6 +391,7 @@ public class FollowingPost extends Fragment   {
                 List<PostItem> itemList = response.body();
                 if (itemList != null) {
                     postItemList.clear();
+                    checkLearnAboutSiteStatus();
                     postItemList.addAll(itemList);
 
                     String totalPostIDs;
@@ -451,6 +455,18 @@ public class FollowingPost extends Fragment   {
 
     }
 
+    private void checkLearnAboutSiteStatus() {
+        Gson gson = new Gson();
+        String json = manager.getUserInfo();
+        UserInfo userInfo = gson.fromJson(json, UserInfo.class);
+        if (userInfo.getLearnAboutSite().equals("0")) {
+            PostItem postItem = new PostItem();
+            postItem.setPostId("");
+            postItem.setHasMeme("0");
+            postItem.setPostType("0");
+            postItemList.add(postItem);
+        }
+    }
 
     private void onPostResponse() {
         shimmerFrameLayout.stopShimmer();
@@ -523,6 +539,21 @@ public class FollowingPost extends Fragment   {
         }
     }
 
+    BroadcastReceiver commonReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String type = intent.getStringExtra("type");
+            if (type.equals("0")) {
+                if (postItemList.size() > 0) {
+                    if (postItemList.get(0).getPostType().equals("0")) {
+                        postItemList.remove(0);
+                        adapter.notifyDataSetChanged();
+                    }
+                }
+            }
+        }
+    };
+
     BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -569,6 +600,7 @@ public class FollowingPost extends Fragment   {
     public void onDestroy() {
         super.onDestroy();
         recyclerView.releasePlayer();
+        Objects.requireNonNull(getActivity()).unregisterReceiver(commonReceiver);
         Objects.requireNonNull(getActivity()).unregisterReceiver(broadcastReceiver);
         Objects.requireNonNull(getActivity()).unregisterReceiver(postFooterChangeBroadcast);
         Objects.requireNonNull(getActivity()).unregisterReceiver(permissionBroadcast);

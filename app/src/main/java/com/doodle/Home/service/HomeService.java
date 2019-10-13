@@ -318,4 +318,13 @@ public interface HomeService {
             @Field("user_id") String userIds
     );
 
+    @POST(AppConstants.HOW_LIKER_WORK)
+    @FormUrlEncoded
+    Call<String> setHowLikerWork(
+            @Header("Device-Id") String deviceId,
+            @Header("Security-Token") String token,
+            @Header("User-Id") String userId,
+            @Field("user_id") String userIds
+    );
+
 }

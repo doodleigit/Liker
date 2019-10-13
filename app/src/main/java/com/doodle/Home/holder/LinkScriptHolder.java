@@ -58,6 +58,7 @@ import com.doodle.Home.view.fragment.LikerUserListFragment;
 import com.doodle.Home.view.fragment.PostPermissionSheet;
 import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.R;
+import com.doodle.Setting.view.SettingActivity;
 import com.doodle.Tool.AppConstants;
 import com.doodle.Tool.NetworkHelper;
 import com.doodle.Tool.Operation;
@@ -343,6 +344,11 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
             tvShareHeaderInfo.setText(builder);
             tvSharePostTime.setText(postDate);
             tvSharePostContent.setText(sharedPostText);
+            if (sharedPostText == null || sharedPostText.isEmpty()) {
+                tvSharePostContent.setVisibility(View.GONE);
+            } else {
+                tvSharePostContent.setVisibility(View.VISIBLE);
+            }
 
             switch (sharedPostPermission) {
                 case "0":
@@ -363,6 +369,11 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
                 imagePermission.setVisibility(View.GONE);
             }else {
                 imagePermission.setVisibility(View.VISIBLE);
+            }
+            if (sharedPostText == null || sharedPostText.isEmpty()) {
+                tvSharePostContent.setVisibility(View.GONE);
+            } else {
+                tvSharePostContent.setVisibility(View.VISIBLE);
             }
         }
 
@@ -725,14 +736,16 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
                 String pattern = "https?:\\/\\/(?:[0-9A-Z-]+\\.)?(?:youtu\\.be\\/|youtube\\.com\\S*[^\\w\\-\\s])([\\w\\-]{11})(?=[^\\w\\-]|$)(?![?=&+%\\w]*(?:['\"][^<>]*>|<\\/a>))[?=&+%\\w]*";
                 if (!item.getPostLinkUrl().isEmpty() && item.getPostLinkUrl().matches(pattern)) {
                     /// Valid youtube URL
-                    Intent browserIntents = new Intent(Intent.ACTION_VIEW, Uri.parse(item.getPostLinkUrl()));
-                    browserIntents.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    App.getAppContext().startActivity(browserIntents);
+//                    Intent browserIntents = new Intent(Intent.ACTION_VIEW, Uri.parse(item.getPostLinkUrl()));
+//                    browserIntents.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                    App.getAppContext().startActivity(browserIntents);
+                    webLink(item.getPostLinkTitle(), item.getPostLinkUrl());
                 } else {
                     // Not Valid youtube URL
-                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(item.getPostLinkUrl()));
-                    browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    App.getAppContext().startActivity(browserIntent);
+//                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(item.getPostLinkUrl()));
+//                    browserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                    App.getAppContext().startActivity(browserIntent);
+                    webLink(item.getPostLinkTitle(), item.getPostLinkUrl());
                 }
 
             }
@@ -1024,6 +1037,13 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
         });
     }
 
+    private void webLink(String type, String link) {
+        Intent termsIntent = new Intent(mContext, SettingActivity.class);
+        termsIntent.putExtra("type", type);
+        termsIntent.putExtra("link", link);
+        mContext.startActivity(termsIntent);
+    }
+
     private void sendPostUnLikeRequest(Call<String> call) {
 
         call.enqueue(new Callback<String>() {
@@ -1084,7 +1104,8 @@ public class LinkScriptHolder extends RecyclerView.ViewHolder {
                             JSONObject object = new JSONObject(response.body());
                             String status = object.getString("status");
                             if ("true".equalsIgnoreCase(status)) {
-                                player.start();
+                                if (Tools.checkNormalModeIsOn(mContext))
+                                    player.start();
                                 Call<String> mCall = webService.sendBrowserNotification(
                                         deviceId,//"8b64708fa409da20341b1a555d1ddee526444",
                                         profileId,//"26444",

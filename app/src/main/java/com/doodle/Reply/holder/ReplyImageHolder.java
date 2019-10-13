@@ -668,7 +668,8 @@ public class ReplyImageHolder extends RecyclerView.ViewHolder {
                             if (isContain(object, "status")) {
                                 String status = object.getString("status");
                                 if ("true".equalsIgnoreCase(status)) {
-                                    player.start();
+                                    if (Tools.checkNormalModeIsOn(mContext))
+                                        player.start();
                                     Call<String> mCall = webService.sendBrowserNotification(
                                             deviceId,//"8b64708fa409da20341b1a555d1ddee526444",
                                             profileId,//"26444",

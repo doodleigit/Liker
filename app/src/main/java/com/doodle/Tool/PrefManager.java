@@ -2,6 +2,7 @@ package com.doodle.Tool;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.DisplayMetrics;
 
 
 /**
@@ -23,6 +24,7 @@ public class PrefManager {
     private static final String IS_SECOND_TIME_LAUNCH = "IsSecondTimeLaunch";
     private static final String IS_VALIDATE_FIELD = "IsValidateField";
 
+    private static final String DEVICE_WIDTH = "device_width";
     private static final String DEVICE_ID = "device_id";
     private static final String OAUTH_TOKEN = "oauth_token";
     private static final String FB_FIRST_NAME = "first_name";
@@ -60,6 +62,11 @@ public class PrefManager {
         pref = _context.getSharedPreferences(PREF_NAME, PRIVATE_MODE);
         introPref = _context.getSharedPreferences(INTRO_PREF_NAME, PRIVATE_MODE);
         editor = pref.edit();
+    }
+
+    public void setDeviceWidth(int deviceWidth) {
+        editor.putInt(DEVICE_WIDTH, deviceWidth);
+        editor.apply();
     }
 
     public void setFirstTimeLaunch(boolean isFirstTime) {
@@ -122,6 +129,9 @@ public class PrefManager {
         return pref.getBoolean(IS_SECOND_TIME_LAUNCH, false);
     }
 
+    public int getDeviceWidth() {
+        return pref.getInt(DEVICE_WIDTH, 450);
+    }
 
     public boolean getSwitchStatus(String keyValue, boolean defaultValue) {
         return pref.getBoolean(keyValue, defaultValue);
