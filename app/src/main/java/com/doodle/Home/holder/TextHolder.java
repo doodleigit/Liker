@@ -289,7 +289,6 @@ public class TextHolder extends RecyclerView.ViewHolder {
         imageCommentLikeThumb.setVisibility(View.GONE);
         tvCountCommentLike.setVisibility(View.GONE);
 
-
         //All comment post
         commentService = CommentService.mRetrofit.create(CommentService.class);
         networkOk = NetworkHelper.hasNetworkAccess(mContext);

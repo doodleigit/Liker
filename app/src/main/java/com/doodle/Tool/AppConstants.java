@@ -16,28 +16,28 @@ public class AppConstants {
 //    public static final String BASE_URL_LOCATION = "http://192.168.0.6:8040/sites/likerapp/";
     //==========================STG SERVER=====================
 
-    public static final String BASE_URL = "https://www.stg.liker.com/";
-    public static final String BASE_URL_MEDIA = "https://www.cdn-liker.com/";
-    public static final String BASE_URL_IMAGES = "https://www.cdn-liker.com/";
-    public static final String SOCKET_WEB = "https://node.liker.com:7803";
-    public static final String SOCKET_MESSAGE = "https://node.liker.com:7804";
-    public static final String SOCKET_VIDEO = "https://node.liker.com:7807";
-    public static final String FACEBOOK_SHARE = "https://www.stg.liker.com/public/posts/";
-    public static final String LINK_IMAGES = "https://www.cdn-liker.com/uploads/link_images/";
-    public static final String FACEBOOK_INVITATION = "https://www.d.liker.com/settings/fbinvite/";
-    public static final String BASE_URL_LOCATION = "https://www.stg.liker.com/";
+//    public static final String BASE_URL = "https://www.stg.liker.com/";
+//    public static final String BASE_URL_MEDIA = "https://www.cdn-liker.com/";
+//    public static final String BASE_URL_IMAGES = "https://www.cdn-liker.com/";
+//    public static final String SOCKET_WEB = "https://node.liker.com:7803";
+//    public static final String SOCKET_MESSAGE = "https://node.liker.com:7804";
+//    public static final String SOCKET_VIDEO = "https://node.liker.com:7807";
+//    public static final String FACEBOOK_SHARE = "https://www.stg.liker.com/public/posts/";
+//    public static final String LINK_IMAGES = "https://www.cdn-liker.com/uploads/link_images/";
+//    public static final String FACEBOOK_INVITATION = "https://www.d.liker.com/settings/fbinvite/";
+//    public static final String BASE_URL_LOCATION = "https://www.stg.liker.com/";
 
     //=======================LIVE SERVER=============================
-//        public static final String BASE_URL = "https://www.api.liker.com/";
-//        public static final String BASE_URL_MEDIA = "https://www.cdn-liker.com/";
-//    public static final String BASE_URL_IMAGES = "https://www.cdn-liker.com/";
-//    public static final String SOCKET_WEB = "https://node.liker.com:7800";
-//    public static final String SOCKET_MESSAGE = "https://node.liker.com:7801";
-//    public static final String SOCKET_VIDEO = "https://node.liker.com:7806";
-//    public static final String FACEBOOK_SHARE = "https://www.api.liker.com/public/posts/";
-//    public static final String LINK_IMAGES = "https://www.cdn-liker.com/uploads/link_images/";
-//    public static final String FACEBOOK_INVITATION = "https://www.liker.com/settings/fbinvite/";
-//    public static final String BASE_URL_LOCATION = "https://www.api.liker.com/";
+    public static final String BASE_URL = "https://www.api.liker.com/";
+    public static final String BASE_URL_MEDIA = "https://www.cdn-liker.com/";
+    public static final String BASE_URL_IMAGES = "https://www.cdn-liker.com/";
+    public static final String SOCKET_WEB = "https://node.liker.com:7800";
+    public static final String SOCKET_MESSAGE = "https://node.liker.com:7801";
+    public static final String SOCKET_VIDEO = "https://node.liker.com:7806";
+    public static final String FACEBOOK_SHARE = "https://www.api.liker.com/public/posts/";
+    public static final String LINK_IMAGES = "https://www.cdn-liker.com/uploads/link_images/";
+    public static final String FACEBOOK_INVITATION = "https://www.liker.com/settings/fbinvite/";
+    public static final String BASE_URL_LOCATION = "https://www.api.liker.com/";
 
     public static final String API_KEY = "cd662c2e9b2e49fc9d4d763089597ea8";
     public static final String NEWS_FEED = "top-headlines?country=us&apiKey=" + API_KEY;
@@ -104,10 +104,10 @@ public class AppConstants {
     public static final String EDIT_COMMENT_REPLY = "edit_comment_reply";
     public static final String DELETE_POST_COMMENT = "delete_postcomment";
     public static final String DELETE_COMMENT_REPLY = "delete_comment_reply";
-    public static final String COMMENT_LIKE= "comment_like";
-    public static final String LIKE_COMMENT_REPLY= "like_comment_reply";
-    public static final String COMMENT_UNLIKE= "comment_unlike";
-    public static final String UNLIKE_COMMENT_REPLY= "unlike_comment_reply";
+    public static final String COMMENT_LIKE = "comment_like";
+    public static final String LIKE_COMMENT_REPLY = "like_comment_reply";
+    public static final String COMMENT_UNLIKE = "comment_unlike";
+    public static final String UNLIKE_COMMENT_REPLY = "unlike_comment_reply";
     public static final String GET_REPORT_REASON = "get_report_reason";
     public static final String REPORT_USER = "reportUser";
     public static final String UN_FOLLOW = "unfollow";
