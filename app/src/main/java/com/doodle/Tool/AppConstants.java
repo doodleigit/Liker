@@ -27,6 +27,12 @@ public class AppConstants {
 //    public static final String FACEBOOK_INVITATION = "https://www.d.liker.com/settings/fbinvite/";
 //    public static final String BASE_URL_LOCATION = "https://www.stg.liker.com/";
 
+//    $config['server_link_recent_activity'] = 'https://node.liker.com:7799';
+//    $config['server_link_web_notificaton'] = 'https://node.liker.com:7800';
+//    $config['server_link_message'] = 'https://node.liker.com:7801';
+//    $config['video_upload_url'] = 'https://node.liker.com:7806/upload';
+//    $config['video_upload_cdn'] = 'https://node.liker.com:7806/upload';
+
     //=======================LIVE SERVER=============================
     public static final String BASE_URL = "https://www.api.liker.com/";
     public static final String BASE_URL_MEDIA = "https://www.cdn-liker.com/";
