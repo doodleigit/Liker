@@ -750,7 +750,9 @@ public class ImageHolder extends RecyclerView.ViewHolder {
                 mediaViewHolders.get(i).getMediaVideoLayout().setVisibility(View.VISIBLE);
                 mediaViewHolders.get(i).getMediaImage().setVisibility(View.GONE);
                 if (item.getFrameNumber() == 1) {
-                    int[] dimension = Tools.getImageDimension(manager.getDeviceWidth(), Integer.parseInt(item.getPostFiles().get(i).getWidth()), Integer.parseInt(item.getPostFiles().get(i).getHeight()));
+                    int[] dimension = Tools.getImageDimension(manager.getDeviceWidth(), Float.parseFloat(item.getPostFiles().get(i).getWidth()), Float.parseFloat(item.getPostFiles().get(i).getHeight()));
+                    mediaViewHolders.get(i).getMediaVideoLayout().getLayoutParams().width = dimension[0];
+                    mediaViewHolders.get(i).getMediaVideoLayout().getLayoutParams().height = dimension[1];
                     Picasso.with(App.getAppContext())
                             .load(imageUrl)
                             .error(R.drawable.post_image_background)
@@ -779,7 +781,7 @@ public class ImageHolder extends RecyclerView.ViewHolder {
                 mediaViewHolders.get(i).getMediaVideoLayout().setVisibility(View.GONE);
                 mediaViewHolders.get(i).getMediaImage().setVisibility(View.VISIBLE);
                 if (item.getFrameNumber() == 1) {
-                    int[] dimension = Tools.getImageDimension(manager.getDeviceWidth(), Integer.parseInt(item.getPostFiles().get(i).getWidth()), Integer.parseInt(item.getPostFiles().get(i).getHeight()));
+                    int[] dimension = Tools.getImageDimension(manager.getDeviceWidth(), Float.parseFloat(item.getPostFiles().get(i).getWidth()), Float.parseFloat(item.getPostFiles().get(i).getHeight()));
                     Picasso.with(App.getAppContext())
                             .load(imageUrl)
                             .error(R.drawable.post_image_background)

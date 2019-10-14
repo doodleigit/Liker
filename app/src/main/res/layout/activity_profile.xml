@@ -235,11 +235,13 @@
 
                             <de.hdodenhof.circleimageview.CircleImageView
                                 android:id="@+id/change_profile_image"
-                                android:layout_width="25dp"
-                                android:layout_height="25dp"
+                                android:layout_width="30dp"
+                                android:layout_height="30dp"
+                                android:padding="5dp"
                                 android:layout_alignEnd="@+id/profile_image"
                                 android:layout_alignBottom="@+id/profile_image"
-                                android:src="@drawable/camera" />
+                                android:src="@drawable/camera"
+                                android:background="@drawable/round_one"/>
 
                         </RelativeLayout>
 

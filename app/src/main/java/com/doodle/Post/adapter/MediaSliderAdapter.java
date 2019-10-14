@@ -110,8 +110,10 @@ public class MediaSliderAdapter extends PagerAdapter {
     public void pauseVideo(int position) {
         for (int i = 0; i < videoViews.size(); i++) {
             if (videoViews.get(i) != null) {
-                if (position != i) {
-                    videoViews.get(i).getPlayer().setPlayWhenReady(false);
+                if (videoViews.get(i).getPlayer() != null) {
+                    if (position != i) {
+                        videoViews.get(i).getPlayer().setPlayWhenReady(false);
+                    }
                 }
             }
         }

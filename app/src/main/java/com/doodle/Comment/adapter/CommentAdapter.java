@@ -36,12 +36,14 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private CommentTextHolder.CommentListener commentListener;
     private CommentYoutubeHolder.CommentListener commentYoutubeListener;
     private CommentImageHolder.CommentListener commentImageListener;
+    private boolean isCommentMode;
 
     public CommentAdapter(Context context, List<Comment_> comment_list, PostItem postItem,
                           CommentTextHolder.CommentListener commentListener,
                           CommentLinkScriptHolder.CommentListener commentLinkListener,
                           CommentYoutubeHolder.CommentListener commentYoutubeListener,
-                          CommentImageHolder.CommentListener commentImageListener
+                          CommentImageHolder.CommentListener commentImageListener,
+                          boolean isCommentMode
 
     ) {
         this.mContext = context;
@@ -51,6 +53,7 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         this.commentLinkListener = commentLinkListener;
         this.commentYoutubeListener = commentYoutubeListener;
         this.commentImageListener = commentImageListener;
+        this.isCommentMode = isCommentMode;
 //        if (comment_list != null && !comment_list.isEmpty()) {
 //            size = comment_list.size();
 //        }
@@ -62,25 +65,25 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         View view;
         if (viewType == VIEW_TYPE_TEXT) {
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_comment_text, parent, false);
-            return new CommentTextHolder(view, mContext, commentListener);
+            return new CommentTextHolder(view, mContext, commentListener, isCommentMode);
         }
 
 
         if (viewType == VIEW_TYPE_TEXT_IMAGE) {
 
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_comment_image, parent, false);
-            return new CommentImageHolder(view, mContext,commentImageListener);
+            return new CommentImageHolder(view, mContext,commentImageListener, isCommentMode);
         }
         if (viewType == VIEW_TYPE_TEXT_LINK_SCRIPT) {
 
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_comment_linkscript, parent, false);
-            return new CommentLinkScriptHolder(view, mContext, commentLinkListener);
+            return new CommentLinkScriptHolder(view, mContext, commentLinkListener, isCommentMode);
         }
 
         if (viewType == VIEW_TYPE_TEXT_LINK_SCRIPT_YOUTUBE) {
 
             view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item_comment_youtube, parent, false);
-            return new CommentYoutubeHolder(view, mContext, commentYoutubeListener);
+            return new CommentYoutubeHolder(view, mContext, commentYoutubeListener, isCommentMode);
         }
 
         return null;

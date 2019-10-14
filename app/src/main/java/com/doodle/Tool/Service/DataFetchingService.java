@@ -190,7 +190,7 @@ public class DataFetchingService extends Service {
                     sendBroadcast((new Intent().putExtra("new_message", (Parcelable) newMessage).putExtra("type", 0)).setAction(AppConstants.NEW_MESSAGE_BROADCAST_FROM_HOME));
                 } catch (JSONException e) {
                     e.printStackTrace();
-                }
+                } catch (NullPointerException ignored) {}
                 if (!IN_CHAT_MODE)
                     sendBroadcast((new Intent().putExtra("type", "1")).setAction(AppConstants.NEW_NOTIFICATION_BROADCAST));
             }
@@ -233,7 +233,7 @@ public class DataFetchingService extends Service {
                     sendBroadcast((new Intent().putExtra("new_message", (Parcelable) newMessage).putExtra("type", 1)).setAction(AppConstants.NEW_MESSAGE_BROADCAST_FROM_HOME));
                 } catch (JSONException e) {
                     e.printStackTrace();
-                }
+                } catch (NullPointerException ignored) {}
             }
         });
     }

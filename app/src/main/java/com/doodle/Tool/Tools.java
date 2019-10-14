@@ -1079,11 +1079,12 @@ public class Tools {
         return jsonObject != null && jsonObject.has(key) && !jsonObject.isNull(key) ? true : false;
     }
 
-    public static int[] getImageDimension(int displayWidth, int imageWidth, int imageHeight) {
+    public static int[] getImageDimension(int displayWidth, float imageWidth, float imageHeight) {
+        int newImageWidth, newImageHeight;
         float ratio = imageHeight / imageWidth;
-        imageWidth = displayWidth;
-        imageHeight = (int) (displayWidth * ratio);
-        return new int[]{imageWidth, imageHeight};
+        newImageWidth = displayWidth;
+        newImageHeight = (int) (displayWidth * ratio);
+        return new int[]{newImageWidth, newImageHeight};
     }
 
     public static void setMargins(View view, int left, int top, int right, int bottom) {

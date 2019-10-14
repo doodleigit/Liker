@@ -74,10 +74,12 @@ public class LikerUserListFragment extends DialogFragment {
         return view;
     }
 
+    Dialog dialog;
+
     @Override
     public void onStart() {
         super.onStart();
-        Dialog dialog = getDialog();
+        dialog = getDialog();
         if (dialog != null) {
             int width = ViewGroup.LayoutParams.MATCH_PARENT;
             int height = ViewGroup.LayoutParams.MATCH_PARENT;
@@ -155,7 +157,7 @@ public class LikerUserListFragment extends DialogFragment {
         close.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getActivity().onBackPressed();
+                dialog.dismiss();
             }
         });
 

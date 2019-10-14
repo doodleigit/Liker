@@ -345,7 +345,7 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
         webService = PostService.mRetrofit.create(PostService.class);
         //  Picasso.with(App.getInstance()).load(imageUrl).into(target);
         adapter = new ReplyAdapter(this, replyItems, postItem, this, this, this, this);
-        adapterHeader = new CommentAdapter(this, commentList, postItem, this, this, this, this);
+        adapterHeader = new CommentAdapter(this, commentList, postItem, this, this, this, this, false);
         App.setRvCommentHeader(true);
         rvCommentHeader.setAdapter(adapterHeader);
         recyclerView.setAdapter(adapter);

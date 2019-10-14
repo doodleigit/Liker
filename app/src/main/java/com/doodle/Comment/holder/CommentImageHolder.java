@@ -40,6 +40,8 @@ import com.doodle.Comment.model.Reason;
 import com.doodle.Comment.model.Reply;
 import com.doodle.Comment.model.ReportReason;
 import com.doodle.Comment.service.CommentService;
+import com.doodle.Comment.view.activity.CommentPost;
+import com.doodle.Home.view.fragment.LikerUserListFragment;
 import com.doodle.Post.view.fragment.MediaFullViewFragment;
 import com.doodle.Profile.view.ProfileActivity;
 import com.doodle.Reply.view.ReplyPost;
@@ -126,6 +128,7 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
     List<Reply> replyItem;
 
     CommentListener listener;
+    private boolean isCommentMode;
     String replyId = "";
     Reply reply;
 
@@ -140,11 +143,12 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
     private int commentLikeNumeric;
     private MediaPlayer player;
 
-    public CommentImageHolder(View itemView, Context context, final CommentListener listener) {
+    public CommentImageHolder(View itemView, Context context, final CommentListener listener, boolean isCommentMode) {
         super(itemView);
 
         mContext = context;
         this.listener = listener;
+        this.isCommentMode = isCommentMode;
 
         player = MediaPlayer.create(mContext, R.raw.post_like);
         manager = new PrefManager(App.getAppContext());
@@ -341,6 +345,33 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
             }
         });
 
+        tvCountCommentLike.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentTransaction ft;
+                Fragment prev;
+                if (isCommentMode) {
+                    ft = ((CommentPost) mContext).getSupportFragmentManager().beginTransaction();
+                    prev = ((CommentPost) mContext).getSupportFragmentManager().findFragmentByTag("dialog");
+                } else {
+                    ft = ((ReplyPost) mContext).getSupportFragmentManager().beginTransaction();
+                    prev = ((ReplyPost) mContext).getSupportFragmentManager().findFragmentByTag("dialog");
+                }
+                if (prev != null) {
+                    ft.remove(prev);
+                }
+                ft.addToBackStack(null);
+                DialogFragment dialogFragment = new LikerUserListFragment();
+
+                Bundle bundle = new Bundle();
+                bundle.putString("type_id", commentItem.getId());
+                bundle.putString("total_likes", commentItem.getTotalLike());
+                bundle.putString("liker_type", "comment");
+                dialogFragment.setArguments(bundle);
+
+                dialogFragment.show(ft, "dialog");
+            }
+        });
 
         imgCommentLike.setOnClickListener(new View.OnClickListener() {
             @Override

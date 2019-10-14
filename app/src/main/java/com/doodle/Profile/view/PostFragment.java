@@ -143,7 +143,7 @@ public class PostFragment extends Fragment {
         progressView = root.findViewById(R.id.progress_view);
         recyclerView = root.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setNestedScrollingEnabled(false);
+        recyclerView.setNestedScrollingEnabled(true);
         v = root;
 
         ((ProfileActivity) Objects.requireNonNull(getActivity())).profileDataFetchCompleteListener = new ProfileDataFetchCompleteListener() {

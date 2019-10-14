@@ -57,7 +57,7 @@ public class NotificationActivity extends AppCompatActivity {
     private NotificationAdapter notificationAdapter;
     private ArrayList<NotificationItem> notificationItems;
     private String deviceId, profileId, token, userIds;
-    int limit = 20;
+    int limit = 15;
     int offset = 0;
     private boolean isScrolling, isPaginationComplete = true;
     private int totalItems;
@@ -208,7 +208,7 @@ public class NotificationActivity extends AppCompatActivity {
                     notificationItems.clear();
                     notificationItems.addAll(arrayList);
                     notificationAdapter.notifyDataSetChanged();
-                    offset = 20;
+                    offset = 15;
                 }
                 progressDialog.dismiss();
                 refreshLayout.setRefreshing(false);
@@ -235,7 +235,7 @@ public class NotificationActivity extends AppCompatActivity {
                 if (arrayList != null) {
                     notificationItems.addAll(arrayList);
                     notificationAdapter.notifyDataSetChanged();
-                    offset += 20;
+                    offset += 15;
                 }
                 progressBar.setVisibility(View.GONE);
                 isPaginationComplete = true;

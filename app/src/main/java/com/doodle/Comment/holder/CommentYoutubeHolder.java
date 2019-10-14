@@ -132,6 +132,8 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
     //EDIT COMMENT
     CommentListener commentListener;
     Reply reply;
+    boolean isCommentMode;
+
     public interface CommentListener {
 
         void onTitleClicked(Comment_ commentItem, int position,Reply reply);
@@ -143,11 +145,12 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
     private int commentLikeNumeric;
     private MediaPlayer player;
 
-    public CommentYoutubeHolder(View itemView, Context context, final CommentListener listener) {
+    public CommentYoutubeHolder(View itemView, Context context, final CommentListener listener, boolean isCommentMode) {
         super(itemView);
 
         mContext = context;
         commentListener = listener;
+        this.isCommentMode = isCommentMode;
 
         player = MediaPlayer.create(mContext, R.raw.post_like);
         manager = new PrefManager(App.getAppContext());
@@ -354,8 +357,15 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
         tvCountCommentLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FragmentTransaction ft = ((CommentPost) mContext).getSupportFragmentManager().beginTransaction();
-                Fragment prev = ((CommentPost) mContext).getSupportFragmentManager().findFragmentByTag("dialog");
+                FragmentTransaction ft;
+                Fragment prev;
+                if (isCommentMode) {
+                    ft = ((CommentPost) mContext).getSupportFragmentManager().beginTransaction();
+                    prev = ((CommentPost) mContext).getSupportFragmentManager().findFragmentByTag("dialog");
+                } else {
+                    ft = ((ReplyPost) mContext).getSupportFragmentManager().beginTransaction();
+                    prev = ((ReplyPost) mContext).getSupportFragmentManager().findFragmentByTag("dialog");
+                }
                 if (prev != null) {
                     ft.remove(prev);
                 }

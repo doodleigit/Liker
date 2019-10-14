@@ -122,6 +122,7 @@ public class CommentLinkScriptHolder extends RecyclerView.ViewHolder {
 
     //EDIT COMMENT
     CommentListener listener;
+    boolean isCommentMode;
 
     public interface CommentListener {
 
@@ -131,11 +132,12 @@ public class CommentLinkScriptHolder extends RecyclerView.ViewHolder {
 
     int position;
 
-    public CommentLinkScriptHolder(View itemView, Context context, final CommentListener listener) {
+    public CommentLinkScriptHolder(View itemView, Context context, final CommentListener listener, boolean isCommentMode) {
         super(itemView);
 
         mContext = context;
         this.listener = listener;
+        this.isCommentMode = isCommentMode;
 
         player = MediaPlayer.create(mContext, R.raw.post_like);
         manager = new PrefManager(App.getAppContext());
@@ -304,8 +306,15 @@ public class CommentLinkScriptHolder extends RecyclerView.ViewHolder {
         tvCountCommentLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FragmentTransaction ft = ((CommentPost) mContext).getSupportFragmentManager().beginTransaction();
-                Fragment prev = ((CommentPost) mContext).getSupportFragmentManager().findFragmentByTag("dialog");
+                FragmentTransaction ft;
+                Fragment prev;
+                if (isCommentMode) {
+                    ft = ((CommentPost) mContext).getSupportFragmentManager().beginTransaction();
+                    prev = ((CommentPost) mContext).getSupportFragmentManager().findFragmentByTag("dialog");
+                } else {
+                    ft = ((ReplyPost) mContext).getSupportFragmentManager().beginTransaction();
+                    prev = ((ReplyPost) mContext).getSupportFragmentManager().findFragmentByTag("dialog");
+                }
                 if (prev != null) {
                     ft.remove(prev);
                 }

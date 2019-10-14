@@ -6,12 +6,13 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <ImageView
             android:id="@+id/media_image_one"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:scaleType="center"
             android:adjustViewBounds="true"
             tools:src="@drawable/photo" />
 
@@ -28,6 +29,7 @@
                 android:id="@+id/media_video_one_thumbnail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:scaleType="center"
                 android:adjustViewBounds="true"
                 tools:src="@drawable/post_image_background" />
 
