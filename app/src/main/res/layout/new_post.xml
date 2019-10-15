@@ -129,6 +129,7 @@
                     android:id="@+id/contentEveryPost"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+
                     android:layout_marginTop="50dp">
 
                     <LinearLayout
@@ -143,6 +144,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_margin="@dimen/_10sdp"
+                            android:padding="@dimen/_5sdp"
                             android:background="@null"
                             android:isScrollContainer="true"
                             android:hint="Speak your mind..."

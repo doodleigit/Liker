@@ -125,6 +125,21 @@ public class Operation {
 
         return bitmap;
     }
+    public static Bitmap getProfilePictureBitmap(String imageUrl) {
+        Bitmap bitmap = null;
+        try {
+            if (android.os.Build.VERSION.SDK_INT > 9) {
+                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                StrictMode.setThreadPolicy(policy);
+            }
+            URL imageURL = new URL(imageUrl);
+            bitmap = BitmapFactory.decodeStream(imageURL.openConnection().getInputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return bitmap;
+    }
 
 
     public static void secondarySplashScreen(View v) {

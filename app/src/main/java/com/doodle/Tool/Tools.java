@@ -1,12 +1,14 @@
 package com.doodle.Tool;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.media.AudioManager;
@@ -20,12 +22,16 @@ import android.provider.MediaStore;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextPaint;
+import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.text.method.LinkMovementMethod;
 import android.text.style.CharacterStyle;
@@ -41,6 +47,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -93,6 +101,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.doodle.Tool.Operation.getProfilePictureBitmap;
 import static com.twitter.sdk.android.core.Twitter.TAG;
 
 public class Tools {
@@ -132,6 +141,17 @@ public class Tools {
                 .setIcon(image)
                 .setDuration(Toast.LENGTH_SHORT)
                 .show();
+    }
+    public static void showKeyboard(EditText mEtSearch, Context context) {
+        mEtSearch.requestFocus();
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
+    }
+
+    public static void hideSoftKeyboard(EditText mEtSearch, Context context) {
+        mEtSearch.clearFocus();
+        InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(mEtSearch.getWindowToken(), 0);
     }
 
 
@@ -1100,5 +1120,21 @@ public class Tools {
         status = am.getRingerMode() == AudioManager.RINGER_MODE_NORMAL;
         return status;
     }
+
+    public static void toggleCustomise(Context context, ActionBarDrawerToggle toggle, String userId ) {
+        if (!TextUtils.isEmpty(userId)) {
+
+            Bitmap bitmap = Operation.getFacebookProfilePicture(userId);
+            Bitmap bitmapResized = Bitmap.createScaledBitmap(bitmap, 90, 90, false);
+            RoundedBitmapDrawable roundedBitmapDrawable = RoundedBitmapDrawableFactory.create(context.getResources(), bitmapResized);
+            roundedBitmapDrawable.setCornerRadius(Math.max(bitmap.getWidth(), bitmap.getHeight()) / 2.0f);
+            roundedBitmapDrawable.setCircular(true);
+            toggle.setHomeAsUpIndicator(roundedBitmapDrawable);
+        } else {
+            toggle.setHomeAsUpIndicator(R.drawable.ic_sentiment_satisfied_black_24dp);
+
+        }
+    }
+
 
 }

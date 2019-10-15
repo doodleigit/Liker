@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="Gradle: com.github.florent37:viewtooltip:1.1.5@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/0488e4c033da650ca5d9b3cef81e99e2/viewtooltip-1.1.5/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/0488e4c033da650ca5d9b3cef81e99e2/viewtooltip-1.1.5/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/18e1cf3cf228717acf9932542d746fab/viewtooltip-1.1.5/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/18e1cf3cf228717acf9932542d746fab/viewtooltip-1.1.5/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>

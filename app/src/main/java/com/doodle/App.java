@@ -12,10 +12,12 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.danikula.videocache.HttpProxyCacheServer;
+import com.doodle.Comment.model.CommentPersistData;
 import com.doodle.Comment.model.Comment_;
 import com.doodle.Comment.model.Reply;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Post.model.Category;
+import com.doodle.Reply.model.ReplyPersistData;
 import com.doodle.Post.model.Subcatg;
 import com.doodle.Tool.Operation;
 import com.doodle.Tool.PrefManager;
@@ -70,6 +72,25 @@ public class App extends Application {
     private static boolean checkEmail;
     private static boolean rvCommentHeader;
     private static boolean sharePostfooter;
+    private static CommentPersistData commentPersistData;
+    private static ReplyPersistData replyPersistData;
+
+
+    public static ReplyPersistData getReplyPersistData() {
+        return replyPersistData;
+    }
+
+    public static void setReplyPersistData(ReplyPersistData replyPersistData) {
+        App.replyPersistData = replyPersistData;
+    }
+
+    public static CommentPersistData getCommentPersistData() {
+        return commentPersistData;
+    }
+
+    public static void setCommentPersistData(CommentPersistData commentPersistData) {
+        App.commentPersistData = commentPersistData;
+    }
 
 
     public static boolean isSharePostfooter() {

@@ -1,5 +1,6 @@
 package com.doodle.Home.adapter;
 
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -34,5 +35,11 @@ public class ViewPagerAdapter extends FragmentPagerAdapter {
     @Override
     public CharSequence getPageTitle(int position) {
         return mFragmentTitleList.get(position);
+    }
+
+    @Override
+    public int getItemPosition(Object object) {
+// POSITION_NONE makes it possible to reload the PagerAdapter
+        return POSITION_NONE;
     }
 }

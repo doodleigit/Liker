@@ -1,8 +1,8 @@
 <component name="libraryTable">
   <library name="Gradle: com.github.jakebonk:ChipView:1.0.1@aar">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/a0e4fb112a97679832f072716cae3d1f/ChipView-1.0.1/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/a0e4fb112a97679832f072716cae3d1f/ChipView-1.0.1/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/48dc7d21f2f6a2be4bc5c4d7005213e8/ChipView-1.0.1/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/48dc7d21f2f6a2be4bc5c4d7005213e8/ChipView-1.0.1/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

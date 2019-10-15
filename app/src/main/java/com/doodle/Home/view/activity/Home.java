@@ -113,6 +113,7 @@ import retrofit2.Response;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
 import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 
+import static android.support.v4.view.PagerAdapter.POSITION_NONE;
 import static com.doodle.Tool.Tools.isEmpty;
 
 public class Home extends AppCompatActivity implements
@@ -1110,6 +1111,25 @@ public class Home extends AppCompatActivity implements
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
 
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                viewPager.getAdapter().notifyDataSetChanged();
+                tabLayout.setupWithViewPager(viewPager);
+                setupTabIcons();
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
         tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
         setupTabIcons();
@@ -1159,6 +1179,7 @@ public class Home extends AppCompatActivity implements
             @Override
             public void onTabReselected(TabLayout.Tab tab) {
 
+
             }
         });
 
@@ -1174,6 +1195,7 @@ public class Home extends AppCompatActivity implements
 
         viewPager.setAdapter(adapter);
         viewPager.setOffscreenPageLimit(3);
+
     }
 
     private void setNotificationCount(int count) {

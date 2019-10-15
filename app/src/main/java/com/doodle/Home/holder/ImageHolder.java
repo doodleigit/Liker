@@ -40,6 +40,7 @@ import android.widget.Toast;
 
 import com.borjabravo.readmoretextview.ReadMoreTextView;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.doodle.App;
 import com.doodle.Comment.model.Reason;
 import com.doodle.Comment.model.ReportReason;
@@ -76,6 +77,7 @@ import com.facebook.FacebookException;
 import com.facebook.share.Sharer;
 import com.facebook.share.model.ShareLinkContent;
 import com.facebook.share.widget.ShareDialog;
+import com.squareup.picasso.Picasso;
 import com.vanniktech.emoji.EmojiTextView;
 
 import org.json.JSONException;
@@ -747,17 +749,23 @@ public class ImageHolder extends RecyclerView.ViewHolder {
                 String imageUrl = AppConstants.POST_VIDEOS_THUMBNAIL + item.getPostFiles().get(i).getImageName();
                 mediaViewHolders.get(i).getMediaVideoLayout().setVisibility(View.VISIBLE);
                 mediaViewHolders.get(i).getMediaImage().setVisibility(View.GONE);
-                Glide.with(App.getAppContext())
+                if (item.getFrameNumber() == 1) {
+                    int[] dimension = Tools.getImageDimension(manager.getDeviceWidth(), Integer.parseInt(item.getPostFiles().get(i).getWidth()), Integer.parseInt(item.getPostFiles().get(i).getHeight()));
+                    Picasso.with(App.getAppContext())
+                            .load(imageUrl)
+                            .error(R.drawable.post_image_background)
+                            .resize(dimension[0], dimension[1])
+                            .into(mediaViewHolders.get(i).getMediaThumbnail());
+                } else {
+                    Picasso.with(App.getAppContext())
+                            .load(imageUrl)
+                            .error(R.drawable.post_image_background)
+                            .into(mediaViewHolders.get(i).getMediaThumbnail());
+                }
+
+                Picasso.with(App.getAppContext())
                         .load(imageUrl)
-                        .centerCrop()
                         .error(R.drawable.post_image_background)
-                        .dontAnimate()
-                        .into(mediaViewHolders.get(i).getMediaThumbnail());
-                Glide.with(App.getAppContext())
-                        .load(imageUrl)
-                        .centerCrop()
-                        .error(R.drawable.post_image_background)
-                        .dontAnimate()
                         .into(mediaViewHolders.get(i).getMediaImage());
 
                 mediaViewHolders.get(i).getMediaVideoLayout().setOnClickListener(new View.OnClickListener() {
@@ -770,17 +778,22 @@ public class ImageHolder extends RecyclerView.ViewHolder {
                 String imageUrl = AppConstants.POST_IMAGES + item.getPostFiles().get(i).getImageName();
                 mediaViewHolders.get(i).getMediaVideoLayout().setVisibility(View.GONE);
                 mediaViewHolders.get(i).getMediaImage().setVisibility(View.VISIBLE);
-                Glide.with(App.getAppContext())
+                if (item.getFrameNumber() == 1) {
+                    int[] dimension = Tools.getImageDimension(manager.getDeviceWidth(), Integer.parseInt(item.getPostFiles().get(i).getWidth()), Integer.parseInt(item.getPostFiles().get(i).getHeight()));
+                    Picasso.with(App.getAppContext())
+                            .load(imageUrl)
+                            .error(R.drawable.post_image_background)
+                            .resize(dimension[0], dimension[1])
+                            .into(mediaViewHolders.get(i).getMediaImage());
+                } else {
+                    Picasso.with(App.getAppContext())
+                            .load(imageUrl)
+                            .error(R.drawable.post_image_background)
+                            .into(mediaViewHolders.get(i).getMediaImage());
+                }
+                Picasso.with(App.getAppContext())
                         .load(imageUrl)
-                        .centerCrop()
                         .error(R.drawable.post_image_background)
-                        .dontAnimate()
-                        .into(mediaViewHolders.get(i).getMediaImage());
-                Glide.with(App.getAppContext())
-                        .load(imageUrl)
-                        .centerCrop()
-                        .error(R.drawable.post_image_background)
-                        .dontAnimate()
                         .into(mediaViewHolders.get(i).getMediaThumbnail());
 
                 mediaViewHolders.get(i).getMediaImage().setOnClickListener(new View.OnClickListener() {

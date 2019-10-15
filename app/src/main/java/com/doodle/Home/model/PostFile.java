@@ -32,6 +32,12 @@ public class PostFile implements Serializable, Parcelable
     @SerializedName("duration")
     @Expose
     private String duration;
+    @SerializedName("width")
+    @Expose
+    private String width;
+    @SerializedName("height")
+    @Expose
+    private String height;
 
     private int playTime = 0;
     public final static Parcelable.Creator<PostFile> CREATOR = new Creator<PostFile>() {
@@ -60,6 +66,8 @@ public class PostFile implements Serializable, Parcelable
         this.videoName = ((String) in.readValue((String.class.getClassLoader())));
         this.uploadStatus = ((String) in.readValue((String.class.getClassLoader())));
         this.duration = ((String) in.readValue((String.class.getClassLoader())));
+        this.width = ((String) in.readValue((String.class.getClassLoader())));
+        this.height = ((String) in.readValue((String.class.getClassLoader())));
     }
 
     public PostFile() {
@@ -121,6 +129,22 @@ public class PostFile implements Serializable, Parcelable
         this.duration = duration;
     }
 
+    public String getWidth() {
+        return width;
+    }
+
+    public void setWidth(String width) {
+        this.width = width;
+    }
+
+    public String getHeight() {
+        return height;
+    }
+
+    public void setHeight(String height) {
+        this.height = height;
+    }
+
     public int getPlayTime() {
         return playTime;
     }
@@ -137,6 +161,8 @@ public class PostFile implements Serializable, Parcelable
         dest.writeValue(videoName);
         dest.writeValue(uploadStatus);
         dest.writeValue(duration);
+        dest.writeValue(width);
+        dest.writeValue(height);
     }
 
     public int describeContents() {

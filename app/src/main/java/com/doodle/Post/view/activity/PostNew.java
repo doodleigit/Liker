@@ -144,6 +144,8 @@ import static android.widget.Toast.makeText;
 import static com.doodle.Tool.Tools.getMD5EncryptedString;
 import static com.doodle.Tool.Tools.isContain;
 import static com.doodle.Tool.Tools.isNullOrEmpty;
+import static com.doodle.Tool.Tools.showCustomToast;
+import static com.doodle.Tool.Tools.showKeyboard;
 
 public class PostNew extends AppCompatActivity implements
         View.OnClickListener,
@@ -367,6 +369,7 @@ public class PostNew extends AppCompatActivity implements
         contentPostView = findViewById(R.id.contentPostView);
         messageContainer = findViewById(R.id.messageContainer);
         messageContainer.setOnClickListener(this);
+        
         deleteMediaFiles = new ArrayList<>();
         mediaAdapter = new MediaAdapter(mContext, postImages, postVideos, imageListener, videoListen);
         imageListener = new ImageViewHolder.ImageListener() {
@@ -1092,6 +1095,19 @@ public class PostNew extends AppCompatActivity implements
 //            manager.setPostAudience(audience);
 //            tvAudience.setText(audience);
 //        }
+
+        editPostMessage.requestFocus();
+
+        editPostMessage.postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                // TODO Auto-generated method stub
+                InputMethodManager keyboard = (InputMethodManager)
+                        getSystemService(Context.INPUT_METHOD_SERVICE);
+                keyboard.showSoftInput(editPostMessage, 0);
+            }
+        },200);
     }
 
 
@@ -1109,6 +1125,7 @@ public class PostNew extends AppCompatActivity implements
             case R.id.imageCancelPost:
                 finish();
                 break;
+      
             case R.id.messageContainer:
 //                editPostMessage.setEnabled(true);
 //                if (postVideos.isEmpty() && postImages.isEmpty()) {
@@ -1655,7 +1672,7 @@ public class PostNew extends AppCompatActivity implements
         if (resultCode == Activity.RESULT_OK && requestCode == REQUEST_VIDEO_CAPTURE) {
             uri = data.getData();
             if (EasyPermissions.hasPermissions(PostNew.this, android.Manifest.permission.READ_EXTERNAL_STORAGE)) {
-               // imageUri = getVideoUri();
+                // imageUri = getVideoUri();
                 pathToStoredVideo = getRealPathFromURIPath(uri, PostNew.this);
                 //imageUri = getImageUri();
 
@@ -1863,13 +1880,14 @@ public class PostNew extends AppCompatActivity implements
         try {
             SimpleDateFormat m_sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
             String m_curentDateandTime = m_sdf.format(new Date());
-            String m_imagePath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + m_curentDateandTime+".mp4" ;
+            String m_imagePath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + m_curentDateandTime + ".mp4";
             m_file = new File(m_imagePath);
             m_imgUri = Uri.fromFile(m_file);
         } catch (Exception p_e) {
         }
         return m_imgUri;
     }
+
     public String getPath(Uri uri) {
         int column_index;
         String imagePath;
@@ -2942,10 +2960,9 @@ public class PostNew extends AppCompatActivity implements
     public void onVideoRecordClicked() {
 
 
-
         Intent videoCaptureIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-      //  Uri videoUri=getVideoUri();
-       // videoCaptureIntent.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
+        //  Uri videoUri=getVideoUri();
+        // videoCaptureIntent.putExtra(MediaStore.EXTRA_OUTPUT, videoUri);
         if (videoCaptureIntent.resolveActivity(getPackageManager()) != null) {
             startActivityForResult(videoCaptureIntent, REQUEST_VIDEO_CAPTURE);
         }
@@ -3018,4 +3035,6 @@ public class PostNew extends AppCompatActivity implements
     public void onPermissionsDenied(int requestCode, List<String> perms) {
         Log.d(TAG, "User has denied requested permission");
     }
+
+
 }
