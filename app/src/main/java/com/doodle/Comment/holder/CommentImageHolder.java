@@ -574,7 +574,8 @@ public class CommentImageHolder extends RecyclerView.ViewHolder {
                 .load(userImageUrl)
                 .centerCrop()
                 .dontAnimate()
-//                .placeholder(R.drawable.loading_spinner)
+                .placeholder(R.drawable.default_image)
+                .error(R.drawable.default_image)
                 //  .crossFade()
                 .into(imagePostUser);
 

@@ -587,6 +587,8 @@ public class CommentYoutubeHolder extends RecyclerView.ViewHolder {
                 .dontAnimate()
 //                .placeholder(R.drawable.loading_spinner)
                 //  .crossFade()
+                .placeholder(R.drawable.default_image)
+                .error(R.drawable.default_image)
                 .into(imagePostUser);
 
 

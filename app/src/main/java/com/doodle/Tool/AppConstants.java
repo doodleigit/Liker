@@ -14,6 +14,7 @@ public class AppConstants {
 //    public static final String FACEBOOK_SHARE = "http://192.168.0.6:8040/sites/likerapp/public/posts/";
 //    public static final String FACEBOOK_INVITATION = "http://192.168.0.6:8040/sites/likerapp/settings/fbinvite/";
 //    public static final String BASE_URL_LOCATION = "http://192.168.0.6:8040/sites/likerapp/";
+
     //==========================STG SERVER=====================
 
 //    public static final String BASE_URL = "https://www.stg.liker.com/";
@@ -26,6 +27,8 @@ public class AppConstants {
 //    public static final String LINK_IMAGES = "https://www.cdn-liker.com/uploads/link_images/";
 //    public static final String FACEBOOK_INVITATION = "https://www.d.liker.com/settings/fbinvite/";
 //    public static final String BASE_URL_LOCATION = "https://www.stg.liker.com/";
+
+
 
     //=======================LIVE SERVER=============================
     public static final String BASE_URL = "https://www.api.liker.com/";
@@ -66,6 +69,7 @@ public class AppConstants {
     public static final String MIM_IMAGE = BASE_URL_MEDIA + "assets/nimg/";
     public static final String Link_IMAGE_PATH = BASE_URL_MEDIA + "uploads/link_images/";
     public static final String YOUTUBE_IMAGE_PATH = BASE_URL_MEDIA + "uploads/youtube/main_img/";
+
     //https://www.cdn-liker.com/stg-static/uploads/post_images/5d2dafdfe9487.jpg
     //https://www.cdn-liker.com/stg-static/uploads/post_videos/thumb/1ovh2hg2jy5qwenx.png
 //http://192.168.0.77:8040/sites/likeropt/uploads/post_images/5d6372064e3a2.jpg

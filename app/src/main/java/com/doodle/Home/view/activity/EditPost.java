@@ -139,6 +139,7 @@ import static com.doodle.Tool.Tools.extractMentionText;
 import static com.doodle.Tool.Tools.extractMentionUser;
 import static com.doodle.Tool.Tools.getMD5EncryptedString;
 import static com.doodle.Tool.Tools.isNullOrEmpty;
+import static com.doodle.Tool.Tools.showKeyboard;
 
 public class EditPost extends AppCompatActivity implements View.OnClickListener,
         PostPermission.BottomSheetListener,
@@ -360,6 +361,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
         contentPostView = findViewById(R.id.contentPostView);
         messageContainer = findViewById(R.id.messageContainer);
         messageContainer.setOnClickListener(this);
+        findViewById(R.id.contentEveryPost).setOnClickListener(this);
         mediaAdapter = new MediaAdapter(mContext, postImages, postVideos, imageListener, videoListen);
         imageListener=new ImageViewHolder.ImageListener() {
             @Override
@@ -1286,6 +1288,10 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
             case R.id.imageCancelPost:
                 finish();
                 break;
+            case R.id.contentEveryPost:
+                showKeyboard(editPostMessage,this);
+                makeText(this, "click edit text:", LENGTH_SHORT).show();
+                break;
             case R.id.messageContainer:
 //                editPostMessage.setEnabled(true);
 //                if (postVideos.isEmpty() && postImages.isEmpty()) {
@@ -1311,6 +1317,7 @@ public class EditPost extends AppCompatActivity implements View.OnClickListener,
 //                }
                 break;
             case R.id.editPostMessage:
+
                 if (postVideos.isEmpty() && postImages.isEmpty()) {
                     rvMimShow = true;
                     rvMimToggle();

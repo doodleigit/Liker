@@ -58,6 +58,7 @@ import com.doodle.Comment.adapter.CommentAdapter;
 import com.doodle.Comment.model.AnimationItem;
 import com.doodle.Comment.model.Comment;
 import com.doodle.Comment.model.CommentItem;
+import com.doodle.Comment.model.CommentPersistData;
 import com.doodle.Comment.model.Comment_;
 import com.doodle.Comment.model.Reason;
 import com.doodle.Comment.model.Reply;
@@ -73,7 +74,6 @@ import com.doodle.Comment.view.fragment.ReportLikerMessageSheet;
 import com.doodle.Comment.view.fragment.ReportPersonMessageSheet;
 import com.doodle.Comment.view.fragment.ReportReasonSheet;
 import com.doodle.Comment.view.fragment.ReportSendCategorySheet;
-import com.doodle.Home.holder.TextHolder;
 import com.doodle.Home.model.PostItem;
 import com.doodle.Post.adapter.MentionUserAdapter;
 import com.doodle.Post.model.MentionUser;
@@ -98,7 +98,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -125,6 +124,7 @@ import static com.doodle.Tool.MediaUtil.isDownloadsDocument;
 import static com.doodle.Tool.MediaUtil.isGooglePhotosUri;
 import static com.doodle.Tool.MediaUtil.isMediaDocument;
 import static com.doodle.Tool.Tools.getMD5EncryptedString;
+import static com.doodle.Tool.Tools.isEmpty;
 import static com.doodle.Tool.Tools.isNullOrEmpty;
 
 public class CommentPost extends AppCompatActivity implements View.OnClickListener,
@@ -227,25 +227,28 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
     private AnimationItem mSelectedItem;
     private final Handler mHandler = new Handler();
     private String queryText;
-
+    CommentPersistData persistData;
+    String mentionId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.comment_view);
 
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        //  getSupportActionBar().setHomeAsUpIndicator( getResources().getDrawable(R.drawable.) );
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
+
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onBackPressed();
             }
         });
-//        toolbar.setNavigationIcon(R.drawable.ic_people_black_24dp);
-//        toolbar.setNavigationIcon(mDrawable);
-//        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        persistData = new CommentPersistData();
         rootView = findViewById(R.id.main_activity_root_view);
         progressDialog = new ProgressDialog(this);
         progressDialog.setMessage(getString(R.string.loading));
@@ -282,13 +285,13 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
         if (postItem == null) {
             throw new AssertionError("Null data item received!");
         }
-//        if (commentChild == null) {
-//            throw new AssertionError("Null data item received!");
-//        }
-//        commentList = commentItem.getComments();
+
         for (Comment temp : commentItem.getComments()) {
             comment_list = temp.getComments();
         }
+
+        postItem.getPostImage();
+        // Operation.toggleCustomise(this, toggle, userIdSp);
 
         IntentFilter replyBroadcastIntent = new IntentFilter();
         replyBroadcastIntent.addAction(AppConstants.REPLY_CHANGE_BROADCAST);
@@ -314,6 +317,14 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
         postId = postItem.getSharedPostId();
         tvLikes = findViewById(R.id.tvLikes);
         tvStars = findViewById(R.id.tvStars);
+      /*  String imageUrl=PROFILE_IMAGE+userInfo.getPhoto();
+        Bitmap bitmap=getProfilePictureBitmap(imageUrl);
+        Bitmap bitmapResized = Bitmap.createScaledBitmap(bitmap, 90, 90, false);
+        RoundedBitmapDrawable roundedBitmapDrawable = RoundedBitmapDrawableFactory.create(getResources(), bitmapResized);
+        roundedBitmapDrawable.setCornerRadius(Math.max(bitmap.getWidth(), bitmap.getHeight()) / 2.0f);
+        roundedBitmapDrawable.setCircular(true);
+        getSupportActionBar().setHomeAsUpIndicator(roundedBitmapDrawable);*/
+        //  toggle.setHomeAsUpIndicator(roundedBitmapDrawable);
 
         userName.setText(String.format("%s %s", userInfo.getFirstName(), userInfo.getLastName()));
         int totalStars = Integer.parseInt(userInfo.getGoldStars()) + Integer.parseInt(userInfo.getSliverStars());
@@ -321,6 +332,121 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
         tvLikes.setText(userInfo.getTotalLikes() + " Likes");
         setUpEmojiPopup();
         imageSendComment.setVisibility(View.GONE);
+        CommentPersistData persistData = App.getCommentPersistData();
+        if (!isEmpty(persistData)) {
+            String commentHistory = persistData.getCommentData();
+            if (!isNullOrEmpty(commentHistory)) {
+                if (App.getCommentPersistData().getPostId().equalsIgnoreCase(postItem.getPostId())) {
+                    etComment.append(commentHistory);
+                    //  imageSendComment.setVisibility(View.VISIBLE);
+                }
+            }
+
+            if(!isEmpty(persistData.mentionNameList)){
+                    //nameList.add(name);
+                    //  persistData.mentionNameList=nameList;
+                    nameList = persistData.mentionNameList;
+                    // idList.add(id);
+                    //   persistData.mentionIdList=idList;
+                    idList = persistData.mentionIdList;
+                    StringBuilder nameBuilder = new StringBuilder();
+                    for (String temp : nameList) {
+
+                        nameBuilder.append(temp);
+                    }
+
+                    for (String temp : idList) {
+                        mentionId = temp;
+                        friendSet.add(temp);
+                    }
+                    String separator = ", ";
+                    int total = friendSet.size() * separator.length();
+                    for (String s : friendSet) {
+                        total += s.length();
+                    }
+
+                    StringBuilder sb = new StringBuilder(total);
+                    for (String s : friendSet) {
+                        sb.append(separator).append(s);
+                    }
+
+                    friends = sb.substring(separator.length()).replaceAll("\\s+", "");
+
+                    mention = friends;
+                    if (nameList.size() > 0) {
+                        //Create new list
+                        String nameStr = nameBuilder.toString();
+                        String[] nameArr = nameStr.split(" ");
+
+                        commentText = persistData.commentData;
+//                    StringBuilder mentionBuilder = new StringBuilder();
+//                    String mention_text = commentText.replaceAll(userQuery, "mention_" + mentionId);
+//
+//                    String full_text = commentText.replaceAll(userQuery, name);
+                        String full_text = commentText;
+                        //split strings by space
+                        String[] splittedWords = full_text.split(" ");
+                        SpannableString str = new SpannableString(full_text);
+                        Log.d(TAG, "onResponse: " + splittedWords);
+
+                        //Check the matching words
+                        for (int i = 0; i < nameArr.length; i++) {
+                            for (int j = 0; j < splittedWords.length; j++) {
+                                if (nameArr[i].equalsIgnoreCase(splittedWords[j])) {
+                                    mList.add(nameArr[i]);
+                                }
+                            }
+                        }
+                        //make the words bold
+                        for (int k = 0; k < mList.size(); k++) {
+                            int val = full_text.indexOf(mList.get(k));
+                            if (val >= 0) {
+                                str.setSpan(new StyleSpan(Typeface.ITALIC), val, val + mList.get(k).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                str.setSpan(new BackgroundColorSpan(Color.parseColor("#D8DFEA")), val, val + mList.get(k).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            }
+                        }
+
+
+                        for (int i = 0; i < nameList.size(); i++) {
+
+                            String mName = nameList.get(i);
+                            for (int j = 0; j < idList.size(); j++) {
+                                String mId = idList.get(j);
+
+                                if (i == j) {
+                                    wordsToReplace.put(mName, "@[" + mName + "]" + "(id:" + mId + ")");
+                                    //    wordsToReplace.put(mName, "mention_"+mId);//@[Mijanur Rahaman](id:32)
+                                    keys = wordsToReplace.keySet();
+                                    break;
+                                }
+
+                            }
+                        }
+
+                        mentionMessage = str.toString();
+                        for (String key : keys) {
+                            mentionMessage = mentionMessage.replace(key, wordsToReplace.get(key));
+                            Log.d("message", mentionMessage);
+                        }
+
+                        Log.d("message", mentionMessage);
+
+                        etComment.setText("");
+                        etComment.append(str);
+
+
+                    }
+
+
+                    userQuery = "";
+                    rvMentionUserShow = false;
+                    mentionUserToggle();
+
+            }
+
+
+        }
+
         etComment.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -513,9 +639,9 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
                     String id = mentionUsers.get(position).getId();
 
                     nameList.add(name);
-
-
+                    persistData.mentionNameList = nameList;
                     idList.add(id);
+                    persistData.mentionIdList = idList;
                     StringBuilder nameBuilder = new StringBuilder();
                     nameBuilder.append(name);
 
@@ -735,7 +861,13 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-
+        // moveTaskToBack(false);
+        String commentHistory = etComment.getText().toString();
+        persistData.commentData = commentHistory;
+        persistData.postId = postItem.getPostId();
+        //   CommentPersistData persistData = new CommentPersistData(commentHistory, postItem.getPostId());
+        App.setCommentPersistData(persistData);
+        //  App.setPersistCommentData(commentHistory);
     }
 
     @Override
@@ -760,7 +892,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
 
                 Call<Comment_> call = commentService.addedComment(deviceId, profileId, token, fileToUpload, commentText, commentType, hasMention, linkUrl, mention, postId, userIds);
                 sendCommentItemRequest(call);
-
+                imageSendComment.setClickable(false);
                 break;
             case R.id.imageEditComment:
                 if (!isNullOrEmpty(mentionMessage)) {
@@ -1093,15 +1225,15 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
                     adapter.refreshData(commentItems);
                     progressDialog.dismiss();
                     etComment.setText("");
-                 //   offset++;
+                    //   offset++;
                     recyclerView.smoothScrollToPosition(0);
-                   // recyclerView.smoothScrollToPosition(0);
+                    // recyclerView.smoothScrollToPosition(0);
                     // App.setCommentCount(1);
                 }
 
 //                adapter = new CommentAdapter(CommentPost.this, comment_list, postItem);
 //                recyclerView.setAdapter(adapter);
-
+                imageSendComment.setClickable(true);
             }
 
             @Override
@@ -1336,7 +1468,7 @@ public class CommentPost extends AppCompatActivity implements View.OnClickListen
             if (position != -1) {
                 //   Log.d("Cbndklfj ",commentItem.toString());
 
-               // comment_list.remove(position);
+                // comment_list.remove(position);
                 comment_list.set(position, commentItem);
                 adapter.notifyDataSetChanged();
 

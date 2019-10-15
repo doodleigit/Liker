@@ -23,17 +23,19 @@
             app:popupTheme="@style/AppTheme.PopupOverlay">
 
             <LinearLayout
+                android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="start|center"
                 android:orientation="vertical">
 
                 <TextView
+                    android:visibility="gone"
                     android:id="@+id/user_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="User Name"
-                    android:textColor="@android:color/white"
+                    android:textColor="@android:color/black"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -47,7 +49,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="5 likes"
-                        android:textColor="@android:color/white"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorPrimary"
                         android:textSize="12sp" />
 
                     <TextView
@@ -56,7 +59,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="5dp"
                         android:text="8 Stars"
-                        android:textColor="@android:color/white"
+                        android:textStyle="bold"
+                        android:textColor="@color/colorPrimary"
                         android:textSize="12sp" />
 
                 </LinearLayout>
@@ -137,7 +141,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                   android:padding="@dimen/_5sdp"
+                    android:padding="@dimen/_5sdp"
                     android:tint="@color/colorThemeBlue"
                     app:srcCompat="@drawable/emoji_twitter_category_smileysandpeople" />
 

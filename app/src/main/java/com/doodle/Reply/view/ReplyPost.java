@@ -71,6 +71,7 @@ import com.doodle.Home.model.PostItem;
 import com.doodle.Post.adapter.MentionUserAdapter;
 import com.doodle.Post.model.MentionUser;
 import com.doodle.Post.model.PostImage;
+import com.doodle.Reply.model.ReplyPersistData;
 import com.doodle.Post.service.PostService;
 import com.doodle.R;
 import com.doodle.Reply.adapter.ReplyAdapter;
@@ -96,7 +97,6 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -122,6 +122,7 @@ import static com.doodle.Tool.MediaUtil.isDownloadsDocument;
 import static com.doodle.Tool.MediaUtil.isGooglePhotosUri;
 import static com.doodle.Tool.MediaUtil.isMediaDocument;
 import static com.doodle.Tool.Tools.getMD5EncryptedString;
+import static com.doodle.Tool.Tools.isEmpty;
 import static com.doodle.Tool.Tools.isNullOrEmpty;
 import static java.lang.Integer.parseInt;
 
@@ -214,6 +215,7 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
     Comment_ commentItem;
     private UserInfo userInfo;
 
+
     public static final String USER_ID_KEY = "user_id_key";
 
 
@@ -251,7 +253,8 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
     private View mView;
     private int commentItemPosition;
     private int totalReply;
-
+ private ReplyPersistData persistData;
+ private String mentionId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -259,6 +262,7 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -266,11 +270,9 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
             }
         });
         mView = new View(this);
-//        toolbar.setNavigationIcon(R.drawable.ic_people_black_24dp);
-//        toolbar.setNavigationIcon(mDrawable);
-//        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        manager = new PrefManager(this);
 
+        manager = new PrefManager(this);
+        persistData=new ReplyPersistData();
         networkOk = NetworkHelper.hasNetworkAccess(this);
         progressView = findViewById(R.id.progress_bar);
         deviceId = manager.getDeviceId();
@@ -350,11 +352,132 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
         rvCommentHeader.setAdapter(adapterHeader);
         recyclerView.setAdapter(adapter);
 
+//        String imageUrl=PROFILE_IMAGE+userInfo.getPhoto();
+//        Bitmap bitmap=getProfilePictureBitmap(imageUrl);
+//        Bitmap bitmapResized = Bitmap.createScaledBitmap(bitmap, 90, 90, false);
+//        RoundedBitmapDrawable roundedBitmapDrawable = RoundedBitmapDrawableFactory.create(getResources(), bitmapResized);
+//        roundedBitmapDrawable.setCornerRadius(Math.max(bitmap.getWidth(), bitmap.getHeight()) / 2.0f);
+//        roundedBitmapDrawable.setCircular(true);
+//        getSupportActionBar().setHomeAsUpIndicator(roundedBitmapDrawable);
+
         userName.setText(String.format("%s %s", userInfo.getFirstName(), userInfo.getLastName()));
         int totalStars = Integer.parseInt(userInfo.getGoldStars()) + Integer.parseInt(userInfo.getSliverStars());
         tvStarts.setText(String.valueOf(totalStars) + " Stars");
         tvLikes.setText(userInfo.getTotalLikes() + " Likes");
         setUpEmojiPopup();
+
+        ReplyPersistData persistData=App.getReplyPersistData();
+        if(!isEmpty(persistData)){
+            String replyHistory=persistData.getReplyData();
+            if(!isNullOrEmpty(replyHistory)){
+                if(persistData.getCommentId().equalsIgnoreCase(commentId)){
+                    etComment.append(replyHistory);
+                 //   imageSendComment.setVisibility(View.VISIBLE);
+                }
+            }
+
+            if(!isEmpty(persistData.mentionNameList)){
+                //nameList.add(name);
+                //  persistData.mentionNameList=nameList;
+                nameList = persistData.mentionNameList;
+                // idList.add(id);
+                //   persistData.mentionIdList=idList;
+                idList = persistData.mentionIdList;
+                StringBuilder nameBuilder = new StringBuilder();
+                for (String temp : nameList) {
+
+                    nameBuilder.append(temp);
+                }
+
+                for (String temp : idList) {
+                    mentionId = temp;
+                    friendSet.add(temp);
+                }
+                String separator = ", ";
+                int total = friendSet.size() * separator.length();
+                for (String s : friendSet) {
+                    total += s.length();
+                }
+
+                StringBuilder sb = new StringBuilder(total);
+                for (String s : friendSet) {
+                    sb.append(separator).append(s);
+                }
+
+                friends = sb.substring(separator.length()).replaceAll("\\s+", "");
+
+                mention = friends;
+                if (nameList.size() > 0) {
+                    //Create new list
+                    String nameStr = nameBuilder.toString();
+                    String[] nameArr = nameStr.split(" ");
+
+                    commentText = persistData.replyData;
+//                    StringBuilder mentionBuilder = new StringBuilder();
+//                    String mention_text = commentText.replaceAll(userQuery, "mention_" + mentionId);
+//
+//                    String full_text = commentText.replaceAll(userQuery, name);
+                    String full_text = commentText;
+                    //split strings by space
+                    String[] splittedWords = full_text.split(" ");
+                    SpannableString str = new SpannableString(full_text);
+                    Log.d(TAG, "onResponse: " + splittedWords);
+
+                    //Check the matching words
+                    for (int i = 0; i < nameArr.length; i++) {
+                        for (int j = 0; j < splittedWords.length; j++) {
+                            if (nameArr[i].equalsIgnoreCase(splittedWords[j])) {
+                                mList.add(nameArr[i]);
+                            }
+                        }
+                    }
+                    //make the words bold
+                    for (int k = 0; k < mList.size(); k++) {
+                        int val = full_text.indexOf(mList.get(k));
+                        if (val >= 0) {
+                            str.setSpan(new StyleSpan(Typeface.ITALIC), val, val + mList.get(k).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            str.setSpan(new BackgroundColorSpan(Color.parseColor("#D8DFEA")), val, val + mList.get(k).length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        }
+                    }
+
+
+                    for (int i = 0; i < nameList.size(); i++) {
+
+                        String mName = nameList.get(i);
+                        for (int j = 0; j < idList.size(); j++) {
+                            String mId = idList.get(j);
+
+                            if (i == j) {
+                                wordsToReplace.put(mName, "@[" + mName + "]" + "(id:" + mId + ")");
+                                //    wordsToReplace.put(mName, "mention_"+mId);//@[Mijanur Rahaman](id:32)
+                                keys = wordsToReplace.keySet();
+                                break;
+                            }
+
+                        }
+                    }
+
+                    mentionMessage = str.toString();
+                    for (String key : keys) {
+                        mentionMessage = mentionMessage.replace(key, wordsToReplace.get(key));
+                        Log.d("message", mentionMessage);
+                    }
+
+                    Log.d("message", mentionMessage);
+
+                    etComment.setText("");
+                    etComment.append(str);
+
+
+                }
+
+
+                userQuery = "";
+                rvMentionUserShow = false;
+                mentionUserToggle();
+
+            }
+        }
 
         etComment.addTextChangedListener(new TextWatcher() {
             @Override
@@ -577,7 +700,6 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
             Tools.showNetworkDialog(getSupportFragmentManager());
             progressView.setVisibility(View.GONE);
 
-
         }
     }
 
@@ -600,9 +722,9 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
                     String id = mentionUsers.get(position).getId();
 
                     nameList.add(name);
-
-
+                    persistData.mentionNameList=nameList;
                     idList.add(id);
+                    persistData.mentionIdList=idList;
                     StringBuilder nameBuilder = new StringBuilder();
                     nameBuilder.append(name);
 
@@ -787,6 +909,11 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
     public void onBackPressed() {
         super.onBackPressed();
 
+        String replyHistory=etComment.getText().toString();
+        persistData.replyData=replyHistory;
+        persistData.commentId=commentItem.getId();
+      //  ReplyPersistData replyPersistData=new ReplyPersistData(replyHistory,commentItem.getId());
+        App.setReplyPersistData(persistData);
         App.setRvCommentHeader(false);
         Intent returnIntent = new Intent();
         commentItem.setTotalReply(String.valueOf(totalReply));
@@ -825,7 +952,7 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
 
                 Call<Reply> call = commentService.addedCommentReply(deviceId, profileId, token, commentId, fileToUpload, commentText, commentType, mention, linkUrl, repLiesUserId, postId, userIds);
                 sendCommentItemRequest(call);
-
+                imageSendComment.setEnabled(false);
                 break;
 
             case R.id.imageEditComment:
@@ -1252,6 +1379,7 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
 
                         }
 
+                        imageSendComment.setEnabled(true);
 
                     } else {
 
@@ -1344,9 +1472,11 @@ public class ReplyPost extends AppCompatActivity implements View.OnClickListener
         String id = reply.getUserId();
 
         nameList.add(name);
+        persistData.mentionNameList=nameList;
         commentText = name;
         userQuery = "@" + friends;
         idList.add(id);
+        persistData.mentionIdList=idList;
         StringBuilder nameBuilder = new StringBuilder();
         nameBuilder.append(name);
 
