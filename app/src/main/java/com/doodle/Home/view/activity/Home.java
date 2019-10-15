@@ -307,7 +307,7 @@ public class Home extends AppCompatActivity implements
         loadCompleteListener = new LoadCompleteListener() {
             @Override
             public void onLoadInitial() {
-                showProgressBar();
+                showProgressBar(getString(R.string.loading));
             }
 
             @Override
@@ -902,7 +902,8 @@ public class Home extends AppCompatActivity implements
         dialog.show();
     }
 
-    private void showProgressBar() {
+    private void showProgressBar(String title) {
+        progressDialog.setMessage(title);
         progressDialog.show();
     }
 
@@ -1523,7 +1524,7 @@ public class Home extends AppCompatActivity implements
     }
 
     private void getSinglePostFilters(String filter, boolean isAllCategory) {
-        showProgressBar();
+        showProgressBar(getString(R.string.loading));
         Call<SinglePostFilters> call = webService.sendSinglePostFilters(deviceId, userId, token, userId);
         call.enqueue(new Callback<SinglePostFilters>() {
             @Override
@@ -1571,7 +1572,7 @@ public class Home extends AppCompatActivity implements
     }
 
     private void getPostFilters(String filter, boolean isAllCategory) {
-        showProgressBar();
+        showProgressBar(getString(R.string.loading));
         Call<PostFilters> call = webService.sendPostFilters(deviceId, userId, token, userId, filter);
         call.enqueue(new Callback<PostFilters>() {
             @Override
@@ -1688,7 +1689,7 @@ public class Home extends AppCompatActivity implements
     }
 
     private void sendLogoutRequest(Call<String> call) {
-
+        showProgressBar(getString(R.string.logging_out));
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
@@ -1710,14 +1711,19 @@ public class Home extends AppCompatActivity implements
                             e.printStackTrace();
                         }
                     } else {
-//                        Tools.toast(Home.this, "Login Unsuccessfull", R.drawable.icon_unchecked);
+                        Tools.toast(Home.this, "Logout failed!", R.drawable.icon_unchecked);
                     }
+                } else {
+                    Tools.toast(Home.this, "Logout failed!", R.drawable.icon_unchecked);
                 }
+                hideProgressBar();
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
                 Log.d("message", t.getMessage());
+                Tools.toast(Home.this, "Logout failed!", R.drawable.icon_unchecked);
+                hideProgressBar();
             }
         });
     }

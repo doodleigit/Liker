@@ -365,6 +365,7 @@ public class Login extends AppCompatActivity implements View.OnClickListener {
         sendFacebookRequest(call);
     }
 
+
     private void socialLoginTwitter(String appSocialAccessCode, String oauthProvider, String oauthId, String deviceId) {
         AuthService webService =
                 AuthService.retrofitBase.create(AuthService.class);

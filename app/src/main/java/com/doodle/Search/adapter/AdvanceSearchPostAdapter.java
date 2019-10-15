@@ -74,7 +74,7 @@ public class AdvanceSearchPostAdapter extends RecyclerView.Adapter<AdvanceSearch
             //   String postDate = Operation.getDurationBreakdown(Long.parseLong(post.getPostDate()));
             //  String postDate = Operation.getDate(Long.parseLong(post.getPostDate()), "dd/MM/yyyy hh:mm:ss.SSS");
             long myMillis = Long.parseLong(post.getPostDate()) * 1000;
-            String postDate = Operation.getFormattedDateFromTimestamp(myMillis);
+            String postDate = Operation.postDateCompare(context, myMillis);
             tvPostDuration.setText(postDate);
             tvPostLike.setText(post.getTotalLike() + " " + context.getString(R.string.likes));
             int totalStar = Integer.parseInt(post.getSliverStars()) + Integer.parseInt(post.getGoldStars());

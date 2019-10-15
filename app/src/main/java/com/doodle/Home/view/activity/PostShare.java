@@ -473,7 +473,7 @@ public class PostShare extends AppCompatActivity implements
 
         tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
         long myMillis = Long.parseLong(item.getDateTime()) * 1000;
-        String postDate = Operation.getFormattedDateFromTimestamp(myMillis);
+        String postDate = Operation.postDateCompare(getApplicationContext(), myMillis);
 
         tvPostTime.setText(postDate);
         tvHeaderInfo.setText(builder);

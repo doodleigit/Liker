@@ -14,6 +14,7 @@ import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.format.DateFormat;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.text.style.URLSpan;
@@ -25,12 +26,20 @@ import android.view.animation.AnimationSet;
 import android.view.animation.TranslateAnimation;
 
 
+import com.doodle.R;
+
+import org.joda.time.DateTime;
+import org.joda.time.Days;
+import org.joda.time.Hours;
+import org.joda.time.Minutes;
+
 import java.io.IOException;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class Operation {
@@ -232,22 +241,66 @@ public class Operation {
         return formatter.format(calendar.getTime());
     }
 
-    public static String getFormattedDateFromTimestamp(long timestampInMilliSeconds) {
+//    public static String getFormattedDateFromTimestamp(long timestampInMilliSeconds) {
+//
+//        Date systemDate = Calendar.getInstance().getTime();
+//        systemDate.setTime(timestampInMilliSeconds);
+//        Calendar cal = Calendar.getInstance();
+//        cal.setTimeInMillis(timestampInMilliSeconds);
+//        int postYear = cal.get(Calendar.YEAR);
+//        int thisYear = Calendar.getInstance().get(Calendar.YEAR);
+//        //String formattedDate=new SimpleDateFormat("MMM d, yyyy").format(date);
+//        if (postYear == thisYear) {
+//            String formattedDate = new SimpleDateFormat("MMM d HH:mm aa").format(timestampInMilliSeconds);
+//            return formattedDate;
+//        } else {
+//            String formattedDate = new SimpleDateFormat("MMM d, yyyy HH:mm aa").format(timestampInMilliSeconds);
+//            return formattedDate;
+//        }
+//    }
 
-        Date systemDate = Calendar.getInstance().getTime();
-        systemDate.setTime(timestampInMilliSeconds);
-        Calendar cal = Calendar.getInstance();
-        cal.setTimeInMillis(timestampInMilliSeconds);
-        int postYear = cal.get(Calendar.YEAR);
-        int thisYear = Calendar.getInstance().get(Calendar.YEAR);
-        //String formattedDate=new SimpleDateFormat("MMM d, yyyy").format(date);
-        if (postYear == thisYear) {
-            String formattedDate = new SimpleDateFormat("MMM d HH:mm aa").format(timestampInMilliSeconds);
-            return formattedDate;
+    public static String postDateCompare(Context context, long chatTime) {
+        long today = Calendar.getInstance().getTimeInMillis();
+        DateTime newTime = new DateTime(today);
+        DateTime lastTime = new DateTime(chatTime);
+
+        if (newTime.year().get() == lastTime.year().get()) {
+            Days days = Days.daysBetween(lastTime, newTime);
+            Minutes minutes = Minutes.minutesBetween(lastTime, newTime);
+            Hours hours = Hours.hoursBetween(lastTime, newTime);
+
+            if (minutes.getMinutes() <= 59) {
+                if (minutes.getMinutes() < 1) {
+                    return context.getString(R.string.few_second_ago);
+                } else {
+                    return (minutes.getMinutes() == 1 ? (minutes.getMinutes() + " " + context.getString(R.string.minute_ago)) : (minutes.getMinutes() + " " + context.getString(R.string.minutes_ago)));
+                }
+            } else if (hours.getHours() <= 23) {
+                return (hours.getHours() == 1 ? (hours.getHours() + " " + context.getString(R.string.hour_ago)) : (hours.getHours() + " " + context.getString(R.string.hours_ago)));
+            } else {
+                if (days.getDays() == 1) {
+                    return context.getString(R.string.yesterday);
+                } else {
+                    return getDate(chatTime);
+                }
+            }
         } else {
-            String formattedDate = new SimpleDateFormat("MMM d, yyyy HH:mm aa").format(timestampInMilliSeconds);
-            return formattedDate;
+            return getPastDate(chatTime);
         }
+    }
+
+    private static String getDate(long time) {
+        Calendar cal = Calendar.getInstance(Locale.ENGLISH);
+        cal.setTimeInMillis(time);
+        String date = DateFormat.format("MMM dd", cal).toString();
+        return date;
+    }
+
+    private static String getPastDate(long time) {
+        Calendar cal = Calendar.getInstance(Locale.ENGLISH);
+        cal.setTimeInMillis(time);
+        String date = DateFormat.format("MMM dd, yyyy", cal).toString();
+        return date;
     }
 
 //

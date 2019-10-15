@@ -309,7 +309,7 @@ public class VideoHolder extends RecyclerView.ViewHolder {
             sharedCategoryName=item.getCatName();
             SpannableStringBuilder builder = getSpannableStringShareHeader(sharedUserProfileLike, "", sharedTotalStar, sharedCategoryName);
             long myMillis = Long.parseLong(sharedDateTime) * 1000;
-            String postDate = Operation.getFormattedDateFromTimestamp(myMillis);
+            String postDate = Operation.postDateCompare(mContext, myMillis);
             //    tvSharePostTime.setText(chatDateCompare(mContext,myMillis));
             tvSharePostUserName.setText(sharedFullName);
             tvShareHeaderInfo.setText(builder);
@@ -529,7 +529,7 @@ public class VideoHolder extends RecyclerView.ViewHolder {
 
         tvPostUserName.setText(String.format("%s %s", item.getUserFirstName(), item.getUserLastName()));
         long myMillis = Long.parseLong(item.getDateTime()) * 1000;
-        String postDate = Operation.getFormattedDateFromTimestamp(myMillis);
+        String postDate = Operation.postDateCompare(mContext, myMillis);
         tvPostTime.setText(postDate);
         tvHeaderInfo.setText(builder);
 
