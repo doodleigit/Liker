@@ -354,16 +354,16 @@ public class Home extends AppCompatActivity implements
         navLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LoginInfo loginInfo = new LoginInfo(manager.getUserInfo(), manager.getToken(), manager.getProfileName(), manager.getProfileImage(), manager.getProfileId(), manager.getUserName(), manager.getDeviceId());
-                Intent loginAgain = new Intent(Home.this, LoginAgain.class);
-                loginAgain.putExtra("login_info", loginInfo);
-                manager.pref.edit().clear().apply();
-                stopService(new Intent(Home.this, DataFetchingService.class));
-                startActivity(loginAgain);
-                finish();
+//                LoginInfo loginInfo = new LoginInfo(manager.getUserInfo(), manager.getToken(), manager.getProfileName(), manager.getProfileImage(), manager.getProfileId(), manager.getUserName(), manager.getDeviceId());
+//                Intent loginAgain = new Intent(Home.this, LoginAgain.class);
+//                loginAgain.putExtra("login_info", loginInfo);
+//                manager.pref.edit().clear().apply();
+//                stopService(new Intent(Home.this, DataFetchingService.class));
+//                startActivity(loginAgain);
+//                finish();
 
-//                Call<String> call = webService.setLogout(deviceId, token, userId, userId);
-//                sendLogoutRequest(call);
+                Call<String> call = webService.setLogout(deviceId, token, userId, userId);
+                sendLogoutRequest(call);
             }
         });
 
